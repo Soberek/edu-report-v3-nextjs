@@ -1,20 +1,9 @@
 "use client";
 import React from "react";
-import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Box,
-  Typography,
-  Divider,
-  useTheme,
-} from "@mui/material";
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Typography, Divider, useTheme } from "@mui/material";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navRoutes } from "../../providers/RouterProvider";
+import { navRoutes } from "@/constants/nav-routes";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import PeopleIcon from "@mui/icons-material/People";
@@ -35,22 +24,16 @@ const getRouteIcon = (path: string) => {
   return iconMap[path] || <DashboardIcon />;
 };
 
-interface SideDrawerProps {
-  handleOpenDrawer: (open: boolean) => void;
-  handleDrawerClose: () => void;
-  open: boolean;
-}
-
-const SideDrawer: React.FC<SideDrawerProps> = ({ handleDrawerClose, open }) => {
+const SideDrawer: React.FC = () => {
   const theme = useTheme();
   const pathname = usePathname();
   const navContext = useNavContext();
-  const { isDrawerOpen, handleDrawerOpen, handleDrawerClose: closeDrawer } = navContext;
+  const { isDrawerOpen, handleDrawerOpen, handleDrawerClose } = navContext;
   return (
     <Drawer
       anchor="left"
       open={isDrawerOpen}
-      onClose={closeDrawer}
+      onClose={handleDrawerClose}
       sx={{
         "& .MuiDrawer-paper": {
           width: drawerWidth,
