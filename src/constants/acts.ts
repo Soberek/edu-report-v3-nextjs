@@ -22,8 +22,7 @@ export const WYKAZ_AKT = {
       "1": {
         code: "966.1",
         name: "Trzymaj formę",
-        description:
-          "Program mający na celu zapobieganie otyłości wśród dzieci.",
+        description: "Program mający na celu zapobieganie otyłości wśród dzieci.",
         archiveCategory: "BE10",
         subCategories: {},
       },
@@ -58,8 +57,7 @@ export const WYKAZ_AKT = {
       "6": {
         code: "966.6",
         name: "Profilaktyka używania napojów energetycznych i substancji psychoaktywnych",
-        description:
-          "Program mający na celu zapobieganie używaniu napojów energetycznych i substancji psychoaktywnych.",
+        description: "Program mający na celu zapobieganie używaniu napojów energetycznych i substancji psychoaktywnych.",
         archiveCategory: "BE10",
         subCategories: {},
       },
@@ -73,16 +71,14 @@ export const WYKAZ_AKT = {
       "8": {
         code: "966.8",
         name: "Profilaktyka chorób zakaźnych i odzwierzęcych",
-        description:
-          "Program mający na celu zapobieganie chorobom zakaźnym i odzwierzęcym",
+        description: "Program mający na celu zapobieganie chorobom zakaźnym i odzwierzęcym",
         archiveCategory: "BE10",
         subCategories: {},
       },
       "9": {
         code: "966.9",
         name: "Profilaktyka chorób nowotworowych",
-        description:
-          "Program mający na celu zapobieganie chorobom nowotworowym",
+        description: "Program mający na celu zapobieganie chorobom nowotworowym",
         archiveCategory: "BE10",
         subCategories: {},
       },
