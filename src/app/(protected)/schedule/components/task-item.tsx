@@ -1,0 +1,291 @@
+import dayjs from "dayjs";
+
+import { type TaskType } from "@/constants/tasks";
+
+import type { Program } from "@/types";
+import { Box, Button, Modal, Typography, Chip, IconButton, Paper } from "@mui/material";
+
+import { Delete as DeleteIcon, DoneAll, Close } from "@mui/icons-material";
+import { DateField } from "@mui/x-date-pickers/DateField";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
+
+type Props = {
+  task: ScheduledTaskType;
+  program: Program | undefined;
+  taskType: TaskType | undefined;
+  updateTask: (id: string, updates: Partial<ScheduledTaskType>) => void;
+  deleteTask: (id: string) => void;
+};
+
+export const Task: React.FC<Props> = ({
+  task,
+  // program,
+  taskType,
+  updateTask,
+  deleteTask,
+}) => {
+  const [openStatusChange, setOpenStatusChange] = useState(false);
+  const isCompleted = task.status === "completed";
+
+  const getTaskTypeEmoji = (taskType: TaskType["label"] | undefined) => {
+    if (!taskType) return "📝";
+
+    const emojiMap: { [key: string]: string } = {
+      prelekcja: "🎤",
+      warsztaty: "🛠️",
+      szkolenie: "📚",
+      wykład: "👨‍🏫",
+      "stoisko informacyjne-edukacyjne": "🏢",
+      konkurs: "🏆",
+      "list intencyjny": "✉️",
+      "publikacja media": "📰",
+      dystrybucja: "📦",
+      sprawozdanie: "📝",
+      wizytacja: "👀",
+      instruktaż: "🧑‍🔧",
+    };
+
+    return emojiMap[taskType] || "📝";
+  };
+
+  const handleToggleStatus = (date?: string) => {
+    if (task.status === "pending") {
+      if (!date) return;
+      const today = dayjs(date);
+      if (!today.isValid()) {
+        alert("Nieprawidłowa data. Użyj formatu YYYY-MM-DD.");
+        return;
+      }
+      updateTask(task.id, {
+        taskTypeId: task.taskTypeId,
+        programId: task.programId,
+        dueDate: task.dueDate,
+        description: task.description,
+        completedDate: today.format("YYYY-MM-DD"),
+        status: "completed",
+      });
+    }
+    if (task.status === "completed") {
+      updateTask(task.id, {
+        taskTypeId: task.taskTypeId,
+        programId: task.programId,
+        dueDate: task.dueDate,
+        description: task.description,
+        completedDate: "",
+        status: "pending",
+      });
+    }
+  };
+
+  const openModal = () => setOpenStatusChange(true);
+  const closeModal = () => setOpenStatusChange(false);
+
+  const { control, handleSubmit } = useForm<{ completedDate: string }>({
+    defaultValues: {
+      completedDate: dayjs(task.dueDate).format("YYYY-MM-DD"),
+    },
+  });
+
+  return (
+    <>
+      {/* Modal */}
+      <Modal open={openStatusChange} onClose={closeModal}>
+        <Paper
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: { xs: "90%", sm: 400 },
+            maxWidth: 500,
+            p: 3,
+            borderRadius: 3,
+            boxShadow: 24,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
+            }}
+          >
+            <Typography variant="h6" component="h2" fontWeight={600}>
+              Zmień status zadania
+            </Typography>
+            <IconButton onClick={closeModal} size="small">
+              <Close />
+            </IconButton>
+          </Box>
+
+          <Box
+            component="form"
+            onSubmit={handleSubmit((data) => {
+              handleToggleStatus(data.completedDate);
+              closeModal();
+            })}
+            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+          >
+            <Controller
+              name="completedDate"
+              control={control}
+              render={({ field }) => (
+                <DateField
+                  label="Data ukończenia"
+                  value={field.value ? dayjs(field.value) : null}
+                  onChange={(newValue) => {
+                    field.onChange(newValue ? newValue.format("YYYY-MM-DD") : "");
+                  }}
+                  format="DD-MM-YYYY"
+                  fullWidth
+                />
+              )}
+            />
+
+            <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
+              <Button variant="outlined" onClick={closeModal}>
+                Anuluj
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  background: "linear-gradient(45deg, #388700ff 30%, #14c947ff 90%)",
+                  "&:hover": { opacity: 0.9 },
+                }}
+              >
+                Potwierdź
+              </Button>
+            </Box>
+          </Box>
+        </Paper>
+      </Modal>
+
+      {/* Compact Task Card */}
+      <Paper
+        elevation={isCompleted ? 1 : 2}
+        sx={{
+          p: 1.5,
+          mb: 1,
+          borderRadius: 1,
+          border: "1px solid",
+          borderColor: isCompleted ? "success.main" : "grey.300",
+          backgroundColor: isCompleted ? "success.50" : "background.paper",
+          opacity: isCompleted ? 0.85 : 1,
+          transition: "all 0.2s ease",
+          "&:hover": {
+            borderColor: isCompleted ? "success.dark" : "primary.main",
+            boxShadow: 2,
+          },
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          {/* Compact Status Indicator */}
+          <Box
+            sx={{
+              width: 20,
+              height: 20,
+              border: "2px solid",
+              borderColor: isCompleted ? "success.main" : "grey.300",
+              borderRadius: "50%",
+              backgroundColor: isCompleted ? "success.main" : "transparent",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            {isCompleted && <Typography sx={{ fontSize: "10px", color: "white" }}>✓</Typography>}
+          </Box>
+
+          {/* Task Type Emoji */}
+          <Typography sx={{ fontSize: "16px" }}>{getTaskTypeEmoji(taskType?.label)}</Typography>
+
+          {/* Main Content */}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                textDecoration: isCompleted ? "line-through" : "none",
+                color: isCompleted ? "text.secondary" : "text.primary",
+                fontWeight: 500,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {taskType?.label} - {task.description || "Brak opisu"}
+            </Typography>
+          </Box>
+
+          {/* Compact Info */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {isCompleted && (
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                sx={{
+                  color: "text.secondary",
+                  fontSize: "11px",
+                  textDecoration: "underline",
+                }}
+              >
+                Wykonano: {dayjs(task.completedDate).format("DD.MM.YYYY")}
+              </Typography>
+            )}
+            <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "11px" }}>
+              Zaplanowana data: {dayjs(task.dueDate).format("DD.MM.YYYY")}
+            </Typography>
+
+            <Chip
+              label={task.status === "completed" ? "✓" : "⏳"}
+              size="small"
+              color={task.status === "completed" ? "success" : "warning"}
+              sx={{ height: 20, fontSize: "10px" }}
+            />
+          </Box>
+
+          {/* Compact Action Buttons */}
+          <Box sx={{ display: "flex", gap: 0.5 }}>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                openModal();
+              }}
+              sx={{
+                width: 24,
+                height: 24,
+                background: "linear-gradient(45deg, #388700ff 30%, #14c947ff 90%)",
+                color: "white",
+                "&:hover": { opacity: 0.8 },
+              }}
+            >
+              <DoneAll sx={{ fontSize: 14 }} />
+            </IconButton>
+
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteTask(task.id);
+              }}
+              sx={{
+                width: 24,
+                height: 24,
+                background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+                color: "white",
+                "&:hover": { opacity: 0.8 },
+              }}
+            >
+              <DeleteIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          </Box>
+        </Box>
+      </Paper>
+    </>
+  );
+};
