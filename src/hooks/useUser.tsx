@@ -1,5 +1,5 @@
 // Hook do łatwego użycia kontekstu w innych komponentach
-
+"use client";
 import { createContext, useContext } from "react";
 import type { User } from "firebase/auth";
 
