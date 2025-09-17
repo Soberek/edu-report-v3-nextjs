@@ -21,7 +21,7 @@ export const navRoutes: Array<{
   },
   {
     title: "Spisy spraw",
-    path: "acts",
+    path: "spisy-spraw",
     category: "database",
   },
 
