@@ -7,6 +7,7 @@ import { ThemeProvider } from "@mui/material";
 import Navbar from "@/components/ui/top-navbar";
 import { NavProvider } from "@/providers/NavProvider";
 import SideDrawer from "@/components/ui/side-drawer";
+import { UserProvider } from "@/providers/UserContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,11 +33,13 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
-            <NavProvider>
-              <Navbar />
-              <SideDrawer />
-              {children}
-            </NavProvider>
+            <UserProvider>
+              <NavProvider>
+                <Navbar />
+                <SideDrawer />
+                {children}
+              </NavProvider>
+            </UserProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
