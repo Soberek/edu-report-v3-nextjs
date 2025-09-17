@@ -6,6 +6,7 @@ import theme from "@/providers/ThemeProvider";
 import { ThemeProvider } from "@mui/material";
 import Navbar from "@/components/ui/top-navbar";
 import { NavProvider } from "@/providers/NavProvider";
+import SideDrawer from "@/components/ui/side-drawer";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
           <ThemeProvider theme={theme}>
             <NavProvider>
               <Navbar />
+              <SideDrawer />
               {children}
             </NavProvider>
           </ThemeProvider>
