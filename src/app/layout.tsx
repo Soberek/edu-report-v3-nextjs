@@ -8,6 +8,9 @@ import Navbar from "@/components/ui/top-navbar";
 import { NavProvider } from "@/providers/NavProvider";
 import SideDrawer from "@/components/ui/side-drawer";
 import { UserProvider } from "@/providers/UserContext";
+import { SearchProvider } from "@/providers/SearchProvider";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -32,15 +35,19 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            <UserProvider>
-              <NavProvider>
-                <Navbar />
-                <SideDrawer />
-                {children}
-              </NavProvider>
-            </UserProvider>
-          </ThemeProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+            <ThemeProvider theme={theme}>
+              <SearchProvider>
+                <UserProvider>
+                  <NavProvider>
+                    <Navbar />
+                    <SideDrawer />
+                    {children}
+                  </NavProvider>
+                </UserProvider>
+              </SearchProvider>
+            </ThemeProvider>
+          </LocalizationProvider>
         </AppRouterCacheProvider>
       </body>
     </html>
