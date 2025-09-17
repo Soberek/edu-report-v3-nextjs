@@ -3,7 +3,7 @@ import React, { useMemo, useCallback } from "react";
 import { Box, Typography, Alert } from "@mui/material";
 
 import ExcelUploaderUploadButtons from "./components/upload-buttons";
-import ExcelUploaderMonthsButtons from "./components/buttons";
+import ExcelUploaderMonthsButtons from "./components/month-buttons";
 import saveExcelToFile from "./components/useExcelFileSaver";
 import ExcelTable from "./components/table";
 import { aggregateData } from "./components/processExcelData";
