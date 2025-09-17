@@ -1,0 +1,131 @@
+"use client";
+import React from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/config";
+import { useUser } from "@/hooks/useUser";
+import { Box, Button, TextField, Typography, Paper, Link as MuiLink, Alert, CircularProgress } from "@mui/material";
+import { useForm } from "react-hook-form";
+
+type FormData = {
+  email: string;
+  password: string;
+};
+
+const SignIn: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const router = useRouter();
+
+  const onSubmit = async (data: FormData) => {
+    setErrorMessage(null);
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      router.push("/");
+    } catch (error: unknown) {
+      const message = "Wystąpił błąd podczas logowania.";
+      setErrorMessage(message);
+      if (error instanceof Error) {
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error signing in:", error.message);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const userContext = useUser();
+
+  if (userContext.user) {
+    router.push("/");
+    return null;
+  }
+
+  return (
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      minHeight="100vh"
+      sx={{
+        background: "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)",
+      }}
+    >
+      <Paper
+        elevation={6}
+        sx={{
+          p: 4,
+          borderRadius: 3,
+          minWidth: 320,
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+        }}
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <Typography variant="h5" fontWeight={700} color="primary" textAlign="center" gutterBottom>
+          Zaloguj się
+        </Typography>
+        <TextField
+          type="email"
+          label="Email"
+          variant="outlined"
+          required
+          fullWidth
+          autoComplete="email"
+          {...register("email", {
+            required: "Email jest wymagany",
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Nieprawidłowy format email",
+            },
+          })}
+          error={!!errors.email}
+          helperText={errors.email?.message}
+        />
+        <TextField
+          type="password"
+          label="Hasło"
+          required
+          variant="outlined"
+          fullWidth
+          autoComplete="current-password"
+          {...register("password", {
+            required: "Hasło jest wymagane",
+            minLength: {
+              value: 6,
+              message: "Hasło musi mieć co najmniej 6 znaków",
+            },
+          })}
+          error={!!errors.password}
+          helperText={errors.password?.message}
+        />
+        <Button type="submit" variant="contained" color="primary" disabled={loading} fullWidth sx={{ py: 1.5, fontWeight: 600 }}>
+          {loading ? <CircularProgress size={26} color="info" /> : "Zaloguj"}
+        </Button>
+        {errorMessage && (
+          <Alert severity="error" sx={{ mt: -2 }}>
+            {errorMessage}
+          </Alert>
+        )}
+        <Typography variant="body2" textAlign="center" color="text.secondary">
+          Nie masz konta?{" "}
+          <MuiLink component={Link} href="/register" underline="none" color="primary" fontWeight={500}>
+            Zarejestruj się
+          </MuiLink>
+        </Typography>
+      </Paper>
+    </Box>
+  );
+};
+
+export default SignIn;
