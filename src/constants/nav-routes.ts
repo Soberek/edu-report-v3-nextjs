@@ -32,8 +32,8 @@ export const navRoutes: Array<{
     category: "database",
   },
   {
-    title: "Programy",
-    path: "programs",
+    title: "Programy edukacyjne",
+    path: "programy-edukacyjne",
     category: "database",
   },
   {
