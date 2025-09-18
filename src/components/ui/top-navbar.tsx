@@ -163,7 +163,7 @@ const Navbar: React.FC = () => {
         </Box>
 
         {/* Center Section - Search */}
-        <Box sx={{ mx: 4, maxWidth: 450, width: "100%" }}>
+        {/* <Box sx={{ mx: 4, maxWidth: 450, width: "100%" }}>
           <TextField
             value={searchContext?.searchTerm || ""}
             onChange={(e) => searchContext?.setSearchTerm(e.target.value)}
@@ -199,7 +199,7 @@ const Navbar: React.FC = () => {
               },
             }}
           />
-        </Box>
+        </Box> */}
 
         {/* Right Section - User Menu */}
         <Box display="flex" alignItems="center" gap={2}>
