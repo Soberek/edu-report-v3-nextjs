@@ -1,14 +1,15 @@
+"use client";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Button, Typography, Box, MenuItem, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridRenderCellParams, GridColDef } from "@mui/x-data-grid";
 import type { School } from "@/types";
-import { useState } from "react";
+import React, { useState } from "react";
 import { schoolTypes } from "@/constants";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
 
-export const Schools = () => {
+export default function Schools(): React.ReactNode {
   const userContext = useUser();
 
   const {
@@ -248,4 +249,4 @@ export const Schools = () => {
       </Box>
     </div>
   );
-};
+}
