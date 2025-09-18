@@ -10,6 +10,11 @@ export const navRoutes: Array<{
     category: "main",
   },
   {
+    title: "Generuj Informacje z realizacji zadania",
+    path: "wygeneruj-izrz",
+    category: "main",
+  },
+  {
     title: "Harmonogram zadań edukacyjnych",
     path: "schedule",
     category: "main",
