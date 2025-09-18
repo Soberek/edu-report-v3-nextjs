@@ -1,9 +1,10 @@
+"use client";
 import { Box, Alert, Snackbar } from "@mui/material";
 import { useContacts } from "@/hooks/useContact";
 import ContactList from "./components/list";
 import ContactForm from "./components/form";
 
-export const Contacts = () => {
+export default function Contacts(): React.ReactNode {
   const { contacts, loading, error, snackbar, handleContactSubmit, handleContactDelete, handleCloseSnackbar } = useContacts();
 
   return (
@@ -23,4 +24,4 @@ export const Contacts = () => {
       <ContactList contacts={contacts} loading={loading} error={error} handleContactDelete={handleContactDelete} />
     </Box>
   );
-};
+}
