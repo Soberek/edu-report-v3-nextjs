@@ -76,18 +76,14 @@ export type SchoolProgramParticipation = {
   userId: string;
 };
 
-export type SchoolProgramParticipationDTO = Omit<
-  SchoolProgramParticipation,
-  "id" | "createdAt" | "updatedAt" | "userId"
->;
+export type SchoolProgramParticipationDTO = Omit<SchoolProgramParticipation, "id" | "createdAt" | "updatedAt" | "userId">;
 
 export interface Contact {
   id: string;
-  name: string;
-  email: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
   phone?: string;
-  organization?: string;
-  position?: string;
   createdAt: string;
   updatedAt?: string;
   userId: string; // ID użytkownika, który dodał kontakt
