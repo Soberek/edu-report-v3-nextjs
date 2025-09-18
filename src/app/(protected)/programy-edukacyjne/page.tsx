@@ -69,13 +69,11 @@ export default function Programs() {
           Usuń
         </Button>
       ),
-      flex: 0.7,
+      flex: 1,
     },
   ];
 
   const [openForm, setOpenForm] = useState(false);
-
-  console.log(programs);
 
   return (
     <Box
@@ -174,7 +172,7 @@ export default function Programs() {
         </Box>
       )}
 
-      <Box sx={{ mt: 4, px: 2 }}>
+      <Box sx={{ mt: 4, px: 2, width: "100%" }}>
         <Typography variant="h6" gutterBottom>
           Programy
         </Typography>
@@ -183,18 +181,16 @@ export default function Programs() {
         ) : errorMessage ? (
           <Typography color="error">{errorMessage}</Typography>
         ) : (
-          <Box sx={{ width: "100%" }}>
-            <DataGrid
-              rows={programs}
-              columns={columns}
-              getRowId={(row) => row.id}
-              disableRowSelectionOnClick
-              pageSizeOptions={[10, 25, 50]}
-              initialState={{
-                pagination: { paginationModel: { pageSize: 50 } },
-              }}
-            />
-          </Box>
+          <DataGrid
+            rows={programs}
+            columns={columns}
+            getRowId={(row) => row.id}
+            disableRowSelectionOnClick
+            pageSizeOptions={[10, 25, 50]}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 50 } },
+            }}
+          />
         )}
       </Box>
     </Box>
