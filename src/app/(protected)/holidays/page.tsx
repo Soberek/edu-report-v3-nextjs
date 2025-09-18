@@ -223,7 +223,7 @@ export default function Holidays() {
         "text": "Treść posta z emoji i wezwaniem do działania (max 280 znaków)",
         "imageUrl": "",
         "tags": "tagi do posta, oddzielone przecinkami, angielskie",
-        "postingTime": "czas publikacji w formacie RRRR-MM-DD HH:MM"
+        "postingTime": "czas publikacji w formacie 2025-MM-DD HH:MM"
       },
       ...
       ]`;
@@ -316,52 +316,20 @@ export default function Holidays() {
 
     const csvRows: any[] = [];
 
-    if (Array.isArray(state.separatedHolidaysFromOpenAi)) {
-      // Map the array returned by OpenAI into rows for Excel
-      for (const h of state.separatedHolidaysFromOpenAi) {
-        csvRows.push({
-          id: h.id,
-          title: h.title,
-          description: h.description,
-          query: h.query,
-        });
-      }
-    } else {
-      // Fallback: parse CSV string if for some reason the value is a string
-      const csvContentSource = String(state.separatedHolidaysFromOpenAi || "");
-      const csvMatch = csvContentSource.match(/Data;Nazwa święta\n([\s\S]*?)(?:\n```|$)/);
-      const csvContent = csvMatch ? csvMatch[1] : csvContentSource;
-
-      const lines = csvContent.split("\n").filter((line) => line.trim() !== "");
-
-      for (const line of lines) {
-        if (line.includes("Text;Image URL;Tags;Posting Time")) {
-          continue;
-        }
-
-        const parts = line.split(";");
-
-        if (parts.length === 2) {
-          // Health holidays CSV
-          const [date, name] = parts;
-          csvRows.push({
-            Data: date?.trim().replace(/\\/g, "") || "",
-            NazwaŚwięta: name?.trim().replace(/\\/g, "") || "",
-          });
-        } else if (parts.length >= 4) {
-          // Posts CSV
-          const [text, imageUrl, tags, postingTime] = parts;
-          csvRows.push({
-            Text: text?.trim().replace(/\\/g, "").replace(/"/g, "") || "",
-            ImageURL: imageUrl?.trim() || "",
-            Tags: tags?.trim() || "",
-            PostingTime: postingTime?.trim() || "",
-          });
-        }
-      }
+    if (!Array.isArray(state.separatedHolidaysFromOpenAi) && typeof state.separatedHolidaysFromOpenAi === "string") {
+      dispatch({ type: "SET_ERROR", payload: "No holidays to export" });
+      return;
     }
 
-    console.log("Parsed CSV Rows:", csvRows);
+    // Map the array returned by OpenAI into rows for Excel
+    for (const h of state.separatedHolidaysFromOpenAi) {
+      csvRows.push({
+        id: h.id,
+        title: h.title,
+        description: h.description,
+        query: h.query,
+      });
+    }
 
     // to xlsx
     const worksheet = XLSX.utils.json_to_sheet(csvRows);
