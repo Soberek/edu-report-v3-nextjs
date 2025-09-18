@@ -92,7 +92,9 @@ function Schedule(): JSX.Element {
 
   return (
     <>
-      <Button onClick={() => setOpenScheduleTaskForm(true)}>Dodaj zadanie</Button>
+      <Box sx={{ display: "flex", justifyContent: "flex-start", mx: 2, mt: 2 }}>
+        <Button onClick={() => setOpenScheduleTaskForm(true)}>Dodaj zadanie</Button>
+      </Box>
       <Modal open={openScheduleTaskForm} onClose={() => setOpenScheduleTaskForm(false)}>
         <Box sx={{ p: 4, bgcolor: "white", margin: "10% auto", maxWidth: 600 }}>
           <TaskForm createTask={handleScheduledTaskCreation} refetch={refetch} userId={user?.uid} loading={loading} />
@@ -116,24 +118,7 @@ function Schedule(): JSX.Element {
           Filtruj po miesiącu:
         </Typography>
         {Object.entries(months).map(([key, label]) => (
-          <Button
-            key={key}
-            onClick={() => setFilter((prev) => ({ ...prev, month: key }))}
-            size="small"
-            sx={{
-              minWidth: "auto",
-              px: 2,
-              py: 0.5,
-              fontSize: "0.875rem",
-              textTransform: "none",
-              borderRadius: 2,
-              transition: "all 0.2s ease-in-out",
-              "&:hover": {
-                transform: "translateY(-1px)",
-                boxShadow: 2,
-              },
-            }}
-          >
+          <Button key={key} onClick={() => setFilter((prev) => ({ ...prev, month: key }))} size="small">
             {label}
           </Button>
         ))}
@@ -156,23 +141,7 @@ function Schedule(): JSX.Element {
         <Typography variant="subtitle1" sx={{ width: "100%", mb: 1, fontWeight: 500 }}>
           Filtruj po programie:
         </Typography>
-        <Button
-          onClick={() => setFilter((prev) => ({ ...prev, programId: "" }))}
-          size="small"
-          sx={{
-            minWidth: "auto",
-            px: 2,
-            py: 0.5,
-            fontSize: "0.875rem",
-            textTransform: "none",
-            borderRadius: 2,
-            transition: "all 0.2s ease-in-out",
-            "&:hover": {
-              transform: "translateY(-1px)",
-              boxShadow: 2,
-            },
-          }}
-        >
+        <Button onClick={() => setFilter((prev) => ({ ...prev, programId: "" }))} size="small">
           Wszystkie
         </Button>
         {programs.map((program) => (
@@ -181,19 +150,6 @@ function Schedule(): JSX.Element {
             onClick={() => setFilter((prev) => ({ ...prev, programId: program.id }))}
             variant={filter.programId === program.id ? "contained" : "outlined"}
             size="small"
-            sx={{
-              minWidth: "auto",
-              px: 2,
-              py: 0.5,
-              fontSize: "0.875rem",
-              textTransform: "none",
-              borderRadius: 2,
-              transition: "all 0.2s ease-in-out",
-              "&:hover": {
-                transform: "translateY(-1px)",
-                boxShadow: 2,
-              },
-            }}
           >
             {program.code} {program.name}
           </Button>
