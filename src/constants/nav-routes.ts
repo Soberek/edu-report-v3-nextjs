@@ -52,4 +52,9 @@ export const navRoutes: Array<{
     path: "holidays",
     category: "main",
   },
+  {
+    title: "Generator postów",
+    path: "generator-postow",
+    category: "main",
+  },
 ];
