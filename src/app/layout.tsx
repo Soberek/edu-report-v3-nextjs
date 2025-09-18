@@ -9,8 +9,7 @@ import { NavProvider } from "@/providers/NavProvider";
 import SideDrawer from "@/components/ui/side-drawer";
 import { UserProvider } from "@/providers/UserContext";
 import { SearchProvider } from "@/providers/SearchProvider";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import LocalizationProviderClient from "@/providers/LocalizationProvder";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -35,7 +34,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AppRouterCacheProvider>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+          <LocalizationProviderClient>
             <ThemeProvider theme={theme}>
               <SearchProvider>
                 <UserProvider>
@@ -47,7 +46,7 @@ export default function RootLayout({
                 </UserProvider>
               </SearchProvider>
             </ThemeProvider>
-          </LocalizationProvider>
+          </LocalizationProviderClient>
         </AppRouterCacheProvider>
       </body>
     </html>
