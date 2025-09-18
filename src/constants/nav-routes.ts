@@ -47,4 +47,9 @@ export const navRoutes: Array<{
   //   path: "canva",
   //   category: 'main',
   // },
+  {
+    title: "Nietypowe święta",
+    path: "holidays",
+    category: "main",
+  },
 ];
