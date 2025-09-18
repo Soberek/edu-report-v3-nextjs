@@ -107,7 +107,7 @@ export default function Holidays() {
     dispatch({ type: "SET_LOADING", payload: true });
 
     try {
-      const res = await fetch("/holidays/api/scrape-holidays", {
+      const res = await fetch("/api/scrape-holidays", {
         cache: "no-store",
         method: "POST",
         headers: { "Content-Type": "application/json" },
