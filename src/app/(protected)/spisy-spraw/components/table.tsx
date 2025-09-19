@@ -45,7 +45,7 @@ const baseColumns: GridColDef[] = [
   // The delete column will be added dynamically in the component
 ];
 
-export const ActCaseRecordsTable = React.memo<Props>(({ caseRecords, deleteCaseRecord, loading }: Props) => {
+export function ActCaseRecordsTable({ caseRecords, deleteCaseRecord, loading }: Props): React.ReactNode {
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -91,4 +91,4 @@ export const ActCaseRecordsTable = React.memo<Props>(({ caseRecords, deleteCaseR
       />
     </Box>
   );
-});
+}
