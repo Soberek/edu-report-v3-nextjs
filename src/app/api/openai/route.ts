@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       response: completion.choices[0].message?.content,
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Nieznany błąd" }, { status: 500 });
   }
 }
