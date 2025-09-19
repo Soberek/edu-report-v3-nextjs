@@ -185,7 +185,7 @@ export default function Holidays() {
       if (Array.isArray(result)) {
         parsed = result;
       } else if (parsed && typeof parsed === "object" && "holidays" in parsed) {
-        parsed = (parsed as any).holidays;
+        parsed = parsed.holidays as EducationalHolidayWithQuery[];
       }
 
       // Validate parsed data
@@ -240,7 +240,7 @@ export default function Holidays() {
 
       // If the response is wrapped in an object with a "holidays_posts" key
       if (parsedPosts && typeof parsedPosts === "object" && "holidays_posts" in parsedPosts) {
-        parsedPosts = (parsedPosts as any).holidays_posts;
+        parsedPosts = (parsedPosts as { holidays_posts: Post[] }).holidays_posts;
       }
 
       if (!Array.isArray(parsedPosts)) {
@@ -303,6 +303,14 @@ export default function Holidays() {
     }
   };
 
+  interface CsvRow {
+    id: number;
+    title: string;
+    description: string;
+    query: string;
+    date: string;
+    name: string;
+  }
   // Step 5 Canva. Export health-related holidays and generated posts to Excel file
   function exportHolidaysToExcel() {
     /*
@@ -314,7 +322,7 @@ export default function Holidays() {
     */
     // Handle both parsed array (EducationalHolidayWithQuery[]) and fallback CSV string
 
-    const csvRows: any[] = [];
+    const csvRows: CsvRow[] = [];
 
     if (!Array.isArray(state.separatedHolidaysFromOpenAi) && typeof state.separatedHolidaysFromOpenAi === "string") {
       dispatch({ type: "SET_ERROR", payload: "No holidays to export" });
@@ -328,6 +336,8 @@ export default function Holidays() {
         title: h.title,
         description: h.description,
         query: h.query,
+        date: h.dateForThisYear,
+        name: h.title,
       });
     }
 
