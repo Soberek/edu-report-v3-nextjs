@@ -17,7 +17,7 @@ interface FormData {
 }
 
 type FormAction =
-  | { type: "SET_FIELD"; name: keyof FormData; value: any }
+  | { type: "SET_FIELD"; name: keyof FormData; value: string | number | boolean }
   | { type: "SET_FILE"; file: File | null }
   | { type: "RESET"; payload?: Partial<FormData> };
 
@@ -62,7 +62,7 @@ export const useRaportDocumentGenerator = () => {
     dispatch({
       type: "SET_FIELD",
       name: name as keyof FormData,
-      value: type === "checkbox" ? checked : value,
+      value: type === "checkbox" ? !!checked : value,
     });
   };
 
