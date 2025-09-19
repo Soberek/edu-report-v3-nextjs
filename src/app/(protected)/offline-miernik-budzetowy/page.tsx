@@ -16,30 +16,29 @@ const MemoizedExcelUploaderUploadButtons = React.memo(ExcelUploaderUploadButtons
 const MemoizedExcelUploaderTable = React.memo(ExcelTable);
 
 // Stats card component
-const StatsCard: React.FC<{
-  icon: string;
-  label: string;
-  value: number | undefined;
-}> = React.memo(({ icon, label, value }) => (
-  <Box
-    sx={{
-      display: "flex",
-      alignItems: "center",
-      gap: 1,
-      padding: 1.5,
-      backgroundColor: "primary.light",
-      borderRadius: 1,
-      minWidth: 200,
-    }}
-  >
-    <Typography variant="h6" component="span">
-      {icon}
-    </Typography>
-    <Typography variant="body1" fontWeight="medium">
-      {label}: {value ?? 0}
-    </Typography>
-  </Box>
-));
+function StatsCard({ icon, label, value }: { icon: string; label: string; value: number | undefined }): React.ReactNode {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        padding: 1.5,
+        backgroundColor: "primary.light",
+        borderRadius: 1,
+        minWidth: 200,
+      }}
+    >
+      <Typography variant="h6" component="span">
+        {icon}
+      </Typography>
+      <Typography variant="body1" fontWeight="medium">
+        {label}: {value ?? 0}
+      </Typography>
+    </Box>
+  );
+}
+const MemoizedStatsCard = React.memo(StatsCard);
 
 const OfflineMiernik: React.FC = () => {
   const { rawData, fileName, handleFileUpload } = useExcelFileReader();
