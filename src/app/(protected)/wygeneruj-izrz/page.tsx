@@ -16,12 +16,11 @@ import { useRaportDocumentGenerator } from "./hooks/useRaportDocumentGenerator";
 
 import type { School } from "@/types";
 import { useUser } from "@/hooks/useUser";
-import { usePrograms } from "@/hooks/useProgram";
+
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { TASK_TYPES } from "@/constants/tasks";
 import { programs } from "@/constants/programs";
 import { useForm, Controller } from "react-hook-form";
-import { useEffect } from "react";
 
 type Templates = "izrz.docx" | "lista_obecnosci.docx";
 
