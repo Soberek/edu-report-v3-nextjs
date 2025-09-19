@@ -71,12 +71,15 @@ export const useRaportDocumentGenerator = () => {
     dispatch({ type: "SET_FILE", file });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setSubmitMessage({ type: "", text: "" });
 
-    const formDataToSend = new FormData(e.currentTarget);
+    const formDataToSend = new FormData();
+
+    for (const [key, value] of Object.entries(data)) {
+      formDataToSend.append(key, value);
+    }
 
     if (formData.templateFile) {
       formDataToSend.set("templateFile", formData.templateFile);
