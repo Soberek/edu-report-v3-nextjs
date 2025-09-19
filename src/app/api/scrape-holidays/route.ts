@@ -44,10 +44,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ holidays: holidaysList });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: `Błąd podczas scrapowania: ${error.message}` },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return NextResponse.json({ error: `Błąd podczas scrapowania: ${error ? (error as Error).message : "Nieznany błąd"}` }, { status: 500 });
   }
 }
