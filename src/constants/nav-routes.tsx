@@ -104,4 +104,16 @@ export const navRoutes: Array<{
     isPrivate: false,
     icon: <FaUserPlus />,
   },
+  {
+    title: "TODO",
+    path: "todo",
+    category: "main",
+    isPrivate: true,
+  },
+  {
+    title: "Czerniak",
+    path: "czerniak",
+    category: "main",
+    isPrivate: true,
+  },
 ];
