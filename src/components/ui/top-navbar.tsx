@@ -162,45 +162,6 @@ const Navbar: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Center Section - Search */}
-        {/* <Box sx={{ mx: 4, maxWidth: 450, width: "100%" }}>
-          <TextField
-            value={searchContext?.searchTerm || ""}
-            onChange={(e) => searchContext?.setSearchTerm(e.target.value)}
-            placeholder="Odkryj niesamowite kursy..."
-            variant="outlined"
-            size="medium"
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: theme.palette.primary.main }} />
-                </InputAdornment>
-              ),
-              sx: {
-                background: "rgba(255,255,255,0.95)",
-                backdropFilter: "blur(20px)",
-                borderRadius: 3,
-                border: "1px solid rgba(255,255,255,0.3)",
-                "& .MuiOutlinedInput-notchedOutline": {
-                  border: "none",
-                },
-                "&:hover": {
-                  background: "rgba(255,255,255,1)",
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-                },
-                "&.Mui-focused": {
-                  background: "rgba(255,255,255,1)",
-                  transform: "translateY(-2px)",
-                  boxShadow: `0 15px 50px ${theme.palette.primary.main}33`,
-                },
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              },
-            }}
-          />
-        </Box> */}
-
         {/* Right Section - User Menu */}
         <Box display="flex" alignItems="center" gap={2}>
           {authContext.user ? (
