@@ -4,30 +4,33 @@ import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navRoutes } from "@/constants/nav-routes";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import AnalyticsIcon from "@mui/icons-material/Analytics";
-import PeopleIcon from "@mui/icons-material/People";
-import TuneIcon from "@mui/icons-material/Tune";
 import { useNavContext } from "@/providers/NavProvider";
+import { useUser } from "@/hooks/useUser";
 
 const drawerWidth = 300;
-
-// Icon mapping for routes
-const getRouteIcon = (path: string) => {
-  const iconMap: { [key: string]: React.ReactNode } = {
-    "": <DashboardIcon />,
-    schools: <AnalyticsIcon />,
-    programs: <PeopleIcon />,
-    acts: <TuneIcon />,
-    contacts: <PeopleIcon />,
-  };
-  return iconMap[path] || <DashboardIcon />;
-};
 
 const SideDrawer: React.FC = () => {
   const theme = useTheme();
   const pathname = usePathname();
   const navContext = useNavContext();
+  const isUserLoggedIn = useUser().user?.uid ? true : false;
+
+  // Filter routes based on authentication
+  // show only public routes if not logged in
+  // show only private routes if logged in
+  const filteredNavRoutes = navRoutes.filter((route) => {
+    // if route is private and user is not logged in, hide it
+    // if route is public and user is logged in, hide it
+    if (route.isPrivate === true && !isUserLoggedIn) {
+      return false;
+    } else if (route.isPrivate === false && isUserLoggedIn) {
+      return false;
+    }
+    return true;
+  });
+
+  // Use filtered routes for rendering
+  const navRoutesToRender = filteredNavRoutes;
   const { isDrawerOpen, handleDrawerOpen, handleDrawerClose } = navContext;
   return (
     <Drawer
@@ -43,7 +46,7 @@ const SideDrawer: React.FC = () => {
     >
       <Box sx={{ width: drawerWidth }} role="presentation">
         <List sx={{ px: 1 }}>
-          {navRoutes.map(({ title, path }) => {
+          {navRoutesToRender.map(({ title, path, category, icon }) => {
             const isActive = pathname === path || (pathname === "/" && path === "");
             return (
               <ListItem key={title} disablePadding sx={{ mb: 1 }}>
@@ -78,7 +81,7 @@ const SideDrawer: React.FC = () => {
                       transition: "color 0.3s ease",
                     }}
                   >
-                    {getRouteIcon(path)}
+                    {icon}
                   </ListItemIcon>
                   <ListItemText primary={title} />
                 </ListItemButton>
