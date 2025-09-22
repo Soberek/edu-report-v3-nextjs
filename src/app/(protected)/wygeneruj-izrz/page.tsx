@@ -21,7 +21,7 @@ import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { TASK_TYPES } from "@/constants/tasks";
 import { programs } from "@/constants/programs";
 import { useForm, Controller } from "react-hook-form";
-
+import { OPISY_ZADAN } from "@/constants/opisy-zadan";
 type Templates = "izrz.docx" | "lista_obecnosci.docx";
 
 type FormValues = {
@@ -40,6 +40,8 @@ type FormValues = {
   templateFile: File | null;
 };
 
+const DEFAULT_OPIS_LICZBY_WIDZOW = `Grupa I: \n Szkoła Podstawowa (klasy 1-3): ... osób \n Opiekunowie: \n Szkola Podstawowa (klasy 4-8): ... osób \n Grupa II: \n Szkoła Ponadpodstawowa (klasy 1-3): ... osób \n Dorosli (studenci, nauczyciele, inni dorośli): ... osób \n`;
+
 const defaultValues: FormValues = {
   caseNumber: "",
   reportNumber: "",
@@ -48,7 +50,7 @@ const defaultValues: FormValues = {
   address: "",
   dateInput: "",
   viewerCount: 0,
-  viewerCountDescription: "",
+  viewerCountDescription: DEFAULT_OPIS_LICZBY_WIDZOW,
   taskDescription: "",
   additionalInfo: "",
   attendanceList: false,
@@ -365,7 +367,16 @@ export default function IzrzForm() {
             />
 
             {/* Opis zadania */}
-
+            <Box sx={{ display: "flex", gap: 2, mb: 1, flexWrap: "wrap" }}>
+              <Typography sx={{ mb: 1, color: "primary.main", fontWeight: 600 }}>Opisy zadań</Typography>
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                {Object.entries(OPISY_ZADAN).map(([title, item]) => (
+                  <Button key={title} onClick={() => setValue("taskDescription", item.opis)}>
+                    {item.icon} {title}
+                  </Button>
+                ))}
+              </Box>
+            </Box>
             <Controller
               name="taskDescription"
               control={control}
@@ -378,7 +389,7 @@ export default function IzrzForm() {
                   required
                   fullWidth
                   multiline
-                  minRows={3}
+                  minRows={5}
                   variant="outlined"
                   error={!!errors.taskDescription}
                   sx={{
