@@ -67,7 +67,7 @@ const Navbar: React.FC = () => {
       position="static"
       elevation={0}
       sx={{
-        display: { xs: "none", md: "block" },
+        display: { xs: "block", md: "block" },
         backgroundColor: theme.palette.primary.main,
         backdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(255,255,255,0.1)",
