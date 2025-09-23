@@ -152,7 +152,15 @@ export default function Rak(): React.ReactNode {
   }
 
   return (
-    <Box maxWidth={1200} mx="auto" px={{ xs: 2, md: 4 }} mt={6} mb={6} fontFamily="sans-serif">
+    <Box
+      maxWidth={1200}
+      mx="auto"
+      px={{ xs: 2, md: 4 }}
+      mt={6}
+      mb={6}
+      fontFamily="sans-serif"
+      sx={{ "& *": { outline: "1px solid   ftransparent" } }}
+    >
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={3} gap={2} flexWrap="wrap">
         <Typography variant="h4" fontWeight={700}>
           Quiz: cechy czerniaka (ABCDE) 🔎🩺
@@ -164,6 +172,19 @@ export default function Rak(): React.ReactNode {
             label={`Wynik: ${overallScore ?? 0} / ${CASES.reduce((acc, c) => acc + c.correctFeatures.size, 0)}`}
             color="info"
             variant="filled"
+          />
+        </Box>
+      </Box>
+
+      <Box my={1}>
+        <Box sx={{ height: 8, bgcolor: "grey.200", borderRadius: 2, overflow: "hidden" }}>
+          <Box
+            sx={{
+              width: `${((caseIndex + 1) / CASES.length) * 100}%`,
+              height: "100%",
+              bgcolor: "primary.main",
+              transition: "width 600ms ease-in-out",
+            }}
           />
         </Box>
       </Box>
@@ -207,19 +228,6 @@ export default function Rak(): React.ReactNode {
               <Typography variant="caption" color="text.secondary">
                 {caseIndex + 1} / {CASES.length}
               </Typography>
-            </Box>
-
-            <Box mt={1}>
-              <Box sx={{ height: 8, bgcolor: "grey.200", borderRadius: 2, overflow: "hidden" }}>
-                <Box
-                  sx={{
-                    width: `${((caseIndex + 1) / CASES.length) * 100}%`,
-                    height: "100%",
-                    bgcolor: "primary.main",
-                    transition: "width 300ms ease",
-                  }}
-                />
-              </Box>
             </Box>
           </CardContent>
         </Card>
@@ -282,7 +290,7 @@ export default function Rak(): React.ReactNode {
                               <Checkbox checked={isSelected} onChange={() => toggleFeature(f.key)} disabled={isChecked} color="primary" />
                             }
                             label={
-                              <Typography variant="body2" sx={{ userSelect: "none" }}>
+                              <Typography variant="h5" sx={{ userSelect: "none" }}>
                                 {f.label}
                               </Typography>
                             }
@@ -294,6 +302,7 @@ export default function Rak(): React.ReactNode {
                               label={isCorrect ? "✅ poprawne" : "❌ niepoprawne"}
                               color={isCorrect ? "success" : "default"}
                               size="small"
+                              sx={{ fontWeight: 600 }}
                             />
                           )}
                         </CardContent>
