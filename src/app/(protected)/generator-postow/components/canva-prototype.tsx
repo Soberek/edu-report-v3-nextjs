@@ -1,28 +1,51 @@
 import { Box, InputLabel, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useReducer } from "react";
 
 const containerDimensions = {
   width: 849,
   height: 788,
 };
 
+type State = {
+  img: string | ArrayBuffer | null;
+  imgFileName: string | null;
+};
+
+type Action = { type: "SET_IMAGE"; payload: { img: string | ArrayBuffer; fileName: string } } | { type: "CLEAR_IMAGE" };
+
+const initialState: State = {
+  img: null,
+  imgFileName: null,
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "SET_IMAGE":
+      return { ...state, img: action.payload.img, imgFileName: action.payload.fileName };
+    case "CLEAR_IMAGE":
+      return { ...state, img: null, imgFileName: null };
+    default:
+      return state;
+  }
+}
+
 export const Canva = () => {
-  const [img, setImg] = useState<string | ArrayBuffer | null>();
-  const [imgFileName, setImgFileName] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) return;
     const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (reader.result) {
-          setImg(reader.result);
-          setImgFileName(file.name);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result;
+      if (result) {
+        // readAsDataURL produces a string, but keep type flexible
+        dispatch({ type: "SET_IMAGE", payload: { img: result, fileName: file.name } });
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -48,7 +71,7 @@ export const Canva = () => {
         >
           Wybierz obrazek
         </InputLabel>
-        {img && (
+        {state.img && (
           <Typography
             variant="body2"
             sx={{
@@ -57,7 +80,7 @@ export const Canva = () => {
               fontStyle: "italic",
             }}
           >
-            {imgFileName ? `Plik załadowany ${imgFileName}` : "Brak pliku"}
+            {state.imgFileName ? `Plik załadowany ${state.imgFileName}` : "Brak pliku"}
           </Typography>
         )}
       </Box>
@@ -94,7 +117,7 @@ export const Canva = () => {
             height: "80%",
             border: "1px solid red",
             borderRadius: "16px",
-            backgroundImage: `url(${img})`,
+            backgroundImage: `url(${state.img})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
