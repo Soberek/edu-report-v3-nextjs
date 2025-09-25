@@ -70,6 +70,12 @@ export const navRoutes: Array<{
     icon: <FaBook />,
   },
   {
+    title: "Szkoły w programie",
+    path: "szkoly-w-programie",
+    category: "database",
+    isPrivate: true,
+  },
+  {
     title: "Baza kontaktów",
     path: "contacts",
     category: "database",
