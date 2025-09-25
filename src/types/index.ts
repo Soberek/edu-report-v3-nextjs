@@ -60,24 +60,6 @@ export interface School {
 
 export type SchoolYear = "2024/2025" | "2025/2026" | "2026/2027" | "2027/2028";
 
-export type SchoolProgramParticipation = {
-  id: string;
-  schoolId: string;
-  programId: string;
-  coordinatorId: string;
-  // Rozwiązanie tymczasowe
-  previousCoordinatorId?: string; // ID koordynatora z poprzedniego roku
-  previousParticipationYear?: "2024/2025"; // czy szkoła brała udział w roku szkolnym 2024/2025
-  //
-  schoolYear: SchoolYear;
-  studentCount: number;
-  createdAt: string;
-  notes?: string;
-  userId: string;
-};
-
-export type SchoolProgramParticipationDTO = Omit<SchoolProgramParticipation, "id" | "createdAt" | "updatedAt" | "userId">;
-
 export interface Contact {
   id: string;
   firstName: string;
