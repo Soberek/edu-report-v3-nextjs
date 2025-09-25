@@ -4,9 +4,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-📊 [Live Demo](https://edu-report-v3-nextjs.vercel.app) | 📘 [Documentation](#) | 🐛 [Report Bug](#) | ✨ [Request Feature](#)
+📊 [Live Demo](https://inspekcja.vercel.app) | 📘 [Documentation](#) | 🐛 [Report Bug](#) | ✨ [Request Feature](#)
 
-![Project Screenshot](https://via.placeholder.com/800x400?text=Edu+Report+V3+Screenshot)
 
 ## 📋 Overview
 
@@ -104,7 +103,7 @@ edu-report-v3-nextjs/
     ├── firebase/    # Firebase setup
     ├── public/      # Static assets (images, icons, etc.)
     └── ...          # Other files and folders
-
+```
 ## 🌐 Deployment
 
 This application is optimized for deployment on [Vercel](https://vercel.com):
