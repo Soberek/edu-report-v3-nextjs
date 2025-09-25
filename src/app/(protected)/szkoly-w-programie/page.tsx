@@ -6,7 +6,6 @@ import type { Contact, Program, School } from "@/types";
 import { schoolYears } from "@/constants";
 import { useMemo } from "react";
 
-import { useSchoolProgramParticipation } from "@/hooks/useSchoolProgramParticipation";
 import { SchoolProgramParticipationTable } from "./components/table";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
@@ -21,19 +20,18 @@ import {
 export default function SchoolsProgramParticipation() {
   const userContext = useUser();
 
-  const { data: schools } = useFirebaseData<School>("schools", userContext.user?.uid);
-  const { data: contacts } = useFirebaseData<Contact>("contacts", userContext.user?.uid);
-  const { programs } = usePrograms();
+  const { data: schools, loading: schoolsLoading } = useFirebaseData<School>("schools", userContext.user?.uid);
+  const { data: contacts, loading: contactsLoading } = useFirebaseData<Contact>("contacts", userContext.user?.uid);
+  const { programs, loading: programsLoading } = usePrograms();
 
   const {
-    participations,
-    loading,
-    errorMessage,
-    isSubmitting,
-    // handleParticipationDelete,
-    // handleParticipationUpdate,
-    handleParticipationSubmit,
-  } = useSchoolProgramParticipation();
+    data: schoolProgramParticipation,
+    loading: schoolProgramParticipationLoading,
+    createItem: createSchoolProgramParticipation,
+    error: schoolProgramParticipationError,
+  } = useFirebaseData<SchoolProgramParticipation>("school-program-participation", userContext.user?.uid);
+
+  console.log("data" + schoolProgramParticipation);
 
   const {
     control,
@@ -59,7 +57,8 @@ export default function SchoolsProgramParticipation() {
       console.error("Validation failed:", parsed.error);
       return;
     }
-    await handleParticipationSubmit(parsed.data);
+    // return
+    await createSchoolProgramParticipation({ ...parsed.data });
   };
 
   const schoolsMap: Record<string, School> = useMemo(() => Object.fromEntries(schools.map((s) => [s.id, s])), [schools]);
@@ -67,6 +66,10 @@ export default function SchoolsProgramParticipation() {
   const contactsMap: Record<string, Contact> = useMemo(() => Object.fromEntries(contacts.map((c) => [c.id, c])), [contacts]);
 
   const programsMap: Record<string, Program> = useMemo(() => Object.fromEntries(programs.map((p) => [p.id, p])), [programs]);
+
+  if (schoolsLoading || contactsLoading || programsLoading) {
+    return <CircularProgress />;
+  }
 
   return (
     <>
@@ -230,18 +233,18 @@ export default function SchoolsProgramParticipation() {
             />
           )}
         />
-        <Button type="submit" disabled={isSubmitting} variant="contained">
-          {isSubmitting ? <CircularProgress size={24} /> : "Zapisz"}
+        <Button type="submit" disabled={schoolProgramParticipationLoading} variant="contained">
+          {schoolProgramParticipationLoading ? <CircularProgress size={24} /> : "Zapisz"}
         </Button>
       </Box>
 
       <SchoolProgramParticipationTable
-        participations={participations}
+        participations={schoolProgramParticipation || []}
         schoolsMap={schoolsMap}
         contactsMap={contactsMap}
         programsMap={programsMap}
-        errorMessage={errorMessage}
-        loading={loading}
+        errorMessage={schoolProgramParticipationError}
+        loading={schoolProgramParticipationLoading}
       />
     </>
   );
