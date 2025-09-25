@@ -63,26 +63,7 @@ const Navbar: React.FC = () => {
   const userInitial = authContext.user?.email?.charAt(0).toUpperCase() ?? "U";
 
   return (
-    <AppBar
-      position="static"
-      elevation={0}
-      sx={{
-        display: { xs: "block", md: "block" },
-        backgroundColor: theme.palette.primary.main,
-        backdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(255,255,255,0.1)",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(255,255,255,0.05)",
-          zIndex: -1,
-        },
-      }}
-    >
+    <AppBar position="static" elevation={0}>
       <Toolbar sx={{ justifyContent: "space-between", minHeight: 80, px: 3 }}>
         {/* Left Section - Logo and Menu */}
         <Box display="flex" alignItems="center" gap={2}>
@@ -135,7 +116,7 @@ const Navbar: React.FC = () => {
                 component="h1"
                 fontWeight={800}
                 sx={{
-                  background: "linear-gradient(45deg, #fff, #e3f2fd)",
+                  background: "linear-gradient(45deg, #b80000ff, #7300ffff)",
                   backgroundClip: "text",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -166,24 +147,6 @@ const Navbar: React.FC = () => {
         <Box display="flex" alignItems="center" gap={2}>
           {authContext.user ? (
             <>
-              <IconButton
-                sx={{
-                  background: "rgba(255, 255, 255)",
-                  backdropFilter: "blur(10px)",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  borderRadius: "12px",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    background: "rgba(255,255,255,0.8)",
-                    transform: "translateY(-2px)",
-                  },
-                }}
-              >
-                <Badge badgeContent={3} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-
               <IconButton
                 onClick={handleUserMenuOpen}
                 sx={{
