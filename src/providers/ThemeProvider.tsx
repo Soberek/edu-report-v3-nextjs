@@ -4,16 +4,16 @@ import { createTheme } from "@mui/material";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#7fc70cff",
-      light: "#8fd13f",
-      dark: "#4a9409",
+      main: "#000000ff",
+      light: "#484848",
+      dark: "#000000",
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#098135",
-      light: "#0ba846",
-      dark: "#065c27",
-      contrastText: "#ffffff",
+      main: "#000000ff",
+      light: "#a4a4a4",
+      dark: "#494949",
+      contrastText: "#000000ff",
     },
     background: {
       default: "#f8f9fa",
@@ -28,7 +28,7 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 12,
+    borderRadius: 4,
   },
   components: {
     MuiButton: {
@@ -36,17 +36,20 @@ const theme = createTheme({
         root: ({ theme }) => ({
           color: "black",
           border: "1px solid black",
+          borderRadius: theme.shape.borderRadius,
           boxShadow: "0 4px 0px rgba(0, 0, 0, 0.8)",
           fontWeight: theme.typography.button.fontWeight,
           textTransform: theme.typography.button.textTransform,
           transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           "&:hover": {
+            color: "black",
+            background: "rgba(255, 255, 255, 0.1)",
             transform: "translateY(4px)",
-            boxShadow: "0 0px 0px rgba(99, 199, 12, 0.4)",
+            boxShadow: "0 0px 0px rgba(0, 0, 0, 0.4)",
           },
           "&:active": {
             transform: "translateY(0px)",
-            boxShadow: "0 3px 12px rgba(99, 199, 12, 0.3)",
+            boxShadow: "0 3px 12px rgba(0, 0, 0, 0.3)",
           },
           "&:disabled": {
             background: theme.palette.action.disabled,
@@ -142,8 +145,9 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: ({ theme }) => ({
-          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-          boxShadow: "0 2px 16px rgba(99, 199, 12, 0.2)",
+          color: theme.palette.primary.main,
+          background: "#ffffff",
+          boxShadow: "0 2px 16px rgba(0, 0, 0, 0.2)",
           borderRadius: 0,
         }),
       },
@@ -166,7 +170,7 @@ const theme = createTheme({
     MuiTabs: {
       styleOverrides: {
         indicator: ({ theme }) => ({
-          background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+          background: theme.palette.primary.main,
           height: 3,
           borderRadius: "3px 3px 0 0",
         }),
@@ -187,14 +191,14 @@ const theme = createTheme({
           border: "1px solid",
         }),
         standardSuccess: ({ theme }) => ({
-          backgroundColor: "rgba(99, 199, 12, 0.1)",
+          backgroundColor: "rgba(0, 0, 0, 0.05)",
           borderColor: theme.palette.primary.light,
           color: theme.palette.primary.dark,
         }),
         standardError: () => ({
-          backgroundColor: "rgba(244, 67, 54, 0.1)",
-          borderColor: "#f44336",
-          color: "#d32f2f",
+          backgroundColor: "rgba(0, 0, 0, 0.1)",
+          borderColor: "#757575",
+          color: "#212121",
         }),
       },
     },
