@@ -148,8 +148,11 @@ function Schedule(): JSX.Element {
           <Button
             key={program.id}
             onClick={() => setFilter((prev) => ({ ...prev, programId: program.id }))}
-            variant={filter.programId === program.id ? "contained" : "outlined"}
             size="small"
+            sx={{
+              backgroundColor: filter.programId === program.id ? "black" : "white",
+              color: filter.programId === program.id ? "white" : "black",
+            }}
           >
             {program.code} {program.name}
           </Button>
