@@ -31,8 +31,6 @@ export default function SchoolsProgramParticipation() {
     error: schoolProgramParticipationError,
   } = useFirebaseData<SchoolProgramParticipation>("school-program-participation", userContext.user?.uid);
 
-  console.log("data" + schoolProgramParticipation);
-
   const {
     control,
     handleSubmit,
@@ -50,15 +48,17 @@ export default function SchoolsProgramParticipation() {
   });
 
   const onSubmit = async (data: SchoolProgramParticipationDTO) => {
-    console.log(data);
+    console.log("Creating...");
 
     const parsed = schoolProgramParticipationDTOSchema.safeParse(data);
+
     if (!parsed.success) {
       console.error("Validation failed:", parsed.error);
       return;
     }
     // return
-    await createSchoolProgramParticipation({ ...parsed.data });
+    const result = await createSchoolProgramParticipation({ ...parsed.data });
+    console.log("Create result:", result);
   };
 
   const schoolsMap: Record<string, School> = useMemo(() => Object.fromEntries(schools.map((s) => [s.id, s])), [schools]);
@@ -233,7 +233,7 @@ export default function SchoolsProgramParticipation() {
             />
           )}
         />
-        <Button type="submit" disabled={schoolProgramParticipationLoading} variant="contained">
+        <Button type="submit" disabled={schoolProgramParticipationLoading}>
           {schoolProgramParticipationLoading ? <CircularProgress size={24} /> : "Zapisz"}
         </Button>
       </Box>
