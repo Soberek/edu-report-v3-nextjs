@@ -169,9 +169,22 @@ export function useUnsplashPhotos() {
         throw new Error(`Failed to fetch photo for tag "${tag}" (${response.status}): ${errorText}`);
       }
 
-      const photo: UnsplashPhoto = await response.json();
-      dispatch({ type: "FETCH_SUCCESS", photos: [photo], tag });
-      return photo;
+      const data = await response.json();
+      
+      // Handle both single photo and array of photos
+      let photos: UnsplashPhoto[];
+      if (Array.isArray(data)) {
+        photos = data;
+      } else {
+        photos = [data];
+      }
+      
+      if (photos.length === 0) {
+        throw new Error(`No photos found for tag "${tag}"`);
+      }
+      
+      dispatch({ type: "FETCH_SUCCESS", photos, tag });
+      return photos[0];
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
         return null;
@@ -218,7 +231,16 @@ export function useUnsplashPhotos() {
         throw new Error(`Failed to fetch photos for tag "${tag}" (${response.status}): ${errorText}`);
       }
 
-      const photos: UnsplashPhoto[] = await response.json();
+      const data = await response.json();
+      
+      // Handle both single photo and array of photos
+      let photos: UnsplashPhoto[];
+      if (Array.isArray(data)) {
+        photos = data;
+      } else {
+        photos = [data];
+      }
+      
       dispatch({ type: "FETCH_SUCCESS", photos, tag });
       return photos;
     } catch (err) {
@@ -239,11 +261,13 @@ export function useUnsplashPhotos() {
     // Try each tag until we find a suitable image
     for (const tag of tags) {
       try {
+        console.log(`Trying to fetch image for tag: "${tag}"`);
         const photo = await fetchPhotoByTag(tag, { 
           orientation: "landscape",
           size: "regular"
         });
-        if (photo) {
+        if (photo && photo.urls && photo.urls.regular) {
+          console.log(`Successfully fetched image for tag: "${tag}"`);
           return photo.urls.regular;
         }
       } catch (error) {
@@ -254,11 +278,13 @@ export function useUnsplashPhotos() {
     // Try fallback tag if provided
     if (fallbackTag) {
       try {
+        console.log(`Trying fallback tag: "${fallbackTag}"`);
         const photo = await fetchPhotoByTag(fallbackTag, { 
           orientation: "landscape",
           size: "regular"
         });
-        if (photo) {
+        if (photo && photo.urls && photo.urls.regular) {
+          console.log(`Successfully fetched fallback image for tag: "${fallbackTag}"`);
           return photo.urls.regular;
         }
       } catch (error) {
@@ -266,6 +292,7 @@ export function useUnsplashPhotos() {
       }
     }
 
+    console.warn("No images found for any tags");
     return null;
   }, [fetchPhotoByTag]);
 

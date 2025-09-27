@@ -51,8 +51,20 @@ export async function POST(request: Request) {
     
     // Handle both single photo and array of photos
     if (Array.isArray(data)) {
+      if (data.length === 0) {
+        return NextResponse.json(
+          { error: `No photos found for tag "${tag}"` }, 
+          { status: 404 }
+        );
+      }
       return NextResponse.json(data);
     } else {
+      if (!data || !data.id) {
+        return NextResponse.json(
+          { error: `Invalid photo data for tag "${tag}"` }, 
+          { status: 404 }
+        );
+      }
       return NextResponse.json([data]);
     }
   } catch (error) {
