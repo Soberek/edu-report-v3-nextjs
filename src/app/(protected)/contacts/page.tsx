@@ -8,7 +8,8 @@ import ContactStats from "./components/stats";
 import ContactSearch from "./components/search";
 
 export default function Contacts(): React.ReactNode {
-  const { contacts, loading, error, snackbar, handleContactSubmit, handleContactDelete, handleContactUpdate, handleCloseSnackbar } = useContacts();
+  const { contacts, loading, error, snackbar, handleContactSubmit, handleContactDelete, handleContactUpdate, handleCloseSnackbar } =
+    useContacts();
   const [activeTab, setActiveTab] = useState(0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -82,7 +83,13 @@ export default function Contacts(): React.ReactNode {
           {/* Tab 0: Contact List */}
           <Fade in={activeTab === 0} timeout={300}>
             <Box sx={{ display: activeTab === 0 ? "block" : "none" }}>
-              <ContactList contacts={contacts} loading={loading} error={error} handleContactDelete={handleContactDelete} handleContactUpdate={handleContactUpdate} />
+              <ContactList
+                contacts={contacts}
+                loading={loading}
+                error={error}
+                handleContactDelete={handleContactDelete}
+                handleContactUpdate={handleContactUpdate}
+              />
             </Box>
           </Fade>
 
