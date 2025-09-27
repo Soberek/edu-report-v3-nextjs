@@ -1,36 +1,46 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { 
   Box, 
+  TextField, 
+  InputAdornment, 
   Typography, 
   Card, 
   CardContent, 
   Avatar, 
-  IconButton, 
   Chip,
   Grid,
   Paper,
-  Divider,
-  Fade,
-  CircularProgress
+  Divider
 } from "@mui/material";
 import { 
-  Delete, 
-  Edit, 
+  Search, 
+  Person, 
   Email, 
-  Phone, 
-  Person,
-  MoreVert
+  Phone,
+  Clear
 } from "@mui/icons-material";
-import type { Contact } from "@/types";
+import { Contact } from "@/types";
 
-interface Props {
+interface ContactSearchProps {
   contacts: Contact[];
-  loading: boolean;
-  error: string | null;
-  handleContactDelete: (id: string) => void;
 }
 
-export default function ContactList({ contacts, loading, error, handleContactDelete }: Props) {
+export default function ContactSearch({ contacts }: ContactSearchProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredContacts = useMemo(() => {
+    if (!searchTerm.trim()) return contacts;
+    
+    const term = searchTerm.toLowerCase();
+    return contacts.filter(contact => 
+      contact.firstName.toLowerCase().includes(term) ||
+      contact.lastName.toLowerCase().includes(term) ||
+      contact.email?.toLowerCase().includes(term) ||
+      contact.phone?.includes(term) ||
+      `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(term)
+    );
+  }, [contacts, searchTerm]);
+
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
@@ -46,90 +56,92 @@ export default function ContactList({ contacts, loading, error, handleContactDel
     return colors[index];
   };
 
-  if (loading) {
-    return (
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: 200,
-        flexDirection: 'column',
-        gap: 2
-      }}>
-        <CircularProgress size={48} />
-        <Typography variant="h6" color="text.secondary">
-          Ładowanie kontaktów...
-        </Typography>
-      </Box>
-    );
-  }
+  return (
+    <Box>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold', color: '#2c3e50' }}>
+        Wyszukaj kontakty
+      </Typography>
 
-  if (error) {
-    return (
+      {/* Search Input */}
       <Paper 
         elevation={0}
         sx={{ 
-          p: 4, 
-          textAlign: 'center',
-          borderRadius: 3,
-          background: 'linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)',
-          border: '1px solid #ffcdd2'
-        }}
-      >
-        <Typography variant="h6" color="error" sx={{ mb: 1 }}>
-          Błąd ładowania kontaktów
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {error}
-        </Typography>
-      </Paper>
-    );
-  }
-
-  if (contacts.length === 0) {
-    return (
-      <Paper 
-        elevation={0}
-        sx={{ 
-          p: 4, 
-          textAlign: 'center',
+          p: 2, 
+          mb: 3,
           borderRadius: 3,
           background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
           border: '1px solid #e0e0e0'
         }}
       >
-        <Person sx={{ fontSize: 64, color: '#ccc', mb: 2 }} />
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-          Brak kontaktów
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Dodaj swój pierwszy kontakt, aby rozpocząć
-        </Typography>
+        <TextField
+          fullWidth
+          placeholder="Szukaj po imieniu, nazwisku, emailu lub telefonie..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search sx={{ color: '#666' }} />
+              </InputAdornment>
+            ),
+            endAdornment: searchTerm && (
+              <InputAdornment position="end">
+                <Clear 
+                  sx={{ 
+                    color: '#666', 
+                    cursor: 'pointer',
+                    '&:hover': { color: '#1976d2' }
+                  }}
+                  onClick={() => setSearchTerm('')}
+                />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2,
+              background: 'white',
+              '&:hover': {
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#1976d2',
+                },
+              },
+            },
+          }}
+        />
       </Paper>
-    );
-  }
 
-  return (
-    <Box>
-      <Typography 
-        variant="h5" 
-        sx={{ 
-          mb: 3, 
-          fontWeight: 'bold', 
-          color: '#2c3e50',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}
-      >
-        <Person sx={{ color: '#1976d2' }} />
-        Wszystkie kontakty ({contacts.length})
-      </Typography>
+      {/* Results */}
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h6" color="text.secondary">
+          {searchTerm ? `Znaleziono ${filteredContacts.length} kontaktów` : `Wszystkie kontakty (${contacts.length})`}
+        </Typography>
+      </Box>
 
-      <Grid container spacing={3}>
-        {contacts.map((contact, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={contact.id}>
-            <Fade in timeout={300} style={{ transitionDelay: `${index * 100}ms` }}>
+      {/* Contact Cards */}
+      {filteredContacts.length === 0 ? (
+        <Paper 
+          elevation={0}
+          sx={{ 
+            p: 4, 
+            textAlign: 'center',
+            borderRadius: 3,
+            background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+            border: '1px solid #e0e0e0'
+          }}
+        >
+          <Person sx={{ fontSize: 64, color: '#ccc', mb: 2 }} />
+          <Typography variant="h6" color="text.secondary">
+            {searchTerm ? 'Nie znaleziono kontaktów' : 'Brak kontaktów'}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {searchTerm ? 'Spróbuj zmienić kryteria wyszukiwania' : 'Dodaj swój pierwszy kontakt'}
+          </Typography>
+        </Paper>
+      ) : (
+        <Grid container spacing={2}>
+          {filteredContacts.map((contact) => (
+            <Grid item xs={12} sm={6} md={4} key={contact.id}>
               <Card 
                 sx={{ 
                   borderRadius: 3,
@@ -142,7 +154,6 @@ export default function ContactList({ contacts, loading, error, handleContactDel
                 }}
               >
                 <CardContent sx={{ p: 3 }}>
-                  {/* Header */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
                     <Avatar 
                       sx={{ 
@@ -167,23 +178,10 @@ export default function ContactList({ contacts, loading, error, handleContactDel
                         Dodano: {new Date(contact.createdAt).toLocaleDateString('pl-PL')}
                       </Typography>
                     </Box>
-                    <IconButton 
-                      size="small"
-                      onClick={() => handleContactDelete(contact.id)}
-                      sx={{
-                        color: '#f44336',
-                        '&:hover': {
-                          background: 'rgba(244, 67, 54, 0.1)',
-                        }
-                      }}
-                    >
-                      <Delete />
-                    </IconButton>
                   </Box>
 
                   <Divider sx={{ my: 2 }} />
 
-                  {/* Contact Info */}
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     {contact.email && (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -228,7 +226,6 @@ export default function ContactList({ contacts, loading, error, handleContactDel
                     )}
                   </Box>
 
-                  {/* Tags */}
                   <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     {contact.email && (
                       <Chip 
@@ -251,10 +248,10 @@ export default function ContactList({ contacts, loading, error, handleContactDel
                   </Box>
                 </CardContent>
               </Card>
-            </Fade>
-          </Grid>
-        ))}
-      </Grid>
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Box>
   );
 }
