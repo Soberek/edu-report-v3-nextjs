@@ -3,29 +3,63 @@ import { NextResponse } from "next/server";
 const UNSPLASH_API_URL = "https://api.unsplash.com/photos/random";
 const ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
+interface UnsplashRequest {
+  tag: string;
+  count?: number;
+  orientation?: "landscape" | "portrait" | "squarish";
+  size?: "small" | "regular" | "full" | "raw";
+}
+
 // GET handler: simple health check
 export function GET() {
   return NextResponse.json({ message: "Unsplash API route is working." });
 }
 
-// POST handler: fetch Unsplash photo by tag
+// POST handler: fetch Unsplash photo(s) by tag
 export async function POST(request: Request) {
   try {
-    const { tag } = await request.json();
+    const { tag, count = 1, orientation = "landscape", size = "regular" }: UnsplashRequest = await request.json();
+    
     if (!tag) {
       return NextResponse.json({ error: "Tag is required." }, { status: 400 });
     }
 
-    const url = `${UNSPLASH_API_URL}?query=${encodeURIComponent(tag)}&client_id=${ACCESS_KEY}`;
+    if (!ACCESS_KEY) {
+      return NextResponse.json({ error: "Unsplash API key not configured." }, { status: 500 });
+    }
+
+    // Build query parameters
+    const params = new URLSearchParams({
+      query: tag,
+      client_id: ACCESS_KEY,
+      orientation,
+      count: Math.min(count, 30).toString(), // Unsplash API limit
+    });
+
+    const url = `${UNSPLASH_API_URL}?${params.toString()}`;
     const res = await fetch(url);
 
     if (!res.ok) {
-      return NextResponse.json({ error: "Failed to fetch photo from Unsplash." }, { status: res.status });
+      const errorText = await res.text().catch(() => "Unknown error");
+      return NextResponse.json(
+        { error: `Failed to fetch photo from Unsplash: ${errorText}` }, 
+        { status: res.status }
+      );
     }
 
-    const photo = await res.json();
-    return NextResponse.json(photo);
+    const data = await res.json();
+    
+    // Handle both single photo and array of photos
+    if (Array.isArray(data)) {
+      return NextResponse.json(data);
+    } else {
+      return NextResponse.json([data]);
+    }
   } catch (error) {
-    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
+    console.error("Unsplash API error:", error);
+    return NextResponse.json(
+      { error: "Internal server error." }, 
+      { status: 500 }
+    );
   }
 }

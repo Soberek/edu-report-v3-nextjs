@@ -8,7 +8,7 @@ import { createNewPost, generateAIPrompt } from "../utils";
  * Custom hook for managing posts and AI content generation
  */
 export function usePostManagement() {
-  const { fetchPhotoByTag } = useUnsplashPhotos();
+  const { fetchPhotoByTag, generateImageForPost, fetchPhotosByTag } = useUnsplashPhotos();
   const { promptOpenAi, loading: aiLoading } = useOpenAIChat();
   const [posts, setPosts] = useState<EducationalPost[]>([]);
 
@@ -34,39 +34,42 @@ export function usePostManagement() {
   const createPost = useCallback(async (topic: string, generatedContent: string): Promise<EducationalPost> => {
     const newPost = createNewPost(topic, generatedContent);
 
-    // Fetch image for the new post
+    // Generate image for the new post using multiple tags
     try {
-      const photo = await fetchPhotoByTag(newPost.tag);
-      if (photo) {
-        newPost.imageUrl = photo.urls.small;
+      const tags = [newPost.tag, topic, "education", "health", "awareness"];
+      const imageUrl = await generateImageForPost(tags, "education");
+      if (imageUrl) {
+        newPost.imageUrl = imageUrl;
       }
     } catch (error) {
-      console.error("Error fetching image:", error);
+      console.error("Error generating image:", error);
     }
 
     setPosts((prev) => [...prev, newPost]);
     return newPost;
-  }, [fetchPhotoByTag]);
+  }, [generateImageForPost]);
 
   /**
    * Refetch image for a specific post
    */
   const refetchImage = useCallback(async (postId: string, tag: string): Promise<string | null> => {
     try {
-      const photo = await fetchPhotoByTag(tag);
-      if (photo) {
+      // Try multiple tags for better image selection
+      const tags = [tag, "education", "health", "awareness"];
+      const imageUrl = await generateImageForPost(tags, "education");
+      if (imageUrl) {
         setPosts((prev) =>
           prev.map((post) =>
-            post.id.toString() === postId ? { ...post, imageUrl: photo.urls.small } : post
+            post.id.toString() === postId ? { ...post, imageUrl } : post
           )
         );
-        return photo.urls.small;
+        return imageUrl;
       }
     } catch (error) {
       console.error("Error refetching image:", error);
     }
     return null;
-  }, [fetchPhotoByTag]);
+  }, [generateImageForPost]);
 
   /**
    * Toggle favorite status for a post
@@ -107,6 +110,22 @@ export function usePostManagement() {
     return posts.filter((post) => post.platform === platform);
   }, [posts]);
 
+  /**
+   * Generate multiple image options for a post
+   */
+  const generateImageOptions = useCallback(async (tag: string, count: number = 5): Promise<string[]> => {
+    try {
+      const photos = await fetchPhotosByTag(tag, count, { 
+        orientation: "landscape",
+        size: "regular"
+      });
+      return photos.map(photo => photo.urls.regular);
+    } catch (error) {
+      console.error("Error generating image options:", error);
+      return [];
+    }
+  }, [fetchPhotosByTag]);
+
   return {
     posts,
     aiLoading,
@@ -119,6 +138,7 @@ export function usePostManagement() {
       deletePost,
       getFavoritePosts,
       getPostsByPlatform,
+      generateImageOptions,
     },
   };
 }

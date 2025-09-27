@@ -33,8 +33,11 @@ export default function PostGeneratorPage() {
     // Fetch images for all posts in parallel
     const updatedPosts = await Promise.all(
       educationalPostsState.map(async (post) => {
-        const imageUrl = await postActions.refetchImage(post.id.toString(), post.tag);
-        return { ...post, imageUrl: imageUrl || post.imageUrl };
+        if (!post.imageUrl) {
+          const imageUrl = await postActions.refetchImage(post.id.toString(), post.tag);
+          return { ...post, imageUrl: imageUrl || post.imageUrl };
+        }
+        return post;
       })
     );
 
@@ -49,11 +52,7 @@ export default function PostGeneratorPage() {
     const imageUrl = await postActions.refetchImage(postId, tag);
     if (imageUrl) {
       updateImageUrl(imageUrl);
-      setEducationalPostsState((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id.toString() === postId ? { ...post, imageUrl } : post
-        )
-      );
+      setEducationalPostsState((prevPosts) => prevPosts.map((post) => (post.id.toString() === postId ? { ...post, imageUrl } : post)));
     }
   };
 
@@ -101,11 +100,7 @@ export default function PostGeneratorPage() {
    */
   const handleToggleFavorite = (postId: number) => {
     actions.toggleFavorite(postId);
-    setEducationalPostsState((prev) =>
-      prev.map((post) =>
-        post.id === postId ? { ...post, isFavorite: !post.isFavorite } : post
-      )
-    );
+    setEducationalPostsState((prev) => prev.map((post) => (post.id === postId ? { ...post, isFavorite: !post.isFavorite } : post)));
   };
 
   /**
@@ -113,9 +108,7 @@ export default function PostGeneratorPage() {
    */
   const handleSavePost = (updatedPost: EducationalPost) => {
     postActions.updatePost(updatedPost);
-    setEducationalPostsState((prev) =>
-      prev.map((post) => (post.id === updatedPost.id ? updatedPost : post))
-    );
+    setEducationalPostsState((prev) => prev.map((post) => (post.id === updatedPost.id ? updatedPost : post)));
   };
 
   /**
@@ -217,12 +210,7 @@ export default function PostGeneratorPage() {
       )}
 
       {/* Edit Dialog */}
-      <PostEditDialog
-        open={state.showEditDialog}
-        post={state.selectedPost}
-        onClose={actions.toggleEditDialog}
-        onSave={handleSavePost}
-      />
+      <PostEditDialog open={state.showEditDialog} post={state.selectedPost} onClose={actions.toggleEditDialog} onSave={handleSavePost} />
 
       {/* Preview Dialog */}
       <PostPreviewDialog
