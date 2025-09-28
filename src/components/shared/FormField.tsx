@@ -32,6 +32,7 @@ export interface FormFieldProps<T extends FieldValues> {
   fullWidth?: boolean;
   size?: "small" | "medium";
   sx?: object;
+  inputProps?: object;
 }
 
 export const FormField = <T extends FieldValues>({
@@ -49,6 +50,7 @@ export const FormField = <T extends FieldValues>({
   fullWidth = true,
   size = "medium",
   sx = {},
+  inputProps = {},
 }: FormFieldProps<T>) => {
   const theme = useTheme();
 
@@ -66,6 +68,7 @@ export const FormField = <T extends FieldValues>({
       error: hasError,
       helperText: hasError ? error.message : helperText,
       placeholder,
+      inputProps,
       sx: {
         "& .MuiOutlinedInput-root": {
           borderRadius: 2,
