@@ -79,21 +79,21 @@ export const SchoolStats: React.FC<SchoolStatsProps> = ({ totalSchools, typeStat
             border: `1px solid ${theme.palette.divider}`,
           }}
         >
-           {/* Total Schools - Ultra Compact */}
-           <Box
-             sx={{
-               display: "flex",
-               alignItems: "center",
-               gap: 1,
-               px: 2,
-               py: 1,
-               background: getTypeGradient(0),
-               color: "white",
-               borderRadius: 2,
-               minWidth: "fit-content",
-               boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
-             }}
-           >
+          {/* Total Schools - Ultra Compact */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              px: 2,
+              py: 1,
+              background: getTypeGradient(0),
+              color: "white",
+              borderRadius: 2,
+              minWidth: "fit-content",
+              boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
+            }}
+          >
             <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
               {totalSchools}
             </Typography>

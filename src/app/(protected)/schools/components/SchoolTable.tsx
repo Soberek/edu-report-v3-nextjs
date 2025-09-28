@@ -36,7 +36,7 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
           >
             <School sx={{ fontSize: "1rem" }} />
           </Avatar>
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+          <Typography variant="body2" sx={{ fontWeight: 600, wordWrap: "break-word", whiteSpace: "normal" }}>
             {params.value}
           </Typography>
         </Box>
@@ -59,7 +59,7 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
             minHeight: 52,
           }}
         >
-          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center", wordWrap: "break-word", whiteSpace: "normal" }}>
             {params.value}
           </Typography>
         </Box>
@@ -82,7 +82,7 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
             minHeight: 52,
           }}
         >
-          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center", wordWrap: "break-word", whiteSpace: "normal" }}>
             {params.value}
           </Typography>
         </Box>
@@ -105,7 +105,7 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
             minHeight: 52,
           }}
         >
-          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center", wordWrap: "break-word", whiteSpace: "normal" }}>
             {params.value}
           </Typography>
         </Box>
@@ -128,7 +128,7 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
             minHeight: 52,
           }}
         >
-          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center", wordWrap: "break-word", whiteSpace: "normal" }}>
             {params.value}
           </Typography>
         </Box>
@@ -151,7 +151,7 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
             minHeight: 52,
           }}
         >
-          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center", wordWrap: "break-word", whiteSpace: "normal" }}>
             {params.value}
           </Typography>
         </Box>
@@ -194,7 +194,7 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
               />
             ))
           ) : (
-            <Typography variant="body2" sx={{ fontSize: "0.85rem", color: "text.secondary", textAlign: "center" }}>
+            <Typography variant="body2" sx={{ fontSize: "0.85rem", color: "text.secondary", textAlign: "center", wordWrap: "break-word", whiteSpace: "normal" }}>
               Brak danych
             </Typography>
           )}
@@ -307,6 +307,9 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
           },
           "& .MuiDataGrid-cell": {
             borderBottom: `1px solid ${theme.palette.divider}`,
+            whiteSpace: "normal",
+            wordWrap: "break-word",
+            lineHeight: "1.4",
           },
         }}
       />
