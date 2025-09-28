@@ -195,7 +195,7 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, o
   return (
     <EditDialog
       open={true}
-      onClose={onClose}
+      onClose={onClose || (() => {})}
       title={title}
       onSave={onSave ? handleSubmit : undefined}
       loading={loading}
