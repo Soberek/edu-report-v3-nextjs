@@ -5,7 +5,7 @@ import { type TaskType } from "@/constants/tasks";
 import type { Program } from "@/types";
 import { Box, Button, Modal, Typography, Chip, IconButton, Paper } from "@mui/material";
 
-import { Delete as DeleteIcon, DoneAll, Close } from "@mui/icons-material";
+import { Delete as DeleteIcon, DoneAll, Close, Edit } from "@mui/icons-material";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -17,6 +17,7 @@ type Props = {
   taskType: TaskType | undefined;
   updateTask: (id: string, updates: Partial<ScheduledTaskType>) => void;
   deleteTask: (id: string) => void;
+  onEdit?: (task: ScheduledTaskType) => void;
 };
 
 export const Task: React.FC<Props> = ({
@@ -25,6 +26,7 @@ export const Task: React.FC<Props> = ({
   taskType,
   updateTask,
   deleteTask,
+  onEdit,
 }) => {
   const [openStatusChange, setOpenStatusChange] = useState(false);
   const isCompleted = task.status === "completed";
@@ -252,6 +254,25 @@ export const Task: React.FC<Props> = ({
 
           {/* Ultra Compact Action Buttons */}
           <Box sx={{ display: "flex", gap: 0.25 }}>
+            {onEdit && (
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(task);
+                }}
+                sx={{
+                  width: 20,
+                  height: 20,
+                  background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+                  color: "white",
+                  "&:hover": { opacity: 0.8 },
+                }}
+              >
+                <Edit sx={{ fontSize: 12 }} />
+              </IconButton>
+            )}
+
             <IconButton
               size="small"
               onClick={(e) => {

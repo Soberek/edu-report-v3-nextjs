@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Paper,
@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { Assignment, CalendarToday, School } from "@mui/icons-material";
 import { Task } from "./task-item";
+import { EditTaskDialog } from "./EditTaskDialog";
 import type { Program } from "@/types";
 import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
 import { TASK_TYPES } from "@/constants/tasks";
@@ -28,6 +29,23 @@ export const TaskListSection: React.FC<TaskListSectionProps> = ({
   handleScheduledTaskUpdate,
   handleScheduledTaskDeletion,
 }) => {
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<ScheduledTaskType | null>(null);
+
+  const handleEditTask = (task: ScheduledTaskType) => {
+    setSelectedTask(task);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+    setSelectedTask(null);
+  };
+
+  const handleSaveTask = (id: string, updates: Partial<ScheduledTaskType>) => {
+    handleScheduledTaskUpdate(id, updates);
+    handleCloseEditDialog();
+  };
   const totalTasks = Object.values(filteredData).reduce(
     (acc, programs) => acc + Object.values(programs).reduce((sum, tasks) => sum + tasks.length, 0),
     0
@@ -143,6 +161,7 @@ export const TaskListSection: React.FC<TaskListSectionProps> = ({
                                     taskType={taskType}
                                     updateTask={handleScheduledTaskUpdate}
                                     deleteTask={handleScheduledTaskDeletion}
+                                    onEdit={handleEditTask}
                                   />
                                 );
                               })}
@@ -161,6 +180,15 @@ export const TaskListSection: React.FC<TaskListSectionProps> = ({
           </Stack>
         )}
       </Box>
+
+      {/* Edit Task Dialog */}
+      <EditTaskDialog
+        open={editDialogOpen}
+        onClose={handleCloseEditDialog}
+        task={selectedTask}
+        programs={programs}
+        onSave={handleSaveTask}
+      />
     </Paper>
   );
 };

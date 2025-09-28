@@ -80,12 +80,7 @@ function Schedule(): JSX.Element {
       <StatisticsCards tasks={tasks} percentageOfCompletedTasks={percentageOfCompletedTasks} />
 
       {/* Filters */}
-      <FilterSection
-        filter={filter}
-        setFilter={setFilter}
-        filteredPrograms={filteredPrograms}
-        months={months}
-      />
+      <FilterSection filter={filter} setFilter={setFilter} filteredPrograms={filteredPrograms} months={months} />
 
       {/* Tasks List */}
       <TaskListSection
