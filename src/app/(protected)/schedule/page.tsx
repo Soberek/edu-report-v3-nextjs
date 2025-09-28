@@ -5,11 +5,11 @@ import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
 import { TASK_TYPES } from "@/constants/tasks";
 import { useMemo, useState, type JSX } from "react";
 import { Task } from "./components/task-item";
-import { 
-  Box, 
-  Button, 
-  Modal, 
-  Typography, 
+import {
+  Box,
+  Button,
+  Modal,
+  Typography,
   Container,
   Paper,
   Chip,
@@ -21,19 +21,14 @@ import {
   Fade,
   Divider,
   Stack,
-  TextField
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  OutlinedInput,
 } from "@mui/material";
-import { 
-  Add, 
-  FilterList, 
-  CalendarToday, 
-  Assignment,
-  CheckCircle,
-  Pending,
-  School,
-  Search,
-  Clear
-} from "@mui/icons-material";
+import { Add, FilterList, CalendarToday, Assignment, CheckCircle, Pending, School, Search, Clear } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { useUser } from "@/hooks/useUser";
 import TaskForm from "./components/form";
@@ -42,7 +37,7 @@ import { useScheduledTask } from "@/hooks/useScheduledTask";
 function Schedule(): JSX.Element {
   const [openScheduleTaskForm, setOpenScheduleTaskForm] = useState(false);
   const [filter, setFilter] = useState({
-    programId: "",
+    programIds: [] as string[],
     taskTypeId: "",
     month: "",
     status: "",
@@ -53,6 +48,16 @@ function Schedule(): JSX.Element {
 
   const { tasks, handleScheduledTaskCreation, handleScheduledTaskUpdate, handleScheduledTaskDeletion, refetch, programs, loading } =
     useScheduledTask();
+
+  // Filter out health programs and get unique programs
+  const filteredPrograms = useMemo(() => {
+    return programs.filter(program => 
+      !program.name.toLowerCase().includes('zdrowie') && 
+      !program.name.toLowerCase().includes('health') &&
+      !program.name.toLowerCase().includes('medyczny') &&
+      !program.name.toLowerCase().includes('medical')
+    );
+  }, [programs]);
 
   const sortedEducationalTasks = useMemo(
     () => tasks.sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime()),
@@ -109,54 +114,59 @@ function Schedule(): JSX.Element {
 
   // Enhanced filtering logic
   let filteredData = { ...aggregateByMonthAndThenByProgram };
-  
+
   // Apply program filter
-  if (filter.programId) {
+  if (filter.programIds.length > 0) {
     filteredData = Object.keys(aggregateByMonthAndThenByProgram).reduce((acc, month) => {
-      if (aggregateByMonthAndThenByProgram[month]?.[filter.programId]) {
-        acc[month] = {
-          [filter.programId]: aggregateByMonthAndThenByProgram[month][filter.programId],
-        };
+      const monthData = aggregateByMonthAndThenByProgram[month];
+      const filteredPrograms: { [programId: string]: ScheduledTaskType[] } = {};
+      
+      filter.programIds.forEach(programId => {
+        if (monthData?.[programId]) {
+          filteredPrograms[programId] = monthData[programId];
+        }
+      });
+      
+      if (Object.keys(filteredPrograms).length > 0) {
+        acc[month] = filteredPrograms;
       }
       return acc;
     }, {} as typeof aggregateByMonthAndThenByProgram);
   }
-  
+
   // Apply month filter
   if (filter.month) {
-    const filteredMonths = Object.keys(filteredData).filter(month => 
-      month.toLowerCase().includes(filter.month.toLowerCase())
-    );
+    const filteredMonths = Object.keys(filteredData).filter((month) => month.toLowerCase().includes(filter.month.toLowerCase()));
     filteredData = filteredMonths.reduce((acc, month) => {
       acc[month] = filteredData[month];
       return acc;
     }, {} as typeof aggregateByMonthAndThenByProgram);
   }
-  
+
   // Apply status and search filters to tasks within each program
   if (filter.status || filter.search || filter.taskTypeId) {
     filteredData = Object.keys(filteredData).reduce((acc, month) => {
       acc[month] = {};
-      Object.keys(filteredData[month]).forEach(programId => {
-        const filteredTasks = filteredData[month][programId].filter(task => {
+      Object.keys(filteredData[month]).forEach((programId) => {
+        const filteredTasks = filteredData[month][programId].filter((task) => {
           // Status filter
           if (filter.status && task.status !== filter.status) return false;
-          
+
           // Search filter
           if (filter.search) {
             const searchLower = filter.search.toLowerCase();
-            const taskType = Object.values(TASK_TYPES).find(type => type.id === task.taskTypeId);
-            const program = programs.find(p => p.id === task.programId);
-            const searchText = `${taskType?.label || ''} ${task.description || ''} ${program?.name || ''}`.toLowerCase();
+            const taskType = Object.values(TASK_TYPES).find((type) => type.id === task.taskTypeId);
+            const program = programs.find((p) => p.id === task.programId);
+            const searchText = `${taskType?.label || ""} ${task.description || ""} ${program?.name || ""}`.toLowerCase();
             if (!searchText.includes(searchLower)) return false;
           }
-          
+
           // Task type filter
           if (filter.taskTypeId && task.taskTypeId !== filter.taskTypeId) return false;
-          
+
           return true;
         });
-        
+
         if (filteredTasks.length > 0) {
           acc[month][programId] = filteredTasks;
         }
@@ -210,7 +220,7 @@ function Schedule(): JSX.Element {
         >
           Dodaj nowe zadanie
         </Button>
-      </Box>
+        </Box>
 
       {/* Statistics Cards */}
       <Box
@@ -268,11 +278,11 @@ function Schedule(): JSX.Element {
           <CardContent sx={{ textAlign: "center", py: 3 }}>
             <Pending sx={{ fontSize: 48, mb: 1, opacity: 0.9 }} />
             <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-              {tasks.filter(task => task.status === "pending").length}
+              {tasks.filter((task) => task.status === "pending").length}
             </Typography>
             <Typography variant="body1" sx={{ opacity: 0.9 }}>
               Oczekujących zadań
-            </Typography>
+        </Typography>
           </CardContent>
         </Card>
       </Box>
@@ -300,22 +310,22 @@ function Schedule(): JSX.Element {
             sx={{
               fontWeight: "bold",
               color: "#2c3e50",
-              display: "flex",
+          display: "flex",
               alignItems: "center",
-              gap: 1,
-              mb: 2,
-            }}
-          >
+          gap: 1,
+          mb: 2,
+        }}
+      >
             <FilterList sx={{ color: "#1976d2" }} />
             Filtry
-          </Typography>
+        </Typography>
         </Box>
 
         <Box sx={{ p: 3 }}>
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
               gap: 3,
             }}
           >
@@ -358,49 +368,41 @@ function Schedule(): JSX.Element {
             <Box>
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: "#2c3e50" }}>
                 <CheckCircle sx={{ mr: 1, verticalAlign: "middle" }} />
-                Status zadania:
+                Status:
               </Typography>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                <Chip
-                  label="Wszystkie"
-                  onClick={() => setFilter((prev) => ({ ...prev, status: "" }))}
-                  variant={filter.status === "" ? "filled" : "outlined"}
+              <FormControl fullWidth size="small">
+                <InputLabel>Status zadania</InputLabel>
+                <Select
+                  value={filter.status}
+                  onChange={(e) => setFilter((prev) => ({ ...prev, status: e.target.value }))}
+                  label="Status zadania"
                   sx={{
-                    background: filter.status === "" ? "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)" : "transparent",
-                    color: filter.status === "" ? "white" : "#1976d2",
-                    borderColor: "#1976d2",
-                    "&:hover": {
-                      background: filter.status === "" ? "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)" : "rgba(25, 118, 210, 0.1)",
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      background: "white",
                     },
                   }}
-                />
-                <Chip
-                  label="Ukończone"
-                  onClick={() => setFilter((prev) => ({ ...prev, status: "completed" }))}
-                  variant={filter.status === "completed" ? "filled" : "outlined"}
-                  sx={{
-                    background: filter.status === "completed" ? "linear-gradient(45deg, #4caf50 30%, #8bc34a 90%)" : "transparent",
-                    color: filter.status === "completed" ? "white" : "#4caf50",
-                    borderColor: "#4caf50",
-                    "&:hover": {
-                      background: filter.status === "completed" ? "linear-gradient(45deg, #388e3c 30%, #4caf50 90%)" : "rgba(76, 175, 80, 0.1)",
-                    },
-                  }}
-                />
-                <Chip
-                  label="Oczekujące"
-                  onClick={() => setFilter((prev) => ({ ...prev, status: "pending" }))}
-                  variant={filter.status === "pending" ? "filled" : "outlined"}
-                  sx={{
-                    background: filter.status === "pending" ? "linear-gradient(45deg, #ff9800 30%, #ffc107 90%)" : "transparent",
-                    color: filter.status === "pending" ? "white" : "#ff9800",
-                    borderColor: "#ff9800",
-                    "&:hover": {
-                      background: filter.status === "pending" ? "linear-gradient(45deg, #f57c00 30%, #ff9800 90%)" : "rgba(255, 152, 0, 0.1)",
-                    },
-                  }}
-                />
-              </Box>
+                >
+                  <MenuItem value="">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Assignment sx={{ fontSize: 16, color: "#666" }} />
+                      <Typography>Wszystkie</Typography>
+                    </Box>
+                  </MenuItem>
+                  <MenuItem value="completed">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CheckCircle sx={{ fontSize: 16, color: "#4caf50" }} />
+                      <Typography>Ukończone</Typography>
+                    </Box>
+                  </MenuItem>
+                  <MenuItem value="pending">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Pending sx={{ fontSize: 16, color: "#ff9800" }} />
+                      <Typography>Oczekujące</Typography>
+                    </Box>
+                  </MenuItem>
+                </Select>
+              </FormControl>
             </Box>
 
             {/* Month Filter */}
@@ -409,76 +411,95 @@ function Schedule(): JSX.Element {
                 <CalendarToday sx={{ mr: 1, verticalAlign: "middle" }} />
                 Miesiąc:
               </Typography>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                <Chip
-                  label="Wszystkie"
-                  onClick={() => setFilter((prev) => ({ ...prev, month: "" }))}
-                  variant={filter.month === "" ? "filled" : "outlined"}
+              <FormControl fullWidth size="small">
+                <InputLabel>Miesiąc</InputLabel>
+                <Select
+                  value={filter.month}
+                  onChange={(e) => setFilter((prev) => ({ ...prev, month: e.target.value }))}
+                  label="Miesiąc"
                   sx={{
-                    background: filter.month === "" ? "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)" : "transparent",
-                    color: filter.month === "" ? "white" : "#1976d2",
-                    borderColor: "#1976d2",
-                    "&:hover": {
-                      background: filter.month === "" ? "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)" : "rgba(25, 118, 210, 0.1)",
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      background: "white",
                     },
                   }}
-                />
-                {Object.entries(months).map(([key, label]) => (
-                  <Chip
-                    key={key}
-                    label={label}
-                    onClick={() => setFilter((prev) => ({ ...prev, month: key }))}
-                    variant={filter.month === key ? "filled" : "outlined"}
-                    sx={{
-                      background: filter.month === key ? "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)" : "transparent",
-                      color: filter.month === key ? "white" : "#1976d2",
-                      borderColor: "#1976d2",
-                      "&:hover": {
-                        background: filter.month === key ? "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)" : "rgba(25, 118, 210, 0.1)",
-                      },
-                    }}
-                  />
-                ))}
-              </Box>
+                >
+                  <MenuItem value="">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CalendarToday sx={{ fontSize: 16, color: "#666" }} />
+                      <Typography>Wszystkie miesiące</Typography>
+                    </Box>
+                  </MenuItem>
+                  {Object.entries(months).map(([key, label]) => (
+                    <MenuItem key={key} value={key}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CalendarToday sx={{ fontSize: 16, color: "#1976d2" }} />
+                        <Typography>{label}</Typography>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
 
             {/* Program Filter */}
             <Box>
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: "#2c3e50" }}>
                 <School sx={{ mr: 1, verticalAlign: "middle" }} />
-                Program:
+                Programy:
               </Typography>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                <Chip
-                  label="Wszystkie"
-                  onClick={() => setFilter((prev) => ({ ...prev, programId: "" }))}
-                  variant={filter.programId === "" ? "filled" : "outlined"}
+              <FormControl fullWidth size="small">
+                <InputLabel>Wybierz programy</InputLabel>
+                <Select
+                  multiple
+                  value={filter.programIds}
+                  onChange={(e) => setFilter((prev) => ({ ...prev, programIds: e.target.value as string[] }))}
+                  input={<OutlinedInput label="Wybierz programy" />}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => {
+                        const program = filteredPrograms.find(p => p.id === value);
+                        return (
+                          <Chip
+                            key={value}
+                            label={program ? `${program.code} ${program.name}` : value}
+                            size="small"
+                            sx={{
+                              background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+                              color: "white",
+                              fontSize: "0.75rem",
+                              height: 20,
+                            }}
+                          />
+                        );
+                      })}
+                    </Box>
+                  )}
                   sx={{
-                    background: filter.programId === "" ? "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)" : "transparent",
-                    color: filter.programId === "" ? "white" : "#1976d2",
-                    borderColor: "#1976d2",
-                    "&:hover": {
-                      background: filter.programId === "" ? "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)" : "rgba(25, 118, 210, 0.1)",
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      background: "white",
+                      minHeight: 40,
                     },
                   }}
-                />
-                {programs.map((program) => (
-                  <Chip
-                    key={program.id}
-                    label={`${program.code} ${program.name}`}
-                    onClick={() => setFilter((prev) => ({ ...prev, programId: program.id }))}
-                    variant={filter.programId === program.id ? "filled" : "outlined"}
-                    sx={{
-                      background: filter.programId === program.id ? "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)" : "transparent",
-                      color: filter.programId === program.id ? "white" : "#1976d2",
-                      borderColor: "#1976d2",
-                      "&:hover": {
-                        background: filter.programId === program.id ? "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)" : "rgba(25, 118, 210, 0.1)",
-                      },
-                    }}
-                  />
-                ))}
-              </Box>
+                >
+                  {filteredPrograms.map((program) => (
+                    <MenuItem key={program.id} value={program.id}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <School sx={{ fontSize: 16, color: "#1976d2" }} />
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {program.code}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {program.name}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
           </Box>
         </Box>
@@ -512,7 +533,12 @@ function Schedule(): JSX.Element {
             }}
           >
             <Assignment sx={{ color: "#1976d2" }} />
-            Lista zadań ({Object.values(filteredData).reduce((acc, programs) => acc + Object.values(programs).reduce((sum, tasks) => sum + tasks.length, 0), 0)})
+            Lista zadań (
+            {Object.values(filteredData).reduce(
+              (acc, programs) => acc + Object.values(programs).reduce((sum, tasks) => sum + tasks.length, 0),
+              0
+            )}
+            )
           </Typography>
         </Box>
 
@@ -529,14 +555,14 @@ function Schedule(): JSX.Element {
               <Assignment sx={{ fontSize: 64, color: "#ccc", mb: 2 }} />
               <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
                 Brak zadań
-              </Typography>
+        </Typography>
               <Typography variant="body2" color="text.secondary">
                 Dodaj pierwsze zadanie do harmonogramu
-              </Typography>
-            </Box>
+        </Typography>
+      </Box>
           ) : (
             <Stack spacing={3}>
-              {Object.entries(filteredData).map(([month, programsInMonth]) => (
+        {Object.entries(filteredData).map(([month, programsInMonth]) => (
                 <Fade in key={month} timeout={300}>
                   <Paper
                     elevation={0}
@@ -559,19 +585,19 @@ function Schedule(): JSX.Element {
                     >
                       <Typography variant="h6" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
                         <CalendarToday />
-                        {localizeMonth(month.split(" ")[0].toLowerCase()) + " " + month.split(" ")[1]}
-                      </Typography>
+              {localizeMonth(month.split(" ")[0].toLowerCase()) + " " + month.split(" ")[1]}
+            </Typography>
                     </Box>
 
                     <Box sx={{ p: 3 }}>
                       <Stack spacing={2}>
-                        {Object.entries(programsInMonth).map(([programId, tasks]) => {
-                          const program: Program | undefined = programs.find((p: Program) => p.id === programId);
-                          return (
+            {Object.entries(programsInMonth).map(([programId, tasks]) => {
+              const program: Program | undefined = programs.find((p: Program) => p.id === programId);
+              return (
                             <Box key={programId}>
                               <Typography
                                 variant="subtitle1"
-                                sx={{
+                  sx={{
                                   fontWeight: "bold",
                                   color: "#2c3e50",
                                   mb: 2,
@@ -581,29 +607,29 @@ function Schedule(): JSX.Element {
                                 }}
                               >
                                 <School sx={{ color: "#1976d2" }} />
-                                {program ? `${program.code} ${program.name}` : "Nieznany program"}
-                              </Typography>
+                    {program ? `${program.code} ${program.name}` : "Nieznany program"}
+                  </Typography>
                               <Stack spacing={1}>
-                                {tasks.map((task) => {
-                                  const taskType = Object.values(TASK_TYPES).find((type) => type.id === task.taskTypeId);
-                                  return (
-                                    <Task
-                                      key={task.id}
-                                      task={task}
-                                      program={program}
-                                      taskType={taskType}
-                                      updateTask={handleScheduledTaskUpdate}
-                                      deleteTask={handleScheduledTaskDeletion}
-                                    />
-                                  );
-                                })}
+                  {tasks.map((task) => {
+                    const taskType = Object.values(TASK_TYPES).find((type) => type.id === task.taskTypeId);
+                    return (
+                      <Task
+                        key={task.id}
+                        task={task}
+                        program={program}
+                        taskType={taskType}
+                        updateTask={handleScheduledTaskUpdate}
+                        deleteTask={handleScheduledTaskDeletion}
+                      />
+                    );
+                  })}
                               </Stack>
                               {Object.entries(programsInMonth).indexOf([programId, tasks]) < Object.entries(programsInMonth).length - 1 && (
                                 <Divider sx={{ my: 2 }} />
                               )}
-                            </Box>
-                          );
-                        })}
+                </Box>
+              );
+            })}
                       </Stack>
                     </Box>
                   </Paper>
@@ -646,7 +672,7 @@ function Schedule(): JSX.Element {
           <Box sx={{ p: 4 }}>
             <TaskForm createTask={handleScheduledTaskCreation} refetch={refetch} userId={user?.uid} loading={loading} />
           </Box>
-        </Box>
+      </Box>
       </Modal>
     </Container>
   );
