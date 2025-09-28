@@ -214,6 +214,9 @@ export default function EducationalTasks(): React.ReactNode {
                               <Typography variant="caption" color="primary" sx={{ fontSize: "0.7rem" }}>
                                 Media: {activity.media.title} ({activity.media.platform})
                               </Typography>
+                              <Typography variant="caption" color="primary" sx={{ fontSize: "0.7rem", wordBreak: "break-all" }}>
+                                Link: {activity.media.link}
+                              </Typography>
                             </Box>
                           )}
                           {activity.materials && activity.materials.length > 0 && (
