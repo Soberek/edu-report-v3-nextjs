@@ -281,8 +281,7 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
             ) : (
               <Button
                 onClick={() => {
-                  onSubmit(); // Submit the current answer to quiz state
-                  onNext(); // Move to next question
+                  onSubmit(); // Submit the current answer to quiz state and move to next question
                 }}
                 color="primary"
                 variant="contained"
