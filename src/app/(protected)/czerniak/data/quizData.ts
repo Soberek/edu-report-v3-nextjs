@@ -145,7 +145,8 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     id: "q2",
     type: "true-false",
     question: "Czerniak może wystąpić tylko na skórze wystawionej na słońce.",
-    correctAnswer: "false",
+    options: ["Prawda", "Fałsz"],
+    correctAnswer: "Fałsz",
     explanation:
       "Czerniak może wystąpić wszędzie na ciele, w tym w miejscach nie wystawionych na słońce, takich jak podeszwy stóp, dłonie, pod paznokciami.",
     difficulty: "medium",
@@ -168,7 +169,8 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     id: "q4",
     type: "true-false",
     question: "Czerniak wcześnie wykryty ma bardzo dobre rokowania.",
-    correctAnswer: "true",
+    options: ["Prawda", "Fałsz"],
+    correctAnswer: "Prawda",
     explanation:
       "Czerniak wcześnie wykryty (w stadium I) ma 5-letnie przeżycie wynoszące ponad 95%. Dlatego tak ważne są regularne badania skóry.",
     difficulty: "easy",
@@ -218,7 +220,8 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     id: "q8",
     type: "true-false",
     question: "Czerniak może rozwinąć się z istniejącego znamienia lub pojawić się jako nowe znamię.",
-    correctAnswer: "true",
+    options: ["Prawda", "Fałsz"],
+    correctAnswer: "Prawda",
     explanation:
       "Czerniak może rozwinąć się zarówno z istniejącego znamienia (około 30% przypadków), jak i pojawić się jako nowe znamię (około 70% przypadków).",
     difficulty: "medium",
@@ -258,7 +261,8 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     id: "q11",
     type: "true-false",
     question: "Czerniak jest bardziej agresywny niż inne rodzaje raka skóry.",
-    correctAnswer: "true",
+    options: ["Prawda", "Fałsz"],
+    correctAnswer: "Prawda",
     explanation:
       "Czerniak jest najgroźniejszym rodzajem raka skóry, ponieważ może szybko rozprzestrzeniać się do innych narządów (przerzuty).",
     difficulty: "easy",
@@ -299,7 +303,8 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     id: "q14",
     type: "true-false",
     question: "Czerniak może wystąpić również pod paznokciami i na błonach śluzowych.",
-    correctAnswer: "true",
+    options: ["Prawda", "Fałsz"],
+    correctAnswer: "Prawda",
     explanation:
       "Czerniak może wystąpić wszędzie, gdzie są melanocyty, w tym pod paznokciami (czerniak podpaznokciowy) i na błonach śluzowych jamy ustnej, nosa, odbytu.",
     difficulty: "medium",
