@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Button,
-  Box,
-  Typography,
-  CircularProgress,
-  Paper,
-  Stack,
-} from "@mui/material";
+import { Button, Box, Typography, CircularProgress, Paper, Stack } from "@mui/material";
 import { Controller } from "react-hook-form";
 import { TextField, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 import { useSchoolForm } from "../hooks/useSchoolForm";
@@ -14,13 +7,7 @@ import { EditDialog } from "@/components/shared/EditDialog";
 import type { SchoolFormProps } from "../types";
 import type { CreateSchoolFormData, EditSchoolFormData } from "../schemas/schoolSchemas";
 
-export const SchoolForm: React.FC<SchoolFormProps> = ({
-  mode,
-  school,
-  onClose,
-  onSave,
-  loading = false,
-}) => {
+export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, onSave, loading = false }) => {
   const {
     control,
     handleSubmit,
@@ -154,17 +141,19 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({
             Typ szkoły *
           </Typography>
           <FormGroup>
-            <Box sx={{ 
-              display: "grid", 
-              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", 
-              gap: 0.5,
-              maxHeight: 120,
-              overflowY: "auto",
-              p: 1,
-              border: "1px solid #e0e0e0",
-              borderRadius: 1,
-              backgroundColor: "#fafafa"
-            }}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                gap: 0.5,
+                maxHeight: 120,
+                overflowY: "auto",
+                p: 1,
+                border: "1px solid #e0e0e0",
+                borderRadius: 1,
+                backgroundColor: "#fafafa",
+              }}
+            >
               {schoolTypes.map(([key, label]) => (
                 <FormControlLabel
                   key={key}
@@ -172,20 +161,20 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({
                     <Checkbox
                       size="small"
                       onChange={(e) => handleTypeChange(key, e.target.checked)}
-                      sx={{ 
+                      sx={{
                         py: 0.5,
-                        "& .MuiSvgIcon-root": { fontSize: "1rem" }
+                        "& .MuiSvgIcon-root": { fontSize: "1rem" },
                       }}
                     />
                   }
                   label={label}
-                  sx={{ 
+                  sx={{
                     fontSize: "0.8rem",
                     margin: 0,
                     "& .MuiFormControlLabel-label": {
                       fontSize: "0.8rem",
-                      lineHeight: 1.2
-                    }
+                      lineHeight: 1.2,
+                    },
                   }}
                 />
               ))}
@@ -198,80 +187,24 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({
           )}
         </Box>
 
-        {/* Actions */}
-        <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 3 }}>
-          {onClose && (
-            <Button
-              onClick={onClose}
-              variant="outlined"
-              size="medium"
-              sx={{ borderRadius: 2 }}
-            >
-              Anuluj
-            </Button>
-          )}
-          <Button
-            type="submit"
-            variant="contained"
-            size="medium"
-            disabled={loading || !isFormValid}
-            startIcon={loading ? <CircularProgress size={18} /> : null}
-            sx={{
-              borderRadius: 2,
-              background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
-              "&:hover": {
-                background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
-              },
-            }}
-          >
-            {loading ? "Zapisywanie..." : "Dodaj szkołę"}
-          </Button>
-        </Box>
       </Stack>
     </Box>
   );
 
-  if (isEditMode) {
-    return (
-      <EditDialog
-        open={true}
-        onClose={onClose}
-        title={title}
-        onSave={handleSubmit}
-        loading={loading}
-        saveText={isEditMode ? "Zapisz zmiany" : "Dodaj szkołę"}
-        cancelText="Anuluj"
-        maxWidth="md"
-        fullWidth
-        mode={mode}
-      >
-        {formContent}
-      </EditDialog>
-    );
-  }
-
   return (
-    <Paper
-      elevation={2}
-      sx={{
-        p: 3,
-        borderRadius: 2,
-        background: "linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)",
-        border: "1px solid #e9ecef",
-      }}
+    <EditDialog
+      open={true}
+      onClose={onClose}
+      title={title}
+      onSave={handleSubmit}
+      loading={loading}
+      saveText={isEditMode ? "Zapisz zmiany" : "Dodaj szkołę"}
+      cancelText="Anuluj"
+      maxWidth="md"
+      fullWidth
+      mode={mode}
     >
-      <Typography
-        variant="h6"
-        sx={{
-          mb: 3,
-          fontWeight: "bold",
-          color: "#1976d2",
-          textAlign: "center",
-        }}
-      >
-        {title}
-      </Typography>
       {formContent}
-    </Paper>
+    </EditDialog>
   );
 };
