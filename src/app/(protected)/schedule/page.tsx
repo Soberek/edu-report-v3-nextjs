@@ -89,6 +89,7 @@ function Schedule(): JSX.Element {
         localizeMonth={localizeMonth}
         handleScheduledTaskUpdate={handleScheduledTaskUpdate}
         handleScheduledTaskDeletion={handleScheduledTaskDeletion}
+        userId={user?.uid}
       />
 
       {/* Add Task Modal */}

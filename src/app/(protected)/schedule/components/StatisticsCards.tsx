@@ -12,22 +12,22 @@ interface StatisticsCardsProps {
 export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ tasks, percentageOfCompletedTasks }) => {
   const currentYear = dayjs().year();
   const currentMonth = dayjs().month() + 1; // 1-12
-  
+
   // Get all tasks from January to current month of current year
   const yearToDateTasks = tasks.filter((task) => {
     const taskDate = dayjs(task.dueDate);
     return taskDate.year() === currentYear && taskDate.month() + 1 <= currentMonth;
   });
-  
+
   const yearToDateCompleted = yearToDateTasks.filter((task) => task.status === "completed").length;
   const yearToDatePercentage = yearToDateTasks.length > 0 ? Math.round((yearToDateCompleted / yearToDateTasks.length) * 100) : 0;
-  
+
   // Get tasks for current month only
   const currentMonthTasks = tasks.filter((task) => {
     const taskDate = dayjs(task.dueDate);
     return taskDate.year() === currentYear && taskDate.month() + 1 === currentMonth;
   });
-  
+
   const currentMonthCompleted = currentMonthTasks.filter((task) => task.status === "completed").length;
   const currentMonthPercentage = currentMonthTasks.length > 0 ? Math.round((currentMonthCompleted / currentMonthTasks.length) * 100) : 0;
   return (

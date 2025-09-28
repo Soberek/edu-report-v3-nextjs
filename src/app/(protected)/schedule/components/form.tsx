@@ -10,7 +10,11 @@ import {
   Paper,
   Typography,
   InputAdornment,
-  Fade
+  Fade,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
 import { 
   Assignment, 
@@ -18,13 +22,15 @@ import {
   CalendarToday, 
   Description, 
   Save,
-  Add
+  Add,
+  Edit,
+  Cancel
 } from "@mui/icons-material";
 import type React from "react";
 import { Controller } from "react-hook-form";
 import { TASK_TYPES } from "@/constants/tasks";
 import { programs } from "@/constants/programs";
-import type { ScheduledTaskDTOType } from "@/models/ScheduledTaskSchema";
+import type { ScheduledTaskDTOType, ScheduledTaskType } from "@/models/ScheduledTaskSchema";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import dayjs from "dayjs";
 import { useTaskForm } from "./useTaskForm";
@@ -34,16 +40,36 @@ type Props = {
   createTask: (itemData: ScheduledTaskDTOType) => void;
   refetch: () => Promise<void>;
   loading: boolean;
+  // Edit mode props
+  mode?: "create" | "edit";
+  task?: ScheduledTaskType | null;
+  onClose?: () => void;
+  onSave?: (id: string, updates: Partial<ScheduledTaskType>) => void;
 };
 
-export default function TaskForm({ userId, createTask, refetch, loading }: Props): React.ReactElement {
+export default function TaskForm({ 
+  userId, 
+  createTask, 
+  refetch, 
+  loading, 
+  mode = "create", 
+  task, 
+  onClose, 
+  onSave 
+}: Props): React.ReactElement {
   const { control, handleSubmit, onSubmit } = useTaskForm({
     userId,
     createTask,
     refetch,
+    mode,
+    task,
+    onSave,
   });
 
-  return (
+  const isEditMode = mode === "edit";
+  const isOpen = isEditMode ? !!task : true;
+
+  const formContent = (
     <Fade in timeout={300}>
       <Paper
         elevation={0}
@@ -65,9 +91,15 @@ export default function TaskForm({ userId, createTask, refetch, loading }: Props
             gap: 3,
           }}
         >
-          <Grid container spacing={3}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: 3,
+            }}
+          >
             {/* Task Type */}
-            <Grid item xs={12} md={6}>
+            <Box>
               <Controller
                 name="taskTypeId"
                 control={control}
@@ -96,10 +128,10 @@ export default function TaskForm({ userId, createTask, refetch, loading }: Props
                   </FormControl>
                 )}
               />
-            </Grid>
+            </Box>
 
             {/* Program */}
-            <Grid item xs={12} md={6}>
+            <Box>
               <Controller
                 name="programId"
                 control={control}
@@ -128,10 +160,10 @@ export default function TaskForm({ userId, createTask, refetch, loading }: Props
                   </FormControl>
                 )}
               />
-            </Grid>
+            </Box>
 
             {/* Due Date */}
-            <Grid item xs={12} md={6}>
+            <Box>
               <Controller
                 name="dueDate"
                 control={control}
@@ -160,10 +192,10 @@ export default function TaskForm({ userId, createTask, refetch, loading }: Props
                   />
                 )}
               />
-            </Grid>
+            </Box>
 
             {/* Completed Date */}
-            <Grid item xs={12} md={6}>
+            <Box>
               <Controller
                 name="completedDate"
                 control={control}
@@ -192,10 +224,10 @@ export default function TaskForm({ userId, createTask, refetch, loading }: Props
                   />
                 )}
               />
-            </Grid>
+            </Box>
 
             {/* Description */}
-            <Grid item xs={12}>
+            <Box sx={{ gridColumn: "1 / -1" }}>
               <Controller
                 name="description"
                 control={control}
@@ -222,8 +254,8 @@ export default function TaskForm({ userId, createTask, refetch, loading }: Props
                   />
                 )}
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
 
           {/* Submit Button */}
           <Box
@@ -235,35 +267,109 @@ export default function TaskForm({ userId, createTask, refetch, loading }: Props
               borderTop: "1px solid rgba(0,0,0,0.1)",
             }}
           >
-            <Button
-              type="submit"
-              disabled={loading}
-              variant="contained"
-              startIcon={<Save />}
-              sx={{
-                borderRadius: 3,
-                textTransform: "none",
-                fontWeight: "bold",
-                px: 4,
-                py: 1.5,
-                background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
-                boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
-                "&:hover": {
-                  background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
-                  boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
-                  transform: "translateY(-1px)",
-                },
-                "&:disabled": {
-                  background: "rgba(0,0,0,0.12)",
-                  color: "rgba(0,0,0,0.26)",
-                },
-              }}
-            >
-              {loading ? "Zapisywanie..." : "Zaplanuj zadanie"}
-            </Button>
+            {isEditMode ? (
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Button
+                  onClick={onClose}
+                  disabled={loading}
+                  startIcon={<Cancel />}
+                  sx={{
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1,
+                    background: "rgba(0,0,0,0.1)",
+                    "&:hover": { background: "rgba(0,0,0,0.2)" },
+                  }}
+                >
+                  Anuluj
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  variant="contained"
+                  startIcon={<Save />}
+                  sx={{
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1,
+                    background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+                    "&:hover": {
+                      background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
+                    },
+                  }}
+                >
+                  {loading ? "Zapisywanie..." : "Zapisz zmiany"}
+                </Button>
+              </Box>
+            ) : (
+              <Button
+                type="submit"
+                disabled={loading}
+                variant="contained"
+                startIcon={<Save />}
+                sx={{
+                  borderRadius: 3,
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  px: 4,
+                  py: 1.5,
+                  background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+                  boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
+                  "&:hover": {
+                    background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
+                    boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
+                    transform: "translateY(-1px)",
+                  },
+                  "&:disabled": {
+                    background: "rgba(0,0,0,0.12)",
+                    color: "rgba(0,0,0,0.26)",
+                  },
+                }}
+              >
+                {loading ? "Zapisywanie..." : "Zaplanuj zadanie"}
+              </Button>
+            )}
           </Box>
         </Box>
       </Paper>
     </Fade>
   );
+
+  if (isEditMode) {
+    return (
+      <Dialog
+        open={isOpen}
+        onClose={onClose}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "white",
+            textAlign: "center",
+            py: 2,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1 }}>
+            <Edit />
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              Edytuj zadanie
+            </Typography>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          {formContent}
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return formContent;
 }

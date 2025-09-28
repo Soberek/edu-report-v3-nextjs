@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { Assignment, CalendarToday, School } from "@mui/icons-material";
 import { Task } from "./task-item";
-import { EditTaskDialog } from "./EditTaskDialog";
+import TaskForm from "./form";
 import type { Program } from "@/types";
 import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
 import { TASK_TYPES } from "@/constants/tasks";
@@ -20,6 +20,7 @@ interface TaskListSectionProps {
   localizeMonth: (month: string) => string;
   handleScheduledTaskUpdate: (id: string, updates: Partial<ScheduledTaskType>) => void;
   handleScheduledTaskDeletion: (id: string) => void;
+  userId?: string;
 }
 
 export const TaskListSection: React.FC<TaskListSectionProps> = ({
@@ -28,6 +29,7 @@ export const TaskListSection: React.FC<TaskListSectionProps> = ({
   localizeMonth,
   handleScheduledTaskUpdate,
   handleScheduledTaskDeletion,
+  userId,
 }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ScheduledTaskType | null>(null);
@@ -182,12 +184,15 @@ export const TaskListSection: React.FC<TaskListSectionProps> = ({
       </Box>
 
       {/* Edit Task Dialog */}
-      <EditTaskDialog
-        open={editDialogOpen}
-        onClose={handleCloseEditDialog}
+      <TaskForm
+        mode="edit"
         task={selectedTask}
-        programs={programs}
+        onClose={handleCloseEditDialog}
         onSave={handleSaveTask}
+        userId={userId}
+        createTask={() => {}}
+        refetch={async () => {}}
+        loading={false}
       />
     </Paper>
   );
