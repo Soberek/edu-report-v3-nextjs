@@ -1,35 +1,11 @@
 import React from "react";
 import { Box, Card, CardContent, Typography } from "@mui/material";
 import { CheckCircle, Assignment, Pending, CalendarMonth } from "@mui/icons-material";
-import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
-import dayjs from "dayjs";
+import type { StatisticsCardsProps } from "../types";
+import { useTaskStatistics } from "../hooks/useTaskStatistics";
 
-interface StatisticsCardsProps {
-  tasks: ScheduledTaskType[];
-  percentageOfCompletedTasks: number;
-}
-
-export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ tasks, percentageOfCompletedTasks }) => {
-  const currentYear = dayjs().year();
-  const currentMonth = dayjs().month() + 1; // 1-12
-
-  // Get all tasks from January to current month of current year
-  const yearToDateTasks = tasks.filter((task) => {
-    const taskDate = dayjs(task.dueDate);
-    return taskDate.year() === currentYear && taskDate.month() + 1 <= currentMonth;
-  });
-
-  const yearToDateCompleted = yearToDateTasks.filter((task) => task.status === "completed").length;
-  const yearToDatePercentage = yearToDateTasks.length > 0 ? Math.round((yearToDateCompleted / yearToDateTasks.length) * 100) : 0;
-
-  // Get tasks for current month only
-  const currentMonthTasks = tasks.filter((task) => {
-    const taskDate = dayjs(task.dueDate);
-    return taskDate.year() === currentYear && taskDate.month() + 1 === currentMonth;
-  });
-
-  const currentMonthCompleted = currentMonthTasks.filter((task) => task.status === "completed").length;
-  const currentMonthPercentage = currentMonthTasks.length > 0 ? Math.round((currentMonthCompleted / currentMonthTasks.length) * 100) : 0;
+export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ tasks }) => {
+  const statistics = useTaskStatistics(tasks);
   return (
     <Box
       sx={{
@@ -50,7 +26,7 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ tasks, percent
         <CardContent sx={{ textAlign: "center", py: 2 }}>
           <CheckCircle sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
           <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
-            {percentageOfCompletedTasks}%
+            {statistics.overallCompletionPercentage}%
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
             Ukończonych zadań
@@ -68,7 +44,7 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ tasks, percent
         <CardContent sx={{ textAlign: "center", py: 2 }}>
           <Assignment sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
           <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
-            {tasks.length}
+            {statistics.totalTasks}
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
             Wszystkich zadań
@@ -86,7 +62,7 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ tasks, percent
         <CardContent sx={{ textAlign: "center", py: 2 }}>
           <Pending sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
           <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
-            {tasks.filter((task) => task.status === "pending").length}
+            {statistics.pendingTasks}
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
             Oczekujących zadań
@@ -104,7 +80,7 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ tasks, percent
         <CardContent sx={{ textAlign: "center", py: 2 }}>
           <CalendarMonth sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
           <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
-            {yearToDatePercentage}%
+            {statistics.yearToDatePercentage}%
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
             Ukończonych od stycznia
@@ -122,7 +98,7 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ tasks, percent
         <CardContent sx={{ textAlign: "center", py: 2 }}>
           <CalendarMonth sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
           <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
-            {currentMonthPercentage}%
+            {statistics.currentMonthPercentage}%
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
             Ukończonych w tym miesiącu

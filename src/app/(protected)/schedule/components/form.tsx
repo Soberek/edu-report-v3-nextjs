@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Button,
@@ -6,7 +7,6 @@ import {
   TextField,
   FormControl,
   InputLabel,
-  Grid,
   Paper,
   Typography,
   InputAdornment,
@@ -14,47 +14,34 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
 } from "@mui/material";
-import { Assignment, School, CalendarToday, Description, Save, Add, Edit, Cancel } from "@mui/icons-material";
-import type React from "react";
+import { Assignment, School, CalendarToday, Description, Save, Edit, Cancel } from "@mui/icons-material";
 import { Controller } from "react-hook-form";
 import { TASK_TYPES } from "@/constants/tasks";
 import { programs } from "@/constants/programs";
-import type { ScheduledTaskDTOType, ScheduledTaskType } from "@/models/ScheduledTaskSchema";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import dayjs from "dayjs";
-import { useTaskForm } from "./useTaskForm";
+import { useTaskForm } from "../hooks/useTaskForm";
+import type { TaskFormProps } from "../types";
+import type { CreateTaskFormData, EditTaskFormData } from "../schemas/taskSchemas";
 
-type Props = {
-  userId: string | undefined;
-  createTask: (itemData: ScheduledTaskDTOType) => void;
-  refetch: () => Promise<void>;
-  loading: boolean;
-  // Edit mode props
-  mode?: "create" | "edit";
-  task?: ScheduledTaskType | null;
-  onClose?: () => void;
-  onSave?: (id: string, updates: Partial<ScheduledTaskType>) => void;
-};
+interface Props extends TaskFormProps {
+  createTask?: (itemData: CreateTaskFormData) => void;
+  refetch?: () => Promise<void>;
+}
 
-export default function TaskForm({
-  userId,
-  createTask,
-  refetch,
-  loading,
-  mode = "create",
-  task,
-  onClose,
-  onSave,
-}: Props): React.ReactElement {
-  const { control, handleSubmit, onSubmit } = useTaskForm({
-    userId,
-    createTask,
-    refetch,
+export default function TaskForm({ mode, task, onClose, onSave, userId, createTask, refetch, loading = false }: Props): React.ReactElement {
+  const { control, handleSubmit, formState, isFormValid, hasErrors } = useTaskForm({
     mode,
     task,
-    onSave,
+    userId,
+    onSubmit: (data) => {
+      if (mode === "edit" && task) {
+        onSave(task.id, data as Partial<EditTaskFormData>);
+      } else if (mode === "create" && createTask) {
+        createTask(data as CreateTaskFormData);
+      }
+    },
   });
 
   const isEditMode = mode === "edit";
@@ -75,7 +62,7 @@ export default function TaskForm({
       >
         <Box
           component="form"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -276,7 +263,7 @@ export default function TaskForm({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !isFormValid}
                   variant="contained"
                   startIcon={<Save />}
                   sx={{
@@ -295,7 +282,7 @@ export default function TaskForm({
             ) : (
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !isFormValid}
                 variant="contained"
                 startIcon={<Save />}
                 sx={{
