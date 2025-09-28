@@ -280,7 +280,7 @@ type Props = {
   schools: School[];
   contacts: Contact[];
   programs: Program[];
-  onUpdate: (id: string, data: any) => void;
+  onUpdate: (id: string, data: Partial<SchoolProgramParticipation>) => void;
   onDelete: (id: string) => void;
 };
 export const SchoolProgramParticipationTable = ({
@@ -304,7 +304,7 @@ export const SchoolProgramParticipationTable = ({
     setEditDialogOpen(true);
   };
 
-  const handleSaveParticipation = (id: string, data: any) => {
+  const handleSaveParticipation = (id: string, data: Partial<SchoolProgramParticipation>) => {
     onUpdate(id, data);
     setEditDialogOpen(false);
     setEditingParticipation(null);

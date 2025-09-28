@@ -2,7 +2,7 @@ import { useReducer, useEffect, useCallback } from "react";
 import { schoolReducer } from "../reducers/schoolReducer";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
-import { defaultFilterValues } from "../schemas/schoolSchemas";
+import { defaultFilterValues, type CreateSchoolFormData, type EditSchoolFormData } from "../schemas/schoolSchemas";
 import type { School } from "@/types";
 import type { SchoolState } from "../types";
 
@@ -59,7 +59,7 @@ export const useSchoolState = () => {
   }, []);
 
   const handleCreateSchool = useCallback(
-    async (data: any) => {
+    async (data: CreateSchoolFormData) => {
       dispatch({ type: "SET_SUBMITTING", payload: true });
       try {
         await createSchool(data);
@@ -75,7 +75,7 @@ export const useSchoolState = () => {
   );
 
   const handleUpdateSchool = useCallback(
-    async (id: string, updates: Partial<School>) => {
+    async (id: string, updates: EditSchoolFormData) => {
       dispatch({ type: "SET_SUBMITTING", payload: true });
       try {
         await updateSchool(id, updates);

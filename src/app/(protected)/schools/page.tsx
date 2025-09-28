@@ -29,7 +29,7 @@ export default function Schools(): React.ReactNode {
     toggleForm(true);
   };
 
-  const handleEditSchool = (school: any) => {
+  const handleEditSchool = (school: School) => {
     setEditSchool(school);
     toggleForm(true);
   };

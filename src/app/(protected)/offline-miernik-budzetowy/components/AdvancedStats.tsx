@@ -1,13 +1,13 @@
 import React from "react";
 import { Box, Typography, Grid, Card, CardContent, useTheme, Chip, Divider } from "@mui/material";
 import { TrendingUp, People, Assignment, CalendarMonth, Assessment, Timeline } from "@mui/icons-material";
-import type { AggregatedData, Month } from "../types";
+import type { AggregatedData, Month, ExcelRow } from "../types";
 import { MONTH_NAMES } from "../types";
 
 interface AdvancedStatsProps {
   data: AggregatedData;
   selectedMonths: Month[];
-  rawData: any[];
+  rawData: ExcelRow[];
 }
 
 export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, selectedMonths, rawData }) => {

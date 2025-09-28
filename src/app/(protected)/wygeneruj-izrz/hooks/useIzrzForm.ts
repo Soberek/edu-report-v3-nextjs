@@ -69,7 +69,7 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
 
   // Set form value helper
   const setFormValue = useCallback(
-    (field: keyof IzrzFormData, value: any) => {
+    (field: keyof IzrzFormData, value: IzrzFormData[keyof IzrzFormData]) => {
       setValue(field, value, { shouldValidate: true });
     },
     [setValue]

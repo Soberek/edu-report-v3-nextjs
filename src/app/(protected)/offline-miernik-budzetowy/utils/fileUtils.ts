@@ -1,4 +1,4 @@
-import { VALID_FILE_EXTENSIONS, MAX_FILE_SIZE, ERROR_MESSAGES } from "../types";
+import { VALID_FILE_EXTENSIONS, MAX_FILE_SIZE, ERROR_MESSAGES, type ExcelRow } from "../types";
 
 /**
  * Validates if a file is a valid Excel file
@@ -30,7 +30,7 @@ export const validateExcelFile = (file: File): { isValid: boolean; error?: strin
 /**
  * Reads Excel file and returns parsed data
  */
-export const readExcelFile = (file: File): Promise<{ fileName: string; data: any[] }> => {
+export const readExcelFile = (file: File): Promise<{ fileName: string; data: ExcelRow[] }> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     

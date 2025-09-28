@@ -28,7 +28,7 @@ interface EditDialogProps {
   contacts: Contact[];
   programs: Program[];
   onClose: () => void;
-  onSave: (id: string, data: any) => void;
+  onSave: (id: string, data: Partial<SchoolProgramParticipation>) => void;
   loading: boolean;
 }
 
@@ -64,7 +64,7 @@ export default function EditDialog({ open, participation, schools, contacts, pro
     }
   }, [participation, reset]);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: Partial<SchoolProgramParticipation>) => {
     if (participation) {
       onSave(participation.id, data);
     }

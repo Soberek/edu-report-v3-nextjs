@@ -12,7 +12,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { PostEditDialogProps } from "../types";
+import { PostEditDialogProps, EducationalPost } from "../types";
 import { postTemplates } from "../constants";
 
 /**
@@ -32,7 +32,7 @@ export function PostEditDialog({ open, post, onClose, onSave }: PostEditDialogPr
     onClose();
   };
 
-  const handleFieldChange = (field: string, value: any) => {
+  const handleFieldChange = (field: keyof EducationalPost, value: EducationalPost[keyof EducationalPost]) => {
     setEditedPost((prev) => ({ ...prev, [field]: value }));
   };
 

@@ -111,7 +111,7 @@ export default function SchoolsProgramParticipation() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const handleUpdateParticipation = async (id: string, data: any) => {
+  const handleUpdateParticipation = async (id: string, data: Partial<SchoolProgramParticipation>) => {
     try {
       await updateSchoolProgramParticipation(id, data);
       setSnackbar({

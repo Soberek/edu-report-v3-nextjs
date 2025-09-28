@@ -39,7 +39,7 @@ interface Props {
   loading: boolean;
   error: string | null;
   handleContactDelete: (id: string) => void;
-  handleContactUpdate: (id: string, data: any) => void;
+  handleContactUpdate: (id: string, data: Partial<Contact>) => void;
 }
 
 export default function ContactList({ contacts, loading, error, handleContactDelete, handleContactUpdate }: Props) {
@@ -67,7 +67,7 @@ export default function ContactList({ contacts, loading, error, handleContactDel
     setEditDialogOpen(true);
   };
 
-  const handleSaveContact = (id: string, data: any) => {
+  const handleSaveContact = (id: string, data: Partial<Contact>) => {
     handleContactUpdate(id, data);
     setEditDialogOpen(false);
     setEditingContact(null);

@@ -7,8 +7,7 @@ export default function saveExcelToFile(data: ProgramsData) {
     return;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const dataArray: any[] = [];
+  const dataArray: (string | number | object)[] = [];
 
   Object.entries(data).forEach(([programType, programData]) => {
     dataArray.push([programType]);

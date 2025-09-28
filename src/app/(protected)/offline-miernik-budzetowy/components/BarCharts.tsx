@@ -1,11 +1,11 @@
 import React from "react";
 import { Box, Typography, Card, CardContent, useTheme, Grid } from "@mui/material";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import type { Month } from "../types";
+import type { Month, ExcelRow } from "../types";
 import { MONTH_NAMES } from "../types";
 
 interface BarChartsProps {
-  rawData: any[];
+  rawData: ExcelRow[];
   selectedMonths: Month[];
 }
 

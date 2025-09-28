@@ -119,7 +119,7 @@ export const exportToExcel = async (data: AggregatedData): Promise<boolean> => {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const dataArray: any[] = [];
+    const dataArray: (string | number)[][] = [];
 
     Object.entries(data.aggregated).forEach(([programType, programData]) => {
       dataArray.push([programType]);
