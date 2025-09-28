@@ -24,7 +24,7 @@ export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?:
     return { isValid: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const firstError = error.errors[0];
+      const firstError = error.issues[0];
       return {
         isValid: false,
         error: `${firstError.path.join(".")}: ${firstError.message}`,
@@ -118,13 +118,12 @@ export const exportToExcel = async (data: AggregatedData): Promise<boolean> => {
       return false;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataArray: (string | number)[][] = [];
 
     Object.entries(data.aggregated).forEach(([programType, programData]) => {
       dataArray.push([programType]);
       Object.entries(programData).forEach(([programName, actions], idx) => {
-        dataArray.push([`${++idx}`, programName, actions]);
+        dataArray.push([`${++idx}`, programName, ""]);
 
         Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
           const { people, actionNumber: action_number } = actionData;

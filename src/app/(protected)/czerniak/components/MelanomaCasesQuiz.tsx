@@ -263,7 +263,7 @@ export const MelanomaCasesQuiz: React.FC<MelanomaCasesQuizProps> = ({ cases, abc
                           {currentResult.isChecked && (
                             <Chip
                               label={status === "success" ? "✓" : status === "error" ? "✗" : status === "info" ? "○" : ""}
-                              color={status as any}
+                              color={status as "primary" | "secondary" | "success" | "warning" | "error" | "info"}
                               size="small"
                               sx={{ minWidth: 24, height: 20, fontSize: "0.7rem" }}
                             />

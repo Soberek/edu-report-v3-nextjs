@@ -79,7 +79,12 @@ export const QuizResults: React.FC<QuizResultsProps> = ({ session, onRestart, on
               <Typography variant="h6" color="text.secondary">
                 Ocena
               </Typography>
-              <Chip label={grade.text} color={grade.color as any} sx={{ mt: 2 }} icon={<Star />} />
+              <Chip
+                label={grade.text}
+                color={grade.color as "primary" | "secondary" | "success" | "warning" | "error" | "info"}
+                sx={{ mt: 2 }}
+                icon={<Star />}
+              />
             </CardContent>
           </Card>
         </Grid>

@@ -71,7 +71,12 @@ export const EducationalContentComponent: React.FC<EducationalContentProps> = ({
                   <Typography variant="h6" fontWeight={600}>
                     {item.title}
                   </Typography>
-                  <Chip label={item.type} color={getColor(item.type) as any} size="small" icon={getIcon(item.type)} />
+                  <Chip
+                    label={item.type}
+                    color={getColor(item.type) as "primary" | "secondary" | "success" | "warning" | "error" | "info"}
+                    size="small"
+                    icon={getIcon(item.type)}
+                  />
                 </Box>
                 <Typography variant="body1">{item.content}</Typography>
               </CardContent>

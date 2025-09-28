@@ -19,13 +19,15 @@ import { postTemplates } from "../constants";
  * Component for editing posts
  */
 export function PostEditDialog({ open, post, onClose, onSave }: PostEditDialogProps) {
-  if (!post) return null;
-
-  const [editedPost, setEditedPost] = React.useState(post);
+  const [editedPost, setEditedPost] = React.useState(post || ({} as EducationalPost));
 
   React.useEffect(() => {
-    setEditedPost(post);
+    if (post) {
+      setEditedPost(post);
+    }
   }, [post]);
+
+  if (!post) return null;
 
   const handleSave = () => {
     onSave(editedPost);
@@ -68,11 +70,7 @@ export function PostEditDialog({ open, post, onClose, onSave }: PostEditDialogPr
           />
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel>Szablon</InputLabel>
-            <Select
-              value={editedPost.template}
-              label="Szablon"
-              onChange={(e) => handleFieldChange("template", e.target.value)}
-            >
+            <Select value={editedPost.template} label="Szablon" onChange={(e) => handleFieldChange("template", e.target.value)}>
               {postTemplates.map((template) => (
                 <MenuItem key={template.id} value={template.id}>
                   {template.name} - {template.description}

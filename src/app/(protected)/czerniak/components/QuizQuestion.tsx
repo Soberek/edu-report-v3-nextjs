@@ -169,7 +169,7 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
                 <FormControlLabel
                   key={index}
                   value={option}
-                  control={<Radio color={getAnswerColor(option) as any} />}
+                  control={<Radio color={getAnswerColor(option) as "primary" | "secondary" | "success" | "warning" | "error" | "info"} />}
                   label={option}
                   disabled={answerState.isSubmitted}
                   sx={{
@@ -193,7 +193,7 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
                 <FormControlLabel
                   key={index}
                   value={option}
-                  control={<Radio color={getAnswerColor(option) as any} />}
+                  control={<Radio color={getAnswerColor(option) as "primary" | "secondary" | "success" | "warning" | "error" | "info"} />}
                   label={option}
                   disabled={answerState.isSubmitted}
                   sx={{
@@ -221,7 +221,7 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
                       checked={Array.isArray(answerState.selectedAnswer) ? answerState.selectedAnswer.includes(option) : false}
                       onChange={(e) => handleMultipleAnswerChange(option, e.target.checked)}
                       disabled={answerState.isSubmitted}
-                      color={getAnswerColor(option) as any}
+                      color={getAnswerColor(option) as "primary" | "secondary" | "success" | "warning" | "error" | "info"}
                     />
                   }
                   label={option}

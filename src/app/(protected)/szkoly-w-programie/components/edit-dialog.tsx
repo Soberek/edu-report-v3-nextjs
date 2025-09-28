@@ -8,19 +8,17 @@ import {
   TextField,
   Box,
   Typography,
-  InputAdornment,
   IconButton,
   Avatar,
   Fade,
   Paper,
   Autocomplete,
 } from "@mui/material";
-import { Close, School, Group, Person, CalendarToday, Save, Edit } from "@mui/icons-material";
+import { Close, School, Group, Person, CalendarToday, Save } from "@mui/icons-material";
 import { Controller, useForm } from "react-hook-form";
 import type { Contact, Program, School as SchoolType } from "@/types";
-import { SchoolProgramParticipation, schoolProgramParticipationSchema } from "@/models/SchoolProgramParticipation";
+import { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
 import { schoolYears } from "@/constants";
-import { z } from "zod";
 
 // Form data type that matches the form structure
 type FormData = {
@@ -125,7 +123,6 @@ export default function EditDialog({ open, participation, schools, contacts, pro
   const programsMap = Object.fromEntries(programs.map((p) => [p.id, p]));
 
   const school = schoolsMap[participation.schoolId];
-  const coordinator = contactsMap[participation.coordinatorId];
 
   return (
     <Dialog
