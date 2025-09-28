@@ -51,7 +51,7 @@ export const useTaskForm = ({ userId, createTask, refetch, mode = "create", task
         status: data.completedDate ? "completed" : "pending",
         updatedAt: new Date().toISOString(),
       };
-      
+
       onSave(task.id, updates);
       return;
     }
