@@ -156,8 +156,8 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, o
               }}
             >
               {schoolTypes.map(([key, label]) => {
-                const isChecked = selectedTypes.includes(key as (typeof selectedTypes)[number]);
-                console.log(`Checkbox ${key}: isChecked=${isChecked}, selectedTypes=${JSON.stringify(selectedTypes)}`);
+                // Check if the stored type (label) matches this checkbox's label
+                const isChecked = selectedTypes.includes(label);
                 return (
                   <FormControlLabel
                     key={key}
@@ -165,7 +165,7 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, o
                       <Checkbox
                         size="small"
                         checked={isChecked}
-                        onChange={(e) => handleTypeChange(key as (typeof selectedTypes)[number], e.target.checked)}
+                        onChange={(e) => handleTypeChange(label as (typeof selectedTypes)[number], e.target.checked)}
                         sx={{
                           py: 0.5,
                           "& .MuiSvgIcon-root": { fontSize: "1rem" },
