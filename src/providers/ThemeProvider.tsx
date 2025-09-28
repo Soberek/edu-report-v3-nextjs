@@ -246,27 +246,107 @@ const theme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: ({ theme }) => ({
-          backgroundColor: theme.palette.background.paper,
+          background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${theme.palette.grey[50]} 100%)`,
           borderRadius: 0,
-          boxShadow: "2px 0 16px rgba(0, 0, 0, 0.08)",
+          boxShadow: "4px 0 24px rgba(0, 0, 0, 0.12)",
           border: "none",
           transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          backdropFilter: "blur(10px)",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main}05 0%, transparent 50%, ${theme.palette.secondary.main}05 100%)`,
+            pointerEvents: "none",
+          },
         }),
         paperAnchorLeft: ({ theme }) => ({
           borderRight: `1px solid ${theme.palette.divider}`,
-          boxShadow: "2px 0 16px rgba(0, 0, 0, 0.08)",
+          boxShadow: "4px 0 24px rgba(0, 0, 0, 0.12)",
         }),
         paperAnchorRight: ({ theme }) => ({
           borderLeft: `1px solid ${theme.palette.divider}`,
-          boxShadow: "-2px 0 16px rgba(0, 0, 0, 0.08)",
+          boxShadow: "-4px 0 24px rgba(0, 0, 0, 0.12)",
         }),
         paperAnchorTop: ({ theme }) => ({
           borderBottom: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0 2px 16px rgba(0, 0, 0, 0.08)",
+          boxShadow: "0 4px 24px rgba(0, 0, 0, 0.12)",
         }),
         paperAnchorBottom: ({ theme }) => ({
           borderTop: `1px solid ${theme.palette.divider}`,
-          boxShadow: "0 -2px 16px rgba(0, 0, 0, 0.08)",
+          boxShadow: "0 -4px 24px rgba(0, 0, 0, 0.12)",
+        }),
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderRadius: 12,
+          margin: "4px 0",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          position: "relative",
+          overflow: "hidden",
+          "&:hover": {
+            backgroundColor: `${theme.palette.primary.main}15`,
+            transform: "translateX(4px)",
+            boxShadow: `0 4px 16px ${theme.palette.primary.main}20`,
+            "&::before": {
+              opacity: 1,
+            },
+          },
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: "3px",
+            background: `linear-gradient(180deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+            opacity: 0,
+            transition: "opacity 0.3s ease",
+          },
+          "&.Mui-selected": {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            boxShadow: `0 6px 20px ${theme.palette.primary.main}40`,
+            transform: "translateX(4px)",
+            "&::before": {
+              opacity: 1,
+              background: theme.palette.primary.contrastText,
+            },
+            "&:hover": {
+              backgroundColor: theme.palette.primary.dark,
+            },
+          },
+        }),
+      },
+    },
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          minWidth: 44,
+          transition: "all 0.3s ease",
+          "& .MuiSvgIcon-root": {
+            fontSize: "1.3rem",
+            transition: "all 0.3s ease",
+          },
+        }),
+      },
+    },
+    MuiListItemText: {
+      styleOverrides: {
+        primary: ({ theme }) => ({
+          fontSize: "0.95rem",
+          fontWeight: 500,
+          transition: "all 0.3s ease",
+        }),
+        secondary: ({ theme }) => ({
+          fontSize: "0.8rem",
+          opacity: 0.7,
+          transition: "all 0.3s ease",
         }),
       },
     },

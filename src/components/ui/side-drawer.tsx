@@ -19,12 +19,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { 
-  navRoutes, 
-  getMainNavigation, 
-  getRoutesByCategory,
-  type NavRoute 
-} from "@/constants/nav-routes";
+import { navRoutes, getMainNavigation, getRoutesByCategory, type NavRoute } from "@/constants/nav-routes";
 import { useNavContext } from "@/providers/NavProvider";
 import { useUser } from "@/hooks/useUser";
 
@@ -35,13 +30,11 @@ const SideDrawer: React.FC = () => {
   const pathname = usePathname();
   const navContext = useNavContext();
   const isUserLoggedIn = useUser().user?.uid ? true : false;
-  const [expandedCategories, setExpandedCategories] = React.useState<Set<string>>(
-    new Set(["education", "database", "tools"])
-  );
+  const [expandedCategories, setExpandedCategories] = React.useState<Set<string>>(new Set(["education", "database", "tools"]));
 
   // Get main navigation routes (private routes only)
   const mainNavRoutes = getMainNavigation();
-  
+
   // Group routes by category
   const routesByCategory = React.useMemo(() => {
     const grouped: Record<string, NavRoute[]> = {};
@@ -83,9 +76,6 @@ const SideDrawer: React.FC = () => {
       sx={{
         "& .MuiDrawer-paper": {
           width: drawerWidth,
-          background: `linear-gradient(180deg, ${theme.palette.background.paper} 0%, ${theme.palette.grey[50]} 100%)`,
-          borderRight: `1px solid ${theme.palette.divider}`,
-          boxShadow: `0 0 20px ${theme.palette.primary.main}10`,
         },
       }}
     >
@@ -98,6 +88,17 @@ const SideDrawer: React.FC = () => {
             color: "white",
             textAlign: "center",
             position: "relative",
+            boxShadow: `0 4px 20px ${theme.palette.primary.main}30`,
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: `radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%)`,
+              pointerEvents: "none",
+            },
             "&::after": {
               content: '""',
               position: "absolute",
@@ -115,9 +116,12 @@ const SideDrawer: React.FC = () => {
               height: 60,
               mx: "auto",
               mb: 2,
-              background: `linear-gradient(45deg, ${theme.palette.secondary.main} 30%, ${theme.palette.secondary.light} 90%)`,
+              background: `linear-gradient(45deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)`,
+              backdropFilter: "blur(10px)",
+              border: "2px solid rgba(255,255,255,0.3)",
               fontSize: "1.5rem",
               fontWeight: "bold",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
             }}
           >
             ER
@@ -136,7 +140,7 @@ const SideDrawer: React.FC = () => {
             {Object.entries(routesByCategory).map(([category, routes]) => {
               const isExpanded = expandedCategories.has(category);
               const config = categoryConfig[category as keyof typeof categoryConfig];
-              
+
               return (
                 <Box key={category}>
                   {/* Category Header */}
@@ -145,16 +149,17 @@ const SideDrawer: React.FC = () => {
                     sx={{
                       borderRadius: 2,
                       mb: 1,
-                      backgroundColor: isExpanded ? theme.palette.primary.light : "transparent",
+                      backgroundColor: isExpanded ? `${theme.palette.primary.main}15` : "transparent",
+                      border: `1px solid ${isExpanded ? theme.palette.primary.main : "transparent"}`,
                       "&:hover": {
-                        backgroundColor: theme.palette.primary.light,
+                        backgroundColor: `${theme.palette.primary.main}10`,
+                        border: `1px solid ${theme.palette.primary.main}50`,
+                        transform: "translateX(2px)",
                       },
                     }}
                   >
                     <ListItemIcon sx={{ minWidth: 36 }}>
-                      <Typography sx={{ fontSize: "1.2rem" }}>
-                        {config?.icon}
-                      </Typography>
+                      <Typography sx={{ fontSize: "1.2rem" }}>{config?.icon}</Typography>
                     </ListItemIcon>
                     <ListItemText
                       primary={config?.label}
@@ -195,16 +200,16 @@ const SideDrawer: React.FC = () => {
                               component={Link}
                               href={path}
                               onClick={handleDrawerClose}
-                              className={isActive ? "active" : ""}
+                              selected={isActive}
                               sx={{
                                 borderRadius: 2,
                                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                 position: "relative",
                                 overflow: "hidden",
                                 "&:hover": {
-                                  backgroundColor: theme.palette.action.hover,
-                                  transform: "translateX(8px)",
-                                  boxShadow: `0 4px 20px ${theme.palette.primary.main}20`,
+                                  backgroundColor: `${theme.palette.primary.main}10`,
+                                  transform: "translateX(4px)",
+                                  boxShadow: `0 4px 16px ${theme.palette.primary.main}20`,
                                   "&::before": {
                                     opacity: 1,
                                   },
@@ -215,22 +220,22 @@ const SideDrawer: React.FC = () => {
                                   left: 0,
                                   top: 0,
                                   bottom: 0,
-                                  width: "4px",
+                                  width: "3px",
                                   background: `linear-gradient(180deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
                                   opacity: 0,
                                   transition: "opacity 0.3s ease",
                                 },
-                                "&.active": {
+                                "&.Mui-selected": {
                                   backgroundColor: theme.palette.primary.main,
-                                  color: "white",
-                                  boxShadow: `0 8px 32px ${theme.palette.primary.main}40`,
-                                  transform: "translateX(8px)",
+                                  color: theme.palette.primary.contrastText,
+                                  boxShadow: `0 6px 20px ${theme.palette.primary.main}40`,
+                                  transform: "translateX(4px)",
                                   "&::before": {
                                     opacity: 1,
-                                    background: "white",
+                                    background: theme.palette.primary.contrastText,
                                   },
                                   "& .MuiListItemIcon-root": {
-                                    color: "white",
+                                    color: theme.palette.primary.contrastText,
                                   },
                                   "&:hover": {
                                     backgroundColor: theme.palette.primary.dark,
@@ -282,7 +287,7 @@ const SideDrawer: React.FC = () => {
                       })}
                     </List>
                   </Collapse>
-                  
+
                   {/* Divider between categories */}
                   {category !== Object.keys(routesByCategory)[Object.keys(routesByCategory).length - 1] && (
                     <Divider sx={{ my: 2, opacity: 0.3 }} />
@@ -300,6 +305,16 @@ const SideDrawer: React.FC = () => {
             background: `linear-gradient(135deg, ${theme.palette.grey[100]} 0%, ${theme.palette.grey[50]} 100%)`,
             borderTop: `1px solid ${theme.palette.divider}`,
             textAlign: "center",
+            position: "relative",
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "1px",
+              background: `linear-gradient(90deg, transparent 0%, ${theme.palette.primary.main}20 50%, transparent 100%)`,
+            },
           }}
         >
           <Stack spacing={1} alignItems="center">
@@ -307,9 +322,10 @@ const SideDrawer: React.FC = () => {
               label="v2.0"
               size="small"
               sx={{
-                backgroundColor: theme.palette.primary.main,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                 color: "white",
                 fontWeight: "bold",
+                boxShadow: `0 2px 8px ${theme.palette.primary.main}30`,
               }}
             />
             <Typography variant="caption" color="text.secondary">
