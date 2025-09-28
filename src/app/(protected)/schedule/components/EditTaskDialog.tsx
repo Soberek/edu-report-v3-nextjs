@@ -16,15 +16,7 @@ import {
   InputAdornment,
   Fade,
 } from "@mui/material";
-import {
-  Edit,
-  Assignment,
-  School,
-  CalendarToday,
-  Description,
-  Save,
-  Cancel,
-} from "@mui/icons-material";
+import { Edit, Assignment, School, CalendarToday, Description, Save, Cancel } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -51,13 +43,7 @@ interface EditTaskDialogProps {
   onSave: (id: string, updates: Partial<ScheduledTaskType>) => void;
 }
 
-export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({
-  open,
-  onClose,
-  task,
-  programs,
-  onSave,
-}) => {
+export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({ open, onClose, task, programs, onSave }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -186,14 +172,34 @@ export const EditTaskDialog: React.FC<EditTaskDialogProps> = ({
                         background: "white",
                       }}
                     >
-                      {Object.values(TASK_TYPES).map((taskType) => (
-                        <MenuItem key={taskType.id} value={taskType.id}>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <Typography sx={{ fontSize: "1.2rem" }}>{taskType.emoji}</Typography>
-                            <Typography>{taskType.label}</Typography>
-                          </Box>
-                        </MenuItem>
-                      ))}
+                      {Object.values(TASK_TYPES).map((taskType) => {
+                        const getTaskTypeEmoji = (label: string) => {
+                          const emojiMap: { [key: string]: string } = {
+                            prelekcja: "🎤",
+                            warsztaty: "🛠️",
+                            szkolenie: "📚",
+                            wykład: "👨‍🏫",
+                            "stoisko informacyjne-edukacyjne": "🏢",
+                            konkurs: "🏆",
+                            "list intencyjny": "✉️",
+                            "publikacja media": "📰",
+                            dystrybucja: "📦",
+                            sprawozdanie: "📝",
+                            wizytacja: "👀",
+                            instruktaż: "🧑‍🔧",
+                          };
+                          return emojiMap[label] || "📝";
+                        };
+
+                        return (
+                          <MenuItem key={taskType.id} value={taskType.id}>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                              <Typography sx={{ fontSize: "1.2rem" }}>{getTaskTypeEmoji(taskType.label)}</Typography>
+                              <Typography>{taskType.label}</Typography>
+                            </Box>
+                          </MenuItem>
+                        );
+                      })}
                     </Select>
                   )}
                 />

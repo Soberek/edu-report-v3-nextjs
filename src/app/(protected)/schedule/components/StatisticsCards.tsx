@@ -1,7 +1,8 @@
 import React from "react";
 import { Box, Card, CardContent, Typography } from "@mui/material";
-import { CheckCircle, Assignment, Pending } from "@mui/icons-material";
+import { CheckCircle, Assignment, Pending, CalendarMonth } from "@mui/icons-material";
 import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
+import dayjs from "dayjs";
 
 interface StatisticsCardsProps {
   tasks: ScheduledTaskType[];
@@ -12,6 +13,14 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({
   tasks,
   percentageOfCompletedTasks,
 }) => {
+  const currentMonth = dayjs().format("YYYY-MM");
+  const currentMonthTasks = tasks.filter((task) => 
+    dayjs(task.dueDate).format("YYYY-MM") === currentMonth
+  );
+  const currentMonthCompleted = currentMonthTasks.filter((task) => task.status === "completed").length;
+  const currentMonthPercentage = currentMonthTasks.length > 0 
+    ? Math.round((currentMonthCompleted / currentMonthTasks.length) * 100) 
+    : 0;
   return (
     <Box
       sx={{
@@ -72,6 +81,24 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
             Oczekujących zadań
+          </Typography>
+        </CardContent>
+      </Card>
+      <Card
+        sx={{
+          background: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+          color: "white",
+          borderRadius: 2,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+        }}
+      >
+        <CardContent sx={{ textAlign: "center", py: 2 }}>
+          <CalendarMonth sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
+          <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
+            {currentMonthPercentage}%
+          </Typography>
+          <Typography variant="body2" sx={{ opacity: 0.9 }}>
+            Ukończonych w tym miesiącu
           </Typography>
         </CardContent>
       </Card>
