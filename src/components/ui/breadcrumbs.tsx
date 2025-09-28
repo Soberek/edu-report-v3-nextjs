@@ -1,12 +1,6 @@
 "use client";
 import React from "react";
-import {
-  Breadcrumbs as MuiBreadcrumbs,
-  Link,
-  Typography,
-  Box,
-  useTheme,
-} from "@mui/material";
+import { Breadcrumbs as MuiBreadcrumbs, Link, Typography, Box, useTheme } from "@mui/material";
 import { usePathname } from "next/navigation";
 import NextLink from "next/link";
 
@@ -47,7 +41,7 @@ const Breadcrumbs: React.FC = () => {
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;
       const isLast = index === pathSegments.length - 1;
-      
+
       breadcrumbs.push({
         label: routeMap[currentPath] || segment.charAt(0).toUpperCase() + segment.slice(1),
         href: currentPath,

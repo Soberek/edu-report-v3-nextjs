@@ -1,252 +1,149 @@
 "use client";
-import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, Typography, Box, MenuItem, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import type { GridRenderCellParams, GridColDef } from "@mui/x-data-grid";
-import type { School } from "@/types";
-import React, { useState } from "react";
-import { schoolTypes } from "@/constants";
-import { useFirebaseData } from "@/hooks/useFirebaseData";
-import { useUser } from "@/hooks/useUser";
+import React from "react";
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  Alert,
+  CircularProgress,
+  useTheme,
+} from "@mui/material";
+import { Add, School } from "@mui/icons-material";
+import { useSchoolState } from "./hooks/useSchoolState";
+import { useSchoolFilters } from "./hooks/useSchoolFilters";
+import { SchoolForm } from "./components/SchoolForm";
+import { SchoolTable } from "./components/SchoolTable";
+import { SchoolFilter } from "./components/SchoolFilter";
+import type { CreateSchoolFormData, EditSchoolFormData } from "./schemas/schoolSchemas";
 
 export default function Schools(): React.ReactNode {
-  const userContext = useUser();
-
+  const theme = useTheme();
   const {
-    data: schools,
-    loading: loadingSchools,
-    error: errorMessage,
-    createItem: createSchool,
-    // updateItem: updateSchool,
-    deleteItem: deleteSchool,
-  } = useFirebaseData<School>("schools", userContext.user?.uid);
+    state,
+    setFilter,
+    toggleForm,
+    setEditSchool,
+    handleCreateSchool,
+    handleUpdateSchool,
+    handleDeleteSchool,
+  } = useSchoolState();
 
-  const { control, handleSubmit } = useForm<Omit<School, "id" | "createdAt" | "updatedAt">>();
+  const { filteredSchools, uniqueTypes, uniqueCities } = useSchoolFilters({
+    schools: state.schools,
+    filter: state.filter,
+  });
 
-  const onSubmit = async (data: Omit<School, "id" | "createdAt" | "updatedAt">) => {
-    await createSchool(data);
+  const handleAddSchool = () => {
+    setEditSchool(null);
+    toggleForm(true);
   };
 
-  const columns: GridColDef[] = [
-    { field: "name", headerName: "Nazwa", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "address", headerName: "Adres", flex: 1 },
-    { field: "city", headerName: "Miasto", flex: 1 },
-    { field: "postalCode", headerName: "Kod pocztowy", flex: 1 },
-    { field: "municipality", headerName: "Gmina", flex: 1 },
-    {
-      field: "type",
-      headerName: "Typ",
-      flex: 1,
-      valueGetter: (params: School["type"]) => {
-        if (params && Array.isArray(params)) {
-          return params.join(", ");
-        }
-      },
-    },
-    {
-      field: "actions",
-      headerName: "Akcje",
-      sortable: false,
-      filterable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Button
-            variant="outlined"
-            color="error"
-            size="small"
-            onClick={() => deleteSchool(params.row.id)}
-            sx={{
-              textTransform: "none",
-              fontWeight: 500,
-              px: 1,
-            }}
-          >
-            Usuń
-          </Button>
-        </Box>
-      ),
-      flex: 0.7,
-    },
-  ];
+  const handleEditSchool = (school: any) => {
+    setEditSchool(school);
+  };
 
-  const [openForm, setOpenForm] = useState(false);
+  const handleDeleteSchoolConfirm = (id: string) => {
+    if (window.confirm("Czy na pewno chcesz usunąć tę szkołę?")) {
+      handleDeleteSchool(id);
+    }
+  };
+
+  const handleFormSave = async (data: CreateSchoolFormData | EditSchoolFormData) => {
+    if (state.editSchool) {
+      await handleUpdateSchool(state.editSchool.id, data);
+    } else {
+      await handleCreateSchool(data);
+    }
+  };
+
+  const handleFormClose = () => {
+    toggleForm(false);
+    setEditSchool(null);
+  };
 
   return (
-    <div>
-      <Button onClick={() => setOpenForm((prev) => !prev)} sx={{ my: 2, mx: 2, textTransform: "none", px: 4 }}>
-        Dodaj szkołę
-      </Button>
-      {openForm && (
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} style={{ maxWidth: 400, margin: "0 auto" }}>
-          <h2>Dodaj szkołę</h2>
-          <Controller
-            name="name"
-            control={control}
-            rules={{ required: "Nazwa jest wymagana" }}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Nazwa"
-                fullWidth
-                required
-                {...field}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                margin="normal"
-              />
-            )}
-          />
-          <Controller
-            name="address"
-            control={control}
-            rules={{ required: "Adres jest wymagany" }}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Adres"
-                fullWidth
-                required
-                {...field}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                margin="normal"
-              />
-            )}
-          />
-          <Controller
-            name="city"
-            control={control}
-            rules={{ required: "Miasto jest wymagane" }}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Miasto"
-                fullWidth
-                required
-                {...field}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                margin="normal"
-              />
-            )}
-          />
-          <Controller
-            name="postalCode"
-            control={control}
-            rules={{ required: "Kod pocztowy jest wymagany" }}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Kod pocztowy"
-                fullWidth
-                required
-                {...field}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                margin="normal"
-              />
-            )}
-          />
-          <Controller
-            name="municipality"
-            control={control}
-            rules={{ required: "Gmina jest wymagana" }}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Gmina"
-                fullWidth
-                required
-                {...field}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                margin="normal"
-              />
-            )}
-          />
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Header */}
+      <Box sx={{ mb: 4, textAlign: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, mb: 2 }}>
+          <School sx={{ fontSize: "2.5rem", color: theme.palette.primary.main }} />
+          <Typography variant="h3" sx={{ fontWeight: "bold", color: "#1976d2" }}>
+            Zarządzanie szkołami
+          </Typography>
+        </Box>
+        <Typography variant="body1" color="text.secondary" sx={{ fontSize: "1.1rem" }}>
+          Dodawaj, edytuj i zarządzaj szkołami w systemie
+        </Typography>
+      </Box>
 
-          <FormGroup>
-            {Object.entries(schoolTypes).map(([key, label]) => {
-              return <FormControlLabel key={key} control={<Checkbox />} label={`${label}`} />;
-            })}
-          </FormGroup>
-          <Controller
-            name="type"
-            control={control}
-            rules={{ required: "Typ szkoły jest wymagany" }}
-            render={({ field, fieldState }) => (
-              <TextField
-                select
-                label="Typ szkoły"
-                fullWidth
-                required
-                {...field}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                margin="normal"
-              >
-                {Object.entries(schoolTypes).map(([key, label]) => (
-                  <MenuItem key={key} value={key}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            )}
+      {/* Error Display */}
+      {state.error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {state.error}
+        </Alert>
+      )}
+
+      {/* Add School Button */}
+      <Box sx={{ mb: 3, display: "flex", justifyContent: "flex-end" }}>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={handleAddSchool}
+          sx={{
+            px: 4,
+            py: 1.5,
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: 2,
+            background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+            "&:hover": {
+              background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
+            },
+          }}
+        >
+          Dodaj szkołę
+        </Button>
+      </Box>
+
+      {/* Filters */}
+      <SchoolFilter
+        filter={state.filter}
+        onFilterChange={setFilter}
+      />
+
+      {/* School Form */}
+      {state.openForm && (
+        <Box sx={{ mb: 4 }}>
+          <SchoolForm
+            mode={state.editSchool ? "edit" : "create"}
+            school={state.editSchool}
+            onClose={handleFormClose}
+            onSave={handleFormSave}
+            loading={state.isSubmitting}
           />
-          <Controller
-            name="email"
-            control={control}
-            rules={{
-              required: "Email jest wymagany",
-              pattern: {
-                value: /^\S+@\S+\.\S+$/,
-                message: "Nieprawidłowy adres email",
-              },
-            }}
-            render={({ field, fieldState }) => (
-              <TextField
-                label="Email"
-                type="email"
-                fullWidth
-                required
-                {...field}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-                margin="normal"
-              />
-            )}
-          />
-          <Button type="submit" disabled={loadingSchools} fullWidth sx={{ mt: 2 }}>
-            Dodaj szkołę
-          </Button>
-          {errorMessage && (
-            <Typography color="error" style={{ marginTop: 16 }}>
-              {errorMessage}
-            </Typography>
-          )}
         </Box>
       )}
 
-      {/* Lista szkół */}
-      <Box sx={{ mt: 4, px: 2 }}>
-        <Typography variant="h6" gutterBottom>
-          Szkoły
+      {/* School Table */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: "#1976d2" }}>
+          Lista szkół ({filteredSchools.length})
         </Typography>
-        {loadingSchools ? (
-          <Typography>Ładowanie...</Typography>
-        ) : errorMessage ? (
-          <Typography color="error">{errorMessage}</Typography>
-        ) : (
-          <Box sx={{ height: 500, width: "100%" }}>
-            <DataGrid
-              rows={schools}
-              columns={columns}
-              getRowId={(row) => row.id}
-              disableRowSelectionOnClick
-              pageSizeOptions={[10, 25, 50]}
-              initialState={{
-                pagination: { paginationModel: { pageSize: 10 } },
-              }}
-            />
+        
+        {state.loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 400 }}>
+            <CircularProgress size={60} />
           </Box>
+        ) : (
+          <SchoolTable
+            schools={filteredSchools}
+            onEdit={handleEditSchool}
+            onDelete={handleDeleteSchoolConfirm}
+            loading={state.loading}
+          />
         )}
       </Box>
-    </div>
+    </Container>
   );
 }

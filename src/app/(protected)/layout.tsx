@@ -9,9 +9,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     <ProtectedPage>
       <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Breadcrumbs />
-        <Box sx={{ flex: 1 }}>
-          {children}
-        </Box>
+        <Box sx={{ flex: 1 }}>{children}</Box>
       </Box>
     </ProtectedPage>
   );
