@@ -194,7 +194,10 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
               />
             ))
           ) : (
-            <Typography variant="body2" sx={{ fontSize: "0.85rem", color: "text.secondary", textAlign: "center", wordWrap: "break-word", whiteSpace: "normal" }}>
+            <Typography
+              variant="body2"
+              sx={{ fontSize: "0.85rem", color: "text.secondary", textAlign: "center", wordWrap: "break-word", whiteSpace: "normal" }}
+            >
               Brak danych
             </Typography>
           )}
@@ -287,6 +290,7 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
         initialState={{
           pagination: { paginationModel: { pageSize: 10 } },
         }}
+        getRowHeight={() => 'auto'}
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
@@ -304,12 +308,17 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
             "&:hover": {
               backgroundColor: theme.palette.action.hover,
             },
+            "& .MuiDataGrid-cell": {
+              borderBottom: `1px solid ${theme.palette.divider}`,
+            },
           },
           "& .MuiDataGrid-cell": {
-            borderBottom: `1px solid ${theme.palette.divider}`,
             whiteSpace: "normal",
             wordWrap: "break-word",
             lineHeight: "1.4",
+            display: "flex",
+            alignItems: "center",
+            padding: "8px 16px",
           },
         }}
       />
