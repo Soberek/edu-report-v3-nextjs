@@ -218,7 +218,7 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 0.5,
+            gap: 1,
             alignItems: "center",
             justifyContent: "center",
             height: "100%",
