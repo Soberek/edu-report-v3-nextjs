@@ -4,7 +4,7 @@ import { Box, Typography, Alert, Button, CircularProgress, Container } from "@mu
 import { PlayArrow } from "@mui/icons-material";
 
 import { useBudgetMeter } from "./hooks/useBudgetMeter";
-import { StatsCard, MonthSelector, FileUploader, DataTable } from "./components";
+import { StatsCard, MonthSelector, FileUploader, DataTable, AdvancedStats } from "./components";
 
 const OfflineMiernik: React.FC = () => {
   const {
@@ -104,6 +104,15 @@ const OfflineMiernik: React.FC = () => {
           <StatsCard icon="📊" label="Ogólna liczba działań" value={state.aggregatedData.allActions} color="primary" />
           <StatsCard icon="👥" label="Ogólna liczba odbiorców" value={state.aggregatedData.allPeople} color="success" />
         </Box>
+      )}
+
+      {/* Advanced Statistics */}
+      {hasValidData && state.aggregatedData && (
+        <AdvancedStats
+          data={state.aggregatedData}
+          selectedMonths={state.selectedMonths}
+          rawData={state.rawData}
+        />
       )}
 
       {/* Data Table */}
