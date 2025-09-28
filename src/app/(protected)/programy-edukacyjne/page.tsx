@@ -1,198 +1,115 @@
 "use client";
-import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, Typography, Box, MenuItem } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import type { GridRenderCellParams, GridColDef } from "@mui/x-data-grid";
-import { useState } from "react";
-import type { Program } from "@/types";
-import { PROGRAM_TYPE } from "@/constants/programs";
-import { usePrograms } from "@/hooks/useProgram";
+import React, { useState } from "react";
+import { Container, Box } from "@mui/material";
+import { Add } from "@mui/icons-material";
+import { PageHeader, PrimaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
+import { useProgramsState, useProgramFilters, useProgramStats } from "./hooks";
+import { ProgramForm, ProgramTable, ProgramFilter, ProgramStats } from "./components";
+import type { CreateProgramFormData, Program } from "./types";
+import type { ProgramFilter as ProgramFilterType } from "./hooks/useProgramFilters";
 
-export default function Programs() {
-  const { programs, loading, errorMessage, handleProgramSubmit, handleProgramDelete } = usePrograms();
+export default function Programs(): React.ReactNode {
+  const { state, handleCreateProgram, handleUpdateProgram, handleDeleteProgram, toggleForm, setEditProgram, clearError } =
+    useProgramsState();
+  const { showConfirm, ConfirmDialog } = useConfirmDialog();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<Omit<Program, "id">>({
-    defaultValues: {
-      code: "",
-      name: "",
-      programType: PROGRAM_TYPE.PROGRAMOWY,
-      description: "",
-    },
+  const [filter, setFilter] = useState<ProgramFilterType>({
+    search: "",
+    programType: "all",
+    sortBy: "name",
+    sortOrder: "asc",
   });
 
-  const onSubmit = async (data: Omit<Program, "id">) => {
-    console.log(data);
-    await handleProgramSubmit(data);
-    reset();
+  const { filteredPrograms, uniqueProgramTypes } = useProgramFilters({
+    programs: state.programs,
+    filter,
+  });
+
+  const { totalPrograms, programowyCount, nieprogramowyCount } = useProgramStats({
+    programs: state.programs,
+  });
+
+  const handleAddProgram = () => {
+    setEditProgram(null);
+    toggleForm(true);
   };
 
-  const columns: GridColDef[] = [
-    { field: "code", headerName: "Numer referencyjny", flex: 1 },
-    { field: "name", headerName: "Nazwa", flex: 2 },
-    {
-      field: "programType",
-      headerName: "Typ programu",
-      flex: 1,
-      valueGetter: (params: string) => {
-        return params;
-      },
-    },
-    // { field: "description", headerName: "Opis", flex: 2 },
-    {
-      field: "actions",
-      headerName: "Akcje",
-      sortable: false,
-      filterable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <Button
-          variant="contained"
-          color="error"
-          size="small"
-          onClick={() => handleProgramDelete(params.row.id)}
-          sx={{
-            borderRadius: 2,
-            textTransform: "none",
-            fontWeight: 700,
-            px: 2,
-            color: "white",
-            backgroundColor: "#d32f2f",
-            "&:hover": {
-              backgroundColor: "#bc0009ff",
-            },
-          }}
-        >
-          Usuń
-        </Button>
-      ),
-      flex: 1,
-    },
-  ];
+  const handleEditProgram = (program: Program) => {
+    setEditProgram(program);
+    toggleForm(true);
+  };
 
-  const [openForm, setOpenForm] = useState(false);
+  const handleDeleteProgramConfirm = (id: string) => {
+    showConfirm(
+      "Usuń program",
+      "Czy na pewno chcesz usunąć ten program? Ta operacja nie może zostać cofnięta.",
+      () => handleDeleteProgram(id),
+      "delete"
+    );
+  };
+
+  const handleFormSave = async (data: CreateProgramFormData) => {
+    if (state.editProgram) {
+      await handleUpdateProgram(state.editProgram.id, data);
+    } else {
+      await handleCreateProgram(data);
+    }
+  };
+
+  const handleFormClose = () => {
+    toggleForm(false);
+    setEditProgram(null);
+  };
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        pb: 4,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <Button onClick={() => setOpenForm((prev) => !prev)} sx={{ my: 2, mx: "auto" }}>
-        Dodaj program
-      </Button>
-      {openForm && (
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} style={{ maxWidth: 400, margin: "0 auto" }}>
-          <h2>Dodaj program</h2>
-          <Controller
-            name="code"
-            control={control}
-            rules={{ required: "Kod jest wymagany" }}
-            render={({ field }) => (
-              <TextField
-                label="Kod"
-                fullWidth
-                required
-                {...field}
-                error={!!errors.code}
-                helperText={errors.code?.message}
-                margin="normal"
-              />
-            )}
-          />
-          <Controller
-            name="name"
-            control={control}
-            rules={{ required: "Nazwa jest wymagana" }}
-            render={({ field }) => (
-              <TextField
-                label="Nazwa"
-                fullWidth
-                required
-                {...field}
-                error={!!errors.name}
-                helperText={errors.name?.message}
-                margin="normal"
-              />
-            )}
-          />
-          <Controller
-            name="programType"
-            control={control}
-            rules={{ required: "Typ programu jest wymagany" }}
-            render={({ field }) => (
-              <TextField
-                select
-                label="Typ programu"
-                fullWidth
-                required
-                {...field}
-                error={!!errors.programType}
-                helperText={errors.programType?.message}
-                margin="normal"
-              >
-                <MenuItem value={PROGRAM_TYPE.PROGRAMOWY}>{PROGRAM_TYPE.PROGRAMOWY}</MenuItem>
-                <MenuItem value={PROGRAM_TYPE.NIEPROGRAMOWY}>{PROGRAM_TYPE.NIEPROGRAMOWY}</MenuItem>
-              </TextField>
-            )}
-          />
-          <Controller
-            name="description"
-            control={control}
-            rules={{ required: "Opis jest wymagany" }}
-            render={({ field }) => (
-              <TextField
-                label="Opis"
-                fullWidth
-                required
-                multiline
-                minRows={2}
-                {...field}
-                error={!!errors.description}
-                helperText={errors.description?.message}
-                margin="normal"
-              />
-            )}
-          />
-          <Button type="submit" variant="contained" color="primary" disabled={loading || isSubmitting} fullWidth sx={{ mt: 2 }}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Header */}
+      <PageHeader
+        title="Programy edukacyjne"
+        subtitle="Zarządzaj programami edukacyjnymi w systemie"
+        actions={
+          <PrimaryButton startIcon={<Add />} onClick={handleAddProgram}>
             Dodaj program
-          </Button>
-          {errorMessage && (
-            <Typography color="error" style={{ marginTop: 16 }}>
-              {errorMessage}
-            </Typography>
-          )}
-        </Box>
+          </PrimaryButton>
+        }
+      />
+
+      {/* Error Display */}
+      {state.error && <ErrorDisplay error={state.error} sx={{ mb: 3 }} />}
+
+      {/* Program Statistics */}
+      <ProgramStats totalPrograms={totalPrograms} programowyCount={programowyCount} nieprogramowyCount={nieprogramowyCount} />
+
+      {/* Filters */}
+      <ProgramFilter filter={filter} onFilterChange={setFilter} uniqueProgramTypes={uniqueProgramTypes} />
+
+      {/* Program Form */}
+      {state.openForm && (
+        <ProgramForm
+          mode={state.editProgram ? "edit" : "create"}
+          program={state.editProgram}
+          onClose={handleFormClose}
+          onSave={handleFormSave}
+          loading={state.isSubmitting}
+        />
       )}
 
-      <Box sx={{ mt: 4, px: 2, width: "100%" }}>
-        <Typography variant="h6" gutterBottom>
-          Programy
-        </Typography>
-        {loading ? (
-          <Typography>Ładowanie...</Typography>
-        ) : errorMessage ? (
-          <Typography color="error">{errorMessage}</Typography>
+      {/* Program Table */}
+      <Box sx={{ mb: 4 }}>
+        {state.loading ? (
+          <LoadingSpinner message="Ładowanie programów..." />
         ) : (
-          <DataGrid
-            rows={programs}
-            columns={columns}
-            getRowId={(row) => row.id}
-            disableRowSelectionOnClick
-            pageSizeOptions={[10, 25, 50]}
-            initialState={{
-              pagination: { paginationModel: { pageSize: 50 } },
-            }}
+          <ProgramTable
+            programs={filteredPrograms}
+            onEdit={handleEditProgram}
+            onDelete={handleDeleteProgramConfirm}
+            loading={state.loading}
           />
         )}
       </Box>
-    </Box>
+
+      {/* Confirm Dialog */}
+      {ConfirmDialog}
+    </Container>
   );
 }
