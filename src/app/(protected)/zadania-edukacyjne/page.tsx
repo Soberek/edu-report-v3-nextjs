@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
-import { Container, Box, Typography, Collapse } from "@mui/material";
-import { Add, ExpandMore, ExpandLess } from "@mui/icons-material";
+import React, { useState, useMemo } from "react";
+import { Container, Box, Typography, Collapse, Chip, FormControl, InputLabel, Select, MenuItem, Stack } from "@mui/material";
+import { Add, ExpandMore, ExpandLess, FilterList } from "@mui/icons-material";
 import { PageHeader, PrimaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
 import { useEducationalTasks } from "./hooks/useEducationalTasks";
 import { EducationalTaskForm } from "./components";
@@ -14,6 +14,12 @@ export default function EducationalTasks(): React.ReactNode {
   const [openForm, setOpenForm] = useState(false);
   const [editTask, setEditTask] = useState<EducationalTask | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+  const [filters, setFilters] = useState({
+    year: "",
+    month: "",
+    program: "",
+    activityType: "",
+  });
 
   const handleAddTask = () => {
     setEditTask(null);
@@ -65,6 +71,69 @@ export default function EducationalTasks(): React.ReactNode {
     });
   };
 
+  // Filter and group tasks
+  const { filteredTasks, groupedTasks, filterOptions } = useMemo(() => {
+    // Filter tasks
+    const filtered = tasks.filter((task) => {
+      const taskDate = new Date(task.date);
+      const taskYear = taskDate.getFullYear().toString();
+      const taskMonth = (taskDate.getMonth() + 1).toString();
+
+      return (
+        (!filters.year || taskYear === filters.year) &&
+        (!filters.month || taskMonth === filters.month) &&
+        (!filters.program || task.programName === filters.program) &&
+        (!filters.activityType || task.activities.some((a) => a.type === filters.activityType))
+      );
+    });
+
+    // Group by year and month
+    const grouped = filtered.reduce((acc, task) => {
+      const taskDate = new Date(task.date);
+      const year = taskDate.getFullYear();
+      const month = taskDate.getMonth() + 1;
+      const key = `${year}-${month.toString().padStart(2, "0")}`;
+
+      if (!acc[key]) {
+        acc[key] = {
+          year,
+          month,
+          tasks: [],
+        };
+      }
+      acc[key].tasks.push(task);
+      return acc;
+    }, {} as Record<string, { year: number; month: number; tasks: EducationalTask[] }>);
+
+    // Get filter options
+    const years = [...new Set(tasks.map((t) => new Date(t.date).getFullYear()))].sort((a, b) => b - a);
+    const programs = [...new Set(tasks.map((t) => t.programName))].sort();
+    const activityTypes = [...new Set(tasks.flatMap((t) => t.activities.map((a) => a.type)))].sort();
+
+    return {
+      filteredTasks: filtered,
+      groupedTasks: Object.entries(grouped)
+        .sort(([a], [b]) => b.localeCompare(a))
+        .map(([key, value]) => ({ key, ...value })),
+      filterOptions: { years, programs, activityTypes },
+    };
+  }, [tasks, filters]);
+
+  const monthNames = [
+    "Styczeń",
+    "Luty",
+    "Marzec",
+    "Kwiecień",
+    "Maj",
+    "Czerwiec",
+    "Lipiec",
+    "Sierpień",
+    "Wrzesień",
+    "Październik",
+    "Listopad",
+    "Grudzień",
+  ];
+
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Header */}
@@ -81,6 +150,113 @@ export default function EducationalTasks(): React.ReactNode {
       {/* Error Display */}
       {error && <ErrorDisplay error={error} onRetry={clearError} retryText="Spróbuj ponownie" />}
 
+      {/* Filters */}
+      <Box sx={{ mb: 3, p: 2, backgroundColor: "grey.50", borderRadius: 2 }}>
+        <Box display="flex" alignItems="center" gap={1} mb={2}>
+          <FilterList color="primary" />
+          <Typography variant="h6" fontWeight="bold">
+            Filtry
+          </Typography>
+        </Box>
+        <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Rok</InputLabel>
+            <Select
+              value={filters.year}
+              label="Rok"
+              onChange={(e) => setFilters(prev => ({ ...prev, year: e.target.value }))}
+            >
+              <MenuItem value="">Wszystkie</MenuItem>
+              {filterOptions.years.map(year => (
+                <MenuItem key={year} value={year.toString()}>{year}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Miesiąc</InputLabel>
+            <Select
+              value={filters.month}
+              label="Miesiąc"
+              onChange={(e) => setFilters(prev => ({ ...prev, month: e.target.value }))}
+            >
+              <MenuItem value="">Wszystkie</MenuItem>
+              {monthNames.map((month, index) => (
+                <MenuItem key={index} value={(index + 1).toString()}>{month}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          
+          <FormControl size="small" sx={{ minWidth: 200 }}>
+            <InputLabel>Program</InputLabel>
+            <Select
+              value={filters.program}
+              label="Program"
+              onChange={(e) => setFilters(prev => ({ ...prev, program: e.target.value }))}
+            >
+              <MenuItem value="">Wszystkie</MenuItem>
+              {filterOptions.programs.map(program => (
+                <MenuItem key={program} value={program}>{program}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Typ aktywności</InputLabel>
+            <Select
+              value={filters.activityType}
+              label="Typ aktywności"
+              onChange={(e) => setFilters(prev => ({ ...prev, activityType: e.target.value }))}
+            >
+              <MenuItem value="">Wszystkie</MenuItem>
+              {filterOptions.activityTypes.map(type => (
+                <MenuItem key={type} value={type}>{type}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
+        
+        {/* Active filters */}
+        <Box mt={2} display="flex" gap={1} flexWrap="wrap">
+          {filters.year && (
+            <Chip
+              label={`Rok: ${filters.year}`}
+              onDelete={() => setFilters(prev => ({ ...prev, year: "" }))}
+              color="primary"
+              variant="outlined"
+              size="small"
+            />
+          )}
+          {filters.month && (
+            <Chip
+              label={`Miesiąc: ${monthNames[parseInt(filters.month) - 1]}`}
+              onDelete={() => setFilters(prev => ({ ...prev, month: "" }))}
+              color="primary"
+              variant="outlined"
+              size="small"
+            />
+          )}
+          {filters.program && (
+            <Chip
+              label={`Program: ${filters.program}`}
+              onDelete={() => setFilters(prev => ({ ...prev, program: "" }))}
+              color="primary"
+              variant="outlined"
+              size="small"
+            />
+          )}
+          {filters.activityType && (
+            <Chip
+              label={`Aktywność: ${filters.activityType}`}
+              onDelete={() => setFilters(prev => ({ ...prev, activityType: "" }))}
+              color="primary"
+              variant="outlined"
+              size="small"
+            />
+          )}
+        </Box>
+      </Box>
+
       {/* Task Form */}
       {openForm && (
         <EducationalTaskForm
@@ -96,7 +272,7 @@ export default function EducationalTasks(): React.ReactNode {
       <Box sx={{ mb: 4 }}>
         {loading ? (
           <LoadingSpinner message="Ładowanie zadań edukacyjnych..." />
-        ) : tasks.length === 0 ? (
+        ) : filteredTasks.length === 0 ? (
           <Box
             sx={{
               textAlign: "center",
@@ -105,10 +281,13 @@ export default function EducationalTasks(): React.ReactNode {
             }}
           >
             <Typography variant="h6" gutterBottom>
-              Brak zadań edukacyjnych
+              {tasks.length === 0 ? "Brak zadań edukacyjnych" : "Brak zadań spełniających kryteria filtrowania"}
             </Typography>
             <Typography variant="body1" mb={3}>
-              Dodaj pierwsze zadanie edukacyjne, aby rozpocząć.
+              {tasks.length === 0 
+                ? "Dodaj pierwsze zadanie edukacyjne, aby rozpocząć."
+                : "Spróbuj zmienić filtry lub dodaj nowe zadanie."
+              }
             </Typography>
             <PrimaryButton startIcon={<Add />} onClick={handleAddTask}>
               Dodaj zadanie
@@ -116,24 +295,53 @@ export default function EducationalTasks(): React.ReactNode {
           </Box>
         ) : (
           <Box>
-            {tasks.map((task) => (
-              <Box
-                key={task.id}
-                sx={{
-                  p: 3,
-                  mb: 2,
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 2,
-                  backgroundColor: "background.paper",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                  transition: "all 0.2s ease-in-out",
-                  "&:hover": {
-                    boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
-                    borderColor: "primary.main",
-                  },
-                }}
-              >
+            {groupedTasks.map((group) => (
+              <Box key={group.key} sx={{ mb: 4 }}>
+                {/* Month/Year Header */}
+                <Box
+                  sx={{
+                    p: 2,
+                    mb: 2,
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    borderRadius: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography variant="h5" fontWeight="bold">
+                    {monthNames[group.month - 1]} {group.year}
+                  </Typography>
+                  <Chip
+                    label={`${group.tasks.length} zadań`}
+                    sx={{
+                      backgroundColor: "rgba(255,255,255,0.2)",
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                  />
+                </Box>
+                
+                {/* Tasks for this month */}
+                {group.tasks.map((task) => (
+                  <Box
+                    key={task.id}
+                    sx={{
+                      p: 3,
+                      mb: 2,
+                      border: "1px solid",
+                      borderColor: "divider",
+                      borderRadius: 2,
+                      backgroundColor: "background.paper",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                      transition: "all 0.2s ease-in-out",
+                      "&:hover": {
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+                        borderColor: "primary.main",
+                      },
+                    }}
+                  >
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
                   <Box flex={1}>
                     <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">
@@ -175,20 +383,16 @@ export default function EducationalTasks(): React.ReactNode {
                     </Box>
                   </Box>
                   <Box display="flex" gap={1}>
-                    <PrimaryButton 
-                      size="small" 
-                      onClick={() => handleEditTask(task)}
-                      sx={{ minWidth: 80 }}
-                    >
+                    <PrimaryButton size="small" onClick={() => handleEditTask(task)} sx={{ minWidth: 80 }}>
                       Edytuj
                     </PrimaryButton>
                     <PrimaryButton
                       size="small"
                       onClick={() => handleDeleteTask(task.id)}
-                      sx={{ 
-                        backgroundColor: "error.main", 
+                      sx={{
+                        backgroundColor: "error.main",
                         "&:hover": { backgroundColor: "error.dark" },
-                        minWidth: 80
+                        minWidth: 80,
                       }}
                     >
                       Usuń
@@ -202,7 +406,7 @@ export default function EducationalTasks(): React.ReactNode {
                     display="flex"
                     alignItems="center"
                     justifyContent="space-between"
-                    sx={{ 
+                    sx={{
                       cursor: "pointer",
                       p: 1.5,
                       backgroundColor: "grey.50",
@@ -303,11 +507,11 @@ export default function EducationalTasks(): React.ReactNode {
                             {activity.description}
                           </Typography>
                           {activity.media && (
-                            <Box 
-                              mt={1.5} 
-                              p={1.5} 
-                              sx={{ 
-                                backgroundColor: "primary.50", 
+                            <Box
+                              mt={1.5}
+                              p={1.5}
+                              sx={{
+                                backgroundColor: "primary.50",
                                 borderRadius: 1,
                                 border: "1px solid",
                                 borderColor: "primary.200",
@@ -319,27 +523,27 @@ export default function EducationalTasks(): React.ReactNode {
                               <Typography variant="body2" color="text.primary" mb={0.5}>
                                 {activity.media.title} ({activity.media.platform})
                               </Typography>
-                              <Typography 
-                                variant="body2" 
-                                color="primary" 
-                                sx={{ 
+                              <Typography
+                                variant="body2"
+                                color="primary"
+                                sx={{
                                   wordBreak: "break-all",
                                   textDecoration: "underline",
                                   cursor: "pointer",
-                                  "&:hover": { color: "primary.dark" }
+                                  "&:hover": { color: "primary.dark" },
                                 }}
-                                onClick={() => activity.media && window.open(activity.media.link, '_blank')}
+                                onClick={() => activity.media && window.open(activity.media.link, "_blank")}
                               >
                                 🔗 {activity.media.link}
                               </Typography>
                             </Box>
                           )}
                           {activity.materials && activity.materials.length > 0 && (
-                            <Box 
-                              mt={1.5} 
-                              p={1.5} 
-                              sx={{ 
-                                backgroundColor: "success.50", 
+                            <Box
+                              mt={1.5}
+                              p={1.5}
+                              sx={{
+                                backgroundColor: "success.50",
                                 borderRadius: 1,
                                 border: "1px solid",
                                 borderColor: "success.200",
@@ -378,6 +582,8 @@ export default function EducationalTasks(): React.ReactNode {
                     </Box>
                   </Collapse>
                 </Box>
+                  </Box>
+                ))}
               </Box>
             ))}
           </Box>
