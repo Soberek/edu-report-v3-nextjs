@@ -56,6 +56,7 @@ export const createEducationalTaskSchema = z.object({
   programName: z.string().min(1, "Nazwa programu jest wymagana").max(200, "Nazwa programu nie może być dłuższa niż 200 znaków"),
   date: z.string().min(1, "Data jest wymagana"),
   schoolId: z.string().min(1, "Wybór szkoły jest wymagany"),
+  referenceNumber: z.string().min(1, "Numer referencyjny jest wymagany").max(50, "Numer referencyjny nie może być dłuższy niż 50 znaków"),
   referenceId: z.string().optional(),
   activities: z.array(activitySchema).min(1, "Dodaj co najmniej jedną aktywność"),
 });
