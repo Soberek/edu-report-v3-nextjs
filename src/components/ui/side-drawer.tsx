@@ -226,19 +226,19 @@ const SideDrawer: React.FC = () => {
                                   transition: "opacity 0.3s ease",
                                 },
                                 "&.Mui-selected": {
-                                  backgroundColor: theme.palette.primary.main,
-                                  color: theme.palette.primary.contrastText,
-                                  boxShadow: `0 6px 20px ${theme.palette.primary.main}40`,
+                                  backgroundColor: theme.palette.grey[200],
+                                  color: theme.palette.text.primary,
+                                  boxShadow: `0 4px 16px ${theme.palette.grey[400]}30`,
                                   transform: "translateX(4px)",
                                   "&::before": {
                                     opacity: 1,
-                                    background: theme.palette.primary.contrastText,
+                                    background: theme.palette.primary.main,
                                   },
                                   "& .MuiListItemIcon-root": {
-                                    color: theme.palette.primary.contrastText,
+                                    color: theme.palette.text.primary,
                                   },
                                   "&:hover": {
-                                    backgroundColor: theme.palette.primary.dark,
+                                    backgroundColor: theme.palette.grey[300],
                                   },
                                 },
                               }}
@@ -273,7 +273,7 @@ const SideDrawer: React.FC = () => {
                                   sx={{
                                     height: 18,
                                     fontSize: "0.65rem",
-                                    backgroundColor: "rgba(255,255,255,0.2)",
+                                    backgroundColor: theme.palette.primary.main,
                                     color: "white",
                                     "& .MuiChip-label": {
                                       px: 0.8,
