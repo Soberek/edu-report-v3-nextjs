@@ -58,6 +58,7 @@ export const useSchoolForm = ({ mode, school, onSubmit }: UseSchoolFormProps) =>
 
   const isFormValid = isValid && isDirty;
   const hasErrors = Object.keys(errors).length > 0;
+  const selectedTypes = watch("type") || [];
 
   return {
     control,
@@ -67,6 +68,7 @@ export const useSchoolForm = ({ mode, school, onSubmit }: UseSchoolFormProps) =>
     hasErrors,
     watch,
     handleTypeChange,
+    selectedTypes,
     schoolTypes: Object.entries(schoolTypes),
   };
 };

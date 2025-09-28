@@ -14,6 +14,7 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, o
     formState: { errors },
     isFormValid,
     handleTypeChange,
+    selectedTypes,
     schoolTypes,
   } = useSchoolForm({
     mode,
@@ -154,30 +155,31 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, o
                 backgroundColor: "#fafafa",
               }}
             >
-              {schoolTypes.map(([key, label]) => (
-                <FormControlLabel
-                  key={key}
-                  control={
-                    <Checkbox
-                      size="small"
-                      onChange={(e) => handleTypeChange(key, e.target.checked)}
-                      sx={{
-                        py: 0.5,
-                        "& .MuiSvgIcon-root": { fontSize: "1rem" },
-                      }}
-                    />
-                  }
-                  label={label}
-                  sx={{
-                    fontSize: "0.8rem",
-                    margin: 0,
-                    "& .MuiFormControlLabel-label": {
+                {schoolTypes.map(([key, label]) => (
+                  <FormControlLabel
+                    key={key}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={selectedTypes.includes(key)}
+                        onChange={(e) => handleTypeChange(key, e.target.checked)}
+                        sx={{
+                          py: 0.5,
+                          "& .MuiSvgIcon-root": { fontSize: "1rem" },
+                        }}
+                      />
+                    }
+                    label={label}
+                    sx={{
                       fontSize: "0.8rem",
-                      lineHeight: 1.2,
-                    },
-                  }}
-                />
-              ))}
+                      margin: 0,
+                      "& .MuiFormControlLabel-label": {
+                        fontSize: "0.8rem",
+                        lineHeight: 1.2,
+                      },
+                    }}
+                  />
+                ))}
             </Box>
           </FormGroup>
           {errors.type && (
