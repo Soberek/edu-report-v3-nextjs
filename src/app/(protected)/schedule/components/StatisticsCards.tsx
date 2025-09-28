@@ -9,18 +9,18 @@ interface StatisticsCardsProps {
   percentageOfCompletedTasks: number;
 }
 
-export const StatisticsCards: React.FC<StatisticsCardsProps> = ({
-  tasks,
-  percentageOfCompletedTasks,
-}) => {
-  const currentMonth = dayjs().format("YYYY-MM");
-  const currentMonthTasks = tasks.filter((task) => 
-    dayjs(task.dueDate).format("YYYY-MM") === currentMonth
-  );
-  const currentMonthCompleted = currentMonthTasks.filter((task) => task.status === "completed").length;
-  const currentMonthPercentage = currentMonthTasks.length > 0 
-    ? Math.round((currentMonthCompleted / currentMonthTasks.length) * 100) 
-    : 0;
+export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ tasks, percentageOfCompletedTasks }) => {
+  const currentYear = dayjs().year();
+  const currentMonth = dayjs().month() + 1; // 1-12
+  
+  // Get all tasks from January to current month of current year
+  const yearToDateTasks = tasks.filter((task) => {
+    const taskDate = dayjs(task.dueDate);
+    return taskDate.year() === currentYear && taskDate.month() + 1 <= currentMonth;
+  });
+  
+  const yearToDateCompleted = yearToDateTasks.filter((task) => task.status === "completed").length;
+  const yearToDatePercentage = yearToDateTasks.length > 0 ? Math.round((yearToDateCompleted / yearToDateTasks.length) * 100) : 0;
   return (
     <Box
       sx={{
@@ -95,10 +95,10 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({
         <CardContent sx={{ textAlign: "center", py: 2 }}>
           <CalendarMonth sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
           <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
-            {currentMonthPercentage}%
+            {yearToDatePercentage}%
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            Ukończonych w tym miesiącu
+            Ukończonych od stycznia
           </Typography>
         </CardContent>
       </Card>
