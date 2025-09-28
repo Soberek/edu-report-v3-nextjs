@@ -44,6 +44,8 @@ export interface SchoolTableProps {
 export interface SchoolFilterProps {
   filter: SchoolFilterFormData;
   onFilterChange: (filter: Partial<SchoolFilterFormData>) => void;
+  uniqueTypes: string[];
+  uniqueCities: string[];
 }
 
 export interface UseSchoolFormProps {

@@ -1,23 +1,10 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Chip,
-  Avatar,
-  useTheme,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Typography, Button, Chip, Avatar, useTheme, CircularProgress } from "@mui/material";
 import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
 import { Edit, Delete, School } from "@mui/icons-material";
 import type { SchoolTableProps } from "../types";
 
-export const SchoolTable: React.FC<SchoolTableProps> = ({
-  schools,
-  onEdit,
-  onDelete,
-  loading = false,
-}) => {
+export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDelete, loading = false }) => {
   const theme = useTheme();
 
   const columns: GridColDef[] = [
@@ -29,14 +16,16 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          gap: 1, 
-          height: "100%",
-          minHeight: 52
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1,
+            height: "100%",
+            minHeight: 52,
+          }}
+        >
           <Avatar
             sx={{
               width: 32,
@@ -61,13 +50,15 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          height: "100%",
-          minHeight: 52
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            minHeight: 52,
+          }}
+        >
           <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
             {params.value}
           </Typography>
@@ -82,13 +73,15 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          height: "100%",
-          minHeight: 52
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            minHeight: 52,
+          }}
+        >
           <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
             {params.value}
           </Typography>
@@ -103,13 +96,15 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          height: "100%",
-          minHeight: 52
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            minHeight: 52,
+          }}
+        >
           <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
             {params.value}
           </Typography>
@@ -124,13 +119,15 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          height: "100%",
-          minHeight: 52
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            minHeight: 52,
+          }}
+        >
           <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
             {params.value}
           </Typography>
@@ -145,13 +142,15 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "center", 
-          height: "100%",
-          minHeight: 52
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            minHeight: 52,
+          }}
+        >
           <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
             {params.value}
           </Typography>
@@ -166,15 +165,17 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ 
-          display: "flex", 
-          gap: 0.5, 
-          flexWrap: "wrap", 
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-          minHeight: 52
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 0.5,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            minHeight: 52,
+          }}
+        >
           {params.value && Array.isArray(params.value) ? (
             params.value.map((type: string, index: number) => (
               <Chip
@@ -210,14 +211,16 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ 
-          display: "flex", 
-          gap: 1, 
-          alignItems: "center", 
-          justifyContent: "center",
-          height: "100%",
-          minHeight: 52
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            minHeight: 52,
+          }}
+        >
           <Button
             variant="outlined"
             size="small"

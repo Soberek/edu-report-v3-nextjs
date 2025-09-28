@@ -92,7 +92,12 @@ export default function Schools(): React.ReactNode {
       </Box>
 
       {/* Filters */}
-      <SchoolFilter filter={state.filter} onFilterChange={setFilter} />
+      <SchoolFilter 
+        filter={state.filter} 
+        onFilterChange={setFilter}
+        uniqueTypes={uniqueTypes}
+        uniqueCities={uniqueCities}
+      />
 
       {/* School Form */}
       {state.openForm && (

@@ -13,6 +13,8 @@ import type { SchoolFilterProps } from "../types";
 export const SchoolFilter: React.FC<SchoolFilterProps> = ({
   filter,
   onFilterChange,
+  uniqueTypes,
+  uniqueCities,
 }) => {
   const theme = useTheme();
 
@@ -63,7 +65,7 @@ export const SchoolFilter: React.FC<SchoolFilterProps> = ({
         <Autocomplete
           value={filter.type}
           onChange={(_, newValue) => onFilterChange({ type: newValue || "" })}
-          options={[]} // Will be populated by parent component
+          options={uniqueTypes}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -83,7 +85,7 @@ export const SchoolFilter: React.FC<SchoolFilterProps> = ({
         <Autocomplete
           value={filter.city}
           onChange={(_, newValue) => onFilterChange({ city: newValue || "" })}
-          options={[]} // Will be populated by parent component
+          options={uniqueCities}
           renderInput={(params) => (
             <TextField
               {...params}
