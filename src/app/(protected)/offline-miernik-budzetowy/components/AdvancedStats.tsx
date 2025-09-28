@@ -12,22 +12,22 @@ interface AdvancedStatsProps {
 
 export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, selectedMonths, rawData }) => {
   const theme = useTheme();
-  
+
   // Calculate month-based statistics
   const monthStats = React.useMemo(() => {
-    const selectedMonthNumbers = selectedMonths.filter(m => m.selected).map(m => m.monthNumber);
+    const selectedMonthNumbers = selectedMonths.filter((m) => m.selected).map((m) => m.monthNumber);
     const monthData: { [key: number]: { actions: number; people: number; programs: number } } = {};
-    
-    rawData.forEach(row => {
+
+    rawData.forEach((row) => {
       try {
         const date = new Date(row["Data"]);
         const month = date.getMonth() + 1;
-        
+
         if (selectedMonthNumbers.includes(month)) {
           if (!monthData[month]) {
             monthData[month] = { actions: 0, people: 0, programs: 0 };
           }
-          
+
           monthData[month].actions += Number(row["Liczba działań"]) || 0;
           monthData[month].people += Number(row["Liczba ludzi"]) || 0;
           monthData[month].programs += 1;
@@ -36,35 +36,35 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
         // Skip invalid dates
       }
     });
-    
+
     return monthData;
   }, [rawData, selectedMonths]);
-  
+
   // Calculate program type statistics
   const programTypeStats = React.useMemo(() => {
     const stats: { [key: string]: { count: number; actions: number; people: number } } = {};
-    
+
     Object.entries(data.aggregated).forEach(([programType, programs]) => {
       stats[programType] = { count: 0, actions: 0, people: 0 };
-      
+
       Object.entries(programs).forEach(([programName, actions]) => {
         stats[programType].count += 1;
-        
+
         Object.entries(actions).forEach(([actionName, actionData]) => {
           stats[programType].actions += actionData.actionNumber;
           stats[programType].people += actionData.people;
         });
       });
     });
-    
+
     return stats;
   }, [data.aggregated]);
-  
+
   // Calculate averages
   const averages = React.useMemo(() => {
-    const selectedCount = selectedMonths.filter(m => m.selected).length;
+    const selectedCount = selectedMonths.filter((m) => m.selected).length;
     const totalPrograms = Object.values(programTypeStats).reduce((sum, stat) => sum + stat.count, 0);
-    
+
     return {
       actionsPerMonth: selectedCount > 0 ? Math.round(data.allActions / selectedCount) : 0,
       peoplePerMonth: selectedCount > 0 ? Math.round(data.allPeople / selectedCount) : 0,
@@ -72,52 +72,52 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
       peoplePerProgram: totalPrograms > 0 ? Math.round(data.allPeople / totalPrograms) : 0,
     };
   }, [data.allActions, data.allPeople, selectedMonths, programTypeStats]);
-  
+
   // Find top performing month
   const topMonth = React.useMemo(() => {
     let maxActions = 0;
     let topMonthNumber = 0;
-    
+
     Object.entries(monthStats).forEach(([month, stats]) => {
       if (stats.actions > maxActions) {
         maxActions = stats.actions;
         topMonthNumber = Number(month);
       }
     });
-    
+
     return topMonthNumber > 0 ? MONTH_NAMES[topMonthNumber - 1] : null;
   }, [monthStats]);
-  
+
   // Find most active program type
   const topProgramType = React.useMemo(() => {
     let maxActions = 0;
     let topType = "";
-    
+
     Object.entries(programTypeStats).forEach(([type, stats]) => {
       if (stats.actions > maxActions) {
         maxActions = stats.actions;
         topType = type;
       }
     });
-    
+
     return topType;
   }, [programTypeStats]);
-  
-  const StatCard = ({ 
-    title, 
-    value, 
-    subtitle, 
-    icon, 
-    color = "primary" 
-  }: { 
-    title: string; 
-    value: string | number; 
-    subtitle?: string; 
-    icon: React.ReactNode; 
+
+  const StatCard = ({
+    title,
+    value,
+    subtitle,
+    icon,
+    color = "primary",
+  }: {
+    title: string;
+    value: string | number;
+    subtitle?: string;
+    icon: React.ReactNode;
     color?: "primary" | "secondary" | "success" | "warning" | "error" | "info";
   }) => {
     const colorValue = theme.palette[color].main;
-    
+
     return (
       <Card sx={{ height: "100%", position: "relative", overflow: "hidden" }}>
         <CardContent>
@@ -155,20 +155,20 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
       </Card>
     );
   };
-  
+
   return (
     <Box sx={{ mt: 4 }}>
       <Typography variant="h5" fontWeight="bold" color="text.primary" sx={{ mb: 3 }}>
         📊 Zaawansowane Statystyki
       </Typography>
-      
+
       {/* Overview Stats */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Średnia działań/miesiąc"
             value={averages.actionsPerMonth}
-            subtitle={`Z ${selectedMonths.filter(m => m.selected).length} miesięcy`}
+            subtitle={`Z ${selectedMonths.filter((m) => m.selected).length} miesięcy`}
             icon={<CalendarMonth />}
             color="primary"
           />
@@ -177,7 +177,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
           <StatCard
             title="Średnia odbiorców/miesiąc"
             value={averages.peoplePerMonth}
-            subtitle={`Z ${selectedMonths.filter(m => m.selected).length} miesięcy`}
+            subtitle={`Z ${selectedMonths.filter((m) => m.selected).length} miesięcy`}
             icon={<People />}
             color="success"
           />
@@ -201,7 +201,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
           />
         </Grid>
       </Grid>
-      
+
       {/* Top Performers */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={6}>
@@ -212,14 +212,13 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
               </Typography>
               {topMonth ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Chip
-                    label={topMonth}
-                    color="primary"
-                    variant="filled"
-                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                  />
+                  <Chip label={topMonth} color="primary" variant="filled" sx={{ fontSize: "1rem", fontWeight: "bold" }} />
                   <Typography variant="body2" color="text.secondary">
-                    {monthStats[selectedMonths.find(m => m.selected && MONTH_NAMES[m.monthNumber - 1] === topMonth)?.monthNumber || 0]?.actions} działań
+                    {
+                      monthStats[selectedMonths.find((m) => m.selected && MONTH_NAMES[m.monthNumber - 1] === topMonth)?.monthNumber || 0]
+                        ?.actions
+                    }{" "}
+                    działań
                   </Typography>
                 </Box>
               ) : (
@@ -238,12 +237,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
               </Typography>
               {topProgramType ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Chip
-                    label={topProgramType}
-                    color="secondary"
-                    variant="filled"
-                    sx={{ fontSize: "1rem", fontWeight: "bold" }}
-                  />
+                  <Chip label={topProgramType} color="secondary" variant="filled" sx={{ fontSize: "1rem", fontWeight: "bold" }} />
                   <Typography variant="body2" color="text.secondary">
                     {programTypeStats[topProgramType]?.actions} działań
                   </Typography>
@@ -257,7 +251,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
           </Card>
         </Grid>
       </Grid>
-      
+
       {/* Monthly Breakdown */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
@@ -266,8 +260,8 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
           </Typography>
           <Grid container spacing={2}>
             {selectedMonths
-              .filter(month => month.selected)
-              .map(month => {
+              .filter((month) => month.selected)
+              .map((month) => {
                 const monthData = monthStats[month.monthNumber];
                 return (
                   <Grid item xs={12} sm={6} md={4} key={month.monthNumber}>
@@ -300,7 +294,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
           </Grid>
         </CardContent>
       </Card>
-      
+
       {/* Program Type Breakdown */}
       <Card>
         <CardContent>
@@ -329,20 +323,34 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
                   </Typography>
                   <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body2" color="text.secondary">Programy:</Typography>
-                      <Typography variant="body2" fontWeight="bold">{stats.count}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Programy:
+                      </Typography>
+                      <Typography variant="body2" fontWeight="bold">
+                        {stats.count}
+                      </Typography>
                     </Box>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body2" color="text.secondary">Działania:</Typography>
-                      <Typography variant="body2" fontWeight="bold">{stats.actions}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Działania:
+                      </Typography>
+                      <Typography variant="body2" fontWeight="bold">
+                        {stats.actions}
+                      </Typography>
                     </Box>
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body2" color="text.secondary">Odbiorcy:</Typography>
-                      <Typography variant="body2" fontWeight="bold">{stats.people}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Odbiorcy:
+                      </Typography>
+                      <Typography variant="body2" fontWeight="bold">
+                        {stats.people}
+                      </Typography>
                     </Box>
                     <Divider sx={{ my: 1 }} />
                     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body2" color="text.secondary">Średnia działań/program:</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Średnia działań/program:
+                      </Typography>
                       <Typography variant="body2" fontWeight="bold">
                         {stats.count > 0 ? Math.round(stats.actions / stats.count) : 0}
                       </Typography>
