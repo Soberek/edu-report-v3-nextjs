@@ -1,11 +1,11 @@
 "use client";
-import { 
-  Autocomplete, 
-  Box, 
-  Button, 
-  CircularProgress, 
-  TextField, 
-  Typography, 
+import {
+  Autocomplete,
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
   Container,
   Paper,
   Alert,
@@ -14,16 +14,9 @@ import {
   Grid,
   Card,
   CardContent,
-  Divider
+  Divider,
 } from "@mui/material";
-import { 
-  School, 
-  Group, 
-  Person, 
-  CalendarToday,
-  Save,
-  Add
-} from "@mui/icons-material";
+import { School, Group, Person, CalendarToday, Save, Add } from "@mui/icons-material";
 import { usePrograms } from "@/hooks/useProgram";
 import { useForm, Controller } from "react-hook-form";
 import type { Contact, Program, School as SchoolType } from "@/types";
@@ -95,13 +88,13 @@ export default function SchoolsProgramParticipation() {
       }
 
       await createSchoolProgramParticipation({ ...parsed.data });
-      
+
       setSnackbar({
         open: true,
         type: "success",
         message: "Uczestnictwo szkoły w programie zostało dodane pomyślnie.",
       });
-      
+
       reset();
     } catch (error) {
       setSnackbar({
@@ -127,14 +120,16 @@ export default function SchoolsProgramParticipation() {
   if (isLoading) {
     return (
       <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          minHeight: 400,
-          flexDirection: 'column',
-          gap: 2
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: 400,
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
           <CircularProgress size={48} />
           <Typography variant="h6" color="text.secondary">
             Ładowanie danych...
@@ -147,16 +142,16 @@ export default function SchoolsProgramParticipation() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Header */}
-      <Box sx={{ mb: 4, textAlign: 'center' }}>
-        <Typography 
-          variant="h3" 
-          sx={{ 
-            fontWeight: 'bold',
-            background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            mb: 2
+      <Box sx={{ mb: 4, textAlign: "center" }}>
+        <Typography
+          variant="h3"
+          sx={{
+            fontWeight: "bold",
+            background: "linear-gradient(45deg, #1976d2, #42a5f5)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            mb: 2,
           }}
         >
           Szkoły w Programie
@@ -174,29 +169,34 @@ export default function SchoolsProgramParticipation() {
       )}
 
       {/* Form Section */}
-      <Paper 
+      <Paper
         elevation={0}
-        sx={{ 
+        sx={{
           mb: 4,
           borderRadius: 4,
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-          overflow: 'hidden'
+          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+          overflow: "hidden",
         }}
       >
-        <Box sx={{ 
-          background: 'rgba(255,255,255,0.9)',
-          backdropFilter: 'blur(10px)',
-          p: 3,
-          borderBottom: '1px solid rgba(255,255,255,0.2)'
-        }}>
-          <Typography variant="h5" sx={{ 
-            fontWeight: 'bold', 
-            color: '#2c3e50',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1
-          }}>
-            <Add sx={{ color: '#1976d2' }} />
+        <Box
+          sx={{
+            background: "rgba(255,255,255,0.9)",
+            backdropFilter: "blur(10px)",
+            p: 3,
+            borderBottom: "1px solid rgba(255,255,255,0.2)",
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: "bold",
+              color: "#2c3e50",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
+            <Add sx={{ color: "#1976d2" }} />
             Dodaj nowe uczestnictwo
           </Typography>
         </Box>
@@ -212,11 +212,13 @@ export default function SchoolsProgramParticipation() {
                 gap: 3,
               }}
             >
-              <Box sx={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-                gap: 3 
-              }}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                  gap: 3,
+                }}
+              >
                 {/* School Selection */}
                 <Box>
                   <Controller
@@ -231,19 +233,19 @@ export default function SchoolsProgramParticipation() {
                         value={field.value ? schoolsMap[field.value] : null}
                         onChange={(_, value) => field.onChange(value?.id)}
                         renderInput={(params) => (
-                          <TextField 
-                            {...params} 
-                            label="Szkoła" 
-                            helperText={errors.schoolId?.message} 
+                          <TextField
+                            {...params}
+                            label="Szkoła"
+                            helperText={errors.schoolId?.message}
                             error={!!errors.schoolId}
                             InputProps={{
                               ...params.InputProps,
-                              startAdornment: <School sx={{ color: '#666', mr: 1 }} />,
+                              startAdornment: <School sx={{ color: "#666", mr: 1 }} />,
                             }}
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              "& .MuiOutlinedInput-root": {
                                 borderRadius: 2,
-                                background: 'white',
+                                background: "white",
                               },
                             }}
                           />
@@ -266,19 +268,19 @@ export default function SchoolsProgramParticipation() {
                         getOptionLabel={(option) => option.name}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
                         renderInput={(params) => (
-                          <TextField 
-                            {...params} 
-                            label="Program Uczestnictwa" 
-                            error={!!errors.programId} 
+                          <TextField
+                            {...params}
+                            label="Program Uczestnictwa"
+                            error={!!errors.programId}
                             helperText={errors.programId?.message}
                             InputProps={{
                               ...params.InputProps,
-                              startAdornment: <Group sx={{ color: '#666', mr: 1 }} />,
+                              startAdornment: <Group sx={{ color: "#666", mr: 1 }} />,
                             }}
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              "& .MuiOutlinedInput-root": {
                                 borderRadius: 2,
-                                background: 'white',
+                                background: "white",
                               },
                             }}
                           />
@@ -310,19 +312,19 @@ export default function SchoolsProgramParticipation() {
                           </li>
                         )}
                         renderInput={(params) => (
-                          <TextField 
-                            {...params} 
-                            label="Koordynator" 
-                            error={!!errors.coordinatorId} 
+                          <TextField
+                            {...params}
+                            label="Koordynator"
+                            error={!!errors.coordinatorId}
                             helperText={errors.coordinatorId?.message}
                             InputProps={{
                               ...params.InputProps,
-                              startAdornment: <Person sx={{ color: '#666', mr: 1 }} />,
+                              startAdornment: <Person sx={{ color: "#666", mr: 1 }} />,
                             }}
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              "& .MuiOutlinedInput-root": {
                                 borderRadius: 2,
-                                background: 'white',
+                                background: "white",
                               },
                             }}
                           />
@@ -344,19 +346,19 @@ export default function SchoolsProgramParticipation() {
                         getOptionLabel={(option) => `${option}`}
                         options={schoolYears}
                         renderInput={(params) => (
-                          <TextField 
-                            {...params} 
-                            label="Rok szkolny" 
-                            error={!!errors.schoolYear} 
+                          <TextField
+                            {...params}
+                            label="Rok szkolny"
+                            error={!!errors.schoolYear}
                             helperText={errors.schoolYear?.message}
                             InputProps={{
                               ...params.InputProps,
-                              startAdornment: <CalendarToday sx={{ color: '#666', mr: 1 }} />,
+                              startAdornment: <CalendarToday sx={{ color: "#666", mr: 1 }} />,
                             }}
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              "& .MuiOutlinedInput-root": {
                                 borderRadius: 2,
-                                background: 'white',
+                                background: "white",
                               },
                             }}
                           />
@@ -380,12 +382,12 @@ export default function SchoolsProgramParticipation() {
                         error={!!errors.studentCount}
                         helperText={errors.studentCount?.message}
                         InputProps={{
-                          startAdornment: <Group sx={{ color: '#666', mr: 1 }} />,
+                          startAdornment: <Group sx={{ color: "#666", mr: 1 }} />,
                         }}
                         sx={{
-                          '& .MuiOutlinedInput-root': {
+                          "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
-                            background: 'white',
+                            background: "white",
                           },
                         }}
                       />
@@ -393,23 +395,23 @@ export default function SchoolsProgramParticipation() {
                   />
                 </Box>
                 {/* Notes */}
-                <Box sx={{ gridColumn: '1 / -1' }}>
+                <Box sx={{ gridColumn: "1 / -1" }}>
                   <Controller
                     name="notes"
                     control={control}
                     defaultValue=""
                     render={({ field }) => (
-                      <TextField 
-                        {...field} 
-                        label="Notatki" 
-                        multiline 
-                        minRows={4} 
-                        error={!!errors.notes} 
+                      <TextField
+                        {...field}
+                        label="Notatki"
+                        multiline
+                        minRows={4}
+                        error={!!errors.notes}
                         helperText={errors.notes?.message}
                         sx={{
-                          '& .MuiOutlinedInput-root': {
+                          "& .MuiOutlinedInput-root": {
                             borderRadius: 2,
-                            background: 'white',
+                            background: "white",
                           },
                         }}
                       />
@@ -441,12 +443,12 @@ export default function SchoolsProgramParticipation() {
                             helperText={errors.previousCoordinatorId?.message}
                             InputProps={{
                               ...params.InputProps,
-                              startAdornment: <Person sx={{ color: '#666', mr: 1 }} />,
+                              startAdornment: <Person sx={{ color: "#666", mr: 1 }} />,
                             }}
                             sx={{
-                              '& .MuiOutlinedInput-root': {
+                              "& .MuiOutlinedInput-root": {
                                 borderRadius: 2,
-                                background: 'white',
+                                background: "white",
                               },
                             }}
                           />
@@ -458,34 +460,36 @@ export default function SchoolsProgramParticipation() {
               </Box>
 
               {/* Submit Button */}
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'flex-end', 
-                mt: 3,
-                pt: 3,
-                borderTop: '1px solid rgba(0,0,0,0.1)'
-              }}>
-                <Button 
-                  type="submit" 
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  mt: 3,
+                  pt: 3,
+                  borderTop: "1px solid rgba(0,0,0,0.1)",
+                }}
+              >
+                <Button
+                  type="submit"
                   disabled={schoolProgramParticipationLoading || !isDirty}
                   variant="contained"
                   startIcon={<Save />}
                   sx={{
                     borderRadius: 3,
-                    textTransform: 'none',
-                    fontWeight: 'bold',
+                    textTransform: "none",
+                    fontWeight: "bold",
                     px: 4,
                     py: 1.5,
-                    background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
-                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)',
-                    '&:hover': {
-                      background: 'linear-gradient(45deg, #1565c0 30%, #1976d2 90%)',
-                      boxShadow: '0 6px 16px rgba(25, 118, 210, 0.4)',
-                      transform: 'translateY(-1px)',
+                    background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+                    boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
+                    "&:hover": {
+                      background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
+                      boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
+                      transform: "translateY(-1px)",
                     },
-                    '&:disabled': {
-                      background: 'rgba(0,0,0,0.12)',
-                      color: 'rgba(0,0,0,0.26)',
+                    "&:disabled": {
+                      background: "rgba(0,0,0,0.12)",
+                      color: "rgba(0,0,0,0.26)",
                     },
                   }}
                 >
@@ -515,20 +519,20 @@ export default function SchoolsProgramParticipation() {
       />
 
       {/* Snackbar */}
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={4000} 
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbar.type} 
-          variant="filled" 
-          sx={{ 
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.type}
+          variant="filled"
+          sx={{
             width: "100%",
             borderRadius: 2,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
           }}
         >
           {snackbar.message}
