@@ -1,7 +1,8 @@
 import React from "react";
-import { Box, Typography, Button, Chip, Avatar, useTheme, CircularProgress } from "@mui/material";
-import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
-import { Edit, Delete, School } from "@mui/icons-material";
+import { Box, Typography, Chip, Avatar, useTheme } from "@mui/material";
+import { type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
+import { School } from "@mui/icons-material";
+import { DataTable, defaultActions, LoadingSpinner } from "@/components/shared";
 import type { SchoolTableProps } from "../types";
 
 export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDelete, loading = false }) => {
@@ -204,126 +205,58 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
         </Box>
       ),
     },
-    {
-      field: "actions",
-      headerName: "Akcje",
-      sortable: false,
-      filterable: false,
-      flex: 0.8,
-      minWidth: 120,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: GridRenderCellParams) => (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-            minHeight: 52,
-            width: "100%",
-          }}
-        >
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<Edit sx={{ fontSize: "0.8rem" }} />}
-            onClick={() => onEdit(params.row)}
-            sx={{
-              textTransform: "none",
-              fontSize: "0.75rem",
-              px: 1,
-              py: 0.5,
-              minWidth: "100%",
-              borderColor: theme.palette.primary.main,
-              color: theme.palette.primary.main,
-              "&:hover": {
-                backgroundColor: theme.palette.primary.main,
-                color: "white",
-              },
-            }}
-          >
-            Edytuj
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<Delete sx={{ fontSize: "0.8rem" }} />}
-            onClick={() => onDelete(params.row.id)}
-            sx={{
-              textTransform: "none",
-              fontSize: "0.75rem",
-              px: 1,
-              py: 0.5,
-              minWidth: "100%",
-              borderColor: theme.palette.error.main,
-              color: theme.palette.error.main,
-              "&:hover": {
-                backgroundColor: theme.palette.error.main,
-                color: "white",
-              },
-            }}
-          >
-            Usuń
-          </Button>
-        </Box>
-      ),
-    },
+  ];
+
+  const actions = [
+    defaultActions.edit((id: string) => {
+      const school = schools.find((s) => s.id === id);
+      if (school) onEdit(school);
+    }),
+    defaultActions.delete(onDelete),
   ];
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 400 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <LoadingSpinner message="Ładowanie szkół..." />;
   }
 
   return (
-    <Box sx={{ height: 600, width: "100%" }}>
-      <DataGrid
-        rows={schools}
-        columns={columns}
-        getRowId={(row) => row.id}
-        disableRowSelectionOnClick
-        pageSizeOptions={[10, 25, 50]}
-        initialState={{
-          pagination: { paginationModel: { pageSize: 10 } },
-        }}
-        getRowHeight={() => 'auto'}
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-            borderRadius: 2,
+    <DataTable
+      data={schools}
+      columns={columns}
+      actions={actions}
+      loading={loading}
+      height={600}
+      getRowId={(row) => row.id}
+      sx={{
+        "& .MuiDataGrid-root": {
+          border: "none",
+          borderRadius: 2,
+        },
+        "& .MuiDataGrid-columnHeaders": {
+          backgroundColor: theme.palette.grey[50],
+          borderBottom: `2px solid ${theme.palette.primary.main}`,
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold",
+            fontSize: "0.9rem",
           },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: theme.palette.grey[50],
-            borderBottom: `2px solid ${theme.palette.primary.main}`,
-            "& .MuiDataGrid-columnHeaderTitle": {
-              fontWeight: "bold",
-              fontSize: "0.9rem",
-            },
-          },
-          "& .MuiDataGrid-row": {
-            "&:hover": {
-              backgroundColor: theme.palette.action.hover,
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: `1px solid ${theme.palette.divider}`,
-            },
+        },
+        "& .MuiDataGrid-row": {
+          "&:hover": {
+            backgroundColor: theme.palette.action.hover,
           },
           "& .MuiDataGrid-cell": {
-            whiteSpace: "normal",
-            wordWrap: "break-word",
-            lineHeight: "1.4",
-            display: "flex",
-            alignItems: "center",
-            padding: "8px 16px",
+            borderBottom: `1px solid ${theme.palette.divider}`,
           },
-        }}
-      />
-    </Box>
+        },
+        "& .MuiDataGrid-cell": {
+          whiteSpace: "normal",
+          wordWrap: "break-word",
+          lineHeight: "1.4",
+          display: "flex",
+          alignItems: "center",
+          padding: "8px 16px",
+        },
+      }}
+    />
   );
 };
