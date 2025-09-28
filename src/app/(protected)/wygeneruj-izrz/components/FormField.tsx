@@ -59,6 +59,14 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                 size="small"
                 error={!!error}
                 helperText={error?.message}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (props.type === "number") {
+                    field.onChange(value === "" ? 0 : Number(value));
+                  } else {
+                    field.onChange(value);
+                  }
+                }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     backgroundColor: "#fff",
