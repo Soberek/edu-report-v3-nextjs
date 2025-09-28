@@ -76,6 +76,7 @@ export const useSchoolState = () => {
     try {
       await updateSchool(id, updates);
       await refetch();
+      dispatch({ type: "TOGGLE_FORM", payload: false });
       dispatch({ type: "SET_EDIT_SCHOOL", payload: null });
     } catch (error) {
       console.error("Error updating school:", error);
