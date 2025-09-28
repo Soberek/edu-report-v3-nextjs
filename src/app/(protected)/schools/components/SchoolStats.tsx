@@ -22,16 +22,8 @@ export const SchoolStats: React.FC<SchoolStatsProps> = ({ totalSchools, typeStat
     return "📚";
   };
 
-  const getTypeColor = (index: number) => {
-    const colors = [
-      theme.palette.primary.main,
-      theme.palette.secondary.main,
-      theme.palette.success.main,
-      theme.palette.warning.main,
-      theme.palette.info.main,
-      theme.palette.error.main,
-    ];
-    return colors[index % colors.length];
+  const getTypeColor = () => {
+    return theme.palette.primary.main;
   };
 
   return (
@@ -64,36 +56,39 @@ export const SchoolStats: React.FC<SchoolStatsProps> = ({ totalSchools, typeStat
 
       {/* Collapsible Stats Content */}
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <Box sx={{ 
-          display: "flex", 
-          flexWrap: "wrap", 
-          gap: 1.5,
-          p: 2,
-          background: theme.palette.grey[50],
-          borderRadius: 2,
-          border: `1px solid ${theme.palette.divider}`
-        }}>
-          {/* Total Schools - Ultra Compact */}
-          <Box sx={{
+        <Box
+          sx={{
             display: "flex",
-            alignItems: "center",
-            gap: 1,
-            px: 2,
-            py: 1,
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-            color: "white",
+            flexWrap: "wrap",
+            gap: 1.5,
+            p: 2,
+            background: theme.palette.grey[50],
             borderRadius: 2,
-            minWidth: "fit-content",
-            boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
-          }}>
-            <School sx={{ fontSize: "1.2rem" }} />
-            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
-              {totalSchools}
-            </Typography>
-            <Typography variant="caption" sx={{ opacity: 0.9, fontSize: "0.75rem" }}>
-              szkół
-            </Typography>
-          </Box>
+            border: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+           {/* Total Schools - Ultra Compact */}
+           <Box
+             sx={{
+               display: "flex",
+               alignItems: "center",
+               gap: 1,
+               px: 2,
+               py: 1,
+               background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+               color: "white",
+               borderRadius: 2,
+               minWidth: "fit-content",
+               boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
+             }}
+           >
+             <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
+               {totalSchools}
+             </Typography>
+             <Typography variant="caption" sx={{ opacity: 0.9, fontSize: "0.75rem" }}>
+               szkół
+             </Typography>
+           </Box>
 
           {/* Type Stats - Ultra Compact */}
           {typeStats.map((stat, index) => (
@@ -105,21 +100,18 @@ export const SchoolStats: React.FC<SchoolStatsProps> = ({ totalSchools, typeStat
                 gap: 1,
                 px: 2,
                 py: 1,
-                background: `linear-gradient(135deg, ${getTypeColor(index)} 0%, ${getTypeColor(index)}dd 100%)`,
+                background: `linear-gradient(135deg, ${getTypeColor()} 0%, ${getTypeColor()}dd 100%)`,
                 color: "white",
                 borderRadius: 2,
                 minWidth: "fit-content",
-                boxShadow: `0 2px 8px ${getTypeColor(index)}20`,
+                boxShadow: `0 2px 8px ${getTypeColor()}20`,
                 transition: "all 0.2s ease",
                 "&:hover": {
                   transform: "translateY(-1px)",
-                  boxShadow: `0 4px 12px ${getTypeColor(index)}30`,
+                  boxShadow: `0 4px 12px ${getTypeColor()}30`,
                 },
               }}
             >
-              <Typography sx={{ fontSize: "1rem" }}>
-                {getTypeIcon(stat.type)}
-              </Typography>
               <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1rem" }}>
                 {stat.count}
               </Typography>
