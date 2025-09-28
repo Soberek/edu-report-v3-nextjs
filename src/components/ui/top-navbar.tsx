@@ -63,8 +63,8 @@ const Navbar: React.FC = () => {
   const userInitial = authContext.user?.email?.charAt(0).toUpperCase() ?? "U";
 
   return (
-    <AppBar 
-      position="static" 
+    <AppBar
+      position="static"
       elevation={0}
       sx={{
         background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.grey[50]} 100%)`,
