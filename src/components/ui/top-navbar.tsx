@@ -63,7 +63,16 @@ const Navbar: React.FC = () => {
   const userInitial = authContext.user?.email?.charAt(0).toUpperCase() ?? "U";
 
   return (
-    <AppBar position="static" elevation={0}>
+    <AppBar 
+      position="static" 
+      elevation={0}
+      sx={{
+        background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.grey[50]} 100%)`,
+        backdropFilter: "blur(20px)",
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        boxShadow: `0 2px 20px ${theme.palette.primary.main}10`,
+      }}
+    >
       <Toolbar sx={{ justifyContent: "space-between", minHeight: 80, px: 3 }}>
         {/* Left Section - Logo and Menu */}
         <Box display="flex" alignItems="center" gap={2}>
@@ -73,16 +82,16 @@ const Navbar: React.FC = () => {
             edge="start"
             onClick={handleDrawerOpen}
             sx={{
-              background: "rgba(255, 255, 255, 1)",
-              color: "black",
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+              color: "white",
               backdropFilter: "blur(10px)",
               border: "1px solid rgba(255,255,255,0.2)",
               borderRadius: "12px",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               "&:hover": {
-                background: "rgba(255,255,255,0.2)",
+                background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
                 transform: "translateY(-2px)",
-                boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
+                boxShadow: `0 8px 25px ${theme.palette.primary.main}40`,
               },
             }}
           >
@@ -92,17 +101,18 @@ const Navbar: React.FC = () => {
           <Box display="flex" alignItems="center" gap={1.5}>
             <Box
               sx={{
-                backgroundColor: theme.palette.secondary.main,
+                background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
                 borderRadius: "16px",
-                p: 1,
+                p: 1.5,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
+                boxShadow: `0 4px 15px ${theme.palette.secondary.main}30`,
                 "&:hover": {
                   transform: "rotate(-5deg) scale(1.1)",
-                  boxShadow: `0 10px 30px ${theme.palette.secondary.main}33`,
+                  boxShadow: `0 10px 30px ${theme.palette.secondary.main}50`,
                 },
               }}
               onClick={() => router.push("/")}
@@ -132,11 +142,13 @@ const Navbar: React.FC = () => {
                 label="v2.0"
                 size="small"
                 sx={{
-                  backgroundColor: theme.palette.secondary.main,
+                  background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
                   color: "white",
                   fontSize: "10px",
-                  height: 18,
+                  height: 20,
                   ml: 1,
+                  fontWeight: "bold",
+                  boxShadow: `0 2px 8px ${theme.palette.secondary.main}30`,
                 }}
               />
             </Box>
@@ -175,12 +187,13 @@ const Navbar: React.FC = () => {
               >
                 <Avatar
                   sx={{
-                    backgroundColor: theme.palette.primary.main,
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                     width: 44,
                     height: 44,
                     border: "2px solid rgba(255,255,255,0.3)",
                     fontSize: 18,
                     fontWeight: 600,
+                    boxShadow: `0 4px 15px ${theme.palette.primary.main}30`,
                   }}
                 >
                   {userInitial}
@@ -249,7 +262,7 @@ const Navbar: React.FC = () => {
               onClick={() => router.push("/sign-in")}
               variant="contained"
               sx={{
-                backgroundColor: theme.palette.secondary.main,
+                background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
                 color: "white",
                 border: "1px solid rgba(255,255,255,0.3)",
                 borderRadius: 3,
@@ -259,10 +272,11 @@ const Navbar: React.FC = () => {
                 fontSize: "0.95rem",
                 textTransform: "none",
                 backdropFilter: "blur(10px)",
+                boxShadow: `0 4px 15px ${theme.palette.secondary.main}30`,
                 "&:hover": {
-                  backgroundColor: theme.palette.primary.main,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                   transform: "translateY(-3px)",
-                  boxShadow: "0 15px 35px rgba(0,0,0,0.1)",
+                  boxShadow: `0 15px 35px ${theme.palette.primary.main}40`,
                 },
                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               }}

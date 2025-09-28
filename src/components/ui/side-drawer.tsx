@@ -109,20 +109,20 @@ const SideDrawer: React.FC = () => {
               const isActive = (() => {
                 // Handle root path
                 if (pathname === "/" && path === "") return true;
-                
+
                 // Handle exact match
                 if (pathname === path) return true;
-                
+
                 // Handle nested routes - check if current path starts with the nav path
                 if (path !== "" && pathname.startsWith(path)) {
                   // Make sure it's not a partial match (e.g., /schedule vs /schedule-edit)
                   const nextChar = pathname[path.length];
                   return !nextChar || nextChar === "/";
                 }
-                
+
                 return false;
               })();
-              
+
               return (
                 <ListItem key={title} disablePadding sx={{ mb: 0.5 }}>
                   <ListItemButton
