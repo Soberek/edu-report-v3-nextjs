@@ -46,7 +46,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ posts, holidays, o
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={6}>
           <Paper elevation={2} sx={{ p: 3, textAlign: "center" }}>
             <TableChart color="primary" sx={{ fontSize: 48, mb: 2 }} />
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
@@ -61,7 +61,7 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ posts, holidays, o
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={6}>
           <Paper elevation={2} sx={{ p: 3, textAlign: "center" }}>
             <FileDownload color="primary" sx={{ fontSize: 48, mb: 2 }} />
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
