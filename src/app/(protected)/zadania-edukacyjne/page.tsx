@@ -127,6 +127,9 @@ export default function EducationalTasks(): React.ReactNode {
                       Data: {new Date(task.date).toLocaleDateString("pl-PL")}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
+                      Numer referencyjny: {task.referenceNumber}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
                       Szkoła ID: {task.schoolId}
                     </Typography>
                   </Box>
