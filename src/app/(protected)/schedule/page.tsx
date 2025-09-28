@@ -51,11 +51,12 @@ function Schedule(): JSX.Element {
 
   // Filter out health programs and get unique programs
   const filteredPrograms = useMemo(() => {
-    return programs.filter(program => 
-      !program.name.toLowerCase().includes('zdrowie') && 
-      !program.name.toLowerCase().includes('health') &&
-      !program.name.toLowerCase().includes('medyczny') &&
-      !program.name.toLowerCase().includes('medical')
+    return programs.filter(
+      (program) =>
+        !program.name.toLowerCase().includes("zdrowie") &&
+        !program.name.toLowerCase().includes("health") &&
+        !program.name.toLowerCase().includes("medyczny") &&
+        !program.name.toLowerCase().includes("medical")
     );
   }, [programs]);
 
@@ -120,13 +121,13 @@ function Schedule(): JSX.Element {
     filteredData = Object.keys(aggregateByMonthAndThenByProgram).reduce((acc, month) => {
       const monthData = aggregateByMonthAndThenByProgram[month];
       const filteredPrograms: { [programId: string]: ScheduledTaskType[] } = {};
-      
-      filter.programIds.forEach(programId => {
+
+      filter.programIds.forEach((programId) => {
         if (monthData?.[programId]) {
           filteredPrograms[programId] = monthData[programId];
         }
       });
-      
+
       if (Object.keys(filteredPrograms).length > 0) {
         acc[month] = filteredPrograms;
       }
@@ -220,31 +221,31 @@ function Schedule(): JSX.Element {
         >
           Dodaj nowe zadanie
         </Button>
-        </Box>
+      </Box>
 
       {/* Statistics Cards */}
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: 3,
-          mb: 4,
+          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: 2,
+          mb: 3,
         }}
       >
         <Card
           sx={{
             background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             color: "white",
-            borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+            borderRadius: 2,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
           }}
         >
-          <CardContent sx={{ textAlign: "center", py: 3 }}>
-            <CheckCircle sx={{ fontSize: 48, mb: 1, opacity: 0.9 }} />
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
+          <CardContent sx={{ textAlign: "center", py: 2 }}>
+            <CheckCircle sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
+            <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
               {percentageOfCompletedTasks}%
             </Typography>
-            <Typography variant="body1" sx={{ opacity: 0.9 }}>
+            <Typography variant="body2" sx={{ opacity: 0.9 }}>
               Ukończonych zadań
             </Typography>
           </CardContent>
@@ -253,16 +254,16 @@ function Schedule(): JSX.Element {
           sx={{
             background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
             color: "white",
-            borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+            borderRadius: 2,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
           }}
         >
-          <CardContent sx={{ textAlign: "center", py: 3 }}>
-            <Assignment sx={{ fontSize: 48, mb: 1, opacity: 0.9 }} />
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
+          <CardContent sx={{ textAlign: "center", py: 2 }}>
+            <Assignment sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
+            <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
               {tasks.length}
             </Typography>
-            <Typography variant="body1" sx={{ opacity: 0.9 }}>
+            <Typography variant="body2" sx={{ opacity: 0.9 }}>
               Wszystkich zadań
             </Typography>
           </CardContent>
@@ -271,18 +272,18 @@ function Schedule(): JSX.Element {
           sx={{
             background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
             color: "white",
-            borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+            borderRadius: 2,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
           }}
         >
-          <CardContent sx={{ textAlign: "center", py: 3 }}>
-            <Pending sx={{ fontSize: 48, mb: 1, opacity: 0.9 }} />
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
+          <CardContent sx={{ textAlign: "center", py: 2 }}>
+            <Pending sx={{ fontSize: 32, mb: 0.5, opacity: 0.9 }} />
+            <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
               {tasks.filter((task) => task.status === "pending").length}
             </Typography>
-            <Typography variant="body1" sx={{ opacity: 0.9 }}>
+            <Typography variant="body2" sx={{ opacity: 0.9 }}>
               Oczekujących zadań
-        </Typography>
+            </Typography>
           </CardContent>
         </Card>
       </Box>
@@ -310,15 +311,15 @@ function Schedule(): JSX.Element {
             sx={{
               fontWeight: "bold",
               color: "#2c3e50",
-          display: "flex",
+              display: "flex",
               alignItems: "center",
-          gap: 1,
-          mb: 2,
-        }}
-      >
+              gap: 1,
+              mb: 2,
+            }}
+          >
             <FilterList sx={{ color: "#1976d2" }} />
             Filtry
-        </Typography>
+          </Typography>
         </Box>
 
         <Box sx={{ p: 3 }}>
@@ -384,19 +385,19 @@ function Schedule(): JSX.Element {
                   }}
                 >
                   <MenuItem value="">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Assignment sx={{ fontSize: 16, color: "#666" }} />
                       <Typography>Wszystkie</Typography>
                     </Box>
                   </MenuItem>
                   <MenuItem value="completed">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <CheckCircle sx={{ fontSize: 16, color: "#4caf50" }} />
                       <Typography>Ukończone</Typography>
                     </Box>
                   </MenuItem>
                   <MenuItem value="pending">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Pending sx={{ fontSize: 16, color: "#ff9800" }} />
                       <Typography>Oczekujące</Typography>
                     </Box>
@@ -425,14 +426,14 @@ function Schedule(): JSX.Element {
                   }}
                 >
                   <MenuItem value="">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <CalendarToday sx={{ fontSize: 16, color: "#666" }} />
                       <Typography>Wszystkie miesiące</Typography>
                     </Box>
                   </MenuItem>
                   {Object.entries(months).map(([key, label]) => (
                     <MenuItem key={key} value={key}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <CalendarToday sx={{ fontSize: 16, color: "#1976d2" }} />
                         <Typography>{label}</Typography>
                       </Box>
@@ -456,9 +457,9 @@ function Schedule(): JSX.Element {
                   onChange={(e) => setFilter((prev) => ({ ...prev, programIds: e.target.value as string[] }))}
                   input={<OutlinedInput label="Wybierz programy" />}
                   renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                       {selected.map((value) => {
-                        const program = filteredPrograms.find(p => p.id === value);
+                        const program = filteredPrograms.find((p) => p.id === value);
                         return (
                           <Chip
                             key={value}
@@ -485,7 +486,7 @@ function Schedule(): JSX.Element {
                 >
                   {filteredPrograms.map((program) => (
                     <MenuItem key={program.id} value={program.id}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <School sx={{ fontSize: 16, color: "#1976d2" }} />
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -555,14 +556,14 @@ function Schedule(): JSX.Element {
               <Assignment sx={{ fontSize: 64, color: "#ccc", mb: 2 }} />
               <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
                 Brak zadań
-        </Typography>
+              </Typography>
               <Typography variant="body2" color="text.secondary">
                 Dodaj pierwsze zadanie do harmonogramu
-        </Typography>
-      </Box>
+              </Typography>
+            </Box>
           ) : (
             <Stack spacing={3}>
-        {Object.entries(filteredData).map(([month, programsInMonth]) => (
+              {Object.entries(filteredData).map(([month, programsInMonth]) => (
                 <Fade in key={month} timeout={300}>
                   <Paper
                     elevation={0}
@@ -585,19 +586,19 @@ function Schedule(): JSX.Element {
                     >
                       <Typography variant="h6" sx={{ fontWeight: "bold", display: "flex", alignItems: "center", gap: 1 }}>
                         <CalendarToday />
-              {localizeMonth(month.split(" ")[0].toLowerCase()) + " " + month.split(" ")[1]}
-            </Typography>
+                        {localizeMonth(month.split(" ")[0].toLowerCase()) + " " + month.split(" ")[1]}
+                      </Typography>
                     </Box>
 
                     <Box sx={{ p: 3 }}>
                       <Stack spacing={2}>
-            {Object.entries(programsInMonth).map(([programId, tasks]) => {
-              const program: Program | undefined = programs.find((p: Program) => p.id === programId);
-              return (
+                        {Object.entries(programsInMonth).map(([programId, tasks]) => {
+                          const program: Program | undefined = programs.find((p: Program) => p.id === programId);
+                          return (
                             <Box key={programId}>
                               <Typography
                                 variant="subtitle1"
-                  sx={{
+                                sx={{
                                   fontWeight: "bold",
                                   color: "#2c3e50",
                                   mb: 2,
@@ -607,29 +608,29 @@ function Schedule(): JSX.Element {
                                 }}
                               >
                                 <School sx={{ color: "#1976d2" }} />
-                    {program ? `${program.code} ${program.name}` : "Nieznany program"}
-                  </Typography>
+                                {program ? `${program.code} ${program.name}` : "Nieznany program"}
+                              </Typography>
                               <Stack spacing={1}>
-                  {tasks.map((task) => {
-                    const taskType = Object.values(TASK_TYPES).find((type) => type.id === task.taskTypeId);
-                    return (
-                      <Task
-                        key={task.id}
-                        task={task}
-                        program={program}
-                        taskType={taskType}
-                        updateTask={handleScheduledTaskUpdate}
-                        deleteTask={handleScheduledTaskDeletion}
-                      />
-                    );
-                  })}
+                                {tasks.map((task) => {
+                                  const taskType = Object.values(TASK_TYPES).find((type) => type.id === task.taskTypeId);
+                                  return (
+                                    <Task
+                                      key={task.id}
+                                      task={task}
+                                      program={program}
+                                      taskType={taskType}
+                                      updateTask={handleScheduledTaskUpdate}
+                                      deleteTask={handleScheduledTaskDeletion}
+                                    />
+                                  );
+                                })}
                               </Stack>
                               {Object.entries(programsInMonth).indexOf([programId, tasks]) < Object.entries(programsInMonth).length - 1 && (
                                 <Divider sx={{ my: 2 }} />
                               )}
-                </Box>
-              );
-            })}
+                            </Box>
+                          );
+                        })}
                       </Stack>
                     </Box>
                   </Paper>
@@ -672,7 +673,7 @@ function Schedule(): JSX.Element {
           <Box sx={{ p: 4 }}>
             <TaskForm createTask={handleScheduledTaskCreation} refetch={refetch} userId={user?.uid} loading={loading} />
           </Box>
-      </Box>
+        </Box>
       </Modal>
     </Container>
   );
