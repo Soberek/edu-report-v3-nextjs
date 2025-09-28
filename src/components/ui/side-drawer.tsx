@@ -23,7 +23,7 @@ import { navRoutes, getMainNavigation, getRoutesByCategory, type NavRoute } from
 import { useNavContext } from "@/providers/NavProvider";
 import { useUser } from "@/hooks/useUser";
 
-const drawerWidth = 280;
+const drawerWidth = 380;
 
 const SideDrawer: React.FC = () => {
   const theme = useTheme();
@@ -263,7 +263,7 @@ const SideDrawer: React.FC = () => {
                                 }}
                                 secondaryTypographyProps={{
                                   fontSize: "0.75rem",
-                                  opacity: 0.7,
+                                  sx: { opacity: 0.7 },
                                 }}
                               />
                               {isActive && (
