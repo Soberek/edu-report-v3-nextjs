@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Container, Typography, Box, Button, Alert, CircularProgress, useTheme } from "@mui/material";
-import { Add, School } from "@mui/icons-material";
+import { Add, School, ContentCopy } from "@mui/icons-material";
 import { useSchoolState } from "./hooks/useSchoolState";
 import { useSchoolFilters } from "./hooks/useSchoolFilters";
 import { SchoolForm } from "./components/SchoolForm";
@@ -47,6 +47,15 @@ export default function Schools(): React.ReactNode {
     setEditSchool(null);
   };
 
+  const handleCopyEmails = () => {
+    const emails = filteredSchools.map(school => school.email).join("; ");
+    navigator.clipboard.writeText(emails).then(() => {
+      alert(`Skopiowano ${filteredSchools.length} adresów email do schowka`);
+    }).catch(() => {
+      alert("Błąd podczas kopiowania emaili");
+    });
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Header */}
@@ -69,8 +78,31 @@ export default function Schools(): React.ReactNode {
         </Alert>
       )}
 
-      {/* Add School Button */}
-      <Box sx={{ mb: 3, display: "flex", justifyContent: "flex-end" }}>
+      {/* Action Buttons */}
+      <Box sx={{ mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Button
+          variant="outlined"
+          startIcon={<ContentCopy />}
+          onClick={handleCopyEmails}
+          disabled={filteredSchools.length === 0}
+          sx={{
+            px: 3,
+            py: 1.5,
+            fontSize: "0.9rem",
+            fontWeight: "bold",
+            borderRadius: 2,
+            borderColor: theme.palette.secondary.main,
+            color: theme.palette.secondary.main,
+            "&:hover": {
+              borderColor: theme.palette.secondary.dark,
+              backgroundColor: theme.palette.secondary.main,
+              color: "white",
+            },
+          }}
+        >
+          Kopiuj emaile ({filteredSchools.length})
+        </Button>
+        
         <Button
           variant="contained"
           startIcon={<Add />}
@@ -92,12 +124,7 @@ export default function Schools(): React.ReactNode {
       </Box>
 
       {/* Filters */}
-      <SchoolFilter 
-        filter={state.filter} 
-        onFilterChange={setFilter}
-        uniqueTypes={uniqueTypes}
-        uniqueCities={uniqueCities}
-      />
+      <SchoolFilter filter={state.filter} onFilterChange={setFilter} uniqueTypes={uniqueTypes} uniqueCities={uniqueCities} />
 
       {/* School Form */}
       {state.openForm && (
