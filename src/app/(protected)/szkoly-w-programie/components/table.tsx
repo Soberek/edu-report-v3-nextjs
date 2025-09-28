@@ -46,8 +46,10 @@ const createColumns = (
     field: "schoolName",
     headerName: "Szkoła",
     width: 200,
+    align: "center",
+    headerAlign: "center",
     renderCell: (params) => (
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, justifyContent: "center" }}>
         <Avatar
           sx={{
             width: 32,
@@ -69,28 +71,34 @@ const createColumns = (
     field: "programName",
     headerName: "Program",
     width: 150,
+    align: "center",
+    headerAlign: "center",
     renderCell: (params) => (
-      <Chip
-        label={params.value}
-        color="primary"
-        variant="filled"
-        size="small"
-        sx={{
-          background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
-          color: "white",
-          fontWeight: "bold",
-          fontSize: "0.75rem",
-          height: 24,
-        }}
-      />
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Chip
+          label={params.value}
+          color="primary"
+          variant="filled"
+          size="small"
+          sx={{
+            background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "0.75rem",
+            height: 24,
+          }}
+        />
+      </Box>
     ),
   },
   {
     field: "coordinatorName",
     headerName: "Koordynator",
     width: 180,
+    align: "center",
+    headerAlign: "center",
     renderCell: (params) => (
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, justifyContent: "center" }}>
         <Avatar
           sx={{
             width: 28,
@@ -112,6 +120,8 @@ const createColumns = (
     field: "schoolYear",
     headerName: "Rok",
     width: 100,
+    align: "center",
+    headerAlign: "center",
     renderCell: (params) => (
       <Box
         sx={{
@@ -123,6 +133,7 @@ const createColumns = (
           borderRadius: 1.5,
           background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
           border: "1px solid #e0e0e0",
+          justifyContent: "center",
         }}
       >
         <CalendarToday sx={{ color: "#1976d2", fontSize: 16 }} />
@@ -137,6 +148,8 @@ const createColumns = (
     headerName: "Uczniowie",
     type: "number",
     width: 100,
+    align: "center",
+    headerAlign: "center",
     renderCell: (params) => (
       <Box
         sx={{
@@ -148,6 +161,7 @@ const createColumns = (
           borderRadius: 1.5,
           background: "linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)",
           border: "1px solid #4caf50",
+          justifyContent: "center",
         }}
       >
         <Group sx={{ color: "#4caf50", fontSize: 16 }} />
@@ -161,85 +175,97 @@ const createColumns = (
     field: "notes",
     headerName: "Notatki",
     width: 150,
+    align: "center",
+    headerAlign: "center",
     renderCell: (params) => (
-      <Tooltip title={params.value || "Brak notatek"} arrow>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 0.5,
-            px: 1,
-            py: 0.5,
-            borderRadius: 1.5,
-            background: params.value ? "linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)" : "rgba(0,0,0,0.04)",
-            border: params.value ? "1px solid #ff9800" : "1px solid #e0e0e0",
-            cursor: "pointer",
-          }}
-        >
-          <Notes sx={{ color: params.value ? "#ff9800" : "#999", fontSize: 16 }} />
-          <Typography
-            variant="caption"
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Tooltip title={params.value || "Brak notatek"} arrow>
+          <Box
             sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              maxWidth: 80,
-              color: params.value ? "#e65100" : "#999",
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+              px: 1,
+              py: 0.5,
+              borderRadius: 1.5,
+              background: params.value ? "linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)" : "rgba(0,0,0,0.04)",
+              border: params.value ? "1px solid #ff9800" : "1px solid #e0e0e0",
+              cursor: "pointer",
             }}
           >
-            {params.value || "Brak"}
-          </Typography>
-        </Box>
-      </Tooltip>
+            <Notes sx={{ color: params.value ? "#ff9800" : "#999", fontSize: 16 }} />
+            <Typography
+              variant="caption"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                maxWidth: 80,
+                color: params.value ? "#e65100" : "#999",
+              }}
+            >
+              {params.value || "Brak"}
+            </Typography>
+          </Box>
+        </Tooltip>
+      </Box>
     ),
   },
   {
     field: "createdAt",
     headerName: "Data",
     width: 100,
+    align: "center",
+    headerAlign: "center",
     renderCell: (params) => (
-      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: "500" }}>
-        {new Date(params.value).toLocaleDateString("pl-PL", { day: '2-digit', month: '2-digit' })}
-      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: "500" }}>
+          {new Date(params.value).toLocaleDateString("pl-PL", { day: "2-digit", month: "2-digit" })}
+        </Typography>
+      </Box>
     ),
   },
   {
     field: "actions",
     headerName: "Akcje",
     width: 100,
+    align: "center",
+    headerAlign: "center",
     sortable: false,
     filterable: false,
     renderCell: (params) => (
-      <Stack direction="row" spacing={0.5}>
-        <Tooltip title="Edytuj" arrow>
-          <IconButton
-            size="small"
-            onClick={() => handleEdit(params.row)}
-            sx={{
-              color: "#ff9800",
-              "&:hover": {
-                background: "rgba(255, 152, 0, 0.1)",
-              },
-            }}
-          >
-            <Edit fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Usuń" arrow>
-          <IconButton
-            size="small"
-            onClick={() => handleDelete(params.row.id)}
-            sx={{
-              color: "#f44336",
-              "&:hover": {
-                background: "rgba(244, 67, 54, 0.1)",
-              },
-            }}
-          >
-            <Delete fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      </Stack>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Stack direction="row" spacing={0.5}>
+          <Tooltip title="Edytuj" arrow>
+            <IconButton
+              size="small"
+              onClick={() => handleEdit(params.row)}
+              sx={{
+                color: "#ff9800",
+                "&:hover": {
+                  background: "rgba(255, 152, 0, 0.1)",
+                },
+              }}
+            >
+              <Edit fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Usuń" arrow>
+            <IconButton
+              size="small"
+              onClick={() => handleDelete(params.row.id)}
+              sx={{
+                color: "#f44336",
+                "&:hover": {
+                  background: "rgba(244, 67, 54, 0.1)",
+                },
+              }}
+            >
+              <Delete fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      </Box>
     ),
   },
 ];
@@ -257,18 +283,18 @@ type Props = {
   onUpdate: (id: string, data: any) => void;
   onDelete: (id: string) => void;
 };
-export const SchoolProgramParticipationTable = ({ 
-  schoolsMap, 
-  contactsMap, 
-  programsMap, 
-  participations, 
-  errorMessage, 
+export const SchoolProgramParticipationTable = ({
+  schoolsMap,
+  contactsMap,
+  programsMap,
+  participations,
+  errorMessage,
   loading,
   schools,
   contacts,
   programs,
   onUpdate,
-  onDelete
+  onDelete,
 }: Props) => {
   const [editingParticipation, setEditingParticipation] = useState<SchoolProgramParticipation | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);

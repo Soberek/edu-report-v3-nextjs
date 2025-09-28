@@ -32,16 +32,7 @@ interface EditDialogProps {
   loading: boolean;
 }
 
-export default function EditDialog({
-  open,
-  participation,
-  schools,
-  contacts,
-  programs,
-  onClose,
-  onSave,
-  loading,
-}: EditDialogProps) {
+export default function EditDialog({ open, participation, schools, contacts, programs, onClose, onSave, loading }: EditDialogProps) {
   const {
     control,
     handleSubmit,
@@ -193,6 +184,7 @@ export default function EditDialog({
             elevation={0}
             sx={{
               p: 4,
+              mt: 4,
               borderRadius: 4,
               background: "rgba(255,255,255,0.95)",
               backdropFilter: "blur(20px)",
