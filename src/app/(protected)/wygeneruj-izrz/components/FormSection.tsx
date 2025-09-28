@@ -9,24 +9,30 @@ export const FormSection: React.FC<FormSectionProps> = ({
 }) => {
   return (
     <Paper
-      elevation={2}
+      elevation={1}
       sx={{
-        p: 3,
-        mb: 3,
-        borderRadius: 2,
-        backgroundColor: "#fafafa",
-        border: "1px solid #e0e0e0",
+        p: 2,
+        mb: 2,
+        borderRadius: 1.5,
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #e9ecef",
+        transition: "all 0.2s ease-in-out",
+        "&:hover": {
+          elevation: 2,
+          borderColor: "#1976d2",
+        },
       }}
     >
       <Typography
-        variant="h6"
+        variant="subtitle1"
         sx={{
-          mb: 2,
-          fontWeight: "bold",
+          mb: 1.5,
+          fontWeight: 600,
           color: "#1976d2",
           display: "flex",
           alignItems: "center",
-          gap: 1,
+          gap: 0.5,
+          fontSize: "0.95rem",
         }}
       >
         {title}
@@ -35,14 +41,15 @@ export const FormSection: React.FC<FormSectionProps> = ({
             component="span"
             sx={{
               color: "error.main",
-              fontSize: "1.2rem",
+              fontSize: "1rem",
+              ml: 0.5,
             }}
           >
             *
           </Typography>
         )}
       </Typography>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
         {children}
       </Box>
     </Paper>

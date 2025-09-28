@@ -1,14 +1,6 @@
 "use client";
 import React from "react";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  Typography,
-  Alert,
-  Stack,
-} from "@mui/material";
+import { Box, Button, CircularProgress, Container, Typography, Alert, Stack } from "@mui/material";
 import { useRaportDocumentGenerator } from "./hooks/useRaportDocumentGenerator";
 import { useIzrzForm } from "./hooks/useIzrzForm";
 import { useUser } from "@/hooks/useUser";
@@ -48,49 +40,43 @@ export default function IzrzForm() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="md" sx={{ py: 3 }}>
       {/* Header */}
-      <Box sx={{ mb: 4, textAlign: "center" }}>
-        <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2, color: "#1976d2" }}>
+      <Box sx={{ mb: 3, textAlign: "center" }}>
+        <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1, color: "#1976d2" }}>
           📋 Generator IZRZ
         </Typography>
-        <Typography variant="h6" color="text.secondary">
+        <Typography variant="body1" color="text.secondary" sx={{ fontSize: "0.9rem" }}>
           Generuj raporty i dokumenty edukacyjne
         </Typography>
       </Box>
 
       {/* Success/Error Messages */}
       {submitMessage && (
-        <Alert
-          severity={submitMessage.type === "success" ? "success" : "error"}
-          sx={{ mb: 3 }}
-        >
+        <Alert severity={submitMessage.type === "success" ? "success" : "error"} sx={{ mb: 2 }}>
           {submitMessage.text}
         </Alert>
       )}
 
       {/* Loading State */}
       {schoolsLoading && (
-        <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
-          <CircularProgress />
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <CircularProgress size={24} />
         </Box>
       )}
 
       {/* Error State */}
       {schoolsError && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
           Błąd podczas ładowania danych: {schoolsError}
         </Alert>
       )}
 
       {/* Form */}
       <Box component="form" onSubmit={handleSubmit}>
-        <Stack spacing={3}>
+        <Stack spacing={2}>
           {/* Template Selection */}
-          <TemplateSelector
-            onTemplateSelect={handleTemplateSelect}
-            selectedTemplate={templateFile}
-          />
+          <TemplateSelector onTemplateSelect={handleTemplateSelect} selectedTemplate={templateFile} />
 
           {/* Basic Information */}
           <FormSection title="Podstawowe informacje" required>
@@ -122,7 +108,7 @@ export default function IzrzForm() {
               control={control}
               error={errors.programName}
               label="Nazwa programu"
-              options={programs.map(program => ({ value: program.name, label: program.name }))}
+              options={programs.map((program) => ({ value: program.name, label: program.name }))}
               required
             />
             <FormField
@@ -131,7 +117,7 @@ export default function IzrzForm() {
               control={control}
               error={errors.taskType}
               label="Typ zadania"
-              options={Object.values(TASK_TYPES).map(taskType => ({ value: taskType.label, label: taskType.label }))}
+              options={Object.values(TASK_TYPES).map((taskType) => ({ value: taskType.label, label: taskType.label }))}
               required
             />
           </FormSection>
@@ -147,14 +133,7 @@ export default function IzrzForm() {
               placeholder="Wprowadź adres"
               required
             />
-            <FormField
-              type="date"
-              name="dateInput"
-              control={control}
-              error={errors.dateInput}
-              label="Data"
-              required
-            />
+            <FormField type="date" name="dateInput" control={control} error={errors.dateInput} label="Data" required />
           </FormSection>
 
           {/* Audience Information */}
@@ -212,34 +191,24 @@ export default function IzrzForm() {
 
           {/* Options */}
           <FormSection title="Opcje">
-            <FormField
-              type="checkbox"
-              name="attendanceList"
-              control={control}
-              label="Lista obecności"
-            />
-            <FormField
-              type="checkbox"
-              name="rozdzielnik"
-              control={control}
-              label="Rozdzielnik"
-            />
+            <FormField type="checkbox" name="attendanceList" control={control} label="Lista obecności" />
+            <FormField type="checkbox" name="rozdzielnik" control={control} label="Rozdzielnik" />
           </FormSection>
 
           {/* Submit Button */}
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
             <Button
               type="submit"
               variant="contained"
-              size="large"
+              size="medium"
               disabled={isSubmitting || !isFormValid}
-              startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
+              startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
               sx={{
-                px: 6,
-                py: 2,
-                fontSize: "1.1rem",
+                px: 4,
+                py: 1.5,
+                fontSize: "1rem",
                 fontWeight: "bold",
-                borderRadius: 3,
+                borderRadius: 2,
                 background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
                 "&:hover": {
                   background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",

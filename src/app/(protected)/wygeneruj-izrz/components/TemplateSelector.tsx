@@ -35,48 +35,58 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
 
   return (
     <Paper
-      elevation={2}
+      elevation={1}
       sx={{
-        p: 3,
-        mb: 3,
-        borderRadius: 2,
+        p: 2,
+        mb: 2,
+        borderRadius: 1.5,
         backgroundColor: "#f8f9fa",
         border: "1px solid #e9ecef",
+        transition: "all 0.2s ease-in-out",
+        "&:hover": {
+          elevation: 2,
+          borderColor: "#1976d2",
+        },
       }}
     >
       <Typography
-        variant="h6"
+        variant="subtitle1"
         sx={{
-          mb: 2,
-          fontWeight: "bold",
+          mb: 1.5,
+          fontWeight: 600,
           color: "#1976d2",
           display: "flex",
           alignItems: "center",
-          gap: 1,
+          gap: 0.5,
+          fontSize: "0.95rem",
         }}
       >
-        <Description />
+        <Description sx={{ fontSize: "1.1rem" }} />
         Wybierz szablon
       </Typography>
 
-      <Stack spacing={2}>
-        <Typography variant="body2" color="text.secondary">
-          Wybierz jeden z dostępnych szablonów lub prześlij własny plik:
+      <Stack spacing={1.5}>
+        <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.85rem" }}>
+          Wybierz jeden z dostępnych szablonów:
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+        <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
           {predefinedTemplates.map((template) => (
             <Button
               key={template.name}
               variant={selectedTemplate?.name === template.name ? "contained" : "outlined"}
               onClick={() => handleTemplateSelect(template.name)}
               disabled={loading}
-              startIcon={loading ? <CircularProgress size={16} /> : <Description />}
+              startIcon={loading ? <CircularProgress size={14} /> : <Description sx={{ fontSize: "1rem" }} />}
+              size="small"
               sx={{
-                minWidth: 150,
-                borderRadius: 2,
+                minWidth: 120,
+                borderRadius: 1.5,
                 textTransform: "none",
                 fontWeight: "medium",
+                fontSize: "0.85rem",
+                py: 0.5,
+                px: 2,
               }}
             >
               {template.label}
@@ -90,14 +100,14 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
               display: "flex",
               alignItems: "center",
               gap: 1,
-              p: 2,
+              p: 1.5,
               backgroundColor: "#e8f5e8",
-              borderRadius: 2,
+              borderRadius: 1.5,
               border: "1px solid #4caf50",
             }}
           >
-            <CheckCircle sx={{ color: "#4caf50" }} />
-            <Typography variant="body2" sx={{ color: "#2e7d32", fontWeight: "medium" }}>
+            <CheckCircle sx={{ color: "#4caf50", fontSize: "1.1rem" }} />
+            <Typography variant="body2" sx={{ color: "#2e7d32", fontWeight: "medium", fontSize: "0.85rem" }}>
               Wybrany szablon: {selectedTemplate.name}
             </Typography>
           </Box>

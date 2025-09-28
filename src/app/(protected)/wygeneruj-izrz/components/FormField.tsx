@@ -56,12 +56,20 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                 minRows={props.minRows}
                 maxRows={props.maxRows}
                 variant="outlined"
+                size="small"
                 error={!!error}
                 helperText={error?.message}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     backgroundColor: "#fff",
-                    borderRadius: 2,
+                    borderRadius: 1.5,
+                    fontSize: "0.9rem",
+                  },
+                  "& .MuiInputLabel-root": {
+                    fontSize: "0.9rem",
+                  },
+                  "& .MuiFormHelperText-root": {
+                    fontSize: "0.8rem",
                   },
                 }}
               />
@@ -81,6 +89,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                 getOptionLabel={(option) => option.label}
                 value={props.options.find(option => option.value === field.value) || null}
                 onChange={(_, newValue) => field.onChange(newValue?.value || "")}
+                size="small"
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -91,7 +100,14 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         backgroundColor: "#fff",
-                        borderRadius: 2,
+                        borderRadius: 1.5,
+                        fontSize: "0.9rem",
+                      },
+                      "& .MuiInputLabel-root": {
+                        fontSize: "0.9rem",
+                      },
+                      "& .MuiFormHelperText-root": {
+                        fontSize: "0.8rem",
                       },
                     }}
                   />
@@ -113,9 +129,15 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                     {...field}
                     checked={field.value}
                     color="primary"
+                    size="small"
                   />
                 }
                 label={props.label}
+                sx={{
+                  "& .MuiFormControlLabel-label": {
+                    fontSize: "0.9rem",
+                  },
+                }}
               />
             )}
           />
