@@ -25,6 +25,7 @@ export default function Schools(): React.ReactNode {
 
   const handleEditSchool = (school: any) => {
     setEditSchool(school);
+    toggleForm(true);
   };
 
   const handleDeleteSchoolConfirm = (id: string) => {
