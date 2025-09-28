@@ -7,8 +7,8 @@ import { useBudgetMeter } from "./hooks/useBudgetMeter";
 import { StatsCard, MonthSelector, FileUploader, DataTable, AdvancedStats, BarCharts } from "./components";
 
 const OfflineMiernik: React.FC = () => {
-  const [activeTab, setActiveTab] = useState(0);
-  
+  const [activeTab, setActiveTab] = useState(2); // Default to "Tabela danych" tab
+
   const {
     state,
     handleFileUpload,
@@ -31,8 +31,10 @@ const OfflineMiernik: React.FC = () => {
     }
   }, [state.rawData.length, selectedMonthsCount, state.aggregatedData, processData]);
 
+  // Error handling
   const currentError = state.fileError || state.monthError || state.processingError;
 
+  // Tab management
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
@@ -112,7 +114,7 @@ const OfflineMiernik: React.FC = () => {
         </Box>
       )}
 
-      {/* Tabs */}
+      {/* Data Visualization Tabs */}
       {hasValidData && state.aggregatedData && (
         <Box sx={{ mb: 4 }}>
           <Tabs
@@ -129,33 +131,40 @@ const OfflineMiernik: React.FC = () => {
               },
             }}
           >
-            <Tab
-              icon={<Assessment />}
-              label="Zaawansowane statystyki"
-              iconPosition="start"
-              sx={{ minHeight: 60 }}
+            <Tab 
+              icon={<Assessment />} 
+              label="Zaawansowane statystyki" 
+              iconPosition="start" 
+              sx={{ minHeight: 60 }} 
             />
-            <Tab
-              icon={<BarChart />}
-              label="Wykresy słupkowe"
-              iconPosition="start"
-              sx={{ minHeight: 60 }}
+            <Tab 
+              icon={<BarChart />} 
+              label="Wykresy słupkowe" 
+              iconPosition="start" 
+              sx={{ minHeight: 60 }} 
             />
-            <Tab
-              icon={<TableChart />}
-              label="Tabela danych"
-              iconPosition="start"
-              sx={{ minHeight: 60 }}
+            <Tab 
+              icon={<TableChart />} 
+              label="Tabela danych" 
+              iconPosition="start" 
+              sx={{ minHeight: 60 }} 
             />
           </Tabs>
 
           {/* Tab Content */}
           <Box sx={{ mt: 3 }}>
             {activeTab === 0 && (
-              <AdvancedStats data={state.aggregatedData} selectedMonths={state.selectedMonths} rawData={state.rawData} />
+              <AdvancedStats 
+                data={state.aggregatedData} 
+                selectedMonths={state.selectedMonths} 
+                rawData={state.rawData} 
+              />
             )}
             {activeTab === 1 && (
-              <BarCharts rawData={state.rawData} selectedMonths={state.selectedMonths} />
+              <BarCharts 
+                rawData={state.rawData} 
+                selectedMonths={state.selectedMonths} 
+              />
             )}
             {activeTab === 2 && (
               <DataTable
