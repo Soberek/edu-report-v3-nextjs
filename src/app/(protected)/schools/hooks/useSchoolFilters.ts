@@ -25,9 +25,14 @@ export const useSchoolFilters = ({ schools, filter }: UseSchoolFiltersProps) => 
 
     // Apply type filter
     if (filter.type) {
-      filtered = filtered.filter((school) =>
-        school.type && school.type.includes(filter.type)
-      );
+      console.log("Filtering by type:", filter.type);
+      console.log("Schools before type filter:", filtered.length);
+      filtered = filtered.filter((school) => {
+        const hasType = school.type && school.type.includes(filter.type);
+        console.log(`School ${school.name}: types=${JSON.stringify(school.type)}, hasType=${hasType}`);
+        return hasType;
+      });
+      console.log("Schools after type filter:", filtered.length);
     }
 
     // Apply city filter

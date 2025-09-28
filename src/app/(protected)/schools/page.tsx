@@ -48,12 +48,15 @@ export default function Schools(): React.ReactNode {
   };
 
   const handleCopyEmails = () => {
-    const emails = filteredSchools.map(school => school.email).join("; ");
-    navigator.clipboard.writeText(emails).then(() => {
-      alert(`Skopiowano ${filteredSchools.length} adresów email do schowka`);
-    }).catch(() => {
-      alert("Błąd podczas kopiowania emaili");
-    });
+    const emails = filteredSchools.map((school) => school.email).join("; ");
+    navigator.clipboard
+      .writeText(emails)
+      .then(() => {
+        alert(`Skopiowano ${filteredSchools.length} adresów email do schowka`);
+      })
+      .catch(() => {
+        alert("Błąd podczas kopiowania emaili");
+      });
   };
 
   return (
@@ -102,7 +105,7 @@ export default function Schools(): React.ReactNode {
         >
           Kopiuj emaile ({filteredSchools.length})
         </Button>
-        
+
         <Button
           variant="contained"
           startIcon={<Add />}
