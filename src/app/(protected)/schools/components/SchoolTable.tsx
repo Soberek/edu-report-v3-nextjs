@@ -29,7 +29,14 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, py: 1 }}>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          gap: 1, 
+          height: "100%",
+          minHeight: 52
+        }}>
           <Avatar
             sx={{
               width: 32,
@@ -54,9 +61,17 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
-          {params.value}
-        </Typography>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          height: "100%",
+          minHeight: 52
+        }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+            {params.value}
+          </Typography>
+        </Box>
       ),
     },
     {
@@ -67,9 +82,17 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
-          {params.value}
-        </Typography>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          height: "100%",
+          minHeight: 52
+        }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+            {params.value}
+          </Typography>
+        </Box>
       ),
     },
     {
@@ -80,9 +103,17 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
-          {params.value}
-        </Typography>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          height: "100%",
+          minHeight: 52
+        }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+            {params.value}
+          </Typography>
+        </Box>
       ),
     },
     {
@@ -93,9 +124,17 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
-          {params.value}
-        </Typography>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          height: "100%",
+          minHeight: 52
+        }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+            {params.value}
+          </Typography>
+        </Box>
       ),
     },
     {
@@ -106,9 +145,17 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
-          {params.value}
-        </Typography>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center", 
+          height: "100%",
+          minHeight: 52
+        }}>
+          <Typography variant="body2" sx={{ fontSize: "0.85rem", textAlign: "center" }}>
+            {params.value}
+          </Typography>
+        </Box>
       ),
     },
     {
@@ -119,7 +166,15 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", justifyContent: "center" }}>
+        <Box sx={{ 
+          display: "flex", 
+          gap: 0.5, 
+          flexWrap: "wrap", 
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+          minHeight: 52
+        }}>
           {params.value && Array.isArray(params.value) ? (
             params.value.map((type: string, index: number) => (
               <Chip
@@ -155,7 +210,14 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({
       align: "center",
       headerAlign: "center",
       renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center", justifyContent: "center" }}>
+        <Box sx={{ 
+          display: "flex", 
+          gap: 1, 
+          alignItems: "center", 
+          justifyContent: "center",
+          height: "100%",
+          minHeight: 52
+        }}>
           <Button
             variant="outlined"
             size="small"
