@@ -95,15 +95,13 @@ export default function Schools(): React.ReactNode {
 
       {/* School Form */}
       {state.openForm && (
-        <Box sx={{ mb: 4 }}>
-          <SchoolForm
-            mode={state.editSchool ? "edit" : "create"}
-            school={state.editSchool}
-            onClose={handleFormClose}
-            onSave={handleFormSave}
-            loading={state.isSubmitting}
-          />
-        </Box>
+        <SchoolForm
+          mode={state.editSchool ? "edit" : "create"}
+          school={state.editSchool}
+          onClose={handleFormClose}
+          onSave={handleFormSave}
+          loading={state.isSubmitting}
+        />
       )}
 
       {/* School Table */}

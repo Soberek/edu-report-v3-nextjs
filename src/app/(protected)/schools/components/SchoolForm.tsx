@@ -218,10 +218,11 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({
         title={title}
         onSave={handleSubmit}
         loading={loading}
-        saveText="Zapisz zmiany"
+        saveText={isEditMode ? "Zapisz zmiany" : "Dodaj szkołę"}
         cancelText="Anuluj"
         maxWidth="md"
         fullWidth
+        mode={mode}
       >
         {formContent}
       </EditDialog>

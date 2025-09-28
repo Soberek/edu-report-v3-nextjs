@@ -11,7 +11,7 @@ import {
   Paper,
   useTheme,
 } from "@mui/material";
-import { Edit, Close } from "@mui/icons-material";
+import { Edit, Add, Close } from "@mui/icons-material";
 
 interface EditDialogProps {
   open: boolean;
@@ -26,6 +26,7 @@ interface EditDialogProps {
   maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
   fullWidth?: boolean;
   showActions?: boolean;
+  mode?: "create" | "edit";
 }
 
 export const EditDialog: React.FC<EditDialogProps> = ({
@@ -36,13 +37,18 @@ export const EditDialog: React.FC<EditDialogProps> = ({
   onSave,
   onCancel,
   loading = false,
-  saveText = "Zapisz",
+  saveText,
   cancelText = "Anuluj",
   maxWidth = "md",
   fullWidth = true,
   showActions = true,
+  mode = "edit",
 }) => {
   const theme = useTheme();
+  
+  // Set default save text based on mode
+  const defaultSaveText = mode === "create" ? "Dodaj" : "Zapisz";
+  const finalSaveText = saveText || defaultSaveText;
 
   const handleCancel = () => {
     if (onCancel) {
@@ -86,7 +92,11 @@ export const EditDialog: React.FC<EditDialogProps> = ({
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1 }}>
-          <Edit sx={{ fontSize: "1.5rem" }} />
+          {mode === "create" ? (
+            <Add sx={{ fontSize: "1.5rem" }} />
+          ) : (
+            <Edit sx={{ fontSize: "1.5rem" }} />
+          )}
           <Typography variant="h6" component="span">
             {title}
           </Typography>
@@ -145,7 +155,7 @@ export const EditDialog: React.FC<EditDialogProps> = ({
               variant="contained"
               size="medium"
               disabled={loading}
-              startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <Edit />}
+              startIcon={loading ? <CircularProgress size={18} color="inherit" /> : (mode === "create" ? <Add /> : <Edit />)}
               sx={{
                 borderRadius: 2,
                 px: 3,
@@ -156,7 +166,7 @@ export const EditDialog: React.FC<EditDialogProps> = ({
                 },
               }}
             >
-              {loading ? "Zapisywanie..." : saveText}
+              {loading ? (mode === "create" ? "Dodawanie..." : "Zapisywanie...") : finalSaveText}
             </Button>
           )}
         </DialogActions>
