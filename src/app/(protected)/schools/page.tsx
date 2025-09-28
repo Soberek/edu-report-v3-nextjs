@@ -4,9 +4,11 @@ import { Container, Typography, Box, Button, Alert, CircularProgress, useTheme }
 import { Add, School, ContentCopy } from "@mui/icons-material";
 import { useSchoolState } from "./hooks/useSchoolState";
 import { useSchoolFilters } from "./hooks/useSchoolFilters";
+import { useSchoolStats } from "./hooks/useSchoolStats";
 import { SchoolForm } from "./components/SchoolForm";
 import { SchoolTable } from "./components/SchoolTable";
 import { SchoolFilter } from "./components/SchoolFilter";
+import { SchoolStats } from "./components/SchoolStats";
 import type { CreateSchoolFormData, EditSchoolFormData } from "./schemas/schoolSchemas";
 
 export default function Schools(): React.ReactNode {
@@ -16,6 +18,10 @@ export default function Schools(): React.ReactNode {
   const { filteredSchools, uniqueTypes, uniqueCities } = useSchoolFilters({
     schools: state.schools,
     filter: state.filter,
+  });
+
+  const { totalSchools, typeStats } = useSchoolStats({
+    schools: state.schools,
   });
 
   const handleAddSchool = () => {
@@ -80,6 +86,9 @@ export default function Schools(): React.ReactNode {
           {state.error}
         </Alert>
       )}
+
+      {/* School Statistics */}
+      <SchoolStats totalSchools={totalSchools} typeStats={typeStats} />
 
       {/* Action Buttons */}
       <Box sx={{ mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>

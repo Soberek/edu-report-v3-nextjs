@@ -19,7 +19,7 @@ const initialState: SchoolState = {
 export const useSchoolState = () => {
   const [state, dispatch] = useReducer(schoolReducer, initialState);
   const userContext = useUser();
-  
+
   const {
     data: fetchedSchools,
     loading: fetchedLoading,
@@ -58,41 +58,50 @@ export const useSchoolState = () => {
     dispatch({ type: "SET_EDIT_SCHOOL", payload: school });
   }, []);
 
-  const handleCreateSchool = useCallback(async (data: any) => {
-    dispatch({ type: "SET_SUBMITTING", payload: true });
-    try {
-      await createSchool(data);
-      await refetch();
-      dispatch({ type: "TOGGLE_FORM", payload: false });
-    } catch (error) {
-      console.error("Error creating school:", error);
-    } finally {
-      dispatch({ type: "SET_SUBMITTING", payload: false });
-    }
-  }, [createSchool, refetch]);
+  const handleCreateSchool = useCallback(
+    async (data: any) => {
+      dispatch({ type: "SET_SUBMITTING", payload: true });
+      try {
+        await createSchool(data);
+        await refetch();
+        dispatch({ type: "TOGGLE_FORM", payload: false });
+      } catch (error) {
+        console.error("Error creating school:", error);
+      } finally {
+        dispatch({ type: "SET_SUBMITTING", payload: false });
+      }
+    },
+    [createSchool, refetch]
+  );
 
-  const handleUpdateSchool = useCallback(async (id: string, updates: Partial<School>) => {
-    dispatch({ type: "SET_SUBMITTING", payload: true });
-    try {
-      await updateSchool(id, updates);
-      await refetch();
-      dispatch({ type: "TOGGLE_FORM", payload: false });
-      dispatch({ type: "SET_EDIT_SCHOOL", payload: null });
-    } catch (error) {
-      console.error("Error updating school:", error);
-    } finally {
-      dispatch({ type: "SET_SUBMITTING", payload: false });
-    }
-  }, [updateSchool, refetch]);
+  const handleUpdateSchool = useCallback(
+    async (id: string, updates: Partial<School>) => {
+      dispatch({ type: "SET_SUBMITTING", payload: true });
+      try {
+        await updateSchool(id, updates);
+        await refetch();
+        dispatch({ type: "TOGGLE_FORM", payload: false });
+        dispatch({ type: "SET_EDIT_SCHOOL", payload: null });
+      } catch (error) {
+        console.error("Error updating school:", error);
+      } finally {
+        dispatch({ type: "SET_SUBMITTING", payload: false });
+      }
+    },
+    [updateSchool, refetch]
+  );
 
-  const handleDeleteSchool = useCallback(async (id: string) => {
-    try {
-      await deleteSchool(id);
-      await refetch();
-    } catch (error) {
-      console.error("Error deleting school:", error);
-    }
-  }, [deleteSchool, refetch]);
+  const handleDeleteSchool = useCallback(
+    async (id: string) => {
+      try {
+        await deleteSchool(id);
+        await refetch();
+      } catch (error) {
+        console.error("Error deleting school:", error);
+      }
+    },
+    [deleteSchool, refetch]
+  );
 
   return {
     state,
