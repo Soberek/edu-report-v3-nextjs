@@ -78,24 +78,26 @@ export default function IzrzForm() {
           <TemplateSelector onTemplateSelect={handleTemplateSelect} selectedTemplate={templateFile} />
 
           {/* Basic Information */}
-          <FormField
-            type="text"
-            name="caseNumber"
-            control={control}
-            error={errors.caseNumber}
-            label="Numer sprawy"
-            placeholder="Wprowadź numer sprawy"
-            required
-          />
-          <FormField
-            type="text"
-            name="reportNumber"
-            control={control}
-            error={errors.reportNumber}
-            label="Numer raportu"
-            placeholder="Wprowadź numer raportu"
-            required
-          />
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+            <FormField
+              type="text"
+              name="caseNumber"
+              control={control}
+              error={errors.caseNumber}
+              label="Numer sprawy"
+              placeholder="Wprowadź numer sprawy"
+              required
+            />
+            <FormField
+              type="text"
+              name="reportNumber"
+              control={control}
+              error={errors.reportNumber}
+              label="Numer raportu"
+              placeholder="Wprowadź numer raportu"
+              required
+            />
+          </Box>
 
           {/* Program and Task Information */}
           <FormField
