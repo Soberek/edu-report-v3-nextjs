@@ -41,6 +41,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
       programName: task?.programName || "",
       date: task?.date || "",
       schoolId: task?.schoolId || "",
+      referenceNumber: task?.referenceNumber || "",
       referenceId: task?.referenceId || "",
       activities: task?.activities || [
         {
@@ -135,6 +136,15 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
                       }}
                     />
                   )}
+                />
+
+                <FormField
+                  name="referenceNumber"
+                  control={form.control}
+                  label="Numer referencyjny"
+                  placeholder="Wprowadź numer referencyjny zadania"
+                  required
+                  fullWidth
                 />
 
                 <FormField
