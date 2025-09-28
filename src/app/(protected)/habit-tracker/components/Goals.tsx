@@ -2,7 +2,7 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 import { useApp } from "../context/AppContext";
-import { Goals } from "../types";
+import { Goals as GoalsType } from "../types";
 import { useGoals } from "../hooks/useGoals";
 
 export const Goals = React.memo(() => {
