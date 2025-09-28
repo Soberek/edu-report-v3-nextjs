@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-import { Container, Typography, Box, Button, Alert, CircularProgress, useTheme } from "@mui/material";
+import { Container, Box, Alert } from "@mui/material";
 import { Add, School, ContentCopy } from "@mui/icons-material";
+import { PageHeader, PrimaryButton, SecondaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
 import { useSchoolState } from "./hooks/useSchoolState";
 import { useSchoolFilters } from "./hooks/useSchoolFilters";
 import { useSchoolStats } from "./hooks/useSchoolStats";
@@ -12,8 +13,8 @@ import { SchoolStats } from "./components/SchoolStats";
 import type { CreateSchoolFormData, EditSchoolFormData } from "./schemas/schoolSchemas";
 
 export default function Schools(): React.ReactNode {
-  const theme = useTheme();
   const { state, setFilter, toggleForm, setEditSchool, handleCreateSchool, handleUpdateSchool, handleDeleteSchool } = useSchoolState();
+  const { showConfirm, ConfirmDialog } = useConfirmDialog();
 
   const { filteredSchools, uniqueTypes, uniqueCities } = useSchoolFilters({
     schools: state.schools,
@@ -35,9 +36,12 @@ export default function Schools(): React.ReactNode {
   };
 
   const handleDeleteSchoolConfirm = (id: string) => {
-    if (window.confirm("Czy na pewno chcesz usunąć tę szkołę?")) {
-      handleDeleteSchool(id);
-    }
+    showConfirm(
+      "Usuń szkołę",
+      "Czy na pewno chcesz usunąć tę szkołę? Ta operacja nie może zostać cofnięta.",
+      () => handleDeleteSchool(id),
+      "delete"
+    );
   };
 
   const handleFormSave = async (data: CreateSchoolFormData | EditSchoolFormData) => {
@@ -68,72 +72,26 @@ export default function Schools(): React.ReactNode {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Header */}
-      <Box sx={{ mb: 4, textAlign: "center" }}>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, mb: 2 }}>
-          <School sx={{ fontSize: "2.5rem", color: theme.palette.primary.main }} />
-          <Typography variant="h3" sx={{ fontWeight: "bold", color: "#1976d2" }}>
-            Zarządzanie szkołami
-          </Typography>
-        </Box>
-        <Typography variant="body1" color="text.secondary" sx={{ fontSize: "1.1rem" }}>
-          Dodawaj, edytuj i zarządzaj szkołami w systemie
-        </Typography>
-      </Box>
+      <PageHeader
+        title="Zarządzanie szkołami"
+        subtitle="Dodawaj, edytuj i zarządzaj szkołami w systemie"
+        actions={
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <SecondaryButton startIcon={<ContentCopy />} onClick={handleCopyEmails} disabled={filteredSchools.length === 0}>
+              Kopiuj emaile ({filteredSchools.length})
+            </SecondaryButton>
+            <PrimaryButton startIcon={<Add />} onClick={handleAddSchool}>
+              Dodaj szkołę
+            </PrimaryButton>
+          </Box>
+        }
+      />
 
       {/* Error Display */}
-      {state.error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {state.error}
-        </Alert>
-      )}
+      {state.error && <ErrorDisplay error={state.error} sx={{ mb: 3 }} />}
 
       {/* School Statistics */}
       <SchoolStats totalSchools={totalSchools} typeStats={typeStats} />
-
-      {/* Action Buttons */}
-      <Box sx={{ mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Button
-          variant="outlined"
-          startIcon={<ContentCopy />}
-          onClick={handleCopyEmails}
-          disabled={filteredSchools.length === 0}
-          sx={{
-            px: 3,
-            py: 1.5,
-            fontSize: "0.9rem",
-            fontWeight: "bold",
-            borderRadius: 2,
-            borderColor: theme.palette.secondary.main,
-            color: theme.palette.secondary.main,
-            "&:hover": {
-              borderColor: theme.palette.secondary.dark,
-              backgroundColor: theme.palette.secondary.main,
-              color: "white",
-            },
-          }}
-        >
-          Kopiuj emaile ({filteredSchools.length})
-        </Button>
-
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={handleAddSchool}
-          sx={{
-            px: 4,
-            py: 1.5,
-            fontSize: "1rem",
-            fontWeight: "bold",
-            borderRadius: 2,
-            background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
-            "&:hover": {
-              background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
-            },
-          }}
-        >
-          Dodaj szkołę
-        </Button>
-      </Box>
 
       {/* Filters */}
       <SchoolFilter filter={state.filter} onFilterChange={setFilter} uniqueTypes={uniqueTypes} uniqueCities={uniqueCities} />
@@ -151,18 +109,15 @@ export default function Schools(): React.ReactNode {
 
       {/* School Table */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: "#1976d2" }}>
-          Lista szkół ({filteredSchools.length})
-        </Typography>
-
         {state.loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 400 }}>
-            <CircularProgress size={60} />
-          </Box>
+          <LoadingSpinner message="Ładowanie szkół..." />
         ) : (
           <SchoolTable schools={filteredSchools} onEdit={handleEditSchool} onDelete={handleDeleteSchoolConfirm} loading={state.loading} />
         )}
       </Box>
+
+      {/* Confirm Dialog */}
+      {ConfirmDialog}
     </Container>
   );
 }
