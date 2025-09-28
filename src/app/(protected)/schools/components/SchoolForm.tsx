@@ -155,31 +155,35 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, o
                 backgroundColor: "#fafafa",
               }}
             >
-              {schoolTypes.map(([key, label]) => (
-                <FormControlLabel
-                  key={key}
-                  control={
-                    <Checkbox
-                      size="small"
-                      checked={selectedTypes.includes(key as (typeof selectedTypes)[number])}
-                      onChange={(e) => handleTypeChange(key as (typeof selectedTypes)[number], e.target.checked)}
-                      sx={{
-                        py: 0.5,
-                        "& .MuiSvgIcon-root": { fontSize: "1rem" },
-                      }}
-                    />
-                  }
-                  label={label}
-                  sx={{
-                    fontSize: "0.8rem",
-                    margin: 0,
-                    "& .MuiFormControlLabel-label": {
+              {schoolTypes.map(([key, label]) => {
+                const isChecked = selectedTypes.includes(key as (typeof selectedTypes)[number]);
+                console.log(`Checkbox ${key}: isChecked=${isChecked}, selectedTypes=${JSON.stringify(selectedTypes)}`);
+                return (
+                  <FormControlLabel
+                    key={key}
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={isChecked}
+                        onChange={(e) => handleTypeChange(key as (typeof selectedTypes)[number], e.target.checked)}
+                        sx={{
+                          py: 0.5,
+                          "& .MuiSvgIcon-root": { fontSize: "1rem" },
+                        }}
+                      />
+                    }
+                    label={label}
+                    sx={{
                       fontSize: "0.8rem",
-                      lineHeight: 1.2,
-                    },
-                  }}
-                />
-              ))}
+                      margin: 0,
+                      "& .MuiFormControlLabel-label": {
+                        fontSize: "0.8rem",
+                        lineHeight: 1.2,
+                      },
+                    }}
+                  />
+                );
+              })}
             </Box>
           </FormGroup>
           {errors.type && (

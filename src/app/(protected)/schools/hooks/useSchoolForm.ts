@@ -30,6 +30,8 @@ export const useSchoolForm = ({ mode, school, onSubmit }: UseSchoolFormProps) =>
   // Reset form with school data when in edit mode
   React.useEffect(() => {
     if (mode === "edit" && school) {
+      console.log("Edit mode - school data:", school);
+      console.log("School types:", school.type);
       reset({
         name: school.name || "",
         email: school.email || "",
@@ -63,6 +65,11 @@ export const useSchoolForm = ({ mode, school, onSubmit }: UseSchoolFormProps) =>
   const isFormValid = isValid && isDirty;
   const hasErrors = Object.keys(errors).length > 0;
   const selectedTypes = watch("type") || [];
+  
+  // Debug selected types
+  React.useEffect(() => {
+    console.log("Selected types:", selectedTypes);
+  }, [selectedTypes]);
 
   return {
     control,
