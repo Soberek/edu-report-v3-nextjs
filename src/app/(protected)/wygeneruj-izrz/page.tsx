@@ -121,12 +121,12 @@ export default function IzrzForm() {
 
           {/* Location and Date */}
           <FormField
-            type="text"
+            type="select"
             name="address"
             control={control}
             error={errors.address}
-            label="Adres"
-            placeholder="Wprowadź adres"
+            label="Szkoła"
+            options={schools?.map((school) => ({ value: school.name, label: school.name })) || []}
             required
           />
           <FormField type="date" name="dateInput" control={control} error={errors.dateInput} label="Data" required />
