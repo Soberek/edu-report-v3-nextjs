@@ -51,7 +51,7 @@ const OfflineMiernik: React.FC = () => {
         onReset={resetState}
         isLoading={state.isLoading}
         isProcessing={state.isProcessing}
-        canExport={canExport}
+        canExport={canExport ?? false}
         error={state.fileError}
       />
 
@@ -101,18 +101,8 @@ const OfflineMiernik: React.FC = () => {
             mb: 4,
           }}
         >
-          <StatsCard
-            icon="📊"
-            label="Ogólna liczba działań"
-            value={state.aggregatedData.allActions}
-            color="primary"
-          />
-          <StatsCard
-            icon="👥"
-            label="Ogólna liczba odbiorców"
-            value={state.aggregatedData.allPeople}
-            color="success"
-          />
+          <StatsCard icon="📊" label="Ogólna liczba działań" value={state.aggregatedData.allActions} color="primary" />
+          <StatsCard icon="👥" label="Ogólna liczba odbiorców" value={state.aggregatedData.allPeople} color="success" />
         </Box>
       )}
 
@@ -137,9 +127,7 @@ const OfflineMiernik: React.FC = () => {
           <Typography variant="h6" sx={{ mb: 2 }}>
             Rozpocznij od wczytania pliku Excel
           </Typography>
-          <Typography variant="body1">
-            Wybierz plik z danymi programów edukacyjnych, aby rozpocząć analizę
-          </Typography>
+          <Typography variant="body1">Wybierz plik z danymi programów edukacyjnych, aby rozpocząć analizę</Typography>
         </Box>
       )}
     </Container>

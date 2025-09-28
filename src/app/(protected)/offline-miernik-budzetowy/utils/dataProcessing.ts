@@ -109,49 +109,53 @@ export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData
 };
 
 /**
- * Exports aggregated data to Excel format
+ * Exports aggregated data to Excel format (original format)
  */
 export const exportToExcel = async (data: AggregatedData): Promise<boolean> => {
   try {
     const XLSX = await import("xlsx");
     
-    // Create workbook
-    const workbook = XLSX.utils.book_new();
-    
-    // Create summary sheet
-    const summaryData = [
-      ["Podsumowanie"],
-      ["Ogólna liczba działań", data.allActions],
-      ["Ogólna liczba odbiorców", data.allPeople],
-      [""],
-      ["Szczegóły programów"],
-    ];
-    
-    // Add program details
-    Object.entries(data.aggregated).forEach(([programType, programs]) => {
-      summaryData.push([`Typ programu: ${programType}`]);
-      
-      Object.entries(programs).forEach(([programName, actions]) => {
-        summaryData.push([`  Program: ${programName}`]);
-        
-        Object.entries(actions).forEach(([actionName, stats]) => {
-          summaryData.push([
-            `    ${actionName}`,
-            `Działania: ${stats.actionNumber}`,
-            `Odbiorcy: ${stats.people}`,
+    if (!data.aggregated || Object.keys(data.aggregated).length === 0) {
+      console.warn("No data provided for Excel export.");
+      return false;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dataArray: any[] = [];
+
+    Object.entries(data.aggregated).forEach(([programType, programData]) => {
+      dataArray.push([programType]);
+      Object.entries(programData).forEach(([programName, actions], idx) => {
+        dataArray.push([`${++idx}`, programName, actions]);
+
+        Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
+          const { people, actionNumber: action_number } = actionData;
+          dataArray.push([
+            `${idx}.${++actionIdx}`,
+            actionName,
+            people,
+            action_number,
           ]);
         });
       });
-      
-      summaryData.push([""]);
     });
-    
-    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summarySheet, "Podsumowanie");
-    
-    // Save file
-    const fileName = `miernik_budzetowy_${moment().format("YYYY-MM-DD")}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
+
+    const worksheet = XLSX.utils.json_to_sheet(dataArray);
+
+    // Basic styling is limited with xlsx library
+    // You can set column widths:
+    worksheet["!cols"] = [
+      { wch: 15 }, // Column A width
+      { wch: 40 }, // Column B width
+      { wch: 5 }, // Column C width
+      { wch: 5 }, // Column D width
+    ];
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Miernik");
+
+    XLSX.writeFile(workbook, "miernik.xlsx");
     
     return true;
   } catch (error) {
