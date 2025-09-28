@@ -1,11 +1,11 @@
-import { 
-  Box, 
-  Button, 
-  MenuItem, 
-  Select, 
-  TextField, 
-  FormControl, 
-  InputLabel, 
+import {
+  Box,
+  Button,
+  MenuItem,
+  Select,
+  TextField,
+  FormControl,
+  InputLabel,
   Grid,
   Paper,
   Typography,
@@ -14,18 +14,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
 } from "@mui/material";
-import { 
-  Assignment, 
-  School, 
-  CalendarToday, 
-  Description, 
-  Save,
-  Add,
-  Edit,
-  Cancel
-} from "@mui/icons-material";
+import { Assignment, School, CalendarToday, Description, Save, Add, Edit, Cancel } from "@mui/icons-material";
 import type React from "react";
 import { Controller } from "react-hook-form";
 import { TASK_TYPES } from "@/constants/tasks";
@@ -47,15 +38,15 @@ type Props = {
   onSave?: (id: string, updates: Partial<ScheduledTaskType>) => void;
 };
 
-export default function TaskForm({ 
-  userId, 
-  createTask, 
-  refetch, 
-  loading, 
-  mode = "create", 
-  task, 
-  onClose, 
-  onSave 
+export default function TaskForm({
+  userId,
+  createTask,
+  refetch,
+  loading,
+  mode = "create",
+  task,
+  onClose,
+  onSave,
 }: Props): React.ReactElement {
   const { control, handleSubmit, onSubmit } = useTaskForm({
     userId,
@@ -364,9 +355,7 @@ export default function TaskForm({
             </Typography>
           </Box>
         </DialogTitle>
-        <DialogContent sx={{ p: 0 }}>
-          {formContent}
-        </DialogContent>
+        <DialogContent sx={{ p: 0 }}>{formContent}</DialogContent>
       </Dialog>
     );
   }
