@@ -85,6 +85,21 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
     isCorrect: null,
   });
 
+  // Sync local state with props when they change
+  React.useEffect(() => {
+    if (currentAnswer !== answerState.selectedAnswer) {
+      dispatch({ type: "SELECT_ANSWER", payload: currentAnswer || "" });
+    }
+  }, [currentAnswer]);
+
+  React.useEffect(() => {
+    if (showExplanation !== answerState.isSubmitted) {
+      if (showExplanation) {
+        dispatch({ type: "SUBMIT_ANSWER", payload: { correctAnswer: question.correctAnswer } });
+      }
+    }
+  }, [showExplanation, question.correctAnswer]);
+
   const isMultipleChoice = question.type === "multiple-choice" || question.type === "scenario";
   const isTrueFalse = question.type === "true-false";
   const isImageAnalysis = question.type === "image-analysis";
@@ -105,7 +120,7 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
 
   const handleSubmit = () => {
     dispatch({ type: "SUBMIT_ANSWER", payload: { correctAnswer: question.correctAnswer } });
-    // Don't call onSubmit() here - just check the answer
+    onSubmit(); // Submit the answer to the quiz state
   };
 
   const getAnswerColor = (option: string) => {
@@ -261,7 +276,7 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
             <Button onClick={onPrevious} disabled={isFirstQuestion}>
               ← Poprzednie
             </Button>
-            <Button onClick={onNext} disabled={!answerState.isSubmitted}>
+            <Button onClick={onNext} disabled={!showExplanation}>
               Następne →
             </Button>
           </Box>
@@ -279,13 +294,7 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
                 Sprawdź odpowiedź
               </Button>
             ) : (
-              <Button
-                onClick={() => {
-                  onSubmit(); // Submit the current answer to quiz state and move to next question
-                }}
-                color="primary"
-                variant="contained"
-              >
+              <Button onClick={onNext} color="primary" variant="contained">
                 {isLastQuestion ? "Zakończ quiz" : "Następne pytanie"}
               </Button>
             )}
