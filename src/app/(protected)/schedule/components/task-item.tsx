@@ -164,13 +164,13 @@ export const Task: React.FC<Props> = ({
         </Paper>
       </Modal>
 
-      {/* Compact Task Card */}
+      {/* Ultra Compact Task Card */}
       <Paper
         elevation={isCompleted ? 1 : 2}
         sx={{
-          p: 1.5,
-          mb: 1,
-          borderRadius: 1,
+          p: 1,
+          mb: 0.5,
+          borderRadius: 2,
           border: "1px solid",
           borderColor: isCompleted ? "success.main" : "grey.300",
           backgroundColor: isCompleted ? "success.50" : "background.paper",
@@ -179,15 +179,16 @@ export const Task: React.FC<Props> = ({
           "&:hover": {
             borderColor: isCompleted ? "success.dark" : "primary.main",
             boxShadow: 2,
+            transform: "translateY(-1px)",
           },
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          {/* Compact Status Indicator */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          {/* Ultra Compact Status Indicator */}
           <Box
             sx={{
-              width: 20,
-              height: 20,
+              width: 16,
+              height: 16,
               border: "2px solid",
               borderColor: isCompleted ? "success.main" : "grey.300",
               borderRadius: "50%",
@@ -198,11 +199,11 @@ export const Task: React.FC<Props> = ({
               flexShrink: 0,
             }}
           >
-            {isCompleted && <Typography sx={{ fontSize: "10px", color: "white" }}>✓</Typography>}
+            {isCompleted && <Typography sx={{ fontSize: "8px", color: "white" }}>✓</Typography>}
           </Box>
 
           {/* Task Type Emoji */}
-          <Typography sx={{ fontSize: "16px" }}>{getTaskTypeEmoji(taskType?.label)}</Typography>
+          <Typography sx={{ fontSize: "14px" }}>{getTaskTypeEmoji(taskType?.label)}</Typography>
 
           {/* Main Content */}
           <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -215,41 +216,42 @@ export const Task: React.FC<Props> = ({
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
+                fontSize: "0.8rem",
               }}
             >
               {taskType?.label} - {task.description || "Brak opisu"}
             </Typography>
           </Box>
 
-          {/* Compact Info */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          {/* Ultra Compact Info */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
             {isCompleted && (
               <Typography
                 variant="caption"
                 fontWeight={700}
                 sx={{
                   color: "text.secondary",
-                  fontSize: "11px",
+                  fontSize: "9px",
                   textDecoration: "underline",
                 }}
               >
-                Wykonano: {dayjs(task.completedDate).format("DD.MM.YYYY")}
+                {dayjs(task.completedDate).format("DD.MM")}
               </Typography>
             )}
-            <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "11px" }}>
-              Zaplanowana data: {dayjs(task.dueDate).format("DD.MM.YYYY")}
+            <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "9px" }}>
+              {dayjs(task.dueDate).format("DD.MM")}
             </Typography>
 
             <Chip
               label={task.status === "completed" ? "✓" : "⏳"}
               size="small"
               color={task.status === "completed" ? "success" : "warning"}
-              sx={{ height: 20, fontSize: "10px" }}
+              sx={{ height: 16, fontSize: "8px", minWidth: 20 }}
             />
           </Box>
 
-          {/* Compact Action Buttons */}
-          <Box sx={{ display: "flex", gap: 0.5 }}>
+          {/* Ultra Compact Action Buttons */}
+          <Box sx={{ display: "flex", gap: 0.25 }}>
             <IconButton
               size="small"
               onClick={(e) => {
@@ -257,14 +259,14 @@ export const Task: React.FC<Props> = ({
                 openModal();
               }}
               sx={{
-                width: 24,
-                height: 24,
+                width: 20,
+                height: 20,
                 background: "linear-gradient(45deg, #388700ff 30%, #14c947ff 90%)",
                 color: "white",
                 "&:hover": { opacity: 0.8 },
               }}
             >
-              <DoneAll sx={{ fontSize: 14 }} />
+              <DoneAll sx={{ fontSize: 12 }} />
             </IconButton>
 
             <IconButton
@@ -274,14 +276,14 @@ export const Task: React.FC<Props> = ({
                 deleteTask(task.id);
               }}
               sx={{
-                width: 24,
-                height: 24,
+                width: 20,
+                height: 20,
                 background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
                 color: "white",
                 "&:hover": { opacity: 0.8 },
               }}
             >
-              <DeleteIcon sx={{ fontSize: 14 }} />
+              <DeleteIcon sx={{ fontSize: 12 }} />
             </IconButton>
           </Box>
         </Box>

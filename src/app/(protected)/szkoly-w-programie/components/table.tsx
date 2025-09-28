@@ -446,7 +446,6 @@ export const SchoolProgramParticipationTable = ({
                   borderBottom: "none",
                   borderRadius: "12px 12px 0 0",
                   "& .MuiDataGrid-columnHeaderTitle": {
-                    color: "white",
                     fontWeight: "bold",
                     fontSize: "0.8rem",
                   },
