@@ -54,6 +54,8 @@ export default function SchoolsProgramParticipation() {
     data: schoolProgramParticipation,
     loading: schoolProgramParticipationLoading,
     createItem: createSchoolProgramParticipation,
+    updateItem: updateSchoolProgramParticipation,
+    deleteItem: deleteSchoolProgramParticipation,
     error: schoolProgramParticipationError,
   } = useFirebaseData<SchoolProgramParticipation>("school-program-participation", userContext.user?.uid);
 
@@ -107,6 +109,40 @@ export default function SchoolsProgramParticipation() {
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleUpdateParticipation = async (id: string, data: any) => {
+    try {
+      await updateSchoolProgramParticipation(id, data);
+      setSnackbar({
+        open: true,
+        type: "success",
+        message: "Uczestnictwo zostało zaktualizowane pomyślnie.",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        type: "error",
+        message: "Wystąpił błąd podczas aktualizacji danych.",
+      });
+    }
+  };
+
+  const handleDeleteParticipation = async (id: string) => {
+    try {
+      await deleteSchoolProgramParticipation(id);
+      setSnackbar({
+        open: true,
+        type: "success",
+        message: "Uczestnictwo zostało usunięte pomyślnie.",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        type: "error",
+        message: "Wystąpił błąd podczas usuwania danych.",
+      });
+    }
   };
 
   const schoolsMap: Record<string, SchoolType> = useMemo(() => Object.fromEntries(schools.map((s) => [s.id, s])), [schools]);
@@ -516,6 +552,11 @@ export default function SchoolsProgramParticipation() {
         programsMap={programsMap}
         errorMessage={schoolProgramParticipationError}
         loading={schoolProgramParticipationLoading}
+        schools={schools}
+        contacts={contacts}
+        programs={programs}
+        onUpdate={handleUpdateParticipation}
+        onDelete={handleDeleteParticipation}
       />
 
       {/* Snackbar */}
