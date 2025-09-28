@@ -51,7 +51,7 @@ export default function IzrzForm() {
       </Box>
 
       {/* Success/Error Messages */}
-      {submitMessage && (
+      {submitMessage && submitMessage.text && (
         <Alert severity={submitMessage.type === "success" ? "success" : "error"} sx={{ mb: 2 }}>
           {submitMessage.text}
         </Alert>
