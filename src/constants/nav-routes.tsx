@@ -11,6 +11,7 @@ import {
   FaPenFancy,
   FaSignInAlt,
   FaUserPlus,
+  FaTasks,
 } from "react-icons/fa";
 
 export const navRoutes: Array<{
@@ -68,6 +69,13 @@ export const navRoutes: Array<{
     category: "database",
     isPrivate: true,
     icon: <FaBook />,
+  },
+  {
+    title: "Zadania edukacyjne",
+    path: "zadania-edukacyjne",
+    category: "database",
+    isPrivate: true,
+    icon: <FaTasks />,
   },
   {
     title: "Szkoły w programie",
