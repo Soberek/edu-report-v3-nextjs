@@ -79,10 +79,22 @@ export default function EditDialog({ open, contact, onClose, onSave, loading }: 
 
   const getRandomColor = (name: string) => {
     const colors = [
-      '#f44336', '#e91e63', '#9c27b0', '#673ab7',
-      '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
-      '#009688', '#4caf50', '#8bc34a', '#cddc39',
-      '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'
+      "#f44336",
+      "#e91e63",
+      "#9c27b0",
+      "#673ab7",
+      "#3f51b5",
+      "#2196f3",
+      "#03a9f4",
+      "#00bcd4",
+      "#009688",
+      "#4caf50",
+      "#8bc34a",
+      "#cddc39",
+      "#ffeb3b",
+      "#ffc107",
+      "#ff9800",
+      "#ff5722",
     ];
     const index = name.charCodeAt(0) % colors.length;
     return colors[index];
@@ -138,8 +150,8 @@ export default function EditDialog({ open, contact, onClose, onSave, loading }: 
             </Typography>
           </Box>
         </Box>
-        <IconButton 
-          onClick={handleClose} 
+        <IconButton
+          onClick={handleClose}
           size="small"
           sx={{
             color: "#666",
@@ -166,204 +178,201 @@ export default function EditDialog({ open, contact, onClose, onSave, loading }: 
               border: "1px solid rgba(255,255,255,0.2)",
             }}
           >
-            <Box
-              component="form"
-              onSubmit={handleSubmit(onSubmit)}
-            >
+            <Box component="form" onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            {/* First Name */}
-            <Controller
-              name="firstName"
-              control={control}
-              rules={{ required: "Imię jest wymagane." }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Imię"
-                  required
-                  fullWidth
-                  error={!!errors.firstName}
-                  helperText={errors.firstName?.message}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Person sx={{ color: "#666" }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 3,
-                        background: "rgba(255,255,255,0.8)",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          background: "rgba(255,255,255,0.9)",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#1976d2",
-                            borderWidth: 2,
+                {/* First Name */}
+                <Controller
+                  name="firstName"
+                  control={control}
+                  rules={{ required: "Imię jest wymagane." }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Imię"
+                      required
+                      fullWidth
+                      error={!!errors.firstName}
+                      helperText={errors.firstName?.message}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Person sx={{ color: "#666" }} />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 3,
+                          background: "rgba(255,255,255,0.8)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            background: "rgba(255,255,255,0.9)",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#1976d2",
+                              borderWidth: 2,
+                            },
+                          },
+                          "&.Mui-focused": {
+                            background: "white",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#1976d2",
+                              borderWidth: 2,
+                            },
                           },
                         },
-                        "&.Mui-focused": {
-                          background: "white",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#1976d2",
-                            borderWidth: 2,
-                          },
-                        },
-                      },
-                    }}
+                      }}
+                    />
+                  )}
                 />
-              )}
-            />
 
-            {/* Last Name */}
-            <Controller
-              name="lastName"
-              control={control}
-              rules={{ required: "Nazwisko jest wymagane." }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Nazwisko"
-                  required
-                  fullWidth
-                  error={!!errors.lastName}
-                  helperText={errors.lastName?.message}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Person sx={{ color: "#666" }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 3,
-                        background: "rgba(255,255,255,0.8)",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          background: "rgba(255,255,255,0.9)",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#1976d2",
-                            borderWidth: 2,
+                {/* Last Name */}
+                <Controller
+                  name="lastName"
+                  control={control}
+                  rules={{ required: "Nazwisko jest wymagane." }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Nazwisko"
+                      required
+                      fullWidth
+                      error={!!errors.lastName}
+                      helperText={errors.lastName?.message}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Person sx={{ color: "#666" }} />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 3,
+                          background: "rgba(255,255,255,0.8)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            background: "rgba(255,255,255,0.9)",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#1976d2",
+                              borderWidth: 2,
+                            },
+                          },
+                          "&.Mui-focused": {
+                            background: "white",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#1976d2",
+                              borderWidth: 2,
+                            },
                           },
                         },
-                        "&.Mui-focused": {
-                          background: "white",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#1976d2",
-                            borderWidth: 2,
-                          },
-                        },
-                      },
-                    }}
+                      }}
+                    />
+                  )}
                 />
-              )}
-            />
 
-            {/* Email */}
-            <Controller
-              name="email"
-              control={control}
-              rules={{
-                required: "Email jest wymagany.",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Nieprawidłowy format email.",
-                },
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Adres email"
-                  type="email"
-                  required
-                  fullWidth
-                  error={!!errors.email}
-                  helperText={errors.email?.message}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Email sx={{ color: "#666" }} />
-                      </InputAdornment>
-                    ),
+                {/* Email */}
+                <Controller
+                  name="email"
+                  control={control}
+                  rules={{
+                    required: "Email jest wymagany.",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Nieprawidłowy format email.",
+                    },
                   }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 3,
-                        background: "rgba(255,255,255,0.8)",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          background: "rgba(255,255,255,0.9)",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#1976d2",
-                            borderWidth: 2,
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Adres email"
+                      type="email"
+                      required
+                      fullWidth
+                      error={!!errors.email}
+                      helperText={errors.email?.message}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Email sx={{ color: "#666" }} />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 3,
+                          background: "rgba(255,255,255,0.8)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            background: "rgba(255,255,255,0.9)",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#1976d2",
+                              borderWidth: 2,
+                            },
+                          },
+                          "&.Mui-focused": {
+                            background: "white",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#1976d2",
+                              borderWidth: 2,
+                            },
                           },
                         },
-                        "&.Mui-focused": {
-                          background: "white",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#1976d2",
-                            borderWidth: 2,
-                          },
-                        },
-                      },
-                    }}
+                      }}
+                    />
+                  )}
                 />
-              )}
-            />
 
-            {/* Phone */}
-            <Controller
-              name="phone"
-              control={control}
-              rules={{
-                pattern: {
-                  value: /^[\+]?[0-9\s\-\(\)]{9,}$/,
-                  message: "Nieprawidłowy format numeru telefonu.",
-                },
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Numer telefonu"
-                  type="tel"
-                  fullWidth
-                  error={!!errors.phone}
-                  helperText={errors.phone?.message || "Opcjonalne"}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Phone sx={{ color: "#666" }} />
-                      </InputAdornment>
-                    ),
+                {/* Phone */}
+                <Controller
+                  name="phone"
+                  control={control}
+                  rules={{
+                    pattern: {
+                      value: /^[\+]?[0-9\s\-\(\)]{9,}$/,
+                      message: "Nieprawidłowy format numeru telefonu.",
+                    },
                   }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 3,
-                        background: "rgba(255,255,255,0.8)",
-                        transition: "all 0.3s ease",
-                        "&:hover": {
-                          background: "rgba(255,255,255,0.9)",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#1976d2",
-                            borderWidth: 2,
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Numer telefonu"
+                      type="tel"
+                      fullWidth
+                      error={!!errors.phone}
+                      helperText={errors.phone?.message || "Opcjonalne"}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Phone sx={{ color: "#666" }} />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: 3,
+                          background: "rgba(255,255,255,0.8)",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            background: "rgba(255,255,255,0.9)",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#1976d2",
+                              borderWidth: 2,
+                            },
+                          },
+                          "&.Mui-focused": {
+                            background: "white",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#1976d2",
+                              borderWidth: 2,
+                            },
                           },
                         },
-                        "&.Mui-focused": {
-                          background: "white",
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#1976d2",
-                            borderWidth: 2,
-                          },
-                        },
-                      },
-                    }}
+                      }}
+                    />
+                  )}
                 />
-              )}
-            />
-          </Box>
-        </Box>
+              </Box>
+            </Box>
           </Paper>
         </Fade>
       </DialogContent>
