@@ -64,123 +64,71 @@ export const SchoolStats: React.FC<SchoolStatsProps> = ({ totalSchools, typeStat
 
       {/* Collapsible Stats Content */}
       <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+        <Box sx={{ 
+          display: "flex", 
+          flexWrap: "wrap", 
+          gap: 1.5,
+          p: 2,
+          background: theme.palette.grey[50],
+          borderRadius: 2,
+          border: `1px solid ${theme.palette.divider}`
+        }}>
+          {/* Total Schools - Ultra Compact */}
+          <Box sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            px: 2,
+            py: 1,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+            color: "white",
+            borderRadius: 2,
+            minWidth: "fit-content",
+            boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
+          }}>
+            <School sx={{ fontSize: "1.2rem" }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
+              {totalSchools}
+            </Typography>
+            <Typography variant="caption" sx={{ opacity: 0.9, fontSize: "0.75rem" }}>
+              szkół
+            </Typography>
+          </Box>
 
-        <Grid container spacing={2}>
-          {/* Total Schools Card - Compact */}
-          <Grid item xs={12} sm={6} md={3}>
-            <Card
+          {/* Type Stats - Ultra Compact */}
+          {typeStats.map((stat, index) => (
+            <Box
+              key={stat.type}
               sx={{
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                px: 2,
+                py: 1,
+                background: `linear-gradient(135deg, ${getTypeColor(index)} 0%, ${getTypeColor(index)}dd 100%)`,
                 color: "white",
                 borderRadius: 2,
-                boxShadow: `0 4px 16px ${theme.palette.primary.main}20`,
-                transition: "all 0.3s ease",
+                minWidth: "fit-content",
+                boxShadow: `0 2px 8px ${getTypeColor(index)}20`,
+                transition: "all 0.2s ease",
                 "&:hover": {
-                  transform: "translateY(-2px)",
-                  boxShadow: `0 8px 24px ${theme.palette.primary.main}30`,
+                  transform: "translateY(-1px)",
+                  boxShadow: `0 4px 12px ${getTypeColor(index)}30`,
                 },
               }}
             >
-              <CardContent sx={{ textAlign: "center", py: 2 }}>
-                <School sx={{ fontSize: "1.8rem", mb: 1, opacity: 0.9 }} />
-                <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
-                  {totalSchools}
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9, fontSize: "0.85rem" }}>
-                  Łącznie szkół
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* Type Stats Cards - Compact */}
-          {typeStats.slice(0, 5).map((stat, index) => (
-            <Grid item xs={12} sm={6} md={3} key={stat.type}>
-              <Card
-                sx={{
-                  background: `linear-gradient(135deg, ${getTypeColor(index)} 0%, ${getTypeColor(index)}dd 100%)`,
-                  color: "white",
-                  borderRadius: 2,
-                  boxShadow: `0 4px 16px ${getTypeColor(index)}20`,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                    boxShadow: `0 8px 24px ${getTypeColor(index)}30`,
-                  },
-                }}
-              >
-                <CardContent sx={{ textAlign: "center", py: 2 }}>
-                  <Typography variant="h5" sx={{ mb: 1, fontSize: "1.5rem" }}>
-                    {getTypeIcon(stat.type)}
-                  </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-                    {stat.count}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      opacity: 0.9,
-                      fontSize: "0.8rem",
-                      lineHeight: 1.2,
-                      height: "2rem",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {stat.type}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+              <Typography sx={{ fontSize: "1rem" }}>
+                {getTypeIcon(stat.type)}
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1rem" }}>
+                {stat.count}
+              </Typography>
+              <Typography variant="caption" sx={{ opacity: 0.9, fontSize: "0.7rem", maxWidth: "80px" }}>
+                {stat.type}
+              </Typography>
+            </Box>
           ))}
-      </Grid>
-
-        {/* Additional Stats Row - Compact */}
-        {typeStats.length > 5 && (
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            {typeStats.slice(5).map((stat, index) => (
-              <Grid item xs={12} sm={6} md={3} key={stat.type}>
-                <Card
-                  sx={{
-                    background: `linear-gradient(135deg, ${getTypeColor(index + 5)} 0%, ${getTypeColor(index + 5)}dd 100%)`,
-                    color: "white",
-                    borderRadius: 2,
-                    boxShadow: `0 4px 16px ${getTypeColor(index + 5)}20`,
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      transform: "translateY(-2px)",
-                      boxShadow: `0 8px 24px ${getTypeColor(index + 5)}30`,
-                    },
-                  }}
-                >
-                  <CardContent sx={{ textAlign: "center", py: 2 }}>
-                    <Typography variant="h6" sx={{ mb: 1, fontSize: "1.3rem" }}>
-                      {getTypeIcon(stat.type)}
-                    </Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
-                      {stat.count}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        opacity: 0.9,
-                        fontSize: "0.75rem",
-                        lineHeight: 1.2,
-                        height: "1.8rem",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {stat.type}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
+        </Box>
       </Collapse>
     </Box>
   );
