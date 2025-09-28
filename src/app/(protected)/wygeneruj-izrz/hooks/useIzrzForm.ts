@@ -1,15 +1,18 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { izrzFormSchema, type IzrzFormData } from "../schemas/izrzSchemas";
 
 interface UseIzrzFormProps {
-  onSubmit: (data: any) => void; // Changed to any to match the existing hook
+  onSubmit: (data: IzrzFormData) => Promise<void>;
   defaultValues?: Partial<IzrzFormData>;
 }
 
 export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
-  const form = useForm({
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const form = useForm<IzrzFormData>({
     resolver: zodResolver(izrzFormSchema),
     mode: "onChange",
     defaultValues: {
@@ -18,7 +21,7 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
       programName: "",
       taskType: "",
       address: "",
-      dateInput: "",
+      dateInput: new Date().toISOString().split("T")[0],
       viewerCount: 0,
       viewerCountDescription: `Grupa I: \n Szkoła Podstawowa (klasy 1-3): ... osób \n Opiekunowie: \n Szkola Podstawowa (klasy 4-8): ... osób \n Grupa II: \n Szkoła Ponadpodstawowa (klasy 1-3): ... osób \n Dorosli (studenci, nauczyciele, inni dorośli): ... osób \n`,
       taskDescription: "",
@@ -33,18 +36,35 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
   const { control, handleSubmit, setValue, watch, formState, reset } = form;
 
   // Handle form submission
-  const handleFormSubmit = handleSubmit((data) => {
-    onSubmit(data);
+  const handleFormSubmit = handleSubmit(async (data) => {
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+    
+    try {
+      await onSubmit(data);
+      setSubmitMessage({
+        type: "success",
+        text: "Raport został wygenerowany! Pobieranie rozpoczęte.",
+      });
+    } catch (error) {
+      setSubmitMessage({
+        type: "error",
+        text: "Błąd podczas generowania raportu. Spróbuj ponownie.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   });
 
   // Set form value helper
-  const setFormValue = useCallback((field: string, value: any) => {
+  const setFormValue = useCallback((field: keyof IzrzFormData, value: any) => {
     setValue(field, value, { shouldValidate: true });
   }, [setValue]);
 
   // Reset form helper
   const resetForm = useCallback(() => {
     reset();
+    setSubmitMessage(null);
   }, [reset]);
 
   // Validation helpers
@@ -60,5 +80,7 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
     reset: resetForm,
     isFormValid,
     hasErrors,
+    isSubmitting,
+    submitMessage,
   };
 };

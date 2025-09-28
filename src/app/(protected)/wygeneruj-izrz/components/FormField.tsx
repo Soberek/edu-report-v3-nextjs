@@ -1,10 +1,11 @@
 import React from "react";
 import { TextField, Autocomplete, FormControlLabel, Checkbox } from "@mui/material";
 import { Controller, Control, FieldError } from "react-hook-form";
+import type { IzrzFormData } from "../schemas/izrzSchemas";
 
 interface BaseFieldProps {
-  name: string;
-  control: Control<any>;
+  name: keyof IzrzFormData;
+  control: Control<IzrzFormData>;
   error?: FieldError;
   required?: boolean;
 }
@@ -63,6 +64,8 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                   const value = e.target.value;
                   if (props.type === "number") {
                     field.onChange(value === "" ? 0 : Number(value));
+                  } else if (props.type === "date") {
+                    field.onChange(value);
                   } else {
                     field.onChange(value);
                   }
@@ -132,7 +135,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
             control={control}
             render={({ field }) => (
               <FormControlLabel
-                control={<Checkbox {...field} checked={field.value} color="primary" size="small" />}
+                control={<Checkbox {...field} checked={Boolean(field.value)} color="primary" size="small" />}
                 label={props.label}
                 sx={{
                   "& .MuiFormControlLabel-label": {

@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import { Box, Button, CircularProgress, Container, Typography, Alert, Stack } from "@mui/material";
-import { useRaportDocumentGenerator } from "./hooks/useRaportDocumentGenerator";
 import { useIzrzForm } from "./hooks/useIzrzForm";
+import { useFormSubmission } from "./hooks/useFormSubmission";
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { TASK_TYPES } from "@/constants/tasks";
@@ -14,8 +14,8 @@ import { TemplateSelector } from "./components/TemplateSelector";
 import { FormField } from "./components/FormField";
 
 export default function IzrzForm() {
-  const { isSubmitting, submitMessage, handleSubmit: handleRaportSubmit } = useRaportDocumentGenerator();
   const userContext = useUser();
+  const { handleSubmit: handleFormSubmission } = useFormSubmission();
 
   const { data: schools, loading: schoolsLoading, error: schoolsError } = useFirebaseData<School>("schools", userContext.user?.uid);
 
@@ -26,8 +26,10 @@ export default function IzrzForm() {
     watch,
     formState: { errors },
     isFormValid,
+    isSubmitting,
+    submitMessage,
   } = useIzrzForm({
-    onSubmit: handleRaportSubmit,
+    onSubmit: handleFormSubmission,
   });
 
   // Watch templateFile for color change
