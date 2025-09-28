@@ -53,6 +53,7 @@ export default function MelanomaQuiz() {
     nextQuestion,
     previousQuestion,
     resetQuiz,
+    returnToFirst,
     selectAnswer,
     selectMultipleAnswers,
     getScoreGrade,
@@ -63,12 +64,12 @@ export default function MelanomaQuiz() {
   useEffect(() => {
     if (!showExplanation && currentQuestion) {
       const interval = setInterval(() => {
-        setTimeSpent((prev) => prev + 1);
+        setTimeSpent(timeSpent + 1);
       }, 1000);
 
       return () => clearInterval(interval);
     }
-  }, [showExplanation, currentQuestion, setTimeSpent]);
+  }, [showExplanation, currentQuestion, setTimeSpent, timeSpent]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
@@ -85,6 +86,11 @@ export default function MelanomaQuiz() {
 
   const handleReviewMaterials = () => {
     setCurrentTab(1);
+  };
+
+  const handleReturnToFirst = () => {
+    returnToFirst();
+    setCurrentTab(0);
   };
 
   return (
@@ -192,21 +198,49 @@ export default function MelanomaQuiz() {
       {/* Results Tab */}
       <TabPanel value={currentTab} index={3}>
         {session.completed ? (
-          <QuizResults session={session} onRestart={handleRestartQuiz} onReview={handleReviewMaterials} />
+          <QuizResults
+            session={session}
+            questions={QUIZ_QUESTIONS}
+            onRestart={handleRestartQuiz}
+            onReview={handleReviewMaterials}
+            onReturnToFirst={handleReturnToFirst}
+          />
         ) : (
-          <Card>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="h5" mb={2}>
-                📊 Wyniki będą dostępne po zakończeniu quizu
-              </Typography>
-              <Typography variant="body1" mb={3}>
-                Ukończ quiz, aby zobaczyć szczegółowe wyniki i analizę.
-              </Typography>
-              <Button variant="contained" onClick={() => setCurrentTab(0)}>
-                Wróć do quizu
-              </Button>
-            </CardContent>
-          </Card>
+          <Box>
+            {/* Current Progress */}
+            <Card sx={{ mb: 3 }}>
+              <CardContent sx={{ textAlign: "center" }}>
+                <Typography variant="h5" mb={2}>
+                  📊 Aktualne wyniki quizu
+                </Typography>
+                <Typography variant="h6" color="primary" mb={2}>
+                  {session.totalScore} / {session.maxScore} poprawnych odpowiedzi
+                </Typography>
+                <Typography variant="body1" mb={3}>
+                  Ukończono {session.results.length} z {session.maxScore} pytań
+                </Typography>
+                <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap">
+                  <Button variant="contained" onClick={() => setCurrentTab(0)}>
+                    Wróć do quizu
+                  </Button>
+                  <Button variant="outlined" color="error" onClick={handleRestartQuiz}>
+                    🔄 Resetuj quiz
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+
+            {/* Current Results */}
+            {session.results.length > 0 && (
+              <QuizResults
+                session={session}
+                questions={QUIZ_QUESTIONS}
+                onRestart={handleRestartQuiz}
+                onReview={handleReviewMaterials}
+                onReturnToFirst={handleReturnToFirst}
+              />
+            )}
+          </Box>
         )}
       </TabPanel>
 
