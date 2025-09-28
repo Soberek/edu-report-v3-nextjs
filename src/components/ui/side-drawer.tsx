@@ -14,10 +14,17 @@ import {
   Avatar,
   Chip,
   Stack,
+  Collapse,
 } from "@mui/material";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navRoutes } from "@/constants/nav-routes";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { 
+  navRoutes, 
+  getMainNavigation, 
+  getRoutesByCategory,
+  type NavRoute 
+} from "@/constants/nav-routes";
 import { useNavContext } from "@/providers/NavProvider";
 import { useUser } from "@/hooks/useUser";
 
@@ -28,23 +35,45 @@ const SideDrawer: React.FC = () => {
   const pathname = usePathname();
   const navContext = useNavContext();
   const isUserLoggedIn = useUser().user?.uid ? true : false;
+  const [expandedCategories, setExpandedCategories] = React.useState<Set<string>>(
+    new Set(["education", "database", "tools"])
+  );
 
-  // Filter routes based on authentication
-  // show only public routes if not logged in
-  // show only private routes if logged in
-  const filteredNavRoutes = navRoutes.filter((route) => {
-    // if route is private and user is not logged in, hide it
-    // if route is public and user is logged in, hide it
-    if (route.isPrivate === true && !isUserLoggedIn) {
-      return false;
-    } else if (route.isPrivate === false && isUserLoggedIn) {
-      return false;
-    }
-    return true;
-  });
+  // Get main navigation routes (private routes only)
+  const mainNavRoutes = getMainNavigation();
+  
+  // Group routes by category
+  const routesByCategory = React.useMemo(() => {
+    const grouped: Record<string, NavRoute[]> = {};
+    mainNavRoutes.forEach((route) => {
+      if (!grouped[route.category]) {
+        grouped[route.category] = [];
+      }
+      grouped[route.category].push(route);
+    });
+    return grouped;
+  }, [mainNavRoutes]);
 
-  // Use filtered routes for rendering
-  const navRoutesToRender = filteredNavRoutes;
+  // Category labels and icons
+  const categoryConfig = {
+    main: { label: "Główna", icon: "🏠" },
+    education: { label: "Edukacja", icon: "📚" },
+    database: { label: "Baza danych", icon: "🗄️" },
+    tools: { label: "Narzędzia", icon: "🔧" },
+  };
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
+
   const { isDrawerOpen, handleDrawerOpen, handleDrawerClose } = navContext;
   return (
     <Drawer
@@ -102,111 +131,163 @@ const SideDrawer: React.FC = () => {
         </Box>
 
         {/* Navigation Section */}
-        <Box sx={{ flex: 1, py: 2 }}>
+        <Box sx={{ flex: 1, py: 2, overflow: "auto" }}>
           <List sx={{ px: 2 }}>
-            {navRoutesToRender.map(({ title, path, category, icon }) => {
-              // Enhanced active path detection
-              const isActive = (() => {
-                // Handle root path
-                if (pathname === "/" && path === "") return true;
-
-                // Handle exact match
-                if (pathname === path) return true;
-
-                // Handle nested routes - check if current path starts with the nav path
-                if (path !== "" && pathname.startsWith(path)) {
-                  // Make sure it's not a partial match (e.g., /schedule vs /schedule-edit)
-                  const nextChar = pathname[path.length];
-                  return !nextChar || nextChar === "/";
-                }
-
-                return false;
-              })();
-
+            {Object.entries(routesByCategory).map(([category, routes]) => {
+              const isExpanded = expandedCategories.has(category);
+              const config = categoryConfig[category as keyof typeof categoryConfig];
+              
               return (
-                <ListItem key={title} disablePadding sx={{ mb: 0.5 }}>
+                <Box key={category}>
+                  {/* Category Header */}
                   <ListItemButton
-                    component={Link}
-                    href={path}
-                    onClick={handleDrawerClose}
-                    className={isActive ? "active" : ""}
+                    onClick={() => toggleCategory(category)}
                     sx={{
                       borderRadius: 2,
-                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      position: "relative",
-                      overflow: "hidden",
+                      mb: 1,
+                      backgroundColor: isExpanded ? theme.palette.primary.light : "transparent",
                       "&:hover": {
-                        backgroundColor: theme.palette.action.hover,
-                        transform: "translateX(8px)",
-                        boxShadow: `0 4px 20px ${theme.palette.primary.main}20`,
-                        "&::before": {
-                          opacity: 1,
-                        },
-                      },
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        width: "4px",
-                        background: `linear-gradient(180deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
-                        opacity: 0,
-                        transition: "opacity 0.3s ease",
-                      },
-                      "&.active": {
-                        backgroundColor: theme.palette.primary.main,
-                        color: "white",
-                        boxShadow: `0 8px 32px ${theme.palette.primary.main}40`,
-                        transform: "translateX(8px)",
-                        "&::before": {
-                          opacity: 1,
-                          background: "white",
-                        },
-                        "& .MuiListItemIcon-root": {
-                          color: "white",
-                        },
-                        "&:hover": {
-                          backgroundColor: theme.palette.primary.dark,
-                        },
+                        backgroundColor: theme.palette.primary.light,
                       },
                     }}
                   >
-                    <ListItemIcon
-                      sx={{
-                        minWidth: 44,
-                        transition: "all 0.3s ease",
-                        "& .MuiSvgIcon-root": {
-                          fontSize: "1.3rem",
-                        },
-                      }}
-                    >
-                      {icon}
+                    <ListItemIcon sx={{ minWidth: 36 }}>
+                      <Typography sx={{ fontSize: "1.2rem" }}>
+                        {config?.icon}
+                      </Typography>
                     </ListItemIcon>
                     <ListItemText
-                      primary={title}
+                      primary={config?.label}
                       primaryTypographyProps={{
-                        fontSize: "0.95rem",
-                        fontWeight: isActive ? 600 : 500,
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                        color: theme.palette.primary.main,
                       }}
                     />
-                    {isActive && (
-                      <Chip
-                        label="Aktywny"
-                        size="small"
-                        sx={{
-                          height: 20,
-                          fontSize: "0.7rem",
-                          backgroundColor: "rgba(255,255,255,0.2)",
-                          color: "white",
-                          "& .MuiChip-label": {
-                            px: 1,
-                          },
-                        }}
-                      />
-                    )}
+                    {isExpanded ? <ExpandLess /> : <ExpandMore />}
                   </ListItemButton>
-                </ListItem>
+
+                  {/* Category Routes */}
+                  <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {routes.map(({ title, path, icon, description }) => {
+                        // Enhanced active path detection
+                        const isActive = (() => {
+                          // Handle root path
+                          if (pathname === "/" && path === "/") return true;
+
+                          // Handle exact match
+                          if (pathname === `/${path}`) return true;
+
+                          // Handle nested routes - check if current path starts with the nav path
+                          if (path !== "/" && pathname.startsWith(`/${path}`)) {
+                            // Make sure it's not a partial match (e.g., /schedule vs /schedule-edit)
+                            const nextChar = pathname[`/${path}`.length];
+                            return !nextChar || nextChar === "/";
+                          }
+
+                          return false;
+                        })();
+
+                        return (
+                          <ListItem key={title} disablePadding sx={{ mb: 0.5, pl: 2 }}>
+                            <ListItemButton
+                              component={Link}
+                              href={path}
+                              onClick={handleDrawerClose}
+                              className={isActive ? "active" : ""}
+                              sx={{
+                                borderRadius: 2,
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                position: "relative",
+                                overflow: "hidden",
+                                "&:hover": {
+                                  backgroundColor: theme.palette.action.hover,
+                                  transform: "translateX(8px)",
+                                  boxShadow: `0 4px 20px ${theme.palette.primary.main}20`,
+                                  "&::before": {
+                                    opacity: 1,
+                                  },
+                                },
+                                "&::before": {
+                                  content: '""',
+                                  position: "absolute",
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: "4px",
+                                  background: `linear-gradient(180deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                                  opacity: 0,
+                                  transition: "opacity 0.3s ease",
+                                },
+                                "&.active": {
+                                  backgroundColor: theme.palette.primary.main,
+                                  color: "white",
+                                  boxShadow: `0 8px 32px ${theme.palette.primary.main}40`,
+                                  transform: "translateX(8px)",
+                                  "&::before": {
+                                    opacity: 1,
+                                    background: "white",
+                                  },
+                                  "& .MuiListItemIcon-root": {
+                                    color: "white",
+                                  },
+                                  "&:hover": {
+                                    backgroundColor: theme.palette.primary.dark,
+                                  },
+                                },
+                              }}
+                            >
+                              <ListItemIcon
+                                sx={{
+                                  minWidth: 40,
+                                  transition: "all 0.3s ease",
+                                  "& .MuiSvgIcon-root": {
+                                    fontSize: "1.2rem",
+                                  },
+                                }}
+                              >
+                                {icon}
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={title}
+                                secondary={description}
+                                primaryTypographyProps={{
+                                  fontSize: "0.9rem",
+                                  fontWeight: isActive ? 600 : 500,
+                                }}
+                                secondaryTypographyProps={{
+                                  fontSize: "0.75rem",
+                                  opacity: 0.7,
+                                }}
+                              />
+                              {isActive && (
+                                <Chip
+                                  label="Aktywny"
+                                  size="small"
+                                  sx={{
+                                    height: 18,
+                                    fontSize: "0.65rem",
+                                    backgroundColor: "rgba(255,255,255,0.2)",
+                                    color: "white",
+                                    "& .MuiChip-label": {
+                                      px: 0.8,
+                                    },
+                                  }}
+                                />
+                              )}
+                            </ListItemButton>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </Collapse>
+                  
+                  {/* Divider between categories */}
+                  {category !== Object.keys(routesByCategory)[Object.keys(routesByCategory).length - 1] && (
+                    <Divider sx={{ my: 2, opacity: 0.3 }} />
+                  )}
+                </Box>
               );
             })}
           </List>
