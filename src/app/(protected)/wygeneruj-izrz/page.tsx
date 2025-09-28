@@ -10,7 +10,6 @@ import { programs } from "@/constants/programs";
 import { OPISY_ZADAN } from "@/constants/opisy-zadan";
 import type { School } from "@/types";
 import type { IzrzFormData } from "./schemas/izrzSchemas";
-import { FormSection } from "./components/FormSection";
 import { TemplateSelector } from "./components/TemplateSelector";
 import { FormField } from "./components/FormField";
 
@@ -79,121 +78,107 @@ export default function IzrzForm() {
           <TemplateSelector onTemplateSelect={handleTemplateSelect} selectedTemplate={templateFile} />
 
           {/* Basic Information */}
-          <FormSection title="Podstawowe informacje" required>
-            <FormField
-              type="text"
-              name="caseNumber"
-              control={control}
-              error={errors.caseNumber}
-              label="Numer sprawy"
-              placeholder="Wprowadź numer sprawy"
-              required
-            />
-            <FormField
-              type="text"
-              name="reportNumber"
-              control={control}
-              error={errors.reportNumber}
-              label="Numer raportu"
-              placeholder="Wprowadź numer raportu"
-              required
-            />
-          </FormSection>
+          <FormField
+            type="text"
+            name="caseNumber"
+            control={control}
+            error={errors.caseNumber}
+            label="Numer sprawy"
+            placeholder="Wprowadź numer sprawy"
+            required
+          />
+          <FormField
+            type="text"
+            name="reportNumber"
+            control={control}
+            error={errors.reportNumber}
+            label="Numer raportu"
+            placeholder="Wprowadź numer raportu"
+            required
+          />
 
           {/* Program and Task Information */}
-          <FormSection title="Informacje o programie i zadaniu" required>
-            <FormField
-              type="select"
-              name="programName"
-              control={control}
-              error={errors.programName}
-              label="Nazwa programu"
-              options={programs.map((program) => ({ value: program.name, label: program.name }))}
-              required
-            />
-            <FormField
-              type="select"
-              name="taskType"
-              control={control}
-              error={errors.taskType}
-              label="Typ zadania"
-              options={Object.values(TASK_TYPES).map((taskType) => ({ value: taskType.label, label: taskType.label }))}
-              required
-            />
-          </FormSection>
+          <FormField
+            type="select"
+            name="programName"
+            control={control}
+            error={errors.programName}
+            label="Nazwa programu"
+            options={programs.map((program) => ({ value: program.name, label: program.name }))}
+            required
+          />
+          <FormField
+            type="select"
+            name="taskType"
+            control={control}
+            error={errors.taskType}
+            label="Typ zadania"
+            options={Object.values(TASK_TYPES).map((taskType) => ({ value: taskType.label, label: taskType.label }))}
+            required
+          />
 
           {/* Location and Date */}
-          <FormSection title="Lokalizacja i data" required>
-            <FormField
-              type="text"
-              name="address"
-              control={control}
-              error={errors.address}
-              label="Adres"
-              placeholder="Wprowadź adres"
-              required
-            />
-            <FormField type="date" name="dateInput" control={control} error={errors.dateInput} label="Data" required />
-          </FormSection>
+          <FormField
+            type="text"
+            name="address"
+            control={control}
+            error={errors.address}
+            label="Adres"
+            placeholder="Wprowadź adres"
+            required
+          />
+          <FormField type="date" name="dateInput" control={control} error={errors.dateInput} label="Data" required />
 
           {/* Audience Information */}
-          <FormSection title="Informacje o widowni" required>
-            <FormField
-              type="number"
-              name="viewerCount"
-              control={control}
-              error={errors.viewerCount}
-              label="Liczba widzów"
-              placeholder="Wprowadź liczbę widzów"
-              required
-            />
-            <FormField
-              type="textarea"
-              name="viewerCountDescription"
-              control={control}
-              error={errors.viewerCountDescription}
-              label="Opis liczby widzów"
-              placeholder="Opisz szczegółowo liczbę widzów"
-              multiline
-              minRows={4}
-              required
-            />
-          </FormSection>
+          <FormField
+            type="number"
+            name="viewerCount"
+            control={control}
+            error={errors.viewerCount}
+            label="Liczba widzów"
+            placeholder="Wprowadź liczbę widzów"
+            required
+          />
+          <FormField
+            type="textarea"
+            name="viewerCountDescription"
+            control={control}
+            error={errors.viewerCountDescription}
+            label="Opis liczby widzów"
+            placeholder="Opisz szczegółowo liczbę widzów"
+            multiline
+            minRows={4}
+            required
+          />
 
           {/* Task Description */}
-          <FormSection title="Opis zadania" required>
-            <FormField
-              type="textarea"
-              name="taskDescription"
-              control={control}
-              error={errors.taskDescription}
-              label="Opis zadania"
-              placeholder="Wprowadź szczegółowy opis zadania"
-              multiline
-              minRows={5}
-              required
-            />
-          </FormSection>
+          <FormField
+            type="textarea"
+            name="taskDescription"
+            control={control}
+            error={errors.taskDescription}
+            label="Opis zadania"
+            placeholder="Wprowadź szczegółowy opis zadania"
+            multiline
+            minRows={5}
+            required
+          />
 
           {/* Additional Information */}
-          <FormSection title="Dodatkowe informacje">
-            <FormField
-              type="textarea"
-              name="additionalInfo"
-              control={control}
-              error={errors.additionalInfo}
-              label="Dodatkowe informacje"
-              placeholder="Wprowadź dodatkowe informacje (opcjonalne)"
-              multiline
-              minRows={3}
-            />
-          </FormSection>
+          <FormField
+            type="textarea"
+            name="additionalInfo"
+            control={control}
+            error={errors.additionalInfo}
+            label="Dodatkowe informacje"
+            placeholder="Wprowadź dodatkowe informacje (opcjonalne)"
+            multiline
+            minRows={3}
+          />
 
           {/* Options */}
-          <FormSection title="Opcje">
-            <FormField type="checkbox" name="attendanceList" control={control} label="Lista obecności" />
-            <FormField type="checkbox" name="rozdzielnik" control={control} label="Rozdzielnik" />
-          </FormSection>
+          <FormField type="checkbox" name="attendanceList" control={control} label="Lista obecności" />
+          <FormField type="checkbox" name="rozdzielnik" control={control} label="Rozdzielnik" />
 
           {/* Submit Button */}
           <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>

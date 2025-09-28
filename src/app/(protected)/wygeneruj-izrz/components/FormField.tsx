@@ -87,7 +87,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                 {...field}
                 options={props.options}
                 getOptionLabel={(option) => option.label}
-                value={props.options.find(option => option.value === field.value) || null}
+                value={props.options.find((option) => option.value === field.value) || null}
                 onChange={(_, newValue) => field.onChange(newValue?.value || "")}
                 size="small"
                 renderInput={(params) => (
@@ -124,14 +124,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
             control={control}
             render={({ field }) => (
               <FormControlLabel
-                control={
-                  <Checkbox
-                    {...field}
-                    checked={field.value}
-                    color="primary"
-                    size="small"
-                  />
-                }
+                control={<Checkbox {...field} checked={field.value} color="primary" size="small" />}
                 label={props.label}
                 sx={{
                   "& .MuiFormControlLabel-label": {

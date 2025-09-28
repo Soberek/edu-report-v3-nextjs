@@ -1,21 +1,10 @@
 import React from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  Paper,
-  Stack,
-  Chip,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Button, Typography, Paper, Stack, Chip, CircularProgress } from "@mui/material";
 import { Description, Upload, CheckCircle } from "@mui/icons-material";
 import type { TemplateSelectorProps } from "../types";
 import { useTemplateManager } from "../hooks/useTemplateManager";
 
-export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
-  onTemplateSelect,
-  selectedTemplate,
-}) => {
+export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSelect, selectedTemplate }) => {
   const { loading, choosePredefinedTemplate } = useTemplateManager({
     onTemplateSelect,
   });

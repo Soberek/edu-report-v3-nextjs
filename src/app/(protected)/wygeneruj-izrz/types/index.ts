@@ -32,8 +32,3 @@ export interface TemplateSelectorProps {
   selectedTemplate?: File | null;
 }
 
-export interface FormSectionProps {
-  title: string;
-  children: React.ReactNode;
-  required?: boolean;
-}
