@@ -217,24 +217,26 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
         <Box
           sx={{
             display: "flex",
-            gap: 1,
+            flexDirection: { xs: "column", sm: "row" },
+            gap: { xs: 0.5, sm: 1 },
             alignItems: "center",
             justifyContent: "center",
             height: "100%",
             minHeight: 52,
+            width: "100%",
           }}
         >
           <Button
             variant="outlined"
             size="small"
-            startIcon={<Edit sx={{ fontSize: "1rem" }} />}
+            startIcon={<Edit sx={{ fontSize: "0.8rem" }} />}
             onClick={() => onEdit(params.row)}
             sx={{
               textTransform: "none",
-              fontSize: "0.75rem",
-              px: 1,
+              fontSize: { xs: "0.7rem", sm: "0.75rem" },
+              px: { xs: 0.5, sm: 1 },
               py: 0.5,
-              minWidth: "auto",
+              minWidth: { xs: "100%", sm: "auto" },
               borderColor: theme.palette.primary.main,
               color: theme.palette.primary.main,
               "&:hover": {
@@ -248,14 +250,14 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
           <Button
             variant="outlined"
             size="small"
-            startIcon={<Delete sx={{ fontSize: "1rem" }} />}
+            startIcon={<Delete sx={{ fontSize: "0.8rem" }} />}
             onClick={() => onDelete(params.row.id)}
             sx={{
               textTransform: "none",
-              fontSize: "0.75rem",
-              px: 1,
+              fontSize: { xs: "0.7rem", sm: "0.75rem" },
+              px: { xs: 0.5, sm: 1 },
               py: 0.5,
-              minWidth: "auto",
+              minWidth: { xs: "100%", sm: "auto" },
               borderColor: theme.palette.error.main,
               color: theme.palette.error.main,
               "&:hover": {
