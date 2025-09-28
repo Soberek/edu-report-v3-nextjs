@@ -1,0 +1,195 @@
+"use client";
+import React from "react";
+import { useForm, FormProvider, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Box, Typography, Stack } from "@mui/material";
+import { Add, Edit } from "@mui/icons-material";
+import { EditDialog, FormField, PrimaryButton, SecondaryButton } from "@/components/shared";
+import { Autocomplete, TextField } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import { createEducationalTaskSchema, type CreateEducationalTaskFormData } from "../schemas/educationalTaskSchemas";
+import { EducationalTask } from "@/types";
+import { ActivityForm } from "./ActivityForm";
+import { usePrograms } from "@/hooks/useProgram";
+import { useFirebaseData } from "@/hooks/useFirebaseData";
+import { useUser } from "@/hooks/useUser";
+import { schoolTypes } from "@/constants";
+
+interface EducationalTaskFormProps {
+  mode: "create" | "edit";
+  task?: EducationalTask | null;
+  onClose: () => void;
+  onSave: (data: CreateEducationalTaskFormData) => Promise<void>;
+  loading?: boolean;
+}
+
+export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, task, onClose, onSave, loading = false }) => {
+  const { user } = useUser();
+  const { programs } = usePrograms();
+  const { data: schools } = useFirebaseData<{ id: string; name: string; address: string; city: string; type: string[] }>(
+    "schools",
+    user?.uid
+  );
+
+  const [selectedSchoolId, setSelectedSchoolId] = React.useState<string>("");
+
+  const form = useForm({
+    resolver: zodResolver(createEducationalTaskSchema),
+    defaultValues: {
+      title: task?.title || "",
+      programName: task?.programName || "",
+      date: task?.date || "",
+      schoolId: task?.schoolId || "",
+      referenceId: task?.referenceId || "",
+      activities: task?.activities || [
+        {
+          type: "prelekcja",
+          title: "",
+          description: "",
+          actionCount: 1,
+          audienceCount: 0,
+        },
+      ],
+    },
+  });
+
+  const handleFormSubmit = async (data: any) => {
+    try {
+      await onSave(data as CreateEducationalTaskFormData);
+      form.reset();
+    } catch (error) {
+      console.error("Form submission error:", error);
+    }
+  };
+
+  const handleClose = () => {
+    form.reset();
+    onClose();
+  };
+
+  const isEdit = mode === "edit";
+  const submitLoading = loading || form.formState.isSubmitting;
+
+  return (
+    <EditDialog
+      open={true}
+      onClose={handleClose}
+      title={isEdit ? "Edytuj zadanie edukacyjne" : "Dodaj nowe zadanie edukacyjne"}
+      maxWidth="lg"
+      fullWidth
+    >
+      <FormProvider {...form}>
+        <Box component="form" onSubmit={form.handleSubmit(handleFormSubmit)}>
+          <Stack spacing={3}>
+            {/* Basic Information */}
+            <Box>
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                Informacje podstawowe
+              </Typography>
+              <Stack spacing={2}>
+                <FormField
+                  name="title"
+                  control={form.control}
+                  label="Tytuł zadania"
+                  placeholder="Wprowadź tytuł zadania edukacyjnego"
+                  required
+                  fullWidth
+                />
+
+                <FormField
+                  name="programName"
+                  control={form.control}
+                  label="Nazwa programu"
+                  type="select"
+                  required
+                  fullWidth
+                  options={programs.map((program) => ({
+                    value: program.name,
+                    label: program.name,
+                  }))}
+                />
+
+                <Controller
+                  name="date"
+                  control={form.control}
+                  render={({ field }) => (
+                    <DatePicker
+                      label="Data"
+                      value={field.value ? dayjs(field.value) : null}
+                      onChange={(date) => {
+                        field.onChange(date ? date.format("YYYY-MM-DD") : "");
+                      }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          required: true,
+                        },
+                      }}
+                      localeText={{
+                        previousMonth: "Poprzedni miesiąc",
+                        nextMonth: "Następny miesiąc",
+                        cancelButtonLabel: "Anuluj",
+                        okButtonLabel: "OK",
+                        todayButtonLabel: "Dzisiaj",
+                      }}
+                    />
+                  )}
+                />
+
+                <FormField
+                  name="referenceId"
+                  control={form.control}
+                  label="ID sprawy (opcjonalne)"
+                  placeholder="Wprowadź ID powiązanej sprawy"
+                  fullWidth
+                />
+              </Stack>
+            </Box>
+
+            {/* School Selection */}
+            <Box>
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                Wybór szkoły
+              </Typography>
+              <Stack spacing={2}>
+                <Controller
+                  name="schoolId"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Autocomplete
+                      options={schools || []}
+                      getOptionLabel={(option) => `${option.name} - ${option.address}, ${option.city} (${option.type.join(", ")})`}
+                      value={schools?.find((school) => school.id === field.value) || null}
+                      onChange={(_, newValue) => {
+                        field.onChange(newValue?.id || "");
+                        setSelectedSchoolId(newValue?.id || "");
+                      }}
+                      renderInput={(params) => <TextField {...params} label="Szkoła" placeholder="Wybierz szkołę" required />}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                    />
+                  )}
+                />
+              </Stack>
+            </Box>
+
+            {/* Activities */}
+            <Box>
+              <ActivityForm />
+            </Box>
+
+            {/* Form Actions */}
+            <Stack direction="row" spacing={2} justifyContent="flex-end">
+              <SecondaryButton onClick={handleClose} disabled={submitLoading}>
+                Anuluj
+              </SecondaryButton>
+              <PrimaryButton type="submit" loading={submitLoading} startIcon={isEdit ? <Edit /> : <Add />}>
+                {isEdit ? "Zaktualizuj zadanie" : "Dodaj zadanie"}
+              </PrimaryButton>
+            </Stack>
+          </Stack>
+        </Box>
+      </FormProvider>
+    </EditDialog>
+  );
+};
