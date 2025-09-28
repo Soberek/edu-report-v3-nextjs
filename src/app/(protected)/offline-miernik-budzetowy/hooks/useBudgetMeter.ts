@@ -38,6 +38,10 @@ export const useBudgetMeter = () => {
       }
       
       dispatch({ type: "SET_FILE_DATA", payload: { fileName, rawData: data } });
+      
+      // Auto-select all months when file is uploaded
+      const allMonthsSelected = state.selectedMonths.map(month => ({ ...month, selected: true }));
+      dispatch({ type: "SET_SELECTED_MONTHS", payload: allMonthsSelected });
     } catch (error) {
       dispatch({ 
         type: "SET_FILE_ERROR", 
