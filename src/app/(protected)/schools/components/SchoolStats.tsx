@@ -22,8 +22,20 @@ export const SchoolStats: React.FC<SchoolStatsProps> = ({ totalSchools, typeStat
     return "📚";
   };
 
-  const getTypeColor = () => {
-    return theme.palette.primary.main;
+  const getTypeGradient = (index: number) => {
+    const gradients = [
+      `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+      `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
+      `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`,
+      `linear-gradient(135deg, ${theme.palette.warning.main} 0%, ${theme.palette.warning.dark} 100%)`,
+      `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`,
+      `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
+      `linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%)`,
+      `linear-gradient(135deg, #ff9800 0%, #f57c00 100%)`,
+      `linear-gradient(135deg, #4caf50 0%, #388e3c 100%)`,
+      `linear-gradient(135deg, #2196f3 0%, #1976d2 100%)`,
+    ];
+    return gradients[index % gradients.length];
   };
 
   return (
@@ -75,20 +87,20 @@ export const SchoolStats: React.FC<SchoolStatsProps> = ({ totalSchools, typeStat
                gap: 1,
                px: 2,
                py: 1,
-               background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+               background: getTypeGradient(0),
                color: "white",
                borderRadius: 2,
                minWidth: "fit-content",
                boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
              }}
            >
-             <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
-               {totalSchools}
-             </Typography>
-             <Typography variant="caption" sx={{ opacity: 0.9, fontSize: "0.75rem" }}>
-               szkół
-             </Typography>
-           </Box>
+            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
+              {totalSchools}
+            </Typography>
+            <Typography variant="caption" sx={{ opacity: 0.9, fontSize: "0.75rem" }}>
+              szkół
+            </Typography>
+          </Box>
 
           {/* Type Stats - Ultra Compact */}
           {typeStats.map((stat, index) => (
@@ -100,15 +112,15 @@ export const SchoolStats: React.FC<SchoolStatsProps> = ({ totalSchools, typeStat
                 gap: 1,
                 px: 2,
                 py: 1,
-                background: `linear-gradient(135deg, ${getTypeColor()} 0%, ${getTypeColor()}dd 100%)`,
+                background: getTypeGradient(index + 1),
                 color: "white",
                 borderRadius: 2,
                 minWidth: "fit-content",
-                boxShadow: `0 2px 8px ${getTypeColor()}20`,
+                boxShadow: `0 2px 8px rgba(0,0,0,0.1)`,
                 transition: "all 0.2s ease",
                 "&:hover": {
                   transform: "translateY(-1px)",
-                  boxShadow: `0 4px 12px ${getTypeColor()}30`,
+                  boxShadow: `0 4px 12px rgba(0,0,0,0.2)`,
                 },
               }}
             >
