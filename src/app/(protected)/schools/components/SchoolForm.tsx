@@ -1,9 +1,5 @@
 import React from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
   Box,
   Typography,
@@ -14,6 +10,7 @@ import {
 import { Controller } from "react-hook-form";
 import { TextField, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 import { useSchoolForm } from "../hooks/useSchoolForm";
+import { EditDialog } from "@/components/shared/EditDialog";
 import type { SchoolFormProps } from "../types";
 import type { CreateSchoolFormData, EditSchoolFormData } from "../schemas/schoolSchemas";
 
@@ -206,7 +203,7 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({
               },
             }}
           >
-            {loading ? "Zapisywanie..." : isEditMode ? "Zapisz zmiany" : "Dodaj szkołę"}
+            {loading ? "Zapisywanie..." : "Dodaj szkołę"}
           </Button>
         </Box>
       </Stack>
@@ -215,34 +212,19 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({
 
   if (isEditMode) {
     return (
-      <Dialog
+      <EditDialog
         open={true}
         onClose={onClose}
+        title={title}
+        onSave={handleSubmit}
+        loading={loading}
+        saveText="Zapisz zmiany"
+        cancelText="Anuluj"
         maxWidth="md"
         fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            background: "linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)",
-          },
-        }}
       >
-        <DialogTitle
-          sx={{
-            background: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
-            color: "white",
-            textAlign: "center",
-            fontWeight: "bold",
-          }}
-        >
-          {title}
-        </DialogTitle>
-        <DialogContent sx={{ p: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, mt: 2, backgroundColor: "transparent" }}>
-            {formContent}
-          </Paper>
-        </DialogContent>
-      </Dialog>
+        {formContent}
+      </EditDialog>
     );
   }
 
