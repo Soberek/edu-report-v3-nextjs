@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { Container, Box, Typography } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Container, Box, Typography, Collapse } from "@mui/material";
+import { Add, ExpandMore, ExpandLess } from "@mui/icons-material";
 import { PageHeader, PrimaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
 import { useEducationalTasks } from "./hooks/useEducationalTasks";
 import { EducationalTaskForm } from "./components";
@@ -13,6 +13,7 @@ export default function EducationalTasks(): React.ReactNode {
 
   const [openForm, setOpenForm] = useState(false);
   const [editTask, setEditTask] = useState<EducationalTask | null>(null);
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
   const handleAddTask = () => {
     setEditTask(null);
@@ -50,6 +51,18 @@ export default function EducationalTasks(): React.ReactNode {
   const handleFormClose = () => {
     setOpenForm(false);
     setEditTask(null);
+  };
+
+  const toggleTaskExpansion = (taskId: string) => {
+    setExpandedTasks((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -149,57 +162,71 @@ export default function EducationalTasks(): React.ReactNode {
                   </Box>
                 </Box>
 
-                {/* Activities - Compact */}
+                {/* Activities - Collapsible */}
                 <Box>
-                  <Typography variant="caption" fontWeight="bold" color="text.secondary" mb={0.5}>
-                    Aktywności ({task.activities.length}):
-                  </Typography>
-                  {task.activities.map((activity, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        p: 1,
-                        mb: 0.5,
-                        backgroundColor: "grey.50",
-                        borderRadius: 0.5,
-                        fontSize: "0.75rem",
-                      }}
-                    >
-                      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={0.5}>
-                        <Typography variant="caption" fontWeight="bold" sx={{ fontSize: "0.75rem" }}>
-                          {activity.title}
-                        </Typography>
-                        <Box display="flex" gap={1}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => toggleTaskExpansion(task.id)}
+                  >
+                    <Typography variant="caption" fontWeight="bold" color="text.secondary">
+                      Aktywności ({task.activities.length}): {task.activities.map((a) => a.type).join(", ")}
+                    </Typography>
+                    {expandedTasks.has(task.id) ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
+                  </Box>
+
+                  <Collapse in={expandedTasks.has(task.id)}>
+                    <Box mt={1}>
+                      {task.activities.map((activity, index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            p: 1,
+                            mb: 0.5,
+                            backgroundColor: "grey.50",
+                            borderRadius: 0.5,
+                            fontSize: "0.75rem",
+                          }}
+                        >
+                          <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={0.5}>
+                            <Typography variant="caption" fontWeight="bold" sx={{ fontSize: "0.75rem" }}>
+                              {activity.title}
+                            </Typography>
+                            <Box display="flex" gap={1}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                                {activity.type}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                                {activity.actionCount} działań
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                                {activity.audienceCount} odbiorców
+                              </Typography>
+                            </Box>
+                          </Box>
                           <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
-                            {activity.type}
+                            {activity.description}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
-                            {activity.actionCount} działań
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
-                            {activity.audienceCount} odbiorców
-                          </Typography>
+                          {activity.media && (
+                            <Box mt={0.5}>
+                              <Typography variant="caption" color="primary" sx={{ fontSize: "0.7rem" }}>
+                                Media: {activity.media.title} ({activity.media.platform})
+                              </Typography>
+                            </Box>
+                          )}
+                          {activity.materials && activity.materials.length > 0 && (
+                            <Box mt={0.5}>
+                              <Typography variant="caption" color="primary" fontWeight="bold" sx={{ fontSize: "0.7rem" }}>
+                                Materiały: {activity.materials.map((m) => `${m.name} (${m.distributedCount})`).join(", ")}
+                              </Typography>
+                            </Box>
+                          )}
                         </Box>
-                      </Box>
-                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
-                        {activity.description}
-                      </Typography>
-                      {activity.media && (
-                        <Box mt={0.5}>
-                          <Typography variant="caption" color="primary" sx={{ fontSize: "0.7rem" }}>
-                            Media: {activity.media.title} ({activity.media.platform})
-                          </Typography>
-                        </Box>
-                      )}
-                      {activity.materials && activity.materials.length > 0 && (
-                        <Box mt={0.5}>
-                          <Typography variant="caption" color="primary" fontWeight="bold" sx={{ fontSize: "0.7rem" }}>
-                            Materiały: {activity.materials.map(m => `${m.name} (${m.distributedCount})`).join(", ")}
-                          </Typography>
-                        </Box>
-                      )}
+                      ))}
                     </Box>
-                  ))}
+                  </Collapse>
                 </Box>
               </Box>
             ))}
