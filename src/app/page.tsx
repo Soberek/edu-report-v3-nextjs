@@ -204,7 +204,7 @@ export default function Home() {
 
         {/* Technology Stack */}
         <section className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl p-12 mb-24 shadow-2xl border border-white/20 dark:border-gray-700/50">
-          <h2 className="text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold text-center mb-12  dark:text-white bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Nowoczesna Technologia
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 text-center">

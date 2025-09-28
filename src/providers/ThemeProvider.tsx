@@ -34,30 +34,71 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: "black",
-          border: "1px solid black",
-          borderRadius: theme.shape.borderRadius,
-          boxShadow: "0 4px 0px rgba(0, 0, 0, 0.8)",
-          fontWeight: theme.typography.button.fontWeight,
-          textTransform: theme.typography.button.textTransform,
+          borderRadius: 12,
+          fontWeight: 600,
+          textTransform: "none",
+          fontSize: "0.95rem",
+          padding: "10px 24px",
+          minHeight: "44px",
           transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          "&:disabled": {
+            opacity: 0.6,
+            cursor: "not-allowed",
+          },
+        }),
+        contained: ({ theme }) => ({
+          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+          color: theme.palette.primary.contrastText,
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          border: "none",
           "&:hover": {
-            color: "black",
-            background: "rgba(255, 255, 255, 0.1)",
-            transform: "translateY(4px)",
-            boxShadow: "0 0px 0px rgba(0, 0, 0, 0.4)",
+            background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+            boxShadow: "0 6px 20px rgba(0, 0, 0, 0.25)",
+            transform: "translateY(-2px)",
           },
           "&:active": {
             transform: "translateY(0px)",
-            boxShadow: "0 3px 12px rgba(0, 0, 0, 0.3)",
-          },
-          "&:disabled": {
-            background: theme.palette.action.disabled,
-            color: theme.palette.text.disabled,
-            boxShadow: "none",
-            transform: "none",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
           },
         }),
+        outlined: ({ theme }) => ({
+          color: theme.palette.primary.main,
+          border: `2px solid ${theme.palette.primary.main}`,
+          background: "transparent",
+          "&:hover": {
+            background: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            border: `2px solid ${theme.palette.primary.main}`,
+            transform: "translateY(-2px)",
+            boxShadow: "0 6px 20px rgba(0, 0, 0, 0.15)",
+          },
+          "&:active": {
+            transform: "translateY(0px)",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+          },
+        }),
+        text: ({ theme }) => ({
+          color: theme.palette.primary.main,
+          background: "transparent",
+          border: "none",
+          "&:hover": {
+            background: `${theme.palette.primary.main}15`,
+            color: theme.palette.primary.dark,
+          },
+          "&:active": {
+            background: `${theme.palette.primary.main}25`,
+          },
+        }),
+        sizeSmall: {
+          padding: "6px 16px",
+          minHeight: "36px",
+          fontSize: "0.85rem",
+        },
+        sizeLarge: {
+          padding: "14px 32px",
+          minHeight: "52px",
+          fontSize: "1.1rem",
+        },
       },
     },
     MuiTextField: {
