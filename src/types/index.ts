@@ -117,6 +117,7 @@ export interface EducationalTask {
   programName: string;
   date: string;
   schoolId: string; // ID szkoły z Firebase
+  referenceNumber: string; // Numer referencyjny zadania (wymagany)
   referenceId?: string; // odwołanie do sprawy, jeśli jest powiązana
   activities: Activity[];
   createdBy: string;
@@ -129,6 +130,7 @@ export interface CreateEducationalTaskFormData {
   programName: string;
   date: string;
   schoolId: string;
+  referenceNumber: string; // Numer referencyjny zadania (wymagany)
   referenceId?: string;
   activities: Activity[];
 }
