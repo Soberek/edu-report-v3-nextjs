@@ -18,8 +18,20 @@ import {
 import { Close, School, Group, Person, CalendarToday, Save, Edit } from "@mui/icons-material";
 import { Controller, useForm } from "react-hook-form";
 import type { Contact, Program, School as SchoolType } from "@/types";
-import { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
+import { SchoolProgramParticipation, schoolProgramParticipationSchema } from "@/models/SchoolProgramParticipation";
 import { schoolYears } from "@/constants";
+import { z } from "zod";
+
+// Form data type that matches the form structure
+type FormData = z.infer<typeof schoolProgramParticipationSchema.partial().pick({
+  schoolId: true,
+  programId: true,
+  coordinatorId: true,
+  schoolYear: true,
+  previousCoordinatorId: true,
+  studentCount: true,
+  notes: true,
+})>;
 
 interface EditDialogProps {
   open: boolean;
@@ -38,7 +50,7 @@ export default function EditDialog({ open, participation, schools, contacts, pro
     handleSubmit,
     reset,
     formState: { errors, isDirty },
-  } = useForm({
+  } = useForm<FormData>({
     defaultValues: {
       schoolId: "",
       programId: "",
@@ -64,7 +76,7 @@ export default function EditDialog({ open, participation, schools, contacts, pro
     }
   }, [participation, reset]);
 
-  const onSubmit = (data: Partial<SchoolProgramParticipation>) => {
+  const onSubmit = (data: FormData) => {
     if (participation) {
       onSave(participation.id, data);
     }
