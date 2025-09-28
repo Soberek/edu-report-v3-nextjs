@@ -107,33 +107,35 @@ export default function EducationalTasks(): React.ReactNode {
               <Box
                 key={task.id}
                 sx={{
-                  p: 3,
-                  mb: 2,
+                  p: 2,
+                  mb: 1.5,
                   border: "1px solid",
                   borderColor: "divider",
-                  borderRadius: 2,
+                  borderRadius: 1,
                   backgroundColor: "background.paper",
                 }}
               >
-                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                  <Box>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
+                  <Box flex={1}>
+                    <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
                       {task.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      Program: {task.programName}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Data: {new Date(task.date).toLocaleDateString("pl-PL")}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Numer referencyjny: {task.referenceNumber}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Szkoła ID: {task.schoolId}
-                    </Typography>
+                    <Box display="flex" flexWrap="wrap" gap={2} mb={1}>
+                      <Typography variant="caption" color="text.secondary">
+                        Program: {task.programName}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Data: {new Date(task.date).toLocaleDateString("pl-PL")}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Ref: {task.referenceNumber}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Szkoła: {task.schoolId}
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Box display="flex" gap={1}>
+                  <Box display="flex" gap={0.5}>
                     <PrimaryButton size="small" onClick={() => handleEditTask(task)}>
                       Edytuj
                     </PrimaryButton>
@@ -147,56 +149,53 @@ export default function EducationalTasks(): React.ReactNode {
                   </Box>
                 </Box>
 
-                {/* Activities */}
+                {/* Activities - Compact */}
                 <Box>
-                  <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-                    Aktywności ({task.activities.length})
+                  <Typography variant="caption" fontWeight="bold" color="text.secondary" mb={0.5}>
+                    Aktywności ({task.activities.length}):
                   </Typography>
                   {task.activities.map((activity, index) => (
                     <Box
                       key={index}
                       sx={{
-                        p: 2,
-                        mb: 1,
+                        p: 1,
+                        mb: 0.5,
                         backgroundColor: "grey.50",
-                        borderRadius: 1,
+                        borderRadius: 0.5,
+                        fontSize: "0.75rem",
                       }}
                     >
-                      <Typography variant="body2" fontWeight="bold">
-                        {activity.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Typ: {activity.type}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Ilość działań: {activity.actionCount}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Ilość odbiorców: {activity.audienceCount}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={0.5}>
+                        <Typography variant="caption" fontWeight="bold" sx={{ fontSize: "0.75rem" }}>
+                          {activity.title}
+                        </Typography>
+                        <Box display="flex" gap={1}>
+                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                            {activity.type}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                            {activity.actionCount} działań
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                            {activity.audienceCount} odbiorców
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
                         {activity.description}
                       </Typography>
                       {activity.media && (
-                        <Box mt={1}>
-                          <Typography variant="body2" color="primary">
+                        <Box mt={0.5}>
+                          <Typography variant="caption" color="primary" sx={{ fontSize: "0.7rem" }}>
                             Media: {activity.media.title} ({activity.media.platform})
-                          </Typography>
-                          <Typography variant="body2" color="primary" sx={{ wordBreak: "break-all" }}>
-                            Link: {activity.media.link}
                           </Typography>
                         </Box>
                       )}
                       {activity.materials && activity.materials.length > 0 && (
-                        <Box mt={1}>
-                          <Typography variant="body2" color="primary" fontWeight="bold">
-                            Materiały:
+                        <Box mt={0.5}>
+                          <Typography variant="caption" color="primary" fontWeight="bold" sx={{ fontSize: "0.7rem" }}>
+                            Materiały: {activity.materials.map(m => `${m.name} (${m.distributedCount})`).join(", ")}
                           </Typography>
-                          {activity.materials.map((material, materialIndex) => (
-                            <Typography key={materialIndex} variant="body2" color="primary">
-                              • {material.name} ({material.type}) - {material.distributedCount} egzemplarzy
-                            </Typography>
-                          ))}
                         </Box>
                       )}
                     </Box>
