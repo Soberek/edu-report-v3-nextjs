@@ -1,101 +1,148 @@
 "use client";
-import React, { useMemo, useCallback } from "react";
-import { Box, Typography, Alert } from "@mui/material";
+import React, { useEffect } from "react";
+import { Box, Typography, Alert, Button, CircularProgress, Container } from "@mui/material";
+import { PlayArrow } from "@mui/icons-material";
 
-import ExcelUploaderUploadButtons from "./components/upload-buttons";
-import ExcelUploaderMonthsButtons from "./components/month-buttons";
-import saveExcelToFile from "./components/useExcelFileSaver";
-import ExcelTable from "./components/table";
-import { aggregateData } from "./components/processExcelData";
-import useExcelFileReader from "./components/useExcelFileReader";
-import { useMonthSelection } from "./components/useMonthSelection";
-
-// Memoized components
-const MemoizedExcelUploaderMonths = React.memo(ExcelUploaderMonthsButtons);
-const MemoizedExcelUploaderUploadButtons = React.memo(ExcelUploaderUploadButtons);
-const MemoizedExcelUploaderTable = React.memo(ExcelTable);
-
-// Stats card component
-function StatsCard({ icon, label, value }: { icon: string; label: string; value: number | undefined }): React.ReactNode {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 1,
-        padding: 1.5,
-        backgroundColor: "primary.light",
-        borderRadius: 1,
-        minWidth: 200,
-      }}
-    >
-      <Typography variant="h6" component="span">
-        {icon}
-      </Typography>
-      <Typography variant="body1" fontWeight="medium">
-        {label}: {value ?? 0}
-      </Typography>
-    </Box>
-  );
-}
-const MemoizedStatsCard = React.memo(StatsCard);
+import { useBudgetMeter } from "./hooks/useBudgetMeter";
+import { StatsCard, MonthSelector, FileUploader, DataTable } from "./components";
 
 const OfflineMiernik: React.FC = () => {
-  const { rawData, fileName, handleFileUpload } = useExcelFileReader();
-  const { selectedMonths, handleMonthSelect, error } = useMonthSelection();
+  const {
+    state,
+    handleFileUpload,
+    handleMonthToggle,
+    handleMonthSelectAll,
+    handleMonthDeselectAll,
+    processData,
+    handleExportToExcel,
+    resetState,
+    selectedMonthsCount,
+    hasValidData,
+    canProcess,
+    canExport,
+  } = useBudgetMeter();
 
-  const aggregatedData = useMemo(() => aggregateData(rawData, selectedMonths), [rawData, selectedMonths]);
-
-  const handleSaveToExcel = useCallback(() => {
-    console.log("Saving to Excel...");
-    if (aggregatedData?.aggregated) {
-      return saveExcelToFile(aggregatedData.aggregated);
+  // Auto-process data when file and months are selected
+  useEffect(() => {
+    if (state.rawData.length > 0 && selectedMonthsCount > 0 && !state.aggregatedData) {
+      processData();
     }
-    return false;
-  }, [aggregatedData?.aggregated]);
+  }, [state.rawData.length, selectedMonthsCount, state.aggregatedData, processData]);
 
-  const hasValidData = aggregatedData && Object.keys(aggregatedData).length > 0;
+  const currentError = state.fileError || state.monthError || state.processingError;
 
   return (
-    <Box>
-      <MemoizedExcelUploaderMonths months={selectedMonths} handleMonthSelect={handleMonthSelect} />
-
-      <MemoizedExcelUploaderUploadButtons
-        fileName={fileName}
-        handleFileUpload={handleFileUpload}
-        saveToExcelFile={handleSaveToExcel}
-        error={error}
-        data={aggregatedData?.aggregated}
-      />
-
-      {/* Statistics Cards */}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 3,
-          flexWrap: "wrap",
-          marginBottom: 3,
-          padding: 2,
-          backgroundColor: "background.paper",
-          borderRadius: 2,
-          boxShadow: 1,
-          mx: 2,
-          mt: 2,
-        }}
-      >
-        <StatsCard icon="👩‍🏫" label="Ogólna liczba działań" value={aggregatedData?.allActions} />
-        <StatsCard icon="👨‍👩‍👧‍👦" label="Ogólna liczba odbiorców" value={aggregatedData?.allPeople} />
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      {/* Header */}
+      <Box sx={{ mb: 6, textAlign: "center" }}>
+        <Typography variant="h3" fontWeight="bold" color="primary" sx={{ mb: 2 }}>
+          Miernik Budżetowy
+        </Typography>
+        <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: "auto" }}>
+          Analizuj dane programów edukacyjnych z plików Excel. Wybierz miesiące, wczytaj dane i wygeneruj raporty.
+        </Typography>
       </Box>
 
-      {/* Data Table or Error */}
-      {error ? (
-        <Alert severity="error" sx={{ mx: 2 }}>
-          {error}
+      {/* File Upload Section */}
+      <FileUploader
+        fileName={state.fileName}
+        onFileUpload={handleFileUpload}
+        onExport={handleExportToExcel}
+        onReset={resetState}
+        isLoading={state.isLoading}
+        isProcessing={state.isProcessing}
+        canExport={canExport}
+        error={state.fileError}
+      />
+
+      {/* Month Selection */}
+      {state.rawData.length > 0 && (
+        <MonthSelector
+          months={state.selectedMonths}
+          onMonthToggle={handleMonthToggle}
+          onSelectAll={handleMonthSelectAll}
+          onDeselectAll={handleMonthDeselectAll}
+          selectedCount={selectedMonthsCount}
+          disabled={!!currentError}
+        />
+      )}
+
+      {/* Manual Process Button */}
+      {state.rawData.length > 0 && selectedMonthsCount > 0 && !state.aggregatedData && (
+        <Box sx={{ textAlign: "center", mb: 4 }}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={processData}
+            disabled={!canProcess}
+            startIcon={state.isProcessing ? <CircularProgress size={20} /> : <PlayArrow />}
+            sx={{ px: 4, py: 2 }}
+          >
+            {state.isProcessing ? "Przetwarzanie..." : "Przetwórz dane"}
+          </Button>
+        </Box>
+      )}
+
+      {/* Error Display */}
+      {currentError && (
+        <Alert severity="error" sx={{ mb: 4 }}>
+          {currentError}
         </Alert>
-      ) : hasValidData ? (
-        <MemoizedExcelUploaderTable {...aggregatedData.aggregated} />
-      ) : null}
-    </Box>
+      )}
+
+      {/* Statistics Cards */}
+      {hasValidData && state.aggregatedData && (
+        <Box
+          sx={{
+            display: "flex",
+            gap: 3,
+            flexWrap: "wrap",
+            justifyContent: "center",
+            mb: 4,
+          }}
+        >
+          <StatsCard
+            icon="📊"
+            label="Ogólna liczba działań"
+            value={state.aggregatedData.allActions}
+            color="primary"
+          />
+          <StatsCard
+            icon="👥"
+            label="Ogólna liczba odbiorców"
+            value={state.aggregatedData.allPeople}
+            color="success"
+          />
+        </Box>
+      )}
+
+      {/* Data Table */}
+      {hasValidData && state.aggregatedData && (
+        <DataTable
+          data={state.aggregatedData.aggregated}
+          allActions={state.aggregatedData.allActions}
+          allPeople={state.aggregatedData.allPeople}
+        />
+      )}
+
+      {/* Empty State */}
+      {!state.rawData.length && !currentError && (
+        <Box
+          sx={{
+            textAlign: "center",
+            py: 8,
+            color: "text.secondary",
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Rozpocznij od wczytania pliku Excel
+          </Typography>
+          <Typography variant="body1">
+            Wybierz plik z danymi programów edukacyjnych, aby rozpocząć analizę
+          </Typography>
+        </Box>
+      )}
+    </Container>
   );
 };
 
