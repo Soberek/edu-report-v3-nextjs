@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { izrzFormSchema, type IzrzFormData } from "../schemas/izrzSchemas";
 
 interface UseIzrzFormProps {
@@ -34,6 +34,17 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
   });
 
   const { control, handleSubmit, setValue, watch, formState, reset } = form;
+
+  // Auto-dismiss submit message after 5 seconds
+  useEffect(() => {
+    if (submitMessage) {
+      const timer = setTimeout(() => {
+        setSubmitMessage(null);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [submitMessage]);
 
   // Handle form submission
   const handleFormSubmit = handleSubmit(async (data: IzrzFormData) => {
