@@ -217,8 +217,8 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            gap: { xs: 0.5, sm: 1 },
+            flexDirection: "column",
+            gap: 0.5,
             alignItems: "center",
             justifyContent: "center",
             height: "100%",
@@ -233,10 +233,10 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
             onClick={() => onEdit(params.row)}
             sx={{
               textTransform: "none",
-              fontSize: { xs: "0.7rem", sm: "0.75rem" },
-              px: { xs: 0.5, sm: 1 },
+              fontSize: "0.75rem",
+              px: 1,
               py: 0.5,
-              minWidth: { xs: "100%", sm: "auto" },
+              minWidth: "100%",
               borderColor: theme.palette.primary.main,
               color: theme.palette.primary.main,
               "&:hover": {
@@ -254,10 +254,10 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
             onClick={() => onDelete(params.row.id)}
             sx={{
               textTransform: "none",
-              fontSize: { xs: "0.7rem", sm: "0.75rem" },
-              px: { xs: 0.5, sm: 1 },
+              fontSize: "0.75rem",
+              px: 1,
               py: 0.5,
-              minWidth: { xs: "100%", sm: "auto" },
+              minWidth: "100%",
               borderColor: theme.palette.error.main,
               color: theme.palette.error.main,
               "&:hover": {
