@@ -36,10 +36,10 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
   const { control, handleSubmit, setValue, watch, formState, reset } = form;
 
   // Handle form submission
-  const handleFormSubmit = handleSubmit(async (data) => {
+  const handleFormSubmit = handleSubmit(async (data: IzrzFormData) => {
     setIsSubmitting(true);
     setSubmitMessage(null);
-    
+
     try {
       await onSubmit(data);
       setSubmitMessage({
@@ -57,9 +57,12 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
   });
 
   // Set form value helper
-  const setFormValue = useCallback((field: keyof IzrzFormData, value: any) => {
-    setValue(field, value, { shouldValidate: true });
-  }, [setValue]);
+  const setFormValue = useCallback(
+    (field: keyof IzrzFormData, value: any) => {
+      setValue(field, value, { shouldValidate: true });
+    },
+    [setValue]
+  );
 
   // Reset form helper
   const resetForm = useCallback(() => {

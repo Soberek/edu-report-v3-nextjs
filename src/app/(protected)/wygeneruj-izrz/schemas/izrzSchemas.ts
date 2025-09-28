@@ -12,8 +12,8 @@ export const izrzFormSchema = z.object({
   viewerCountDescription: z.string().min(1, "Opis liczby widzów jest wymagany"),
   taskDescription: z.string().min(1, "Opis zadania jest wymagany").max(2000, "Opis nie może przekraczać 2000 znaków"),
   additionalInfo: z.string().optional(),
-  attendanceList: z.boolean().default(false),
-  rozdzielnik: z.boolean().default(false),
+  attendanceList: z.boolean(),
+  rozdzielnik: z.boolean(),
   templateFile: z.instanceof(File).nullable().optional(),
 });
 
