@@ -1,14 +1,6 @@
 "use client";
 import React from "react";
-import {
-  Container,
-  Typography,
-  Box,
-  Button,
-  Alert,
-  CircularProgress,
-  useTheme,
-} from "@mui/material";
+import { Container, Typography, Box, Button, Alert, CircularProgress, useTheme } from "@mui/material";
 import { Add, School } from "@mui/icons-material";
 import { useSchoolState } from "./hooks/useSchoolState";
 import { useSchoolFilters } from "./hooks/useSchoolFilters";
@@ -19,15 +11,7 @@ import type { CreateSchoolFormData, EditSchoolFormData } from "./schemas/schoolS
 
 export default function Schools(): React.ReactNode {
   const theme = useTheme();
-  const {
-    state,
-    setFilter,
-    toggleForm,
-    setEditSchool,
-    handleCreateSchool,
-    handleUpdateSchool,
-    handleDeleteSchool,
-  } = useSchoolState();
+  const { state, setFilter, toggleForm, setEditSchool, handleCreateSchool, handleUpdateSchool, handleDeleteSchool } = useSchoolState();
 
   const { filteredSchools, uniqueTypes, uniqueCities } = useSchoolFilters({
     schools: state.schools,
@@ -107,10 +91,7 @@ export default function Schools(): React.ReactNode {
       </Box>
 
       {/* Filters */}
-      <SchoolFilter
-        filter={state.filter}
-        onFilterChange={setFilter}
-      />
+      <SchoolFilter filter={state.filter} onFilterChange={setFilter} />
 
       {/* School Form */}
       {state.openForm && (
@@ -130,18 +111,13 @@ export default function Schools(): React.ReactNode {
         <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: "#1976d2" }}>
           Lista szkół ({filteredSchools.length})
         </Typography>
-        
+
         {state.loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: 400 }}>
             <CircularProgress size={60} />
           </Box>
         ) : (
-          <SchoolTable
-            schools={filteredSchools}
-            onEdit={handleEditSchool}
-            onDelete={handleDeleteSchoolConfirm}
-            loading={state.loading}
-          />
+          <SchoolTable schools={filteredSchools} onEdit={handleEditSchool} onDelete={handleDeleteSchoolConfirm} loading={state.loading} />
         )}
       </Box>
     </Container>
