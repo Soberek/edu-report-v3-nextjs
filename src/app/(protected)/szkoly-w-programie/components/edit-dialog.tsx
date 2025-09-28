@@ -23,15 +23,15 @@ import { schoolYears } from "@/constants";
 import { z } from "zod";
 
 // Form data type that matches the form structure
-type FormData = z.infer<typeof schoolProgramParticipationSchema.partial().pick({
-  schoolId: true,
-  programId: true,
-  coordinatorId: true,
-  schoolYear: true,
-  previousCoordinatorId: true,
-  studentCount: true,
-  notes: true,
-})>;
+type FormData = {
+  schoolId: string;
+  programId: string;
+  coordinatorId: string;
+  schoolYear: "2024/2025" | "2025/2026" | "2026/2027" | "2027/2028";
+  previousCoordinatorId: string;
+  studentCount: number;
+  notes: string;
+};
 
 interface EditDialogProps {
   open: boolean;
