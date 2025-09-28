@@ -87,3 +87,57 @@ export interface Contact {
 //   type: "ulotka" | "plakat" | "broszura" | "zakładka" | "inne";
 //   description: string;
 // }
+
+// Educational Task Types
+export interface Media {
+  title: string;
+  link: string;
+  platform: string;
+}
+
+export interface Material {
+  type: string; // Will be one of MATERIAL_TYPES labels
+  name: string;
+  distributedCount: number; // Ilość rozdanych egzemplarzy
+}
+
+export interface Activity {
+  type: string; // Will be one of TASK_TYPES labels
+  title: string;
+  actionCount: number; // Ilość działań (domyślnie 1)
+  audienceCount: number; // Ilość odbiorców
+  description: string;
+  media?: Media;
+  materials?: Material[]; // Materiały dla dystrybucji
+}
+
+export interface EducationalTask {
+  id: string;
+  title: string;
+  programName: string;
+  date: string;
+  schoolId: string; // ID szkoły z Firebase
+  referenceId?: string; // odwołanie do sprawy, jeśli jest powiązana
+  activities: Activity[];
+  createdBy: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateEducationalTaskFormData {
+  title: string;
+  programName: string;
+  date: string;
+  schoolId: string;
+  referenceId?: string;
+  activities: Activity[];
+}
+
+export interface EditEducationalTaskFormData extends CreateEducationalTaskFormData {
+  id: string;
+}
+
+// User Types
+export interface User {
+  email: string | null;
+}
