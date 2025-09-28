@@ -155,31 +155,31 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, o
                 backgroundColor: "#fafafa",
               }}
             >
-                {schoolTypes.map(([key, label]) => (
-                  <FormControlLabel
-                    key={key}
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={selectedTypes.includes(key)}
-                        onChange={(e) => handleTypeChange(key, e.target.checked)}
-                        sx={{
-                          py: 0.5,
-                          "& .MuiSvgIcon-root": { fontSize: "1rem" },
-                        }}
-                      />
-                    }
-                    label={label}
-                    sx={{
+              {schoolTypes.map(([key, label]) => (
+                <FormControlLabel
+                  key={key}
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={selectedTypes.includes(key as (typeof selectedTypes)[number])}
+                      onChange={(e) => handleTypeChange(key as (typeof selectedTypes)[number], e.target.checked)}
+                      sx={{
+                        py: 0.5,
+                        "& .MuiSvgIcon-root": { fontSize: "1rem" },
+                      }}
+                    />
+                  }
+                  label={label}
+                  sx={{
+                    fontSize: "0.8rem",
+                    margin: 0,
+                    "& .MuiFormControlLabel-label": {
                       fontSize: "0.8rem",
-                      margin: 0,
-                      "& .MuiFormControlLabel-label": {
-                        fontSize: "0.8rem",
-                        lineHeight: 1.2,
-                      },
-                    }}
-                  />
-                ))}
+                      lineHeight: 1.2,
+                    },
+                  }}
+                />
+              ))}
             </Box>
           </FormGroup>
           {errors.type && (
@@ -188,7 +188,6 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, o
             </Typography>
           )}
         </Box>
-
       </Stack>
     </Box>
   );
@@ -198,7 +197,7 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, o
       open={true}
       onClose={onClose}
       title={title}
-      onSave={handleSubmit}
+      onSave={onSave ? handleSubmit : undefined}
       loading={loading}
       saveText={isEditMode ? "Zapisz zmiany" : "Dodaj szkołę"}
       cancelText="Anuluj"

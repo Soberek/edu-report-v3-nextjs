@@ -52,7 +52,11 @@ export const useSchoolForm = ({ mode, school, onSubmit }: UseSchoolFormProps) =>
     if (checked) {
       setValue("type", [...currentTypes, typeKey], { shouldValidate: true });
     } else {
-      setValue("type", currentTypes.filter(t => t !== typeKey), { shouldValidate: true });
+      setValue(
+        "type",
+        currentTypes.filter((t) => t !== typeKey),
+        { shouldValidate: true }
+      );
     }
   };
 
