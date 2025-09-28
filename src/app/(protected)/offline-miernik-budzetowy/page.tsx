@@ -1,13 +1,14 @@
 "use client";
-import React, { useEffect } from "react";
-import { Box, Typography, Alert, Button, CircularProgress, Container } from "@mui/material";
-import { PlayArrow, BarChart } from "@mui/icons-material";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import { Box, Typography, Alert, Button, CircularProgress, Container, Tabs, Tab } from "@mui/material";
+import { PlayArrow, BarChart, TableChart, Assessment } from "@mui/icons-material";
 
 import { useBudgetMeter } from "./hooks/useBudgetMeter";
-import { StatsCard, MonthSelector, FileUploader, DataTable, AdvancedStats } from "./components";
+import { StatsCard, MonthSelector, FileUploader, DataTable, AdvancedStats, BarCharts } from "./components";
 
 const OfflineMiernik: React.FC = () => {
+  const [activeTab, setActiveTab] = useState(0);
+  
   const {
     state,
     handleFileUpload,
@@ -31,6 +32,10 @@ const OfflineMiernik: React.FC = () => {
   }, [state.rawData.length, selectedMonthsCount, state.aggregatedData, processData]);
 
   const currentError = state.fileError || state.monthError || state.processingError;
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -104,77 +109,63 @@ const OfflineMiernik: React.FC = () => {
         >
           <StatsCard icon="📊" label="Ogólna liczba działań" value={state.aggregatedData.allActions} color="primary" />
           <StatsCard icon="👥" label="Ogólna liczba odbiorców" value={state.aggregatedData.allPeople} color="success" />
-          
-          {/* Statistics Page Link */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              padding: 3,
-              backgroundColor: "info.light",
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "info.main",
-              minWidth: 250,
-              transition: "all 0.3s ease",
-              "&:hover": {
-                backgroundColor: "info.main",
-                transform: "translateY(-2px)",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              },
-            }}
-          >
-            <Link
-              href="/offline-miernik-budzetowy/statistics"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                textDecoration: "none",
-                color: "inherit",
-                width: "100%",
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 48,
-                  height: 48,
-                  backgroundColor: "info.main",
-                  borderRadius: "50%",
-                  color: "white",
-                }}
-              >
-                <BarChart />
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.5px", fontSize: "0.75rem" }}>
-                  Statystyki
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: "bold", color: "info.main", lineHeight: 1.2 }}>
-                  Wykresy słupkowe
-                </Typography>
-              </Box>
-            </Link>
-          </Box>
         </Box>
       )}
 
-      {/* Advanced Statistics */}
+      {/* Tabs */}
       {hasValidData && state.aggregatedData && (
-        <AdvancedStats data={state.aggregatedData} selectedMonths={state.selectedMonths} rawData={state.rawData} />
-      )}
+        <Box sx={{ mb: 4 }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="fullWidth"
+            sx={{
+              borderBottom: 1,
+              borderColor: "divider",
+              "& .MuiTab-root": {
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "1rem",
+              },
+            }}
+          >
+            <Tab
+              icon={<Assessment />}
+              label="Zaawansowane statystyki"
+              iconPosition="start"
+              sx={{ minHeight: 60 }}
+            />
+            <Tab
+              icon={<BarChart />}
+              label="Wykresy słupkowe"
+              iconPosition="start"
+              sx={{ minHeight: 60 }}
+            />
+            <Tab
+              icon={<TableChart />}
+              label="Tabela danych"
+              iconPosition="start"
+              sx={{ minHeight: 60 }}
+            />
+          </Tabs>
 
-      {/* Data Table */}
-      {hasValidData && state.aggregatedData && (
-        <DataTable
-          data={state.aggregatedData.aggregated}
-          allActions={state.aggregatedData.allActions}
-          allPeople={state.aggregatedData.allPeople}
-        />
+          {/* Tab Content */}
+          <Box sx={{ mt: 3 }}>
+            {activeTab === 0 && (
+              <AdvancedStats data={state.aggregatedData} selectedMonths={state.selectedMonths} rawData={state.rawData} />
+            )}
+            {activeTab === 1 && (
+              <BarCharts rawData={state.rawData} selectedMonths={state.selectedMonths} />
+            )}
+            {activeTab === 2 && (
+              <DataTable
+                data={state.aggregatedData.aggregated}
+                allActions={state.aggregatedData.allActions}
+                allPeople={state.aggregatedData.allPeople}
+              />
+            )}
+          </Box>
+        </Box>
       )}
 
       {/* Empty State */}
