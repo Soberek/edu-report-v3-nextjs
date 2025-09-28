@@ -150,11 +150,21 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({
 
         {/* School Types */}
         <Box>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600, fontSize: "0.9rem" }}>
             Typ szkoły *
           </Typography>
           <FormGroup>
-            <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 1 }}>
+            <Box sx={{ 
+              display: "grid", 
+              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", 
+              gap: 0.5,
+              maxHeight: 120,
+              overflowY: "auto",
+              p: 1,
+              border: "1px solid #e0e0e0",
+              borderRadius: 1,
+              backgroundColor: "#fafafa"
+            }}>
               {schoolTypes.map(([key, label]) => (
                 <FormControlLabel
                   key={key}
@@ -162,16 +172,27 @@ export const SchoolForm: React.FC<SchoolFormProps> = ({
                     <Checkbox
                       size="small"
                       onChange={(e) => handleTypeChange(key, e.target.checked)}
+                      sx={{ 
+                        py: 0.5,
+                        "& .MuiSvgIcon-root": { fontSize: "1rem" }
+                      }}
                     />
                   }
                   label={label}
-                  sx={{ fontSize: "0.9rem" }}
+                  sx={{ 
+                    fontSize: "0.8rem",
+                    margin: 0,
+                    "& .MuiFormControlLabel-label": {
+                      fontSize: "0.8rem",
+                      lineHeight: 1.2
+                    }
+                  }}
                 />
               ))}
             </Box>
           </FormGroup>
           {errors.type && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
+            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block", fontSize: "0.75rem" }}>
               {errors.type.message}
             </Typography>
           )}
