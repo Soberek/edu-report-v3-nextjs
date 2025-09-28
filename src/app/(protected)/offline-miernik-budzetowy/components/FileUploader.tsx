@@ -30,6 +30,14 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(({
     fileInputRef.current?.click();
   };
   
+  const handleReset = () => {
+    // Clear the file input value to allow re-uploading the same file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    onReset();
+  };
+  
   const handleExport = async () => {
     const success = await onExport();
     if (success) {
@@ -89,7 +97,7 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(({
         {fileName && (
           <Button
             variant="outlined"
-            onClick={onReset}
+            onClick={handleReset}
             disabled={isLoading || isProcessing}
             startIcon={<Refresh />}
           >
