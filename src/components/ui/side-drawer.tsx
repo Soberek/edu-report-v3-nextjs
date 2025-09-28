@@ -1,19 +1,19 @@
 "use client";
 import React from "react";
-import { 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
-  Box, 
-  Typography, 
-  Divider, 
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Box,
+  Typography,
+  Divider,
   useTheme,
   Avatar,
   Chip,
-  Stack
+  Stack,
 } from "@mui/material";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -105,7 +105,24 @@ const SideDrawer: React.FC = () => {
         <Box sx={{ flex: 1, py: 2 }}>
           <List sx={{ px: 2 }}>
             {navRoutesToRender.map(({ title, path, category, icon }) => {
-              const isActive = pathname === path || (pathname === "/" && path === "");
+              // Enhanced active path detection
+              const isActive = (() => {
+                // Handle root path
+                if (pathname === "/" && path === "") return true;
+                
+                // Handle exact match
+                if (pathname === path) return true;
+                
+                // Handle nested routes - check if current path starts with the nav path
+                if (path !== "" && pathname.startsWith(path)) {
+                  // Make sure it's not a partial match (e.g., /schedule vs /schedule-edit)
+                  const nextChar = pathname[path.length];
+                  return !nextChar || nextChar === "/";
+                }
+                
+                return false;
+              })();
+              
               return (
                 <ListItem key={title} disablePadding sx={{ mb: 0.5 }}>
                   <ListItemButton
@@ -166,7 +183,7 @@ const SideDrawer: React.FC = () => {
                     >
                       {icon}
                     </ListItemIcon>
-                    <ListItemText 
+                    <ListItemText
                       primary={title}
                       primaryTypographyProps={{
                         fontSize: "0.95rem",
