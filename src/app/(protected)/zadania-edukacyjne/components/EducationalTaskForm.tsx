@@ -44,6 +44,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
       programName: task?.programName || "",
       date: task?.date || "",
       schoolId: task?.schoolId || "",
+      taskNumber: task?.taskNumber || "",
       referenceNumber: task?.referenceNumber || "",
       referenceId: task?.referenceId || "",
       activities: task?.activities || [
@@ -143,11 +144,21 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
 
                 <TaskNumberField
                   control={form.control}
-                  name="referenceNumber"
+                  name="taskNumber"
                   tasks={tasks}
                   editTaskId={mode === "edit" ? task?.id : undefined}
-                  label="Numer referencyjny"
-                  helperText="Unikalny identyfikator zadania"
+                  label="Numer zadania"
+                  helperText="Unikalny numer zadania w formacie: liczba/rok (np. 45/2025)"
+                  required
+                />
+
+                <FormField
+                  name="referenceNumber"
+                  control={form.control}
+                  label="Numer referencyjny dokumentu"
+                  placeholder="np. OZiPZ.966.5.2.2025"
+                  helperText="Formalny numer referencyjny dokumentu"
+                  fullWidth
                   required
                 />
 

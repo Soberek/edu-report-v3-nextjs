@@ -45,7 +45,7 @@ export const generateTaskNumber = (number: number, year: number): string => {
  */
 export const getTaskNumbersForYear = (tasks: EducationalTask[], year: number): number[] => {
   return tasks
-    .map((task) => parseTaskNumber(task.referenceNumber))
+    .map((task) => parseTaskNumber(task.taskNumber))
     .filter(Boolean)
     .filter((parsed) => parsed!.year === year)
     .map((parsed) => parsed!.number)
@@ -63,7 +63,7 @@ export const getUsedTaskNumbers = (tasks: EducationalTask[], year: number, exclu
   return new Set(
     tasks
       .filter((task) => !excludeTaskId || task.id !== excludeTaskId)
-      .map((task) => parseTaskNumber(task.referenceNumber))
+      .map((task) => parseTaskNumber(task.taskNumber))
       .filter(Boolean)
       .filter((parsed) => parsed!.year === year)
       .map((parsed) => parsed!.number)

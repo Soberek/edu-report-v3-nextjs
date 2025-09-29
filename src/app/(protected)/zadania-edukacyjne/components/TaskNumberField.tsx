@@ -177,7 +177,7 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
 
                 <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                   <Typography variant="caption" color="text.secondary">
-                    Całkowita liczba zadań: {tasks.filter((t) => t.referenceNumber.includes(`/${taskNumberManager.year}`)).length}
+                    Całkowita liczba zadań: {tasks.filter((t) => t.taskNumber.includes(`/${taskNumberManager.year}`)).length}
                   </Typography>
 
                   <Typography variant="caption" color="text.secondary">

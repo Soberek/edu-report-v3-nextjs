@@ -27,7 +27,7 @@ interface TaskNumberManager {
   setYear: (year: number) => void;
   generateSuggestions: () => void;
   getNextSuggestion: () => string;
-  validateCurrentNumber: () => void;
+  validateCurrentNumber: () => { isValid: boolean; errorMessage?: string };
   clearError: () => void;
 }
 
@@ -38,7 +38,7 @@ export const useTaskNumberManager = ({
 }: UseTaskNumberManagerProps): TaskNumberManager => {
   const [year, setYear] = useState(initialYear);
   const [currentTaskNumber, setCurrentTaskNumber] = useState(() =>
-    editTaskId ? tasks.find((t) => t.id === editTaskId)?.referenceNumber || "" : `${year}`
+    editTaskId ? tasks.find((t) => t.id === editTaskId)?.taskNumber || "" : `${year}`
   );
 
   const [validationError, setValidationError] = useState<string>("");
@@ -106,6 +106,7 @@ export const useTaskNumberManager = ({
   const validateCurrentNumber = useCallback(() => {
     const result = validateTaskNumber(currentTaskNumber, tasks, editTaskId);
     setValidationError(result.errorMessage || "");
+    return result;
   }, [currentTaskNumber, tasks, editTaskId]);
 
   const clearError = useCallback(() => {
