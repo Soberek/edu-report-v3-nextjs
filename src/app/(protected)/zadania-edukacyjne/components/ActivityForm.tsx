@@ -1,6 +1,6 @@
 import React from "react";
 import { useFieldArray, useFormContext, useWatch, Controller } from "react-hook-form";
-import { Box, Typography, Button, IconButton, Stack, Divider, TextField } from "@mui/material";
+import { Box, Typography, Button, IconButton, Stack, Divider, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import { FormField } from "@/components/shared";
 import { TASK_TYPES } from "@/constants/tasks";
@@ -258,27 +258,30 @@ export const ActivityForm: React.FC = () => {
                 name={`activities.${index}.type`}
                 control={control}
                 render={({ field }) => (
-                  <FormField
-                    {...field}
-                    label="Typ aktywności"
-                    type="select"
-                    required
-                    fullWidth
-                    options={Object.values(TASK_TYPES).map((taskType) => ({
-                      value: taskType.label,
-                      label: taskType.label,
-                    }))}
-                    onChange={(value: string) => {
-                      field.onChange(value);
-                      // Clear materials and media when activity type changes
-                      if (value !== "dystrybucja") {
-                        setValue(`activities.${index}.materials`, []);
-                      }
-                      if (value !== "publikacja media") {
-                        setValue(`activities.${index}.media`, undefined);
-                      }
-                    }}
-                  />
+                  <FormControl fullWidth>
+                    <InputLabel required>Typ aktywności</InputLabel>
+                    <Select
+                      {...field}
+                      label="Typ aktywności"
+                      onChange={(e) => {
+                        const value = e.target.value as string;
+                        field.onChange(value);
+                        // Clear materials and media when activity type changes
+                        if (value !== "dystrybucja") {
+                          setValue(`activities.${index}.materials`, []);
+                        }
+                        if (value !== "publikacja media") {
+                          setValue(`activities.${index}.media`, undefined);
+                        }
+                      }}
+                    >
+                      {Object.values(TASK_TYPES).map((taskType) => (
+                        <MenuItem key={taskType.label} value={taskType.label}>
+                          {taskType.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 )}
               />
 
