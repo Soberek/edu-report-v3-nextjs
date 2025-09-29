@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Typography, Grid, Card, CardContent, useTheme, Chip, Divider } from "@mui/material";
 import { TrendingUp, People, Assignment, CalendarMonth, Assessment, Timeline } from "@mui/icons-material";
-import type { AggregatedData, Month, ExcelRow } from "../types";
-import { MONTH_NAMES } from "../types";
+import type { AggregatedData, Month, ExcelRow } from "../../types";
+import { MONTH_NAMES } from "../../types";
 
 interface AdvancedStatsProps {
   data: AggregatedData;
@@ -164,7 +164,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
 
       {/* Overview Stats */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Średnia działań/miesiąc"
             value={averages.actionsPerMonth}
@@ -173,7 +173,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
             color="primary"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Średnia odbiorców/miesiąc"
             value={averages.peoplePerMonth}
@@ -182,7 +182,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
             color="success"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Średnia działań/program"
             value={averages.actionsPerProgram}
@@ -191,7 +191,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
             color="info"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title="Średnia odbiorców/program"
             value={averages.peoplePerProgram}
@@ -204,7 +204,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
 
       {/* Top Performers */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
@@ -229,7 +229,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
@@ -264,7 +264,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
               .map((month) => {
                 const monthData = monthStats[month.monthNumber];
                 return (
-                  <Grid item xs={12} sm={6} md={4} key={month.monthNumber}>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={month.monthNumber}>
                     <Box
                       sx={{
                         p: 2,
@@ -303,7 +303,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
           </Typography>
           <Grid container spacing={2}>
             {Object.entries(programTypeStats).map(([type, stats]) => (
-              <Grid item xs={12} sm={6} md={4} key={type}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={type}>
                 <Box
                   sx={{
                     p: 3,
