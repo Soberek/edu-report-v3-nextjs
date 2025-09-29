@@ -50,7 +50,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
               {getSchoolName(task.schoolId)}
             </Typography>
           </Box>
-          
+
           <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.85rem", fontStyle: "italic" }}>
             {task.programName}
           </Typography>
