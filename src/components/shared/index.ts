@@ -30,6 +30,7 @@ export type { DataTableAction, DataTableProps } from "./DataTable";
 export type { LoadingSpinnerProps } from "./LoadingSpinner";
 export type { ConfirmDialogProps } from "./ConfirmDialog";
 export type { FormFieldProps } from "./FormField";
+export { getPolishValidationMessage, polishTypographyProps } from "./FormField";
 export type { ActionButtonProps } from "./ActionButton";
 export type { StatsCardProps } from "./StatsCard";
 export type { PageHeaderProps, BreadcrumbItem } from "./PageHeader";
