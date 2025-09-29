@@ -203,8 +203,8 @@ const useTaskOperations = (
           updatedTask.activities.forEach((activity, index) => {
             console.log(`🎯 Activity ${index}:`, {
               type: activity.type,
-              materials: activity.materials,
-              media: activity.media,
+              materials: "materials" in activity ? activity.materials : undefined,
+              media: "media" in activity ? activity.media : undefined,
               hasUndefinedValues: Object.entries(activity).some(([key, value]) => value === undefined),
             });
           });

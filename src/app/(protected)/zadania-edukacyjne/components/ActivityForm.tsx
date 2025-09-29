@@ -4,13 +4,13 @@ import { Box, Typography, Button, IconButton, Stack, Divider, TextField, FormCon
 import { Add, Delete } from "@mui/icons-material";
 import { FormField } from "@/components/shared";
 import { MEDIA_PLATFORMS, MATERIAL_TYPES } from "@/constants/educationalTasks";
-import { 
-  CreateEducationalTaskFormData, 
-  isPresentationActivity, 
-  isDistributionActivity, 
+import {
+  CreateEducationalTaskFormData,
+  isPresentationActivity,
+  isDistributionActivity,
   isMediaPublicationActivity,
   hasAudienceGroups,
-  hasActionCount
+  hasActionCount,
 } from "@/types";
 import { AudienceGroupsForm } from "./AudienceGroupsForm";
 import { MaterialSelector } from "./MaterialSelector";

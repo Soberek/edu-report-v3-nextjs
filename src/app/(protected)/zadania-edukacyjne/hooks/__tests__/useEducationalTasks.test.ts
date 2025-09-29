@@ -71,22 +71,6 @@ const mockTaskData: CreateEducationalTaskFormData = {
           count: 25,
         },
       ],
-      materials: [
-        {
-          id: "ulotka_zdrowie_psychiczne",
-          name: "Ulotka - Zdrowie psychiczne młodzieży",
-          type: "ulotka",
-          distributedCount: 50,
-          description: "Materiały edukacyjne o zdrowiu psychicznym młodzieży",
-        },
-        {
-          id: "plakat_aktywnosc_fizyczna",
-          name: "Plakat - Aktywność fizyczna",
-          type: "plakat",
-          distributedCount: 10,
-          description: "Promocja aktywności fizycznej wśród młodzieży",
-        },
-      ],
     },
   ],
 };

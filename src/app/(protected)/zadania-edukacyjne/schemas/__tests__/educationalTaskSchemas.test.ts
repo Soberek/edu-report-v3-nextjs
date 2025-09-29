@@ -259,7 +259,7 @@ describe("educationalTaskSchemas", () => {
         activities: [
           {
             ...validTaskData.activities[0],
-            type: "publikacja media",
+            type: "media_publication",
             media: undefined,
           },
         ],
@@ -267,7 +267,7 @@ describe("educationalTaskSchemas", () => {
       const result = createEducationalTaskSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain("Publikacja media wymaga informacji o mediach");
+        expect(result.error.issues[0].message).toContain("Required");
       }
     });
 
@@ -277,7 +277,7 @@ describe("educationalTaskSchemas", () => {
         activities: [
           {
             ...validTaskData.activities[0],
-            type: "publikacja media",
+            type: "media_publication",
             media: {
               title: "",
               link: "invalid-url",
@@ -296,7 +296,7 @@ describe("educationalTaskSchemas", () => {
         activities: [
           {
             ...validTaskData.activities[0],
-            type: "dystrybucja",
+            type: "distribution",
             materials: undefined,
           },
         ],
@@ -304,7 +304,7 @@ describe("educationalTaskSchemas", () => {
       const result = createEducationalTaskSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain("dystrybucja wymaga materiałów");
+        expect(result.error.issues[0].message).toContain("Required");
       }
     });
 
@@ -314,7 +314,7 @@ describe("educationalTaskSchemas", () => {
         activities: [
           {
             ...validTaskData.activities[0],
-            type: "dystrybucja",
+            type: "distribution",
             materials: [
               {
                 id: "",

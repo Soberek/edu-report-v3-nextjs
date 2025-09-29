@@ -34,10 +34,7 @@ const baseActivitySchema = z.object({
 // Schemas for specific activity types
 const presentationActivitySchema = baseActivitySchema.extend({
   type: z.literal("presentation"),
-  actionCount: z.coerce
-    .number()
-    .min(1, "Ilość działań musi być co najmniej 1")
-    .max(100, "Ilość działań nie może przekraczać 100"),
+  actionCount: z.coerce.number().min(1, "Ilość działań musi być co najmniej 1").max(100, "Ilość działań nie może przekraczać 100"),
   audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
 });
 
@@ -50,7 +47,11 @@ const distributionActivitySchema = baseActivitySchema.extend({
 const mediaPublicationActivitySchema = baseActivitySchema.extend({
   type: z.literal("media_publication"),
   media: mediaSchema,
-  estimatedReach: z.coerce.number().min(1, "Szacowany zasięg musi być większy od 0").max(10000000, "Zasięg nie może przekraczać 10 milionów").optional(),
+  estimatedReach: z.coerce
+    .number()
+    .min(1, "Szacowany zasięg musi być większy od 0")
+    .max(10000000, "Zasięg nie może przekraczać 10 milionów")
+    .optional(),
 });
 
 const educationalInfoStandActivitySchema = baseActivitySchema.extend({
@@ -68,10 +69,7 @@ const monthlyReportActivitySchema = baseActivitySchema.extend({
 
 const lectureActivitySchema = baseActivitySchema.extend({
   type: z.literal("lecture"),
-  actionCount: z.coerce
-    .number()
-    .min(1, "Ilość działań musi być co najmniej 1")
-    .max(100, "Ilość działań nie może przekraczać 100"),
+  actionCount: z.coerce.number().min(1, "Ilość działań musi być co najmniej 1").max(100, "Ilość działań nie może przekraczać 100"),
   audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
 });
 
