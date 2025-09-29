@@ -17,6 +17,7 @@ import { usePrograms } from "@/hooks/useProgram";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
 import { schoolTypes } from "@/constants";
+import { suggestNextTaskNumber } from "../utils/taskNumberUtils";
 
 interface EducationalTaskFormProps {
   mode: "create" | "edit";
@@ -37,6 +38,18 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
 
   const [selectedSchoolId, setSelectedSchoolId] = React.useState<string>("");
 
+  // Calculate default task number for new tasks
+  const defaultTaskNumber = React.useMemo(() => {
+    if (task?.taskNumber) {
+      return task.taskNumber; // For edit mode, use existing task number
+    }
+    // For create mode, suggest next available number for current year
+    if (tasks?.length) {
+      return suggestNextTaskNumber(tasks, new Date().getFullYear());
+    }
+    return "1/2025"; // Fallback default
+  }, [task?.taskNumber, tasks]);
+
   const form = useForm({
     resolver: zodResolver(createEducationalTaskSchema),
     defaultValues: {
@@ -44,7 +57,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
       programName: task?.programName || "",
       date: task?.date || "",
       schoolId: task?.schoolId || "",
-      taskNumber: task?.taskNumber || "",
+      taskNumber: defaultTaskNumber,
       referenceNumber: task?.referenceNumber || "",
       referenceId: task?.referenceId || "",
       activities: task?.activities || [
