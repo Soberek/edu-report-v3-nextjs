@@ -267,7 +267,7 @@ describe("educationalTaskSchemas", () => {
       const result = createEducationalTaskSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain("Required");
+        expect(result.error.issues[0].message).toContain("expected object, received undefined");
       }
     });
 
@@ -304,7 +304,7 @@ describe("educationalTaskSchemas", () => {
       const result = createEducationalTaskSchema.safeParse(data);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain("Required");
+        expect(result.error.issues[0].message).toContain("expected array, received undefined");
       }
     });
 
