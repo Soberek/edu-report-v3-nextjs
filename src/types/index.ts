@@ -88,7 +88,16 @@ export interface Contact {
 //   description: string;
 // }
 
-// Educational Task Types
+// Podstawowe typy
+export type AudienceType = "dorośli" | "młodzież" | "dzieci" | "seniorzy";
+
+export interface AudienceGroup {
+  id: string;
+  name: string; // np. "Grupa I"
+  type: AudienceType;
+  count: number;
+}
+
 export interface Media {
   title: string;
   link: string;
@@ -96,61 +105,85 @@ export interface Media {
 }
 
 export interface Material {
-  id: string; // ID z EDUCATIONAL_MATERIALS lub wybrane przez użytkownika
-  name: string;
-  type: string; // Will be one of MATERIAL_TYPES labels
-  distributedCount: number; // Ilość rozdanych egzemplarzy
-  description?: string; // Opcjonalny opis dodany przez użytkownika
-}
-
-export interface Activity {
-  type: string; // Will be one of TASK_TYPES labels
-  title: string;
-  actionCount: number; // Ilość działań (domyślnie 1)
-  audienceCount: number; // Ilość odbiorców (DEPRECATED - use audienceGroups)
-  description: string;
-  audienceGroups: AudienceGroup[]; // Grupy odbiorców dla tej aktywności
-  media?: Media;
-  materials?: Material[]; // Materiały dla dystrybucji
-}
-
-export type AudienceType = "dorośli" | "młodzież" | "dzieci" | "seniorzy";
-
-export interface AudienceGroup {
   id: string;
-  name: string; // np. "Grupa I"
-  type: AudienceType; // typ odbiorcy
-  count: number; // liczba osób
+  name: string;
+  type: string;
+  distributedCount: number;
+  description?: string;
 }
 
+// Typy aktywności - każdy z własnymi wymaganymi polami
+export interface PresentationActivity {
+  type: "presentation";
+  title: string;
+  actionCount: number; // liczba przeprowadzonych prelekcji
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface DistributionActivity {
+  type: "distribution";
+  title: string;
+  description: string;
+  materials: Material[]; // WYMAGANE dla dystrybucji
+  audienceGroups: AudienceGroup[];
+}
+
+export interface MediaPublicationActivity {
+  type: "media_publication";
+  title: string;
+  description: string;
+  media: Media; // WYMAGANE dla publikacji
+  // Media nie mają audienceGroups - zasięg jest określony przez platformę
+  estimatedReach?: number; // opcjonalny szacowany zasięg
+}
+
+// Union type dla wszystkich aktywności
+export type Activity = PresentationActivity | DistributionActivity | MediaPublicationActivity;
+
+// Główna struktura zadania
 export interface EducationalTask {
   id: string;
   title: string;
   programName: string;
   date: string;
-  schoolId: string; // ID szkoły z Firebase
-  taskNumber: string; // Numer zadania (np. 45/2025)
-  referenceNumber: string; // Numer referencyjny dokumentu (np. OZiPZ.966.5.2.2025)
-  referenceId?: string; // odwołanie do sprawy, która jest powiązana
-  activities: Activity[];
+  schoolId: string;
+  taskNumber: string; // np. 45/2025
+  referenceNumber: string; // np. OZiPZ.966.5.2.2025
+  referenceId?: string;
+  activities: Activity[]; // Może zawierać mix różnych typów
   createdBy: string;
   createdAt: string;
   updatedAt?: string;
 }
 
+// Formularze
 export interface CreateEducationalTaskFormData {
   title: string;
   programName: string;
   date: string;
   schoolId: string;
-  taskNumber: string; // Numer zadania (np. 45/2025)
-  referenceNumber: string; // Numer referencyjny dokumentu (np. OZiPZ.966.5.2.2025)
+  taskNumber: string;
+  referenceNumber: string;
   referenceId?: string;
   activities: Activity[];
 }
 
 export interface EditEducationalTaskFormData extends CreateEducationalTaskFormData {
   id: string;
+}
+
+// Type guards dla łatwiejszej pracy z union types
+export function isPresentationActivity(activity: Activity): activity is PresentationActivity {
+  return activity.type === "presentation";
+}
+
+export function isDistributionActivity(activity: Activity): activity is DistributionActivity {
+  return activity.type === "distribution";
+}
+
+export function isMediaPublicationActivity(activity: Activity): activity is MediaPublicationActivity {
+  return activity.type === "media_publication";
 }
 
 // User Types

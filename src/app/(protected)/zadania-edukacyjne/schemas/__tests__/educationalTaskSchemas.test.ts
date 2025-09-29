@@ -11,10 +11,9 @@ describe("educationalTaskSchemas", () => {
     referenceNumber: "TEST.001.2025",
     activities: [
       {
-        type: "prelekcja",
+        type: "presentation",
         title: "Test Activity",
         actionCount: 1,
-        audienceCount: 30,
         description: "Test description",
         audienceGroups: [
           {
@@ -172,7 +171,6 @@ describe("educationalTaskSchemas", () => {
           {
             ...validTaskData.activities[0],
             actionCount: "5",
-            audienceCount: "30",
           },
         ],
       };
@@ -180,7 +178,6 @@ describe("educationalTaskSchemas", () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.activities[0].actionCount).toBe(5);
-        expect(result.data.activities[0].audienceCount).toBe(30);
       }
     });
 

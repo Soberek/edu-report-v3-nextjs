@@ -128,10 +128,7 @@ export const SimplifiedEducationalTaskForm: React.FC<SimplifiedEducationalTaskFo
 
                 <FormControl fullWidth error={!!form.formState.errors.programName}>
                   <InputLabel required>Nazwa programu</InputLabel>
-                  <Select
-                    {...form.register("programName")}
-                    label="Nazwa programu"
-                  >
+                  <Select {...form.register("programName")} label="Nazwa programu">
                     {programs.map((program) => (
                       <MenuItem key={program.id} value={program.name}>
                         {program.name}
@@ -183,10 +180,7 @@ export const SimplifiedEducationalTaskForm: React.FC<SimplifiedEducationalTaskFo
 
                 <FormControl fullWidth error={!!form.formState.errors.schoolId}>
                   <InputLabel required>Szkoła</InputLabel>
-                  <Select
-                    {...form.register("schoolId")}
-                    label="Szkoła"
-                  >
+                  <Select {...form.register("schoolId")} label="Szkoła">
                     {schools?.map((school) => (
                       <MenuItem key={school.id} value={school.id}>
                         {school.name} - {school.address}, {school.city}
@@ -210,10 +204,7 @@ export const SimplifiedEducationalTaskForm: React.FC<SimplifiedEducationalTaskFo
               <Stack spacing={2}>
                 <FormControl fullWidth error={!!form.formState.errors.activityType}>
                   <InputLabel required>Typ aktywności</InputLabel>
-                  <Select
-                    {...form.register("activityType")}
-                    label="Typ aktywności"
-                  >
+                  <Select {...form.register("activityType")} label="Typ aktywności">
                     {ACTIVITY_TYPES.map((type) => (
                       <MenuItem key={type.value} value={type.value}>
                         {type.label}
@@ -270,12 +261,7 @@ export const SimplifiedEducationalTaskForm: React.FC<SimplifiedEducationalTaskFo
                 )}
 
                 {form.watch("activityType") === "publikacja" && (
-                  <TextField
-                    {...form.register("mediaLink")}
-                    label="Link do publikacji"
-                    placeholder="https://..."
-                    fullWidth
-                  />
+                  <TextField {...form.register("mediaLink")} label="Link do publikacji" placeholder="https://..." fullWidth />
                 )}
               </Stack>
             </Box>

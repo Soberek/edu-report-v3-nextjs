@@ -480,7 +480,7 @@ export default function EducationalTasks(): React.ReactNode {
                                       Odbiorców:
                                     </Typography>
                                     <Typography variant="body2" color="text.primary" fontWeight="bold">
-                                      {activity.audienceCount}
+                                      {activity.audienceGroups?.reduce((total, group) => total + group.count, 0) || 0}
                                     </Typography>
                                   </Box>
                                 </Box>

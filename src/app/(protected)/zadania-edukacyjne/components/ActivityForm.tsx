@@ -3,9 +3,8 @@ import { useFieldArray, useFormContext, useWatch, Controller } from "react-hook-
 import { Box, Typography, Button, IconButton, Stack, Divider, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import { FormField } from "@/components/shared";
-import { TASK_TYPES } from "@/constants/tasks";
 import { MEDIA_PLATFORMS, MATERIAL_TYPES } from "@/constants/educationalTasks";
-import { CreateEducationalTaskFormData } from "@/types";
+import { CreateEducationalTaskFormData, isPresentationActivity, isDistributionActivity, isMediaPublicationActivity } from "@/types";
 import { AudienceGroupsForm } from "./AudienceGroupsForm";
 import { MaterialSelector } from "./MaterialSelector";
 
@@ -207,13 +206,13 @@ export const ActivityForm: React.FC = () => {
 
   const addActivity = () => {
     append({
-      type: "prelekcja",
+      type: "presentation",
       title: "",
       description: "",
       actionCount: 1,
-      audienceCount: 0,
       audienceGroups: [
         {
+          id: `group-${Date.now()}`,
           name: "Grupa I",
           type: "dorośli",
           count: 30,
@@ -238,9 +237,10 @@ export const ActivityForm: React.FC = () => {
       </Box>
 
       {fields.map((field, index) => {
-        const activityType = watchedActivities?.[index]?.type;
-        const isPublication = activityType === "publikacja media";
-        const isDistribution = activityType === "dystrybucja";
+        const activity = watchedActivities?.[index];
+        const isPresentation = activity && isPresentationActivity(activity);
+        const isDistribution = activity && isDistributionActivity(activity);
+        const isMediaPublication = activity && isMediaPublicationActivity(activity);
 
         return (
           <Box key={field.id} sx={{ mb: 3, p: 2, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
@@ -268,21 +268,19 @@ export const ActivityForm: React.FC = () => {
                         console.log(`🔄 Activity ${index} type changed to:`, value);
                         field.onChange(value);
                         // Clear materials and media when activity type changes
-                        if (value !== "dystrybucja") {
+                        if (value !== "distribution") {
                           console.log(`🧹 Clearing materials for activity ${index}`);
                           setValue(`activities.${index}.materials`, []);
                         }
-                        if (value !== "publikacja media") {
+                        if (value !== "media_publication") {
                           console.log(`🧹 Clearing media for activity ${index}`);
                           setValue(`activities.${index}.media`, undefined);
                         }
                       }}
                     >
-                      {Object.values(TASK_TYPES).map((taskType) => (
-                        <MenuItem key={taskType.label} value={taskType.label}>
-                          {taskType.label}
-                        </MenuItem>
-                      ))}
+                      <MenuItem value="presentation">Prelekcja</MenuItem>
+                      <MenuItem value="distribution">Dystrybucja</MenuItem>
+                      <MenuItem value="media_publication">Publikacja media</MenuItem>
                     </Select>
                   </FormControl>
                 )}
@@ -290,48 +288,38 @@ export const ActivityForm: React.FC = () => {
 
               <FormField name={`activities.${index}.title`} control={control} label="Tytuł aktywności" required fullWidth />
 
-              <Controller
-                name={`activities.${index}.actionCount`}
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Ilość działań"
-                    type="number"
-                    required
-                    fullWidth
-                    inputProps={{ min: 1, max: 100 }}
-                    onChange={(e) => field.onChange(Number(e.target.value) || 1)}
-                  />
-                )}
-              />
-
-              <Controller
-                name={`activities.${index}.audienceCount`}
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Ilość odbiorców"
-                    type="number"
-                    required
-                    fullWidth
-                    inputProps={{ min: 0, max: 10000 }}
-                    onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                  />
-                )}
-              />
+              {isPresentation && (
+                <Controller
+                  name={`activities.${index}.actionCount`}
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Ilość działań"
+                      type="number"
+                      required
+                      fullWidth
+                      inputProps={{ min: 1, max: 100 }}
+                      onChange={(e) => field.onChange(Number(e.target.value) || 1)}
+                    />
+                  )}
+                />
+              )}
 
               <FormField name={`activities.${index}.description`} control={control} label="Opis" multiline rows={2} required fullWidth />
 
-              <Divider />
-              <Typography variant="subtitle2" fontWeight="bold" color="primary" sx={{ mt: 2, mb: 1 }}>
-                Grupy odbiorców dla tej aktywności
-              </Typography>
+              {(isPresentation || isDistribution) && (
+                <>
+                  <Divider />
+                  <Typography variant="subtitle2" fontWeight="bold" color="primary" sx={{ mt: 2, mb: 1 }}>
+                    Grupy odbiorców dla tej aktywności
+                  </Typography>
 
-              <ActivityAudienceGroups activityIndex={index} />
+                  <ActivityAudienceGroups activityIndex={index} />
+                </>
+              )}
 
-              {isPublication && (
+              {isMediaPublication && (
                 <>
                   <Divider />
                   <Typography variant="subtitle2" fontWeight="bold" color="primary">
@@ -358,6 +346,14 @@ export const ActivityForm: React.FC = () => {
                     label="Link do publikacji"
                     type="text"
                     required
+                    fullWidth
+                  />
+                  
+                  <FormField
+                    name={`activities.${index}.estimatedReach`}
+                    control={control}
+                    label="Szacowany zasięg (opcjonalny)"
+                    type="number"
                     fullWidth
                   />
                 </>

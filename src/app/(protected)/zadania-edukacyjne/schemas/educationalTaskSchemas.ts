@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { TASK_TYPES } from "@/constants/tasks";
 import { MEDIA_PLATFORMS, MATERIAL_TYPES } from "@/constants/educationalTasks";
 
 const mediaSchema = z.object({
@@ -26,43 +25,40 @@ const audienceGroupSchema = z.object({
   count: z.coerce.number().min(1, "Liczba osób musi być większa od 0").max(1000, "Maksymalnie 1000 osób"),
 });
 
-const activitySchema = z
-  .object({
-    type: z.enum(Object.values(TASK_TYPES).map((taskType) => taskType.label) as [string, ...string[]]),
-    title: z.string().min(1, "Tytuł aktywności jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
-    actionCount: z.coerce.number().min(1, "Ilość działań musi być co najmniej 1").max(100, "Ilość działań nie może przekraczać 100").default(1),
-    audienceCount: z.coerce.number().min(0, "Liczba odbiorców nie może być ujemna").max(10000, "Liczba odbiorców nie może przekraczać 10000"),
-    description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
-    audienceGroups: z.array(audienceGroupSchema).optional().default([]),
-    media: mediaSchema.optional(),
-    materials: z.array(materialSchema).optional(),
-  })
-  .refine(
-    (data) => {
-      // If type is "publikacja media", media is required
-      if (data.type === "publikacja media" && !data.media) {
-        return false;
-      }
-      // If type is not "publikacja media", media should not be present
-      if (data.type !== "publikacja media" && data.media) {
-        return false;
-      }
-      // If type is "dystrybucja", materials are required
-      if (data.type === "dystrybucja" && (!data.materials || data.materials.length === 0)) {
-        return false;
-      }
-      // If type is not "dystrybucja", materials should not be present
-      if (data.type !== "dystrybucja" && data.materials) {
-        return false;
-      }
-      return true;
-    },
-    {
-      message:
-        "Publikacja media wymaga informacji o mediach, dystrybucja wymaga materiałów, inne typy aktywności nie powinny mieć tych informacji",
-      path: ["media", "materials"],
-    }
-  );
+// Schemas for specific activity types
+const presentationActivitySchema = z.object({
+  type: z.literal("presentation"),
+  title: z.string().min(1, "Tytuł aktywności jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
+  actionCount: z.coerce
+    .number()
+    .min(1, "Ilość działań musi być co najmniej 1")
+    .max(100, "Ilość działań nie może przekraczać 100"),
+  description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const distributionActivitySchema = z.object({
+  type: z.literal("distribution"),
+  title: z.string().min(1, "Tytuł aktywności jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
+  description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
+  materials: z.array(materialSchema).min(1, "Dodaj co najmniej jeden materiał"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const mediaPublicationActivitySchema = z.object({
+  type: z.literal("media_publication"),
+  title: z.string().min(1, "Tytuł aktywności jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
+  description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
+  media: mediaSchema,
+  estimatedReach: z.coerce.number().min(1, "Szacowany zasięg musi być większy od 0").max(10000000, "Zasięg nie może przekraczać 10 milionów").optional(),
+});
+
+// Union schema for all activity types
+const activitySchema = z.discriminatedUnion("type", [
+  presentationActivitySchema,
+  distributionActivitySchema,
+  mediaPublicationActivitySchema,
+]);
 
 export const createEducationalTaskSchema = z.object({
   title: z.string().min(1, "Tytuł zadania jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),

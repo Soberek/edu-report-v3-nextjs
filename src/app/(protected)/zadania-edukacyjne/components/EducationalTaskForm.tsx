@@ -62,15 +62,15 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
       referenceId: task?.referenceId || "",
       activities: task?.activities || [
         {
-          type: "prelekcja",
+          type: "presentation",
           title: "",
           description: "",
           actionCount: 1,
-          audienceCount: 0,
           audienceGroups: task
             ? []
             : [
                 {
+                  id: `group-${Date.now()}`,
                   name: "Grupa I",
                   type: "dorośli" as const,
                   count: 30,
@@ -83,7 +83,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
 
   const handleFormSubmit = async (data: any) => {
     console.log("📋 Form submitted with data:", data);
-    
+
     // Check for validation errors
     const formErrors = form.formState.errors;
     if (Object.keys(formErrors).length > 0) {
@@ -91,7 +91,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
       // Don't submit if there are validation errors
       return;
     }
-    
+
     try {
       await onSave(data as CreateEducationalTaskFormData);
       console.log("✅ Form saved successfully");
@@ -234,7 +234,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
             {/* Activities */}
             <Box>
               <ActivityForm />
-              
+
               {/* Display form validation errors */}
               {form.formState.errors.activities && (
                 <Alert severity="error" sx={{ mt: 2 }}>

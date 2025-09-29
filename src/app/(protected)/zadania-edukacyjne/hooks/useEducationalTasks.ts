@@ -80,9 +80,9 @@ export const taskUtils = {
     const deepClean = (obj: any): any => {
       if (obj === null || obj === undefined) return null;
       if (Array.isArray(obj)) {
-        return obj.map(deepClean).filter(item => item !== null && item !== undefined);
+        return obj.map(deepClean).filter((item) => item !== null && item !== undefined);
       }
-      if (typeof obj === 'object') {
+      if (typeof obj === "object") {
         const cleaned: any = {};
         for (const [key, value] of Object.entries(obj)) {
           if (value !== undefined) {
@@ -96,7 +96,7 @@ export const taskUtils = {
       }
       return obj;
     };
-    
+
     const cleanedTaskData = deepClean(taskData);
 
     return {
