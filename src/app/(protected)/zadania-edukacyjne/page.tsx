@@ -1,39 +1,32 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useReducer, useMemo } from "react";
 import { Container, Box, Typography, Collapse, Chip, FormControl, InputLabel, Select, MenuItem, Stack } from "@mui/material";
 import { Add, ExpandMore, ExpandLess, FilterList } from "@mui/icons-material";
 import { PageHeader, PrimaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
 import { useEducationalTasks } from "./hooks/useEducationalTasks";
 import { EducationalTaskForm } from "./components";
-import { CreateEducationalTaskFormData, EducationalTask } from "@/types";
+import { CreateEducationalTaskFormData } from "@/types";
+import { INITIAL_PAGE_STATE } from "./types";
+import { educationalTasksPageReducer, actions } from "./reducers/educationalTasksPageReducer";
+import type { EducationalTask } from "@/types";
 
 export default function EducationalTasks(): React.ReactNode {
   const { tasks, loading, error, createTask, updateTask, deleteTask, clearError } = useEducationalTasks();
   const { showConfirm, ConfirmDialog } = useConfirmDialog();
 
-  const [openForm, setOpenForm] = useState(false);
-  const [editTask, setEditTask] = useState<EducationalTask | null>(null);
-  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
-  const [filters, setFilters] = useState({
-    year: "",
-    month: "",
-    program: "",
-    activityType: "",
-  });
+  // Centralized state management with useReducer
+  const [state, dispatch] = useReducer(educationalTasksPageReducer, INITIAL_PAGE_STATE);
+
+  // Destructure state for easier access
+  const { openForm, editTask, expandedTasks, filters } = state;
 
   const handleAddTask = () => {
-    setEditTask(null);
-    setOpenForm(true);
-  };
-
-  const handleFormClose = () => {
-    setOpenForm(false);
-    setEditTask(null);
+    dispatch(actions.setEditTask(null));
+    dispatch(actions.setFormOpen(true));
   };
 
   const handleEditTask = (task: EducationalTask) => {
-    setEditTask(task);
-    setOpenForm(true);
+    dispatch(actions.setEditTask(task));
   };
 
   const handleDeleteTask = (id: string) => {
@@ -52,28 +45,18 @@ export default function EducationalTasks(): React.ReactNode {
       } else {
         await createTask(data as CreateEducationalTaskFormData);
       }
-      setOpenForm(false);
-      setEditTask(null);
+      dispatch(actions.setFormClosed());
     } catch (error) {
       console.error("Error saving task:", error);
     }
   };
 
   const handleFormClose = () => {
-    setOpenForm(false);
-    setEditTask(null);
+    dispatch(actions.setFormClosed());
   };
 
   const toggleTaskExpansion = (taskId: string) => {
-    setExpandedTasks((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(taskId)) {
-        newSet.delete(taskId);
-      } else {
-        newSet.add(taskId);
-      }
-      return newSet;
-    });
+    dispatch(actions.toggleTaskExpansion(taskId));
   };
 
   // Filter and group tasks
@@ -166,7 +149,7 @@ export default function EducationalTasks(): React.ReactNode {
         <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Rok</InputLabel>
-            <Select value={filters.year} label="Rok" onChange={(e) => setFilters((prev) => ({ ...prev, year: e.target.value }))}>
+            <Select value={filters.year} label="Rok" onChange={(e) => dispatch(actions.setFilter("year", e.target.value))}>
               <MenuItem value="">Wszystkie</MenuItem>
               {filterOptions.years.map((year) => (
                 <MenuItem key={year} value={year.toString()}>
@@ -178,7 +161,7 @@ export default function EducationalTasks(): React.ReactNode {
 
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Miesiąc</InputLabel>
-            <Select value={filters.month} label="Miesiąc" onChange={(e) => setFilters((prev) => ({ ...prev, month: e.target.value }))}>
+            <Select value={filters.month} label="Miesiąc" onChange={(e) => dispatch(actions.setFilter("month", e.target.value))}>
               <MenuItem value="">Wszystkie</MenuItem>
               {monthNames.map((month, index) => (
                 <MenuItem key={index} value={(index + 1).toString()}>
@@ -190,7 +173,7 @@ export default function EducationalTasks(): React.ReactNode {
 
           <FormControl size="small" sx={{ minWidth: 200 }}>
             <InputLabel>Program</InputLabel>
-            <Select value={filters.program} label="Program" onChange={(e) => setFilters((prev) => ({ ...prev, program: e.target.value }))}>
+            <Select value={filters.program} label="Program" onChange={(e) => dispatch(actions.setFilter("program", e.target.value))}>
               <MenuItem value="">Wszystkie</MenuItem>
               {filterOptions.programs.map((program) => (
                 <MenuItem key={program} value={program}>
@@ -205,7 +188,7 @@ export default function EducationalTasks(): React.ReactNode {
             <Select
               value={filters.activityType}
               label="Typ aktywności"
-              onChange={(e) => setFilters((prev) => ({ ...prev, activityType: e.target.value }))}
+              onChange={(e) => dispatch(actions.setFilter("activityType", e.target.value))}
             >
               <MenuItem value="">Wszystkie</MenuItem>
               {filterOptions.activityTypes.map((type) => (
@@ -222,7 +205,7 @@ export default function EducationalTasks(): React.ReactNode {
           {filters.year && (
             <Chip
               label={`Rok: ${filters.year}`}
-              onDelete={() => setFilters((prev) => ({ ...prev, year: "" }))}
+              onDelete={() => dispatch(actions.setFilter("year", ""))}
               color="primary"
               variant="outlined"
               size="small"
@@ -231,7 +214,7 @@ export default function EducationalTasks(): React.ReactNode {
           {filters.month && (
             <Chip
               label={`Miesiąc: ${monthNames[parseInt(filters.month) - 1]}`}
-              onDelete={() => setFilters((prev) => ({ ...prev, month: "" }))}
+              onDelete={() => dispatch(actions.setFilter("month", ""))}
               color="primary"
               variant="outlined"
               size="small"
@@ -240,7 +223,7 @@ export default function EducationalTasks(): React.ReactNode {
           {filters.program && (
             <Chip
               label={`Program: ${filters.program}`}
-              onDelete={() => setFilters((prev) => ({ ...prev, program: "" }))}
+              onDelete={() => dispatch(actions.setFilter("program", ""))}
               color="primary"
               variant="outlined"
               size="small"
@@ -249,7 +232,7 @@ export default function EducationalTasks(): React.ReactNode {
           {filters.activityType && (
             <Chip
               label={`Aktywność: ${filters.activityType}`}
-              onDelete={() => setFilters((prev) => ({ ...prev, activityType: "" }))}
+              onDelete={() => dispatch(actions.setFilter("activityType", ""))}
               color="primary"
               variant="outlined"
               size="small"
