@@ -1,94 +1,88 @@
-import { DataGrid } from "@mui/x-data-grid";
-import type { GridColDef } from "@mui/x-data-grid";
-import type { CaseRecord } from "@/types";
-import { Box, IconButton } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import React from "react";
+import { GridColDef } from "@mui/x-data-grid";
+import type { CaseRecord } from "@/types";
+import { DataTable, defaultActions, LoadingSpinner, EmptyState } from "@/components/shared";
+import { Box, Typography, Paper } from "@mui/material";
+import { Description as DescriptionIcon } from "@mui/icons-material";
 
-interface Props {
+interface ActCaseRecordsTableProps {
   caseRecords: CaseRecord[];
   deleteCaseRecord: (caseId: string) => void;
   loading?: boolean;
 }
 
-const baseColumns: GridColDef[] = [
-  { field: "code", headerName: "Code", flex: 1 },
-  { field: "referenceNumber", headerName: "Reference Number", flex: 1 },
-  { field: "title", headerName: "Title", flex: 1 },
-  { field: "comments", headerName: "Comments", flex: 1 },
-  { field: "date", headerName: "Date", flex: 1 },
-  { field: "notes", headerName: "Notes", flex: 1 },
-  { field: "startDate", headerName: "Start Date", flex: 1 },
-  { field: "endDate", headerName: "End Date", flex: 1 },
-  { field: "sender", headerName: "Sender", flex: 1 },
-  {
-    field: "edit",
-    headerName: "Edytuj",
-    flex: 0.5,
-    sortable: false,
-    filterable: false,
-    renderCell: () => (
-      <IconButton
-        sx={{
-          background: "linear-gradient(to right, green, lightgreen)",
-          color: "white",
-          maxWidth: "100%",
-          height: "auto",
-          aspectRatio: "1",
-        }}
-      >
-        <EditIcon fontSize="small" />
-      </IconButton>
-    ),
-  },
-  // The delete column will be added dynamically in the component
+const createColumns = (): GridColDef[] => [
+  { field: "code", headerName: "Kod", flex: 0.8, minWidth: 100 },
+  { field: "referenceNumber", headerName: "Numer referencyjny", flex: 1.5, minWidth: 200 },
+  { field: "title", headerName: "Tytuł", flex: 2, minWidth: 250 },
+  { field: "date", headerName: "Data", flex: 0.8, minWidth: 120 },
+  { field: "startDate", headerName: "Data rozpoczęcia", flex: 0.8, minWidth: 120 },
+  { field: "endDate", headerName: "Data zakończenia", flex: 0.8, minWidth: 120 },
+  { field: "sender", headerName: "Nadawca", flex: 1, minWidth: 150 },
+  { field: "comments", headerName: "Uwagi", flex: 1.2, minWidth: 150 },
 ];
 
-export function ActCaseRecordsTable({ caseRecords, deleteCaseRecord, loading }: Props): React.ReactNode {
+export const ActCaseRecordsTable: React.FC<ActCaseRecordsTableProps> = ({ caseRecords, deleteCaseRecord, loading = false }) => {
+  const columns = createColumns();
+
+  const actions = [defaultActions.delete(deleteCaseRecord)];
+
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner size={48} message="Ładowanie danych..." sx={{ minHeight: 200 }} />;
   }
+
+  if (caseRecords.length === 0) {
+    return <EmptyState title="Brak danych" description="Nie znaleziono żadnych akt spraw" />;
+  }
+
   return (
-    <Box
+    <Paper
+      elevation={0}
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: 1200,
-        width: "100%",
-        mx: "auto",
-        px: 2,
-        my: 2,
+        borderRadius: 3,
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        overflow: "hidden",
       }}
     >
-      <DataGrid
-        rows={caseRecords}
-        columns={[
-          ...baseColumns,
-          {
-            field: "delete",
-            headerName: "Usuń",
-            flex: 0.5,
-            sortable: false,
-            filterable: false,
-            renderCell: (params: { row: CaseRecord }) => (
-              <IconButton
-                sx={{
-                  background: "linear-gradient(to right, red, lightcoral)",
-                  color: "white",
-                  maxWidth: "100%",
-                  height: "auto",
-                  aspectRatio: "1",
-                }}
-                onClick={() => deleteCaseRecord(params.row.id)}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            ),
-          },
-        ]}
-        getRowId={(row) => row.id}
-      />
-    </Box>
+      <Box
+        sx={{
+          background: "rgba(255,255,255,0.9)",
+          backdropFilter: "blur(10px)",
+          p: 2,
+          borderBottom: "1px solid rgba(255,255,255,0.2)",
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: "bold",
+            color: "#2c3e50",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
+          <DescriptionIcon sx={{ color: "#1976d2" }} />
+          Akta spraw ({caseRecords.length})
+        </Typography>
+      </Box>
+
+      <Box sx={{ p: 2, background: "transparent" }}>
+        <DataTable
+          data={caseRecords}
+          columns={columns}
+          actions={actions}
+          loading={loading}
+          height={600}
+          pageSizeOptions={[5, 10, 25, 50]}
+          getRowId={(row) => row.id}
+          sx={{
+            background: "white",
+            borderRadius: 2,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          }}
+        />
+      </Box>
+    </Paper>
   );
-}
+};
