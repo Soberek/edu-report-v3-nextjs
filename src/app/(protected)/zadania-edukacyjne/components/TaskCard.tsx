@@ -5,13 +5,7 @@ import type { TaskCardProps } from "../types";
 import { formatTaskDate } from "../utils";
 import { STYLE_CONSTANTS, BUTTON_LABELS } from "../constants";
 
-export const TaskCard: React.FC<TaskCardProps> = ({
-  task,
-  isExpanded,
-  onToggleExpansion,
-  onEdit,
-  onDelete,
-}) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpansion, onEdit, onDelete }) => {
   const taskDate = formatTaskDate(task.date);
   const activityCount = task.activities.length;
 
@@ -38,19 +32,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             fontWeight: "bold",
           }}
         />
-        <Chip
-          label={task.taskType}
-          size="small"
-          variant="outlined"
-          color="primary"
-        />
+        {task.activities.length > 0 && <Chip label={task.activities[0].type} size="small" variant="outlined" color="primary" />}
       </Box>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {task.taskDescription.length > 150
-          ? `${task.taskDescription.substring(0, 150)}...`
-          : task.taskDescription
-        }
+        {task.title.length > 150 ? `${task.title.substring(0, 150)}...` : task.title}
       </Typography>
     </Box>
   );
@@ -65,16 +51,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2, mb: 2 }}>
           <Box>
             <Typography variant="subtitle2" color="text.secondary">
-              Numer sprawy
+              Numer zadania
             </Typography>
-            <Typography variant="body2">{task.caseNumber || "Brak"}</Typography>
+            <Typography variant="body2">{task.taskNumber || "Brak"}</Typography>
           </Box>
 
           <Box>
             <Typography variant="subtitle2" color="text.secondary">
-              Numer raportu
+              Numer referencyjny
             </Typography>
-            <Typography variant="body2">{task.reportNumber || "Brak"}</Typography>
+            <Typography variant="body2">{task.referenceNumber || "Brak"}</Typography>
           </Box>
         </Box>
 
@@ -84,25 +70,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </Typography>
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
             {task.activities.map((activity, index) => (
-              <Chip
-                key={index}
-                label={activity.type}
-                size="small"
-                variant="outlined"
-                sx={{ mb: 1 }}
-              />
+              <Chip key={index} label={activity.type} size="small" variant="outlined" sx={{ mb: 1 }} />
             ))}
           </Box>
         </Box>
-
-        {task.notes && (
-          <Box>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Notatki
-            </Typography>
-            <Typography variant="body2">{task.notes}</Typography>
-          </Box>
-        )}
       </Box>
     </Collapse>
   );
