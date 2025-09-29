@@ -14,7 +14,7 @@ vi.mock("../../utils/taskNumberUtils", () => ({
   suggestNextTaskNumber: vi.fn(() => "3/2025"),
   getSuggestionsForYear: vi.fn(() => ["3/2025", "4/2025", "5/2025"]),
   generateTaskNumberSuggestions: vi.fn(() => ["3/2025", "4/2025", "5/2025"]),
-  validateTaskNumber: vi.fn((taskNumber: string, tasks: any[], editTaskId?: string) => {
+  validateTaskNumber: vi.fn((taskNumber: string, tasks: EducationalTask[], editTaskId?: string) => {
     // If editing and task number matches the task being edited, it should be valid
     if (editTaskId && taskNumber === "1/2025") {
       return { isValid: true, errorMessage: undefined };

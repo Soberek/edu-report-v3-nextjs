@@ -147,7 +147,7 @@ export const simplifiedTaskUtils = {
 // Custom hook for task operations
 const useSimplifiedTaskOperations = (
   dispatch: React.Dispatch<SimplifiedEducationalTasksAction>,
-  user: any,
+  user: { uid: string } | null,
   createItem: (item: SimplifiedEducationalTask) => Promise<SimplifiedEducationalTask | null>,
   updateItem: (id: string, item: Partial<SimplifiedEducationalTask>) => Promise<boolean>,
   deleteItem: (id: string) => Promise<boolean>

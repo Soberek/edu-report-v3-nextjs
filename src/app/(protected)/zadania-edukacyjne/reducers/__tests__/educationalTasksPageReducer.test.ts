@@ -20,7 +20,7 @@ const mockEducationalTask: EducationalTask = {
 
 describe("educationalTasksPageReducer", () => {
   it("should initialize with correct initial state", () => {
-    const state = educationalTasksPageReducer(INITIAL_PAGE_STATE, { type: "RESET_STATE" } as any);
+    const state = educationalTasksPageReducer(INITIAL_PAGE_STATE, { type: "RESET_STATE" } as EducationalTasksPageAction);
 
     expect(state).toEqual(INITIAL_PAGE_STATE);
     expect(state.openForm).toBe(false);

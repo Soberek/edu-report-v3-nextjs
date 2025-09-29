@@ -81,7 +81,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
     },
   });
 
-  const handleFormSubmit = async (data: any) => {
+  const handleFormSubmit = async (data: Record<string, unknown>) => {
     console.log("📋 Form submitted with data:", data);
 
     // Check for validation errors
@@ -241,7 +241,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
                   <Typography variant="subtitle2" fontWeight="bold">
                     Błędy w aktywnościach:
                   </Typography>
-                  {form.formState.errors.activities.map((activityError: any, index: number) => (
+                  {form.formState.errors.activities.map((activityError: Record<string, unknown>, index: number) => (
                     <Box key={index} sx={{ mt: 1 }}>
                       <Typography variant="body2">
                         <strong>Aktywność {index + 1}:</strong> {activityError.message}

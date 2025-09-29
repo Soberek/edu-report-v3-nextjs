@@ -20,13 +20,13 @@ import { EDUCATIONAL_MATERIALS, MATERIAL_CATEGORY_LABELS, getMaterialById } from
 import type { MaterialItem } from "@/constants/materials";
 
 interface MaterialSelectorProps {
-  control: Control<any, any>;
-  fields: (FieldArrayWithId<any, any, "id"> & {
+  control: Control<Record<string, unknown>>;
+  fields: (FieldArrayWithId<Record<string, unknown>, "materials", "id"> & {
     originalId?: string;
     name?: string;
     type?: string;
   })[];
-  append: (value: any) => void;
+  append: (value: Record<string, unknown>) => void;
   remove: (index: number) => void;
   activityIndex: number;
 }
@@ -231,7 +231,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fie
             Brak materiałów
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Wybierz materiał z listy powyżej i kliknij "Dodaj materiał" aby rozpocząć dystrybucję
+            Wybierz materiał z listy powyżej i kliknij &quot;Dodaj materiał&quot; aby rozpocząć dystrybucję
           </Typography>
           <Button
             variant="contained"

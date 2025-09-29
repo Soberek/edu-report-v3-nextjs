@@ -77,13 +77,13 @@ export const taskUtils = {
   generateTaskId: (): string => `task_${Date.now()}_${Math.random().toString(36).slice(2)}`,
   createTaskFromData: (taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => {
     // Deep clean undefined values to prevent Firebase errors
-    const deepClean = (obj: any): any => {
+    const deepClean = (obj: unknown): unknown => {
       if (obj === null || obj === undefined) return null;
       if (Array.isArray(obj)) {
         return obj.map(deepClean).filter((item) => item !== null && item !== undefined);
       }
       if (typeof obj === "object") {
-        const cleaned: any = {};
+        const cleaned: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(obj)) {
           if (value !== undefined) {
             const cleanedValue = deepClean(value);
@@ -108,13 +108,13 @@ export const taskUtils = {
   },
   updateTaskFromData: (id: string, taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => {
     // Deep clean undefined values to prevent Firebase errors
-    const deepClean = (obj: any): any => {
+    const deepClean = (obj: unknown): unknown => {
       if (obj === null || obj === undefined) return null;
       if (Array.isArray(obj)) {
         return obj.map(deepClean).filter((item) => item !== null && item !== undefined);
       }
       if (typeof obj === "object") {
-        const cleaned: any = {};
+        const cleaned: Record<string, unknown> = {};
         for (const [key, value] of Object.entries(obj)) {
           if (value !== undefined) {
             const cleanedValue = deepClean(value);
@@ -146,7 +146,7 @@ export const taskUtils = {
 // Custom hook for task operations
 const useTaskOperations = (
   dispatch: React.Dispatch<EducationalTasksAction>,
-  user: any,
+  user: { uid: string } | null,
   createItem: (item: EducationalTask) => Promise<EducationalTask | null>,
   updateItem: (id: string, item: Partial<EducationalTask>) => Promise<boolean>,
   deleteItem: (id: string) => Promise<boolean>

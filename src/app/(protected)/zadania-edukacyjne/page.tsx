@@ -38,7 +38,7 @@ export default function EducationalTasks(): React.ReactNode {
     );
   };
 
-  const handleFormSave = async (data: any) => {
+  const handleFormSave = async (data: Record<string, unknown>) => {
     try {
       if (editTask) {
         await updateTask(editTask.id, data as CreateEducationalTaskFormData);

@@ -6,9 +6,9 @@ import { AudienceGroup, CreateEducationalTaskFormData, AudienceType } from "@/ty
 import { FormField, ActionButton } from "@/components/shared";
 
 interface AudienceGroupsFormProps {
-  control: Control<any, any>;
-  fields: FieldArrayWithId<any, any, "id">[];
-  append: (value: any) => void;
+  control: Control<Record<string, unknown>>;
+  fields: FieldArrayWithId<Record<string, unknown>, "audienceGroups", "id">[];
+  append: (value: Record<string, unknown>) => void;
   remove: (index: number) => void;
   basePath: string; // ścieżka bazowa, np. "audienceGroups" lub "activities.0.audienceGroups"
 }
@@ -38,7 +38,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
 
   const getTotalAudience = () => {
     const audienceGroups = watch(basePath) || [];
-    return audienceGroups.reduce((total: number, group: any) => {
+    return audienceGroups.reduce((total: number, group: Record<string, unknown>) => {
       const count = Number(group.count) || 0;
       return total + count;
     }, 0);

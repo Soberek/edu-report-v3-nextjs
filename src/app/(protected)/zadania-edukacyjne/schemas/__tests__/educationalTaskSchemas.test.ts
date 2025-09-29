@@ -376,7 +376,7 @@ describe("educationalTaskSchemas", () => {
               {
                 id: "group-1",
                 name: "Grupa I",
-                type: "invalid-type" as any,
+                type: "invalid-type" as "dorośli",
                 count: 30,
               },
             ],

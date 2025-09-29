@@ -4,7 +4,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 // Mock the form component
-const MockEducationalTaskForm = ({ onSubmit, onCancel, initialData }: any) => {
+const MockEducationalTaskForm = ({ onSubmit, onCancel, initialData }: { onSubmit: (data: Record<string, unknown>) => void; onCancel: () => void; initialData?: Record<string, unknown> }) => {
   const [formData, setFormData] = React.useState({
     title: initialData?.title || "",
     programName: initialData?.programName || "",
@@ -71,19 +71,19 @@ const MockEducationalTaskForm = ({ onSubmit, onCancel, initialData }: any) => {
 const MockEducationalTasksPage = () => {
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editTask, setEditTask] = React.useState(null);
-  const [submittedData, setSubmittedData] = React.useState<any>(null);
+  const [submittedData, setSubmittedData] = React.useState<Record<string, unknown> | null>(null);
 
   const handleAddTask = () => {
     setEditTask(null);
     setIsFormOpen(true);
   };
 
-  const handleEditTask = (task: any) => {
+  const handleEditTask = (task: Record<string, unknown>) => {
     setEditTask(task);
     setIsFormOpen(true);
   };
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = (data: Record<string, unknown>) => {
     setSubmittedData(data);
     setIsFormOpen(false);
     setEditTask(null);
@@ -222,9 +222,9 @@ describe("Form Submission Integration Tests", () => {
     // Mock the page with existing task
     const MockPageWithTask = () => {
       const [isFormOpen, setIsFormOpen] = React.useState(false);
-      const [editTask, setEditTask] = React.useState<any>(existingTask);
+      const [editTask, setEditTask] = React.useState<Record<string, unknown>>(existingTask);
 
-      const handleFormSubmit = (data: any) => {
+      const handleFormSubmit = (data: Record<string, unknown>) => {
         setIsFormOpen(false);
         setEditTask(null);
       };

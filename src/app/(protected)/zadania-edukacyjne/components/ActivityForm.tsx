@@ -125,20 +125,17 @@ export const ActivityForm: React.FC = () => {
     name: "activities",
   });
 
-  // Pre-define maximum number of activities to avoid conditional hooks
-  const maxActivities = 10;
-  const materialWatches = Array.from({ length: maxActivities }, (_, index) =>
-    useWatch({
-      control,
-      name: `activities.${index}.materials`,
-    })
-  );
+  // Watch all activities materials at once
+  const watchedAllMaterials = useWatch({
+    control,
+    name: "activities",
+  });
 
-  // Only use the materials for existing activities
-  const watchedAllMaterials = React.useMemo(() => {
-    if (!watchedActivities) return [];
-    return materialWatches.slice(0, watchedActivities.length);
-  }, [watchedActivities, materialWatches]);
+  // Extract materials from watched activities
+  const materialsData = React.useMemo(() => {
+    if (!watchedAllMaterials) return [];
+    return watchedAllMaterials.map((activity: Record<string, unknown>) => activity.materials || []);
+  }, [watchedAllMaterials]);
 
   // Helper component for activity audience groups
   const ActivityAudienceGroups: React.FC<{ activityIndex: number }> = ({ activityIndex }) => {
@@ -164,12 +161,12 @@ export const ActivityForm: React.FC = () => {
     };
 
     const removeAudienceGroup = (removeIndex: number) => {
-      const updatedGroups = audienceGroups.filter((_: any, index: number) => index !== removeIndex);
+      const updatedGroups = audienceGroups.filter((_: unknown, index: number) => index !== removeIndex);
       setValue(`activities.${activityIndex}.audienceGroups`, updatedGroups);
     };
 
     // Create fields array compatible with AudienceGroupsForm
-    const fields = audienceGroups.map((group: any, index: number) => ({
+    const fields = audienceGroups.map((group: Record<string, unknown>, index: number) => ({
       id: group.id || `audience-${activityIndex}-${index}`,
       ...group,
     }));
@@ -187,16 +184,16 @@ export const ActivityForm: React.FC = () => {
 
   // Helper functions for activity materials
   const getMaterialsFields = (activityIndex: number) => {
-    const materials = watchedAllMaterials[activityIndex] || [];
-    return materials.map((material: any, index: number) => ({
+    const materials = materialsData[activityIndex] || [];
+    return materials.map((material: Record<string, unknown>, index: number) => ({
       id: `field-${activityIndex}-${index}`, // Unique React key
       originalId: material.id || `material-${activityIndex}-${index}`,
       ...material,
     }));
   };
 
-  const appendMaterial = (activityIndex: number, value: any) => {
-    const currentMaterials = watchedAllMaterials[activityIndex] || [];
+  const appendMaterial = (activityIndex: number, value: Record<string, unknown>) => {
+    const currentMaterials = materialsData[activityIndex] || [];
     const newMaterial = {
       ...value,
       id: value.id || `material-${activityIndex}-${currentMaterials.length}`,
@@ -206,8 +203,8 @@ export const ActivityForm: React.FC = () => {
   };
 
   const removeMaterial = (activityIndex: number, materialIndex: number) => {
-    const currentMaterials = watchedAllMaterials[activityIndex] || [];
-    const updatedMaterials = currentMaterials.filter((_: any, index: number) => index !== materialIndex);
+    const currentMaterials = materialsData[activityIndex] || [];
+    const updatedMaterials = currentMaterials.filter((_: unknown, index: number) => index !== materialIndex);
     setValue(`activities.${activityIndex}.materials`, updatedMaterials);
   };
 

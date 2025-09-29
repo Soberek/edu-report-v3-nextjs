@@ -6,7 +6,7 @@ import { Controller, Control } from "react-hook-form";
 import { useTaskNumberManager } from "../hooks/useTaskNumberManager";
 
 interface TaskNumberFieldProps {
-  control: Control<any>;
+  control: Control<Record<string, unknown>>;
   name: string;
   tasks: EducationalTask[];
   editTaskId?: string;
@@ -27,6 +27,13 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
   disabled = false,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
+  
+  // Create manager with current field value
+  const taskNumberManager = useTaskNumberManager({
+    tasks,
+    editTaskId,
+    currentTaskNumber: "",
+  });
 
   return (
     <Controller
@@ -34,7 +41,7 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
       control={control}
       rules={{
         required: required ? "Numer zadania jest wymagany" : false,
-        validate: (value: string, taskManager: any) => {
+        validate: (value: string) => {
           if (!value.trim()) {
             return required ? "Numer zadania jest wymagany" : true;
           }
@@ -42,12 +49,6 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
         },
       }}
       render={({ field, fieldState }) => {
-        // Create manager with current field value
-        const taskNumberManager = useTaskNumberManager({
-          tasks,
-          editTaskId,
-          currentTaskNumber: field.value || "",
-        });
 
         const handleQuickSuggestion = () => {
           const nextNumber = taskNumberManager.getNextSuggestion();
