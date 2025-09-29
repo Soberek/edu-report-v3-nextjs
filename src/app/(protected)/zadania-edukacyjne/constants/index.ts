@@ -12,7 +12,6 @@ export const PAGE_CONSTANTS = {
   TITLE: "Zadania edukacyjne",
   SUBTITLE: "Zarządzaj zadaniami edukacyjnymi i ich aktywnościami",
   ADD_TASK_BUTTON: "Dodaj zadanie",
-  FILTERS_TITLE: "Filtry",
   EMPTY_STATE: {
     NO_TASKS: "Brak zadań edukacyjnych",
     NO_FILTERED_TASKS: "Brak zadań spełniających kryteria filtrowania",
@@ -31,6 +30,7 @@ export const FILTER_CONSTANTS = {
   MONTH_LABEL: "Miesiąc",
   PROGRAM_LABEL: "Program",
   ACTIVITY_TYPE_LABEL: "Typ aktywności",
+  FILTERS_TITLE: "Filtry",
   MIN_WIDTH: 120,
   SELECT_WIDTHS: {
     YEAR: 120,
