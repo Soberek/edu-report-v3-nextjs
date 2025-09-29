@@ -80,7 +80,11 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fie
         <Autocomplete
           value={selectedMaterialId ? EDUCATIONAL_MATERIALS.find((m) => m.id === selectedMaterialId) : null}
           onChange={(_, material) => setSelectedMaterialId(material?.id || "")}
-          options={EDUCATIONAL_MATERIALS}
+          options={EDUCATIONAL_MATERIALS.sort((a, b) => {
+            const categoryA = MATERIAL_CATEGORY_LABELS[a.category as keyof typeof MATERIAL_CATEGORY_LABELS];
+            const categoryB = MATERIAL_CATEGORY_LABELS[b.category as keyof typeof MATERIAL_CATEGORY_LABELS];
+            return categoryA.localeCompare(categoryB);
+          })}
           getOptionLabel={(option) => option.name}
           groupBy={(option) => MATERIAL_CATEGORY_LABELS[option.category as keyof typeof MATERIAL_CATEGORY_LABELS]}
           renderInput={(params) => (
