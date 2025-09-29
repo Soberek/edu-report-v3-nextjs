@@ -3,7 +3,7 @@ import { Box, MenuItem, Select, FormControl, FormHelperText, SelectChangeEvent }
 import { Controller, type Control, type FieldErrors, type UseFormHandleSubmit } from "react-hook-form";
 import type { CaseRecord } from "@/types";
 import { FormField, FormSection, ActionButton } from "@/components/shared";
-import { Assignment, Save } from "@mui/icons-material";
+import { Save } from "@mui/icons-material";
 
 interface ActFormProps {
   control: Control<CaseRecord>;
@@ -46,26 +46,17 @@ const CustomSelectField: React.FC<{
               </MenuItem>
             ))}
           </Select>
-          {errors[name] && (
-            <FormHelperText>{errors[name]?.message}</FormHelperText>
-          )}
+          {errors[name] && <FormHelperText>{errors[name]?.message}</FormHelperText>}
         </FormControl>
       )}
     />
   );
 };
 
-export const ActForm: React.FC<ActFormProps> = ({
-  control,
-  errors,
-  handleSubmit,
-  onSubmit,
-  actsOptions,
-}) => {
+export const ActForm: React.FC<ActFormProps> = ({ control, errors, handleSubmit, onSubmit, actsOptions }) => {
   return (
     <FormSection
       title="Dodaj nowy akt sprawy"
-      icon={<Assignment />}
       sx={{
         maxWidth: 800,
         mx: "auto",
@@ -83,13 +74,7 @@ export const ActForm: React.FC<ActFormProps> = ({
       >
         {/* Code Selection */}
         <Box>
-          <CustomSelectField
-            control={control}
-            name="code"
-            label="Wybierz kod"
-            options={actsOptions}
-            errors={errors}
-          />
+          <CustomSelectField control={control} name="code" label="Wybierz kod" options={actsOptions} errors={errors} />
         </Box>
 
         {/* Reference Number */}
@@ -103,50 +88,22 @@ export const ActForm: React.FC<ActFormProps> = ({
         />
 
         {/* Date */}
-        <FormField
-          name="date"
-          control={control}
-          label="Data"
-          required
-        />
+        <FormField name="date" control={control} label="Data" required />
 
         {/* Title */}
-        <FormField
-          name="title"
-          control={control}
-          label="Tytuł"
-          required
-        />
+        <FormField name="title" control={control} label="Tytuł" required />
 
         {/* Start Date */}
-        <FormField
-          name="startDate"
-          control={control}
-          label="Data wszczęcia sprawy"
-          required
-        />
+        <FormField name="startDate" control={control} label="Data wszczęcia sprawy" required />
 
         {/* End Date */}
-        <FormField
-          name="endDate"
-          control={control}
-          label="Data zakończenia sprawy"
-          required
-        />
+        <FormField name="endDate" control={control} label="Data zakończenia sprawy" required />
 
         {/* Sender */}
-        <FormField
-          name="sender"
-          control={control}
-          label="Nadawca"
-        />
+        <FormField name="sender" control={control} label="Nadawca" />
 
         {/* Comments */}
-        <FormField
-          name="comments"
-          control={control}
-          label="Uwagi"
-        />
+        <FormField name="comments" control={control} label="Uwagi" />
 
         {/* Notes - spanning full width */}
         <Box sx={{ gridColumn: "1 / -1" }}>
