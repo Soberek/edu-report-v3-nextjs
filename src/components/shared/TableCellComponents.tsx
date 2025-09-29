@@ -255,7 +255,18 @@ export const DateCell: React.FC<DateCellProps> = ({ date, format = "short" }) =>
       py: 1,
     }}
   >
-    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: "500" }}>
+    <Typography 
+      variant="caption" 
+      color="text.secondary" 
+      sx={{ 
+        fontWeight: "500",
+        wordBreak: "break-word",
+        whiteSpace: "normal",
+        overflowWrap: "break-word",
+        lineHeight: 1.3,
+        textAlign: "center",
+      }}
+    >
       {format === "short" ? formatDateForTable(date) : formatDate(date, format === "full" ? "long" : "medium")}
     </Typography>
   </Box>

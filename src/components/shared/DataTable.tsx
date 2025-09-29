@@ -171,12 +171,32 @@ export const DataTable = <T extends Record<string, any>>({
             alignItems: "center",
             fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
             fontSize: "0.875rem",
+            // Text wrapping properties
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+            overflowWrap: "break-word",
+            lineHeight: 1.4,
+            minHeight: "auto !important",
+            padding: "8px 16px",
+            // Ensure text doesn't overflow
+            overflow: "visible",
+            textOverflow: "unset",
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: theme.palette.grey[50],
             fontWeight: "bold",
             fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
             fontSize: "0.875rem",
+            // Header text wrapping
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+            overflowWrap: "break-word",
+            lineHeight: 1.3,
+            minHeight: "auto !important",
+          },
+          "& .MuiDataGrid-row": {
+            minHeight: "auto !important",
+            alignItems: "stretch",
           },
           "& .MuiDataGrid-row:hover": {
             backgroundColor: theme.palette.action.hover,
@@ -198,6 +218,9 @@ export const DataTable = <T extends Record<string, any>>({
         disableColumnResize={false}
         disableColumnMenu={false}
         disableRowSelectionOnClick={true}
+        // Auto-adjust row height for text wrapping
+        autoHeight={false}
+        getRowHeight={() => "auto"}
         // Accessibility improvements for Polish users
         aria-label="Tabela danych"
       />
