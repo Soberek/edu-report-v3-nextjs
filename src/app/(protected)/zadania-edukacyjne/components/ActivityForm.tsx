@@ -7,6 +7,7 @@ import { TASK_TYPES } from "@/constants/tasks";
 import { MEDIA_PLATFORMS, MATERIAL_TYPES } from "@/constants/educationalTasks";
 import { CreateEducationalTaskFormData } from "@/types";
 import { AudienceGroupsForm } from "./AudienceGroupsForm";
+import { MaterialSelector } from "./MaterialSelector";
 
 interface MaterialsFormProps {
   activityIndex: number;
@@ -105,7 +106,7 @@ const MaterialsForm: React.FC<MaterialsFormProps> = ({ activityIndex }) => {
 };
 
 export const ActivityForm: React.FC = () => {
-  const { control } = useFormContext();
+  const { control, setValue } = useFormContext();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -161,6 +162,43 @@ export const ActivityForm: React.FC = () => {
         basePath={`activities.${activityIndex}.audienceGroups`}
       />
     );
+  };
+
+  // Helper functions for activity materials
+  const getMaterialsFields = (activityIndex: number) => {
+    const materials = useWatch({
+      control,
+      name: `activities.${activityIndex}.materials`,
+    }) || [];
+    
+    return materials.map((material: any, index: number) => ({
+      id: material.id || `material-${activityIndex}-${index}`,
+      ...material
+    }));
+  };
+
+  const appendMaterial = (activityIndex: number, value: any) => {
+    const currentMaterials = useWatch({
+      control,
+      name: `activities.${activityIndex}.materials`,
+    }) || [];
+    
+    const newMaterial = {
+      ...value,
+      id: value.id || `material-${activityIndex}-${currentMaterials.length}`
+    };
+    const updatedMaterials = [...currentMaterials, newMaterial];
+    setValue(`activities.${activityIndex}.materials`, updatedMaterials);
+  };
+
+  const removeMaterial = (activityIndex: number, materialIndex: number) => {
+    const currentMaterials = useWatch({
+      control,
+      name: `activities.${activityIndex}.materials`,
+    }) || [];
+    
+    const updatedMaterials = currentMaterials.filter((_: any, index: number) => index !== materialIndex);
+    setValue(`activities.${activityIndex}.materials`, updatedMaterials);
   };
 
   const addActivity = () => {
@@ -307,7 +345,13 @@ export const ActivityForm: React.FC = () => {
                     Materiały do dystrybucji
                   </Typography>
 
-                  <MaterialsForm activityIndex={index} />
+                  <MaterialSelector 
+                    control={control}
+                    fields={getMaterialsFields(index)}
+                    append={(value) => appendMaterial(index, value)}
+                    remove={(materialIndex) => removeMaterial(index, materialIndex)}
+                    activityIndex={index}
+                  />
                 </>
               )}
             </Stack>

@@ -1,4 +1,5 @@
 import type { SchoolYear, SchoolTypes } from "../types";
+export * from "./materials";
 
 export const schoolYears: SchoolYear[] = [
   "2024/2025",

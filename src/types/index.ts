@@ -96,9 +96,11 @@ export interface Media {
 }
 
 export interface Material {
-  type: string; // Will be one of MATERIAL_TYPES labels
+  id: string; // ID z EDUCATIONAL_MATERIALS lub wybrane przez użytkownika
   name: string;
+  type: string; // Will be one of MATERIAL_TYPES labels
   distributedCount: number; // Ilość rozdanych egzemplarzy
+  description?: string; // Opcjonalny opis dodany przez użytkownika
 }
 
 export interface Activity {

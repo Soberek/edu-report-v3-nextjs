@@ -9,9 +9,11 @@ const mediaSchema = z.object({
 });
 
 const materialSchema = z.object({
-  type: z.enum(Object.values(MATERIAL_TYPES) as [string, ...string[]]),
+  id: z.string().min(1, "ID materiału jest wymagane"),
   name: z.string().min(1, "Nazwa materiału jest wymagana").max(200, "Nazwa nie może być dłuższa niż 200 znaków"),
+  type: z.enum(Object.values(MATERIAL_TYPES) as [string, ...string[]]),
   distributedCount: z.number().min(1, "Ilość musi być co najmniej 1").max(10000, "Ilość nie może przekraczać 10000"),
+  description: z.string().optional(),
 });
 
 // Schema dla grup odbiorców
