@@ -111,6 +111,15 @@ export interface Activity {
   materials?: Material[]; // Materiały dla dystrybucji
 }
 
+export type AudienceType = "dorośli" | "młodzież" | "dzieci" | "seniorzy";
+
+export interface AudienceGroup {
+  id: string;
+  name: string; // np. "Grupa I"
+  type: AudienceType; // typ odbiorcy
+  count: number; // liczba osób
+}
+
 export interface EducationalTask {
   id: string;
   title: string;
@@ -119,8 +128,9 @@ export interface EducationalTask {
   schoolId: string; // ID szkoły z Firebase
   taskNumber: string; // Numer zadania (np. 45/2025)
   referenceNumber: string; // Numer referencyjny dokumentu (np. OZiPZ.966.5.2.2025)
-  referenceId?: string; // odwołanie do sprawy, jeśli jest powiązana
+  referenceId?: string; // odwołanie do sprawy, która jest powiązana
   activities: Activity[];
+  audienceGroups: AudienceGroup[]; // Grupy odbiorców
   createdBy: string;
   createdAt: string;
   updatedAt?: string;
@@ -135,6 +145,7 @@ export interface CreateEducationalTaskFormData {
   referenceNumber: string; // Numer referencyjny dokumentu (np. OZiPZ.966.5.2.2025)
   referenceId?: string;
   activities: Activity[];
+  audienceGroups: AudienceGroup[]; // Grupy odbiorców
 }
 
 export interface EditEducationalTaskFormData extends CreateEducationalTaskFormData {

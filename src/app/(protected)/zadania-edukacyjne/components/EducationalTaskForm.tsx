@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useForm, FormProvider, Controller } from "react-hook-form";
+import { useForm, FormProvider, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Typography, Stack } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
@@ -13,6 +13,7 @@ import { createEducationalTaskSchema, type CreateEducationalTaskFormData } from 
 import { EducationalTask } from "@/types";
 import { ActivityForm } from "./ActivityForm";
 import { TaskNumberField } from "./TaskNumberField";
+import { AudienceGroupsForm } from "./AudienceGroupsForm";
 import { usePrograms } from "@/hooks/useProgram";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
@@ -69,7 +70,22 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
           audienceCount: 0,
         },
       ],
+      audienceGroups: task?.audienceGroups || task ? [] : [{
+        name: "Grupa I",
+        type: "dorośli" as const,
+        count: 30,
+      }],
     },
+  });
+
+  // Field array for audience groups
+  const {
+    fields: audienceGroupsFields,
+    append: appendAudienceGroup,
+    remove: removeAudienceGroup,
+  } = useFieldArray({
+    control: form.control,
+    name: "audienceGroups",
   });
 
   const handleFormSubmit = async (data: any) => {
@@ -210,6 +226,14 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
                 />
               </Stack>
             </Box>
+
+            {/* Audience Groups */}
+            <AudienceGroupsForm
+              control={form.control}
+              fields={audienceGroupsFields}
+              append={appendAudienceGroup}
+              remove={removeAudienceGroup}
+            />
 
             {/* Activities */}
             <Box>

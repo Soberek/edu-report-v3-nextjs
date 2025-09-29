@@ -51,15 +51,29 @@ const activitySchema = z
     }
   );
 
+// Schema dla grup odbiorców
+const audienceGroupSchema = z.object({
+  id: z.string().min(1, "ID grupy jest wymagane"),
+  name: z.string().min(1, "Nazwa grupy jest wymagana").max(50, "Nazwa grupy nie może być dłuższa niż 50 znaków"),
+  type: z.enum(["dorośli", "młodzież", "dzieci", "seniorzy"], {
+    message: "Wybierz prawidłowy typ odbiorcy",
+  }),
+  count: z.number().min(1, "Liczba osób musi być większa od 0").max(1000, "Maksymalnie 1000 osób"),
+});
+
 export const createEducationalTaskSchema = z.object({
   title: z.string().min(1, "Tytuł zadania jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
   programName: z.string().min(1, "Nazwa programu jest wymagana").max(200, "Nazwa programu nie może być dłuższa niż 200 znaków"),
   date: z.string().min(1, "Data jest wymagana"),
   schoolId: z.string().min(1, "Wybór szkoły jest wymagany"),
-  taskNumber: z.string().min(1, "Numer zadania jest wymagany").regex(/^\d+\/\d{4}$/, "Numer zadania musi mieć format: liczba/rok (np. 45/2025)"),
+  taskNumber: z
+    .string()
+    .min(1, "Numer zadania jest wymagany")
+    .regex(/^\d+\/\d{4}$/, "Numer zadania musi mieć format: liczba/rok (np. 45/2025)"),
   referenceNumber: z.string().min(1, "Numer referencyjny jest wymagany").max(50, "Numer referencyjny nie może być dłuższy niż 50 znaków"),
   referenceId: z.string().optional(),
   activities: z.array(activitySchema).min(1, "Dodaj co najmniej jedną aktywność"),
+  audienceGroups: z.array(audienceGroupSchema).optional().default([]),
 });
 
 export const editEducationalTaskSchema = createEducationalTaskSchema.extend({
