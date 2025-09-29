@@ -167,20 +167,17 @@ export const navRoutes: NavRoute[] = [
 
 // Helper functions for filtering routes
 export const getRoutesByCategory = (category: NavRoute["category"]): NavRoute[] => {
-  return navRoutes.filter(route => route.category === category);
+  return navRoutes.filter((route) => route.category === category);
 };
 
 export const getPrivateRoutes = (): NavRoute[] => {
-  return navRoutes.filter(route => route.isPrivate);
+  return navRoutes.filter((route) => route.isPrivate);
 };
 
 export const getPublicRoutes = (): NavRoute[] => {
-  return navRoutes.filter(route => !route.isPrivate);
+  return navRoutes.filter((route) => !route.isPrivate);
 };
 
 export const getMainNavigation = (): NavRoute[] => {
-  return navRoutes.filter(route => 
-    route.isPrivate && 
-    ["main", "education", "database", "tools"].includes(route.category)
-  );
+  return navRoutes.filter((route) => route.isPrivate && ["main", "education", "database", "tools"].includes(route.category));
 };
