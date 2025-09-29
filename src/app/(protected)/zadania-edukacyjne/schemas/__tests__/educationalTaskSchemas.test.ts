@@ -27,9 +27,167 @@ describe("educationalTaskSchemas", () => {
     ],
   };
 
+  const validDistributionTaskData = {
+    title: "Distribution Task",
+    programName: "Health Program",
+    date: "2025-02-20",
+    schoolId: "school-2",
+    taskNumber: "2/2025",
+    referenceNumber: "HEALTH.002.2025",
+    activities: [
+      {
+        type: "distribution",
+        title: "Material Distribution",
+        description: "Distributing educational materials",
+        materials: [
+          {
+            id: "ulotka_zdrowie",
+            name: "Ulotka - Zdrowie psychiczne",
+            type: "ulotka",
+            distributedCount: 100,
+            description: "Materiały o zdrowiu psychicznym",
+          },
+          {
+            id: "plakat_aktywnosc",
+            name: "Plakat - Aktywność fizyczna",
+            type: "plakat",
+            distributedCount: 20,
+            description: "Promocja aktywności fizycznej",
+          },
+        ],
+        audienceGroups: [
+          {
+            id: "group-2",
+            name: "Grupa II",
+            type: "młodzież" as const,
+            count: 50,
+          },
+          {
+            id: "group-3",
+            name: "Grupa III",
+            type: "dzieci" as const,
+            count: 25,
+          },
+        ],
+      },
+    ],
+  };
+
+  const validMediaPublicationTaskData = {
+    title: "Media Publication Task",
+    programName: "Social Media Program",
+    date: "2025-03-10",
+    schoolId: "school-3",
+    taskNumber: "3/2025",
+    referenceNumber: "SOCIAL.003.2025",
+    activities: [
+      {
+        type: "media_publication",
+        title: "Facebook Post",
+        description: "Educational post about healthy lifestyle",
+        media: {
+          title: "Zdrowy styl życia",
+          link: "https://facebook.com/post/123",
+          platform: "facebook",
+        },
+        estimatedReach: 1000,
+      },
+    ],
+  };
+
+  const validEducationalInfoStandTaskData = {
+    title: "Info Stand Task",
+    programName: "Community Program",
+    date: "2025-04-15",
+    schoolId: "school-4",
+    taskNumber: "4/2025",
+    referenceNumber: "COMMUNITY.004.2025",
+    activities: [
+      {
+        type: "educational_info_stand",
+        title: "Health Information Stand",
+        description: "Providing health information to community",
+        audienceGroups: [
+          {
+            id: "group-4",
+            name: "Grupa IV",
+            type: "seniorzy" as const,
+            count: 40,
+          },
+        ],
+      },
+    ],
+  };
+
+  const validReportTaskData = {
+    title: "Report Task",
+    programName: "Reporting Program",
+    date: "2025-05-20",
+    schoolId: "school-5",
+    taskNumber: "5/2025",
+    referenceNumber: "REPORT.005.2025",
+    activities: [
+      {
+        type: "report",
+        title: "Monthly Report",
+        description: "Monthly activity report",
+      },
+    ],
+  };
+
+  const validLectureTaskData = {
+    title: "Lecture Task",
+    programName: "Academic Program",
+    date: "2025-06-25",
+    schoolId: "school-6",
+    taskNumber: "6/2025",
+    referenceNumber: "ACADEMIC.006.2025",
+    activities: [
+      {
+        type: "lecture",
+        title: "Health Education Lecture",
+        actionCount: 3,
+        description: "Series of lectures on health education",
+        audienceGroups: [
+          {
+            id: "group-5",
+            name: "Grupa V",
+            type: "dorośli" as const,
+            count: 60,
+          },
+        ],
+      },
+    ],
+  };
+
   describe("createEducationalTaskSchema", () => {
     it("should validate correct task data", () => {
       const result = createEducationalTaskSchema.safeParse(validTaskData);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate distribution task data", () => {
+      const result = createEducationalTaskSchema.safeParse(validDistributionTaskData);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate media publication task data", () => {
+      const result = createEducationalTaskSchema.safeParse(validMediaPublicationTaskData);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate educational info stand task data", () => {
+      const result = createEducationalTaskSchema.safeParse(validEducationalInfoStandTaskData);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate report task data", () => {
+      const result = createEducationalTaskSchema.safeParse(validReportTaskData);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate lecture task data", () => {
+      const result = createEducationalTaskSchema.safeParse(validLectureTaskData);
       expect(result.success).toBe(true);
     });
 
@@ -337,6 +495,36 @@ describe("educationalTaskSchemas", () => {
   describe("editEducationalTaskSchema", () => {
     it("should validate correct edit data with id", () => {
       const data = { ...validTaskData, id: "task-1" };
+      const result = editEducationalTaskSchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate distribution task edit data", () => {
+      const data = { ...validDistributionTaskData, id: "task-2" };
+      const result = editEducationalTaskSchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate media publication task edit data", () => {
+      const data = { ...validMediaPublicationTaskData, id: "task-3" };
+      const result = editEducationalTaskSchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate educational info stand task edit data", () => {
+      const data = { ...validEducationalInfoStandTaskData, id: "task-4" };
+      const result = editEducationalTaskSchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate report task edit data", () => {
+      const data = { ...validReportTaskData, id: "task-5" };
+      const result = editEducationalTaskSchema.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it("should validate lecture task edit data", () => {
+      const data = { ...validLectureTaskData, id: "task-6" };
       const result = editEducationalTaskSchema.safeParse(data);
       expect(result.success).toBe(true);
     });
