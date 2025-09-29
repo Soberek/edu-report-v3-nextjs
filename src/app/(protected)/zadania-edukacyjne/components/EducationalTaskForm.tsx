@@ -67,16 +67,19 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
           description: "",
           actionCount: 1,
           audienceCount: 0,
-          audienceGroups: task ? [] : [{
-            name: "Grupa I",
-            type: "dorośli" as const,
-            count: 30,
-          }],
+          audienceGroups: task
+            ? []
+            : [
+                {
+                  name: "Grupa I",
+                  type: "dorośli" as const,
+                  count: 30,
+                },
+              ],
         },
       ],
     },
   });
-
 
   const handleFormSubmit = async (data: any) => {
     try {
@@ -216,7 +219,6 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
                 />
               </Stack>
             </Box>
-
 
             {/* Activities */}
             <Box>

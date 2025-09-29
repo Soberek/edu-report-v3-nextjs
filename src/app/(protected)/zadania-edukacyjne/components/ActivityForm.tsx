@@ -6,6 +6,7 @@ import { FormField } from "@/components/shared";
 import { TASK_TYPES } from "@/constants/tasks";
 import { MEDIA_PLATFORMS, MATERIAL_TYPES } from "@/constants/educationalTasks";
 import { CreateEducationalTaskFormData } from "@/types";
+import { AudienceGroupsForm } from "./AudienceGroupsForm";
 
 interface MaterialsFormProps {
   activityIndex: number;
@@ -117,6 +118,32 @@ export const ActivityForm: React.FC = () => {
     name: "activities",
   });
 
+  // Helper component for activity audience groups
+  const ActivityAudienceGroups: React.FC<{ activityIndex: number }> = ({ activityIndex }) => {
+    const { fields: audienceFields, append: appendAudience, remove: removeAudience } = useFieldArray({
+      control,
+      name: `activities.${activityIndex}.audienceGroups`,
+    });
+
+    const addAudienceGroup = () => {
+      const nextGroupNumber = audienceFields.length + 1;
+      appendAudience({
+        name: `Grupa ${nextGroupNumber}`,
+        type: "dorośli",
+        count: 30,
+      });
+    };
+
+    return (
+      <AudienceGroupsForm
+        control={control}
+        fields={audienceFields}
+        append={(_value) => addAudienceGroup()}
+        remove={removeAudience}
+        basePath={`activities.${activityIndex}.audienceGroups`}
+      />
+    );
+  };
 
   const addActivity = () => {
     append({
@@ -125,11 +152,13 @@ export const ActivityForm: React.FC = () => {
       description: "",
       actionCount: 1,
       audienceCount: 0,
-      audienceGroups: [{
-        name: "Grupa I",
-        type: "dorośli",
-        count: 30,
-      }],
+      audienceGroups: [
+        {
+          name: "Grupa I",
+          type: "dorośli",
+          count: 30,
+        },
+      ],
     });
   };
 
@@ -218,12 +247,8 @@ export const ActivityForm: React.FC = () => {
               <Typography variant="subtitle2" fontWeight="bold" color="primary" sx={{ mt: 2, mb: 1 }}>
                 Grupy odbiorców dla tej aktywności
               </Typography>
-              
-              {/* Simple audience groups section for now */}
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Używaj pola "Ilość odbiorców" powyżej jako domyślnej liczby odbiorców.
-                Szczegółowe grupy odbiorców można będzie doprecyzować w przyszłych wersjach.
-              </Typography>
+
+              <ActivityAudienceGroups activityIndex={index} />
 
               {isPublication && (
                 <>

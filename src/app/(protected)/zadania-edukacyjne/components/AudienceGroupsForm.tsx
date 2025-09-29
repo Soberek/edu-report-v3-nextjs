@@ -7,9 +7,10 @@ import { FormField, ActionButton } from "@/components/shared";
 
 interface AudienceGroupsFormProps {
   control: Control<any, any>;
-  fields: FieldArrayWithId<any, "audienceGroups", "id">[];
+  fields: FieldArrayWithId<any, any, "id">[];
   append: (value: any) => void;
   remove: (index: number) => void;
+  basePath: string; // ścieżka bazowa, np. "audienceGroups" lub "activities.0.audienceGroups"
 }
 
 const AUDIENCE_TYPES: { value: AudienceType; label: string }[] = [
@@ -19,7 +20,7 @@ const AUDIENCE_TYPES: { value: AudienceType; label: string }[] = [
   { value: "seniorzy", label: "Seniorzy" },
 ];
 
-export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control, fields, append, remove }) => {
+export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control, fields, append, remove, basePath }) => {
   const { watch } = useFormContext();
 
   const addGroup = () => {
@@ -36,7 +37,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
   };
 
   const getTotalAudience = () => {
-    const audienceGroups = watch("audienceGroups") || [];
+    const audienceGroups = watch(basePath) || [];
     return audienceGroups.reduce((total: number, group: any) => {
       const count = group.count || 0;
       return total + count;
@@ -75,7 +76,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
             <Stack spacing={2}>
               {/* Group Name */}
               <Controller
-                name={`audienceGroups.${index}.name`}
+                name={`${basePath}.${index}.name`}
                 control={control}
                 rules={{
                   required: "Nazwa grupy jest wymagana",
@@ -98,7 +99,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
                 {/* Audience Type */}
                 <Box sx={{ flex: 1 }}>
                   <Controller
-                    name={`audienceGroups.${index}.type`}
+                    name={`${basePath}.${index}.type`}
                     control={control}
                     rules={{ required: "Wybierz typ odbiorcy" }}
                     render={({ field, fieldState }) => (
@@ -119,7 +120,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
                 {/* Count */}
                 <Box sx={{ flex: 1 }}>
                   <Controller
-                    name={`audienceGroups.${index}.count`}
+                    name={`${basePath}.${index}.count`}
                     control={control}
                     rules={{
                       required: "Liczba osób jest wymagana",
