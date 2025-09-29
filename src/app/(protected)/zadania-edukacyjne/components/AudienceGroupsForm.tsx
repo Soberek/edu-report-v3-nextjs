@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Stack, IconButton, Chip } from "@mui/material";
 import { Add, Delete, People } from "@mui/icons-material";
-import { Controller, Control, FieldArrayWithId } from "react-hook-form";
+import { Controller, Control, FieldArrayWithId, useFormContext } from "react-hook-form";
 import { AudienceGroup, CreateEducationalTaskFormData, AudienceType } from "@/types";
 import { FormField, ActionButton } from "@/components/shared";
 
@@ -20,6 +20,8 @@ const AUDIENCE_TYPES: { value: AudienceType; label: string }[] = [
 ];
 
 export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control, fields, append, remove }) => {
+  const { watch } = useFormContext();
+
   const addGroup = () => {
     const nextGroupNumber = fields.length + 1;
     append({
@@ -34,8 +36,9 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
   };
 
   const getTotalAudience = () => {
-    return fields.reduce((total, field) => {
-      const count = field.count || 0;
+    const audienceGroups = watch("audienceGroups") || [];
+    return audienceGroups.reduce((total: number, group: any) => {
+      const count = group.count || 0;
       return total + count;
     }, 0);
   };
@@ -62,7 +65,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
           >
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
               <Typography variant="subtitle1" fontWeight="bold" color="text.secondary">
-                {field.name || `Grupa ${index + 1}`}
+                {`Grupa ${index + 1}`}
               </Typography>
               <IconButton onClick={() => removeGroup(index)} size="small" sx={{ color: "error.main" }} title="Usuń grupę">
                 <Delete />

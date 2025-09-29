@@ -105,8 +105,9 @@ export interface Activity {
   type: string; // Will be one of TASK_TYPES labels
   title: string;
   actionCount: number; // Ilość działań (domyślnie 1)
-  audienceCount: number; // Ilość odbiorców
+  audienceCount: number; // Ilość odbiorców (DEPRECATED - use audienceGroups)
   description: string;
+  audienceGroups: AudienceGroup[]; // Grupy odbiorców dla tej aktywności
   media?: Media;
   materials?: Material[]; // Materiały dla dystrybucji
 }
@@ -130,7 +131,6 @@ export interface EducationalTask {
   referenceNumber: string; // Numer referencyjny dokumentu (np. OZiPZ.966.5.2.2025)
   referenceId?: string; // odwołanie do sprawy, która jest powiązana
   activities: Activity[];
-  audienceGroups: AudienceGroup[]; // Grupy odbiorców
   createdBy: string;
   createdAt: string;
   updatedAt?: string;
@@ -145,7 +145,6 @@ export interface CreateEducationalTaskFormData {
   referenceNumber: string; // Numer referencyjny dokumentu (np. OZiPZ.966.5.2.2025)
   referenceId?: string;
   activities: Activity[];
-  audienceGroups: AudienceGroup[]; // Grupy odbiorców
 }
 
 export interface EditEducationalTaskFormData extends CreateEducationalTaskFormData {

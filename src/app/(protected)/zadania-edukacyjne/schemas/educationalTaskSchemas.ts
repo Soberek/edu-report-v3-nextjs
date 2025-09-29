@@ -14,6 +14,16 @@ const materialSchema = z.object({
   distributedCount: z.number().min(1, "Ilość musi być co najmniej 1").max(10000, "Ilość nie może przekraczać 10000"),
 });
 
+// Schema dla grup odbiorców
+const audienceGroupSchema = z.object({
+  id: z.string().min(1, "ID grupy jest wymagane"),
+  name: z.string().min(1, "Nazwa grupy jest wymagana").max(50, "Nazwa grupy nie może być dłuższa niż 50 znaków"),
+  type: z.enum(["dorośli", "młodzież", "dzieci", "seniorzy"], {
+    message: "Wybierz prawidłowy typ odbiorcy",
+  }),
+  count: z.number().min(1, "Liczba osób musi być większa od 0").max(1000, "Maksymalnie 1000 osób")
+});
+
 const activitySchema = z
   .object({
     type: z.enum(Object.values(TASK_TYPES).map((taskType) => taskType.label) as [string, ...string[]]),
@@ -21,6 +31,7 @@ const activitySchema = z
     actionCount: z.number().min(1, "Ilość działań musi być co najmniej 1").max(100, "Ilość działań nie może przekraczać 100").default(1),
     audienceCount: z.number().min(0, "Liczba odbiorców nie może być ujemna").max(10000, "Liczba odbiorców nie może przekraczać 10000"),
     description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
+    audienceGroups: z.array(audienceGroupSchema).optional().default([]),
     media: mediaSchema.optional(),
     materials: z.array(materialSchema).optional(),
   })
@@ -51,16 +62,6 @@ const activitySchema = z
     }
   );
 
-// Schema dla grup odbiorców
-const audienceGroupSchema = z.object({
-  id: z.string().min(1, "ID grupy jest wymagane"),
-  name: z.string().min(1, "Nazwa grupy jest wymagana").max(50, "Nazwa grupy nie może być dłuższa niż 50 znaków"),
-  type: z.enum(["dorośli", "młodzież", "dzieci", "seniorzy"], {
-    message: "Wybierz prawidłowy typ odbiorcy",
-  }),
-  count: z.number().min(1, "Liczba osób musi być większa od 0").max(1000, "Maksymalnie 1000 osób"),
-});
-
 export const createEducationalTaskSchema = z.object({
   title: z.string().min(1, "Tytuł zadania jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
   programName: z.string().min(1, "Nazwa programu jest wymagana").max(200, "Nazwa programu nie może być dłuższa niż 200 znaków"),
@@ -73,7 +74,6 @@ export const createEducationalTaskSchema = z.object({
   referenceNumber: z.string().min(1, "Numer referencyjny jest wymagany").max(50, "Numer referencyjny nie może być dłuższy niż 50 znaków"),
   referenceId: z.string().optional(),
   activities: z.array(activitySchema).min(1, "Dodaj co najmniej jedną aktywność"),
-  audienceGroups: z.array(audienceGroupSchema).optional().default([]),
 });
 
 export const editEducationalTaskSchema = createEducationalTaskSchema.extend({

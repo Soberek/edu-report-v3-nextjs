@@ -117,6 +117,7 @@ export const ActivityForm: React.FC = () => {
     name: "activities",
   });
 
+
   const addActivity = () => {
     append({
       type: "prelekcja",
@@ -124,6 +125,11 @@ export const ActivityForm: React.FC = () => {
       description: "",
       actionCount: 1,
       audienceCount: 0,
+      audienceGroups: [{
+        name: "Grupa I",
+        type: "dorośli",
+        count: 30,
+      }],
     });
   };
 
@@ -207,6 +213,17 @@ export const ActivityForm: React.FC = () => {
               />
 
               <FormField name={`activities.${index}.description`} control={control} label="Opis" multiline rows={2} required fullWidth />
+
+              <Divider />
+              <Typography variant="subtitle2" fontWeight="bold" color="primary" sx={{ mt: 2, mb: 1 }}>
+                Grupy odbiorców dla tej aktywności
+              </Typography>
+              
+              {/* Simple audience groups section for now */}
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Używaj pola "Ilość odbiorców" powyżej jako domyślnej liczby odbiorców.
+                Szczegółowe grupy odbiorców można będzie doprecyzować w przyszłych wersjach.
+              </Typography>
 
               {isPublication && (
                 <>
