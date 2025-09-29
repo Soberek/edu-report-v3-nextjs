@@ -116,7 +116,7 @@ export const simplifiedTaskUtils = {
 
   createTaskFromData: (taskData: SimplifiedTaskFormData, userId: string): SimplifiedEducationalTask => {
     // Clean undefined values
-    const cleanTaskData = Object.fromEntries(Object.entries(taskData).filter(([_, value]) => value !== undefined));
+    const cleanTaskData = Object.fromEntries(Object.entries(taskData).filter(([, value]) => value !== undefined));
 
     return {
       ...cleanTaskData,
@@ -128,7 +128,7 @@ export const simplifiedTaskUtils = {
 
   updateTaskFromData: (id: string, taskData: SimplifiedTaskFormData, userId: string): SimplifiedEducationalTask => {
     // Clean undefined values
-    const cleanTaskData = Object.fromEntries(Object.entries(taskData).filter(([_, value]) => value !== undefined));
+    const cleanTaskData = Object.fromEntries(Object.entries(taskData).filter(([, value]) => value !== undefined));
 
     return {
       ...cleanTaskData,
