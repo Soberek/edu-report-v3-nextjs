@@ -25,32 +25,118 @@ const audienceGroupSchema = z.object({
   count: z.coerce.number().min(1, "Liczba osób musi być większa od 0").max(1000, "Maksymalnie 1000 osób"),
 });
 
-// Schemas for specific activity types
-const presentationActivitySchema = z.object({
-  type: z.literal("presentation"),
+// Base activity schema with common fields
+const baseActivitySchema = z.object({
   title: z.string().min(1, "Tytuł aktywności jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
+  description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
+});
+
+// Schemas for specific activity types
+const presentationActivitySchema = baseActivitySchema.extend({
+  type: z.literal("presentation"),
   actionCount: z.coerce
     .number()
     .min(1, "Ilość działań musi być co najmniej 1")
     .max(100, "Ilość działań nie może przekraczać 100"),
-  description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
   audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
 });
 
-const distributionActivitySchema = z.object({
+const distributionActivitySchema = baseActivitySchema.extend({
   type: z.literal("distribution"),
-  title: z.string().min(1, "Tytuł aktywności jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
-  description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
   materials: z.array(materialSchema).min(1, "Dodaj co najmniej jeden materiał"),
   audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
 });
 
-const mediaPublicationActivitySchema = z.object({
+const mediaPublicationActivitySchema = baseActivitySchema.extend({
   type: z.literal("media_publication"),
-  title: z.string().min(1, "Tytuł aktywności jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
-  description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
   media: mediaSchema,
   estimatedReach: z.coerce.number().min(1, "Szacowany zasięg musi być większy od 0").max(10000000, "Zasięg nie może przekraczać 10 milionów").optional(),
+});
+
+const educationalInfoStandActivitySchema = baseActivitySchema.extend({
+  type: z.literal("educational_info_stand"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const reportActivitySchema = baseActivitySchema.extend({
+  type: z.literal("report"),
+});
+
+const monthlyReportActivitySchema = baseActivitySchema.extend({
+  type: z.literal("monthly_report"),
+});
+
+const lectureActivitySchema = baseActivitySchema.extend({
+  type: z.literal("lecture"),
+  actionCount: z.coerce
+    .number()
+    .min(1, "Ilość działań musi być co najmniej 1")
+    .max(100, "Ilość działań nie może przekraczać 100"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const intentLetterActivitySchema = baseActivitySchema.extend({
+  type: z.literal("intent_letter"),
+});
+
+const visitationActivitySchema = baseActivitySchema.extend({
+  type: z.literal("visitation"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const gamesActivitySchema = baseActivitySchema.extend({
+  type: z.literal("games"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const instructionActivitySchema = baseActivitySchema.extend({
+  type: z.literal("instruction"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const individualInstructionActivitySchema = baseActivitySchema.extend({
+  type: z.literal("individual_instruction"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const meetingActivitySchema = baseActivitySchema.extend({
+  type: z.literal("meeting"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const trainingActivitySchema = baseActivitySchema.extend({
+  type: z.literal("training"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const conferenceActivitySchema = baseActivitySchema.extend({
+  type: z.literal("conference"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const counselingActivitySchema = baseActivitySchema.extend({
+  type: z.literal("counseling"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const workshopActivitySchema = baseActivitySchema.extend({
+  type: z.literal("workshop"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const contestActivitySchema = baseActivitySchema.extend({
+  type: z.literal("contest"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const otherActivitySchema = baseActivitySchema.extend({
+  type: z.literal("other"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
+});
+
+const streetHappeningActivitySchema = baseActivitySchema.extend({
+  type: z.literal("street_happening"),
+  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj co najmniej jedną grupę odbiorców"),
 });
 
 // Union schema for all activity types
@@ -58,6 +144,23 @@ const activitySchema = z.discriminatedUnion("type", [
   presentationActivitySchema,
   distributionActivitySchema,
   mediaPublicationActivitySchema,
+  educationalInfoStandActivitySchema,
+  reportActivitySchema,
+  monthlyReportActivitySchema,
+  lectureActivitySchema,
+  intentLetterActivitySchema,
+  visitationActivitySchema,
+  gamesActivitySchema,
+  instructionActivitySchema,
+  individualInstructionActivitySchema,
+  meetingActivitySchema,
+  trainingActivitySchema,
+  conferenceActivitySchema,
+  counselingActivitySchema,
+  workshopActivitySchema,
+  contestActivitySchema,
+  otherActivitySchema,
+  streetHappeningActivitySchema,
 ]);
 
 export const createEducationalTaskSchema = z.object({

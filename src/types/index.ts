@@ -138,8 +138,148 @@ export interface MediaPublicationActivity {
   estimatedReach?: number; // opcjonalny szacowany zasięg
 }
 
+export interface EducationalInfoStandActivity {
+  type: "educational_info_stand";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface ReportActivity {
+  type: "report";
+  title: string;
+  description: string;
+  // Sprawozdania nie mają audienceGroups - są dokumentami wewnętrznymi
+}
+
+export interface MonthlyReportActivity {
+  type: "monthly_report";
+  title: string;
+  description: string;
+  // Sprawozdania miesięczne nie mają audienceGroups - są dokumentami wewnętrznymi
+}
+
+export interface LectureActivity {
+  type: "lecture";
+  title: string;
+  actionCount: number; // liczba przeprowadzonych wykładów
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface IntentLetterActivity {
+  type: "intent_letter";
+  title: string;
+  description: string;
+  // Listy intencyjne nie mają audienceGroups - są dokumentami formalnymi
+}
+
+export interface VisitationActivity {
+  type: "visitation";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface GamesActivity {
+  type: "games";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface InstructionActivity {
+  type: "instruction";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface IndividualInstructionActivity {
+  type: "individual_instruction";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface MeetingActivity {
+  type: "meeting";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface TrainingActivity {
+  type: "training";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface ConferenceActivity {
+  type: "conference";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface CounselingActivity {
+  type: "counseling";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface WorkshopActivity {
+  type: "workshop";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface ContestActivity {
+  type: "contest";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface OtherActivity {
+  type: "other";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
+export interface StreetHappeningActivity {
+  type: "street_happening";
+  title: string;
+  description: string;
+  audienceGroups: AudienceGroup[];
+}
+
 // Union type dla wszystkich aktywności
-export type Activity = PresentationActivity | DistributionActivity | MediaPublicationActivity;
+export type Activity =
+  | PresentationActivity
+  | DistributionActivity
+  | MediaPublicationActivity
+  | EducationalInfoStandActivity
+  | ReportActivity
+  | MonthlyReportActivity
+  | LectureActivity
+  | IntentLetterActivity
+  | VisitationActivity
+  | GamesActivity
+  | InstructionActivity
+  | IndividualInstructionActivity
+  | MeetingActivity
+  | TrainingActivity
+  | ConferenceActivity
+  | CounselingActivity
+  | WorkshopActivity
+  | ContestActivity
+  | OtherActivity
+  | StreetHappeningActivity;
 
 // Główna struktura zadania
 export interface EducationalTask {
@@ -184,6 +324,84 @@ export function isDistributionActivity(activity: Activity): activity is Distribu
 
 export function isMediaPublicationActivity(activity: Activity): activity is MediaPublicationActivity {
   return activity.type === "media_publication";
+}
+
+export function isEducationalInfoStandActivity(activity: Activity): activity is EducationalInfoStandActivity {
+  return activity.type === "educational_info_stand";
+}
+
+export function isReportActivity(activity: Activity): activity is ReportActivity {
+  return activity.type === "report";
+}
+
+export function isMonthlyReportActivity(activity: Activity): activity is MonthlyReportActivity {
+  return activity.type === "monthly_report";
+}
+
+export function isLectureActivity(activity: Activity): activity is LectureActivity {
+  return activity.type === "lecture";
+}
+
+export function isIntentLetterActivity(activity: Activity): activity is IntentLetterActivity {
+  return activity.type === "intent_letter";
+}
+
+export function isVisitationActivity(activity: Activity): activity is VisitationActivity {
+  return activity.type === "visitation";
+}
+
+export function isGamesActivity(activity: Activity): activity is GamesActivity {
+  return activity.type === "games";
+}
+
+export function isInstructionActivity(activity: Activity): activity is InstructionActivity {
+  return activity.type === "instruction";
+}
+
+export function isIndividualInstructionActivity(activity: Activity): activity is IndividualInstructionActivity {
+  return activity.type === "individual_instruction";
+}
+
+export function isMeetingActivity(activity: Activity): activity is MeetingActivity {
+  return activity.type === "meeting";
+}
+
+export function isTrainingActivity(activity: Activity): activity is TrainingActivity {
+  return activity.type === "training";
+}
+
+export function isConferenceActivity(activity: Activity): activity is ConferenceActivity {
+  return activity.type === "conference";
+}
+
+export function isCounselingActivity(activity: Activity): activity is CounselingActivity {
+  return activity.type === "counseling";
+}
+
+export function isWorkshopActivity(activity: Activity): activity is WorkshopActivity {
+  return activity.type === "workshop";
+}
+
+export function isContestActivity(activity: Activity): activity is ContestActivity {
+  return activity.type === "contest";
+}
+
+export function isOtherActivity(activity: Activity): activity is OtherActivity {
+  return activity.type === "other";
+}
+
+export function isStreetHappeningActivity(activity: Activity): activity is StreetHappeningActivity {
+  return activity.type === "street_happening";
+}
+
+// Helper functions to check if activity has audience groups
+export function hasAudienceGroups(activity: Activity): activity is Activity & { audienceGroups: AudienceGroup[] } {
+  return !["report", "monthly_report", "intent_letter", "media_publication"].includes(activity.type);
+}
+
+// Helper functions to check if activity has action count
+export function hasActionCount(activity: Activity): activity is Activity & { actionCount: number } {
+  return ["presentation", "lecture"].includes(activity.type);
 }
 
 // User Types

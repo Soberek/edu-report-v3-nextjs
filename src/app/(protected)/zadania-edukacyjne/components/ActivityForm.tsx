@@ -4,7 +4,14 @@ import { Box, Typography, Button, IconButton, Stack, Divider, TextField, FormCon
 import { Add, Delete } from "@mui/icons-material";
 import { FormField } from "@/components/shared";
 import { MEDIA_PLATFORMS, MATERIAL_TYPES } from "@/constants/educationalTasks";
-import { CreateEducationalTaskFormData, isPresentationActivity, isDistributionActivity, isMediaPublicationActivity } from "@/types";
+import { 
+  CreateEducationalTaskFormData, 
+  isPresentationActivity, 
+  isDistributionActivity, 
+  isMediaPublicationActivity,
+  hasAudienceGroups,
+  hasActionCount
+} from "@/types";
 import { AudienceGroupsForm } from "./AudienceGroupsForm";
 import { MaterialSelector } from "./MaterialSelector";
 
@@ -241,6 +248,8 @@ export const ActivityForm: React.FC = () => {
         const isPresentation = activity && isPresentationActivity(activity);
         const isDistribution = activity && isDistributionActivity(activity);
         const isMediaPublication = activity && isMediaPublicationActivity(activity);
+        const hasAudience = activity && hasAudienceGroups(activity);
+        const hasAction = activity && hasActionCount(activity);
 
         return (
           <Box key={field.id} sx={{ mb: 3, p: 2, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
@@ -279,8 +288,25 @@ export const ActivityForm: React.FC = () => {
                       }}
                     >
                       <MenuItem value="presentation">Prelekcja</MenuItem>
+                      <MenuItem value="lecture">Wykład</MenuItem>
                       <MenuItem value="distribution">Dystrybucja</MenuItem>
                       <MenuItem value="media_publication">Publikacja media</MenuItem>
+                      <MenuItem value="educational_info_stand">Stoisko informacyjne-edukacyjne</MenuItem>
+                      <MenuItem value="report">Sprawozdanie</MenuItem>
+                      <MenuItem value="monthly_report">Sprawozdanie miesięczne</MenuItem>
+                      <MenuItem value="intent_letter">List intencyjny</MenuItem>
+                      <MenuItem value="visitation">Wizytacja</MenuItem>
+                      <MenuItem value="games">Gry i zabawy</MenuItem>
+                      <MenuItem value="instruction">Instruktaż</MenuItem>
+                      <MenuItem value="individual_instruction">Instruktaż indywidualny</MenuItem>
+                      <MenuItem value="meeting">Narada</MenuItem>
+                      <MenuItem value="training">Szkolenie</MenuItem>
+                      <MenuItem value="conference">Konferencja</MenuItem>
+                      <MenuItem value="counseling">Poradnictwo</MenuItem>
+                      <MenuItem value="workshop">Warsztaty</MenuItem>
+                      <MenuItem value="contest">Konkurs</MenuItem>
+                      <MenuItem value="other">Inny</MenuItem>
+                      <MenuItem value="street_happening">Happening uliczny</MenuItem>
                     </Select>
                   </FormControl>
                 )}
@@ -288,7 +314,7 @@ export const ActivityForm: React.FC = () => {
 
               <FormField name={`activities.${index}.title`} control={control} label="Tytuł aktywności" required fullWidth />
 
-              {isPresentation && (
+              {hasAction && (
                 <Controller
                   name={`activities.${index}.actionCount`}
                   control={control}
@@ -308,7 +334,7 @@ export const ActivityForm: React.FC = () => {
 
               <FormField name={`activities.${index}.description`} control={control} label="Opis" multiline rows={2} required fullWidth />
 
-              {(isPresentation || isDistribution) && (
+              {hasAudience && (
                 <>
                   <Divider />
                   <Typography variant="subtitle2" fontWeight="bold" color="primary" sx={{ mt: 2, mb: 1 }}>
@@ -348,7 +374,7 @@ export const ActivityForm: React.FC = () => {
                     required
                     fullWidth
                   />
-                  
+
                   <FormField
                     name={`activities.${index}.estimatedReach`}
                     control={control}
