@@ -1,76 +1,70 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useState, useEffect } from "react";
-import { izrzFormSchema, type IzrzFormData } from "../schemas/izrzSchemas";
-
-interface UseIzrzFormProps {
-  onSubmit: (data: IzrzFormData) => Promise<void>;
-  defaultValues?: Partial<IzrzFormData>;
-}
+import { useCallback, useState, useEffect, useMemo } from "react";
+import { izrzFormSchema, defaultFormValues, type IzrzFormData } from "../schemas/izrzSchemas";
+import { UI_CONSTANTS, MESSAGES } from "../constants";
+import type { UseIzrzFormProps, SubmitMessage } from "../types";
 
 export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [submitMessage, setSubmitMessage] = useState<SubmitMessage | null>(null);
 
-  const form = useForm<IzrzFormData>({
-    resolver: zodResolver(izrzFormSchema),
-    mode: "onChange",
-    defaultValues: {
-      caseNumber: "",
-      reportNumber: "",
-      programName: "",
-      taskType: "",
-      address: "",
-      dateInput: new Date().toISOString().split("T")[0],
-      viewerCount: 0,
-      viewerCountDescription: `Grupa I: \n Szkoła Podstawowa (klasy 1-3): ... osób \n Opiekunowie: \n Szkola Podstawowa (klasy 4-8): ... osób \n Grupa II: \n Szkoła Ponadpodstawowa (klasy 1-3): ... osób \n Dorosli (studenci, nauczyciele, inni dorośli): ... osób \n`,
-      taskDescription: "",
-      additionalInfo: "",
-      attendanceList: false,
-      rozdzielnik: false,
-      templateFile: null,
-      ...defaultValues,
-    },
-  });
+  // Memoize form configuration
+  const formConfig = useMemo(
+    () => ({
+      resolver: zodResolver(izrzFormSchema),
+      mode: "onChange" as const,
+      defaultValues: {
+        ...defaultFormValues,
+        ...defaultValues,
+      },
+    }),
+    [defaultValues]
+  );
 
+  const form = useForm<IzrzFormData>(formConfig);
   const { control, handleSubmit, setValue, watch, formState, reset } = form;
 
-  // Auto-dismiss submit message after 5 seconds
+  // Auto-dismiss submit message
   useEffect(() => {
     if (submitMessage) {
       const timer = setTimeout(() => {
         setSubmitMessage(null);
-      }, 5000);
+      }, UI_CONSTANTS.SUBMIT_MESSAGE_DURATION);
 
       return () => clearTimeout(timer);
     }
   }, [submitMessage]);
 
-  // Handle form submission
-  const handleFormSubmit = handleSubmit(async (data: IzrzFormData) => {
-    setIsSubmitting(true);
-    setSubmitMessage(null);
+  // Handle form submission with proper error handling
+  const handleFormSubmit = useCallback(
+    handleSubmit(async (data: IzrzFormData) => {
+      setIsSubmitting(true);
+      setSubmitMessage(null);
 
-    try {
-      await onSubmit(data);
-      setSubmitMessage({
-        type: "success",
-        text: "Raport został wygenerowany! Pobieranie rozpoczęte.",
-      });
-    } catch (error) {
-      setSubmitMessage({
-        type: "error",
-        text: "Błąd podczas generowania raportu. Spróbuj ponownie.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  });
+      try {
+        await onSubmit(data);
+        setSubmitMessage({
+          type: "success",
+          text: MESSAGES.SUCCESS.REPORT_GENERATED,
+        });
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.GENERATION_FAILED;
+        setSubmitMessage({
+          type: "error",
+          text: errorMessage,
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    }),
+    [handleSubmit, onSubmit]
+  );
 
-  // Set form value helper
+  // Set form value helper with validation
   const setFormValue = useCallback(
     (field: keyof IzrzFormData, value: IzrzFormData[keyof IzrzFormData]) => {
-      setValue(field, value, { shouldValidate: true });
+      setValue(field, value, { shouldValidate: true, shouldDirty: true });
     },
     [setValue]
   );
@@ -82,19 +76,30 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
   }, [reset]);
 
   // Validation helpers
-  const isFormValid = formState.isValid;
-  const hasErrors = Object.keys(formState.errors).length > 0;
+  const validationState = useMemo(
+    () => ({
+      isValid: formState.isValid,
+      hasErrors: Object.keys(formState.errors).length > 0,
+      errorCount: Object.keys(formState.errors).length,
+      isDirty: formState.isDirty,
+    }),
+    [formState.isValid, formState.errors, formState.isDirty]
+  );
 
   return {
+    // Form controls
     control,
     handleSubmit: handleFormSubmit,
     setValue: setFormValue,
     watch,
-    formState,
     reset: resetForm,
-    isFormValid,
-    hasErrors,
+
+    // Form state
+    formState,
     isSubmitting,
     submitMessage,
+
+    // Validation state
+    ...validationState,
   };
 };

@@ -1,41 +1,95 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { TextField, Autocomplete, FormControlLabel, Checkbox } from "@mui/material";
 import { Controller, Control, FieldError } from "react-hook-form";
 import type { IzrzFormData } from "../schemas/izrzSchemas";
+import { STYLE_CONSTANTS, FORM_CONSTANTS } from "../constants";
+import type { FormFieldType, SelectOption } from "../types";
 
 interface BaseFieldProps {
-  name: keyof IzrzFormData;
-  control: Control<IzrzFormData>;
-  error?: FieldError;
-  required?: boolean;
+  readonly name: keyof IzrzFormData;
+  readonly control: Control<IzrzFormData>;
+  readonly error?: FieldError;
+  readonly required?: boolean;
+  readonly disabled?: boolean;
 }
 
 interface TextFieldProps extends BaseFieldProps {
-  type: "text" | "number" | "date" | "textarea";
-  label: string;
-  placeholder?: string;
-  multiline?: boolean;
-  minRows?: number;
-  maxRows?: number;
+  readonly type: "text" | "number" | "date" | "textarea";
+  readonly label: string;
+  readonly placeholder?: string;
+  readonly multiline?: boolean;
+  readonly minRows?: number;
+  readonly maxRows?: number;
 }
 
 interface SelectFieldProps extends BaseFieldProps {
-  type: "select";
-  label: string;
-  options: { value: string; label: string }[];
+  readonly type: "select";
+  readonly label: string;
+  readonly options: readonly SelectOption[];
 }
 
 interface CheckboxFieldProps extends BaseFieldProps {
-  type: "checkbox";
-  label: string;
+  readonly type: "checkbox";
+  readonly label: string;
 }
 
 type FormFieldProps = TextFieldProps | SelectFieldProps | CheckboxFieldProps;
 
-export const FormField: React.FC<FormFieldProps> = (props) => {
-  const { name, control, error, required = false } = props;
+// Common field styles
+const commonFieldStyles = {
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: "#fff",
+    borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.SMALL,
+    fontSize: STYLE_CONSTANTS.FONT_SIZES.MEDIUM,
+  },
+  "& .MuiInputLabel-root": {
+    fontSize: STYLE_CONSTANTS.FONT_SIZES.MEDIUM,
+  },
+  "& .MuiFormHelperText-root": {
+    fontSize: STYLE_CONSTANTS.FONT_SIZES.SMALL,
+  },
+} as const;
 
-  const renderField = () => {
+export const FormField: React.FC<FormFieldProps> = (props) => {
+  const { name, control, error, required = false, disabled = false } = props;
+
+  // Handle text field value changes
+  const handleTextFieldChange = useCallback(
+    (field: any, type: FormFieldType) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+
+      switch (type) {
+        case "number":
+          field.onChange(value === "" ? 0 : Number(value));
+          break;
+        case "date":
+          field.onChange(value);
+          break;
+        default:
+          field.onChange(value);
+      }
+    },
+    []
+  );
+
+  // Handle select field changes
+  const handleSelectChange = useCallback(
+    (field: any, options: readonly SelectOption[]) => (_: any, newValue: SelectOption | null) => {
+      field.onChange(newValue?.value || "");
+    },
+    []
+  );
+
+  // Find selected option for select field
+  const findSelectedOption = useCallback(
+    (value: string | number | boolean | File | null | undefined, options: readonly SelectOption[]): SelectOption | null => {
+      const stringValue = String(value || "");
+      return options.find((option) => option.value === stringValue) || null;
+    },
+    []
+  );
+
+  const renderField = (): React.ReactNode => {
     switch (props.type) {
       case "text":
       case "number":
@@ -52,37 +106,17 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                 label={props.label}
                 placeholder={props.placeholder}
                 required={required}
+                disabled={disabled}
                 fullWidth
                 multiline={props.multiline}
-                minRows={props.minRows}
-                maxRows={props.maxRows}
+                minRows={props.minRows || FORM_CONSTANTS.TEXTAREA_ROWS.DEFAULT}
+                maxRows={props.maxRows || FORM_CONSTANTS.TEXTAREA_ROWS.MAX}
                 variant="outlined"
                 size="small"
                 error={!!error}
                 helperText={error?.message}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (props.type === "number") {
-                    field.onChange(value === "" ? 0 : Number(value));
-                  } else if (props.type === "date") {
-                    field.onChange(value);
-                  } else {
-                    field.onChange(value);
-                  }
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#fff",
-                    borderRadius: 1.5,
-                    fontSize: "0.9rem",
-                  },
-                  "& .MuiInputLabel-root": {
-                    fontSize: "0.9rem",
-                  },
-                  "& .MuiFormHelperText-root": {
-                    fontSize: "0.8rem",
-                  },
-                }}
+                onChange={handleTextFieldChange(field, props.type)}
+                sx={commonFieldStyles}
               />
             )}
           />
@@ -95,11 +129,11 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
             control={control}
             render={({ field }) => (
               <Autocomplete
-                {...field}
                 options={props.options}
                 getOptionLabel={(option) => option.label}
-                value={props.options.find((option) => option.value === field.value) || null}
-                onChange={(_, newValue) => field.onChange(newValue?.value || "")}
+                value={findSelectedOption(field.value, props.options)}
+                onChange={handleSelectChange(field, props.options)}
+                disabled={disabled}
                 size="small"
                 renderInput={(params) => (
                   <TextField
@@ -108,19 +142,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                     required={required}
                     error={!!error}
                     helperText={error?.message}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: "#fff",
-                        borderRadius: 1.5,
-                        fontSize: "0.9rem",
-                      },
-                      "& .MuiInputLabel-root": {
-                        fontSize: "0.9rem",
-                      },
-                      "& .MuiFormHelperText-root": {
-                        fontSize: "0.8rem",
-                      },
-                    }}
+                    sx={commonFieldStyles}
                   />
                 )}
               />
@@ -135,11 +157,11 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
             control={control}
             render={({ field }) => (
               <FormControlLabel
-                control={<Checkbox {...field} checked={Boolean(field.value)} color="primary" size="small" />}
+                control={<Checkbox {...field} checked={Boolean(field.value)} disabled={disabled} color="primary" size="small" />}
                 label={props.label}
                 sx={{
                   "& .MuiFormControlLabel-label": {
-                    fontSize: "0.9rem",
+                    fontSize: STYLE_CONSTANTS.FONT_SIZES.MEDIUM,
                   },
                 }}
               />

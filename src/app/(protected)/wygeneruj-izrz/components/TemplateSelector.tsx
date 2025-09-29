@@ -1,26 +1,38 @@
-import React from "react";
-import { Box, Button, Typography, Paper, Stack, Chip, CircularProgress } from "@mui/material";
-import { Description, Upload, CheckCircle } from "@mui/icons-material";
+import React, { useCallback } from "react";
+import { Box, Button, Typography, Paper, Stack, Alert, CircularProgress } from "@mui/material";
+import { Description, CheckCircle, Error } from "@mui/icons-material";
 import type { TemplateSelectorProps } from "../types";
 import { useTemplateManager } from "../hooks/useTemplateManager";
+import { TEMPLATE_CONSTANTS, STYLE_CONSTANTS, MESSAGES } from "../constants";
 
-export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSelect, selectedTemplate }) => {
-  const { loading, choosePredefinedTemplate } = useTemplateManager({
-    onTemplateSelect,
-  });
+export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
+  onTemplateSelect,
+  selectedTemplate,
+  loading: externalLoading = false,
+  error: externalError = null,
+}) => {
+  const { loading: internalLoading, error: internalError, choosePredefinedTemplate } = useTemplateManager({ onTemplateSelect });
 
-  const predefinedTemplates: { name: string; label: string }[] = [
-    { name: "izrz.docx", label: "IZRZ Template" },
-    { name: "lista_obecnosci.docx", label: "Lista Obecności" },
-  ];
+  const isLoading = externalLoading || internalLoading;
+  const error = externalError || internalError;
 
-  const handleTemplateSelect = async (templateName: string) => {
-    try {
-      await choosePredefinedTemplate(templateName);
-    } catch (error) {
-      console.error("Failed to load template:", error);
-    }
-  };
+  const handleTemplateSelect = useCallback(
+    async (templateName: string): Promise<void> => {
+      try {
+        await choosePredefinedTemplate(templateName);
+      } catch (error) {
+        console.error("Failed to load template:", error);
+      }
+    },
+    [choosePredefinedTemplate]
+  );
+
+  const isTemplateSelected = useCallback(
+    (templateName: string): boolean => {
+      return selectedTemplate?.name === templateName;
+    },
+    [selectedTemplate?.name]
+  );
 
   return (
     <Paper
@@ -28,13 +40,13 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSe
       sx={{
         p: 2,
         mb: 2,
-        borderRadius: 1.5,
+        borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.SMALL,
         backgroundColor: "#f8f9fa",
         border: "1px solid #e9ecef",
         transition: "all 0.2s ease-in-out",
         "&:hover": {
           elevation: 2,
-          borderColor: "#1976d2",
+          borderColor: STYLE_CONSTANTS.COLORS.PRIMARY,
         },
       }}
     >
@@ -43,7 +55,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSe
         sx={{
           mb: 1.5,
           fontWeight: 600,
-          color: "#1976d2",
+          color: STYLE_CONSTANTS.COLORS.PRIMARY,
           display: "flex",
           alignItems: "center",
           gap: 0.5,
@@ -59,18 +71,26 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSe
           Wybierz jeden z dostępnych szablonów:
         </Typography>
 
+        {/* Error Display */}
+        {error && (
+          <Alert severity="error" icon={<Error />} sx={{ fontSize: "0.85rem" }}>
+            {error}
+          </Alert>
+        )}
+
+        {/* Template Buttons */}
         <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
-          {predefinedTemplates.map((template) => (
+          {TEMPLATE_CONSTANTS.PREDEFINED_TEMPLATES.map((template) => (
             <Button
               key={template.name}
-              variant={selectedTemplate?.name === template.name ? "contained" : "outlined"}
+              variant={isTemplateSelected(template.name) ? "contained" : "outlined"}
               onClick={() => handleTemplateSelect(template.name)}
-              disabled={loading}
-              startIcon={loading ? <CircularProgress size={14} /> : <Description sx={{ fontSize: "1rem" }} />}
+              disabled={isLoading}
+              startIcon={isLoading ? <CircularProgress size={14} /> : <Description sx={{ fontSize: "1rem" }} />}
               size="small"
               sx={{
                 minWidth: 120,
-                borderRadius: 1.5,
+                borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.SMALL,
                 textTransform: "none",
                 fontWeight: "medium",
                 fontSize: "0.85rem",
@@ -83,6 +103,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSe
           ))}
         </Box>
 
+        {/* Selected Template Display */}
         {selectedTemplate && (
           <Box
             sx={{
@@ -91,12 +112,19 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSe
               gap: 1,
               p: 1.5,
               backgroundColor: "#e8f5e8",
-              borderRadius: 1.5,
+              borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.SMALL,
               border: "1px solid #4caf50",
             }}
           >
-            <CheckCircle sx={{ color: "#4caf50", fontSize: "1.1rem" }} />
-            <Typography variant="body2" sx={{ color: "#2e7d32", fontWeight: "medium", fontSize: "0.85rem" }}>
+            <CheckCircle sx={{ color: STYLE_CONSTANTS.COLORS.SUCCESS, fontSize: "1.1rem" }} />
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#2e7d32",
+                fontWeight: "medium",
+                fontSize: "0.85rem",
+              }}
+            >
               Wybrany szablon: {selectedTemplate.name}
             </Typography>
           </Box>
