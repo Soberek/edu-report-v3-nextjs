@@ -88,7 +88,7 @@ export const VaccinationInfo: React.FC<VaccinationInfoProps> = ({
 
       <Grid container spacing={3}>
         {/* Skuteczność szczepień */}
-        <Grid item xs={12} lg={6}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <Card sx={{ height: "100%", borderRadius: 2, boxShadow: 2 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: "success.main" }}>
@@ -123,7 +123,7 @@ export const VaccinationInfo: React.FC<VaccinationInfoProps> = ({
         </Grid>
 
         {/* Korzyści ze szczepień */}
-        <Grid item xs={12} lg={6}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <Card sx={{ height: "100%", borderRadius: 2, boxShadow: 2 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: "info.main" }}>
@@ -150,7 +150,7 @@ export const VaccinationInfo: React.FC<VaccinationInfoProps> = ({
         </Grid>
 
         {/* Kiedy się szczepić */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ height: "100%", borderRadius: 2, boxShadow: 2 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: "warning.main" }}>
@@ -177,7 +177,7 @@ export const VaccinationInfo: React.FC<VaccinationInfoProps> = ({
         </Grid>
 
         {/* Przeciwwskazania */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ height: "100%", borderRadius: 2, boxShadow: 2 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: "error.main" }}>
@@ -204,7 +204,7 @@ export const VaccinationInfo: React.FC<VaccinationInfoProps> = ({
         </Grid>
 
         {/* Skutki uboczne */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ height: "100%", borderRadius: 2, boxShadow: 2 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: "secondary.main" }}>
@@ -242,7 +242,7 @@ export const VaccinationInfo: React.FC<VaccinationInfoProps> = ({
         </Grid>
 
         {/* Gdzie się szczepić */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ height: "100%", borderRadius: 2, boxShadow: 2 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: "primary.main" }}>

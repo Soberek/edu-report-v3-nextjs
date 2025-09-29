@@ -125,7 +125,7 @@ export const TreatmentMethods: React.FC<TreatmentMethodsProps> = ({ title = "ğŸ
 
       <Grid container spacing={3}>
         {treatmentCategories.map((category) => (
-          <Grid item xs={12} md={6} lg={4} key={category.id}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }} key={category.id}>
             <Card
               sx={{
                 height: "100%",

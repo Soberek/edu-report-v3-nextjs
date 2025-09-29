@@ -25,7 +25,7 @@ export const CommonMistakes: React.FC<CommonMistakesProps> = ({ title = "⚠️ 
 
       <Grid container spacing={3}>
         {COMMON_MISTAKES.map((mistake, index) => (
-          <Grid item xs={12} md={6} key={mistake.id}>
+          <Grid size={{ xs: 12, md: 6 }} key={mistake.id}>
             <Card
               sx={{
                 height: "100%",

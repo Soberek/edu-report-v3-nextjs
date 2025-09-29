@@ -105,7 +105,7 @@ export const DetailedSymptomGuide: React.FC<DetailedSymptomGuideProps> = ({
       case "variable":
         return "warning";
       default:
-        return "default";
+        return "primary";
     }
   };
 
@@ -171,7 +171,7 @@ export const DetailedSymptomGuide: React.FC<DetailedSymptomGuideProps> = ({
 
           <AccordionDetails sx={{ p: 3 }}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Card variant="outlined" sx={{ mb: 2 }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: "primary.main" }}>
@@ -204,7 +204,7 @@ export const DetailedSymptomGuide: React.FC<DetailedSymptomGuideProps> = ({
                 </Card>
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Card variant="outlined" sx={{ mb: 2 }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: "error.main" }}>
@@ -220,7 +220,7 @@ export const DetailedSymptomGuide: React.FC<DetailedSymptomGuideProps> = ({
                 </Card>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Card variant="outlined">
                   <CardContent>
                     <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: "secondary.main" }}>

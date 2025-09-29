@@ -20,7 +20,7 @@ export const PreventionTips: React.FC<PreventionTipsProps> = ({ title = "🛡️
       case "environment":
         return "warning";
       default:
-        return "default";
+        return "primary";
     }
   };
 
@@ -49,7 +49,7 @@ export const PreventionTips: React.FC<PreventionTipsProps> = ({ title = "🛡️
 
       <Grid container spacing={3}>
         {PREVENTION_TIPS.map((tip) => (
-          <Grid item xs={12} sm={6} md={4} key={tip.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={tip.id}>
             <Card
               sx={{
                 height: "100%",
