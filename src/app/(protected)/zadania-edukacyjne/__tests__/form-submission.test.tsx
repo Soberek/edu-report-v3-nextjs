@@ -107,7 +107,9 @@ const MockEducationalTasksPage = () => {
       <button onClick={handleAddTask} data-testid="add-task-button">
         Dodaj zadanie
       </button>
-      {isFormOpen && <MockEducationalTaskForm onSubmit={handleFormSubmit} onCancel={handleFormCancel} initialData={editTask || undefined} />}
+      {isFormOpen && (
+        <MockEducationalTaskForm onSubmit={handleFormSubmit} onCancel={handleFormCancel} initialData={editTask || undefined} />
+      )}
       {submittedData && (
         <div data-testid="submitted-data">
           <h3>Zadanie zostało dodane:</h3>
