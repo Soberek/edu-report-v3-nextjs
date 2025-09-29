@@ -19,19 +19,11 @@ export { StatsCard, CompactStatsCard } from "./StatsCard";
 export { PageHeader, SimplePageHeader } from "./PageHeader";
 export { TabPanel, AnimatedTabPanel } from "./TabPanel";
 export { EmptyState, NoDataEmptyState, ErrorEmptyState } from "./EmptyState";
-export { default as ResponseDisplay } from "./response-display";
+export { ResponseDisplay } from "./response-display";
 
 // New components
 export { AutocompleteField } from "./AutocompleteField";
-export { 
-  AvatarWithText, 
-  Tag, 
-  InfoBadge, 
-  NotesCell, 
-  DateCell,
-  getInitials,
-  getRandomColor 
-} from "./TableCellComponents";
+export { AvatarWithText, Tag, InfoBadge, NotesCell, DateCell, getInitials, getRandomColor } from "./TableCellComponents";
 
 // Re-export types
 export type { DataTableAction, DataTableProps } from "./DataTable";
