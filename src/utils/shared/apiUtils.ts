@@ -1,4 +1,4 @@
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T;
   success: boolean;
   message?: string;
@@ -23,15 +23,16 @@ export const createApiError = (message: string, status?: number, code?: string):
   code,
 });
 
-export const handleApiError = (error: any): ApiError => {
-  if (error.response) {
+export const handleApiError = (error: unknown): ApiError => {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const apiError = error as { response: { data?: { message?: string; code?: string }; status: number } };
     // Server responded with error status
     return {
-      message: error.response.data?.message || "Wystąpił błąd serwera",
-      status: error.response.status,
-      code: error.response.data?.code,
+      message: apiError.response.data?.message || "Wystąpił błąd serwera",
+      status: apiError.response.status,
+      code: apiError.response.data?.code,
     };
-  } else if (error.request) {
+  } else if (error && typeof error === 'object' && 'request' in error) {
     // Request was made but no response received
     return {
       message: "Brak połączenia z serwerem",
@@ -39,14 +40,17 @@ export const handleApiError = (error: any): ApiError => {
     };
   } else {
     // Something else happened
+    const message = error && typeof error === 'object' && 'message' in error 
+      ? (error as { message: string }).message 
+      : "Wystąpił nieoczekiwany błąd";
     return {
-      message: error.message || "Wystąpił nieoczekiwany błąd",
+      message,
     };
   }
 };
 
 export const retryApiCall = async <T>(apiCall: () => Promise<T>, maxRetries: number = 3, delay: number = 1000): Promise<T> => {
-  let lastError: any;
+  let lastError: unknown;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -66,7 +70,7 @@ export const retryApiCall = async <T>(apiCall: () => Promise<T>, maxRetries: num
   throw lastError;
 };
 
-export const debounceApiCall = <T extends (...args: any[]) => Promise<any>>(apiCall: T, delay: number = 300): T => {
+export const debounceApiCall = <T extends (...args: unknown[]) => Promise<unknown>>(apiCall: T, delay: number = 300): T => {
   let timeoutId: NodeJS.Timeout;
 
   return ((...args: Parameters<T>) => {
@@ -112,12 +116,12 @@ export const createApiClient = (baseURL: string) => {
 
   return {
     get: <T>(endpoint: string) => request<T>(endpoint, { method: "GET" }),
-    post: <T>(endpoint: string, data?: any) =>
+    post: <T>(endpoint: string, data?: unknown) =>
       request<T>(endpoint, {
         method: "POST",
         body: data ? JSON.stringify(data) : undefined,
       }),
-    put: <T>(endpoint: string, data?: any) =>
+    put: <T>(endpoint: string, data?: unknown) =>
       request<T>(endpoint, {
         method: "PUT",
         body: data ? JSON.stringify(data) : undefined,
