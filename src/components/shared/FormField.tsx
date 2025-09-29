@@ -15,8 +15,10 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { DateField } from "@mui/x-date-pickers/DateField";
 import { Controller, Control, FieldPath, FieldValues } from "react-hook-form";
 import { formatDateForInput } from "@/utils/shared/dayjsUtils";
+import dayjs from "dayjs";
 
 // Polish validation helpers
 export const getPolishValidationMessage = (type: string, label: string): string => {
@@ -105,7 +107,7 @@ export const FormField = <T extends FieldValues>({
       sx: {
         "& .MuiOutlinedInput-root": {
           borderRadius: 2,
-          background: type === "date" ? "white" : "transparent",
+          background: "transparent",
           fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
           fontSize: size === "small" ? "0.875rem" : "1rem",
           "&:hover .MuiOutlinedInput-notchedOutline": {
@@ -133,7 +135,7 @@ export const FormField = <T extends FieldValues>({
         },
         ...sx,
       },
-      InputLabelProps: type === "date" ? { shrink: true } : undefined, // Ensure label stays up for date inputs
+      // InputLabelProps not needed for DateField - handled by MUI Date Picker
     };
 
     switch (type) {
@@ -193,26 +195,54 @@ export const FormField = <T extends FieldValues>({
         );
 
       case "date":
-        // Ensure date value is in correct format for HTML5 date input
-        const dateValue = field.value ? (typeof field.value === "string" ? field.value : formatDateForInput(field.value)) : "";
+        // Use MUI DateField for proper Polish localization
+        const dateValue = field.value ? (field.value instanceof dayjs ? field.value : dayjs(field.value)) : null;
 
         return (
-          <TextField
-            {...commonProps}
-            type="date"
-            value={dateValue}
-            onChange={(e) => {
-              const value = e.target.value;
-              // Always store in YYYY-MM-DD format for consistency with our dayjs utils
-              field.onChange(value || "");
-            }}
-            FormHelperTextProps={{
-              sx: {
-                fontSize: "0.75rem",
-                fontFamily: "Roboto, sans-serif",
-              },
-            }}
-          />
+          <FormControl fullWidth={fullWidth} error={hasError}>
+            <DateField
+              label={label}
+              value={dateValue}
+              onChange={(newValue) => {
+                field.onChange(newValue ? formatDateForInput(newValue) : "");
+              }}
+              format="DD.MM.YYYY"
+              fullWidth
+              required={required}
+              disabled={disabled}
+              slotProps={{
+                textField: {
+                  size: size,
+                  error: hasError,
+                  helperText: hasError ? error.message : helperText,
+                },
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  background: "white",
+                  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                  fontSize: size === "small" ? "0.875rem" : "1rem",
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: theme.palette.primary.main,
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: theme.palette.primary.main,
+                    borderWidth: "1px",
+                  },
+                },
+                "& .MuiFormLabel-root": {
+                  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                  fontSize: size === "small" ? "0.875rem" : "1rem",
+                },
+                "& .MuiFormHelperText-root": {
+                  fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                  fontSize: "0.75rem",
+                },
+                ...sx,
+              }}
+            />
+          </FormControl>
         );
 
       default:
