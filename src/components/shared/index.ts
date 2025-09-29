@@ -27,6 +27,7 @@ export { AvatarWithText, Tag, InfoBadge, NotesCell, DateCell, getInitials, getRa
 
 // Re-export types
 export type { DataTableAction, DataTableProps } from "./DataTable";
+export { polishDataTableLabels } from "./DataTable";
 export type { LoadingSpinnerProps } from "./LoadingSpinner";
 export type { ConfirmDialogProps } from "./ConfirmDialog";
 export type { FormFieldProps } from "./FormField";
