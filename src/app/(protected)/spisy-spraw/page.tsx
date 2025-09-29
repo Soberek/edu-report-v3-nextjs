@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { Container, Alert, Snackbar, Box } from "@mui/material";
-import { useCallback, useMemo, useState, useRef } from "react";
+import { useCallback, useMemo, useReducer, useRef } from "react";
 
 import type { CaseRecord } from "@/types";
 import { ActForm } from "./components/form";
@@ -31,22 +31,105 @@ const INITIAL_SELECTED_CODE = {
   title: "Sprawozdawczość statystyczna",
 };
 
-export default function Acts() {
-  const [selectedCode, setSelectedCode] = useState(INITIAL_SELECTED_CODE);
-  const [editingCaseRecord, setEditingCaseRecord] = useState<CaseRecord | null>(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [dialogLoading, setDialogLoading] = useState(false);
-  const formRef = useRef<any>(null);
-
-  const [snackbar, setSnackbar] = useState<{
+// Reducer types and actions
+interface SpisySprawState {
+  selectedCode: { code: string; title: string };
+  editingCaseRecord: CaseRecord | null;
+  editDialogOpen: boolean;
+  dialogLoading: boolean;
+  snackbar: {
     open: boolean;
     type: "success" | "error" | "info" | "warning";
     message: string;
-  }>({
+  };
+}
+
+type SpisySprawAction =
+  | { type: "SET_SELECTED_CODE"; payload: { code: string; title: string } }
+  | { type: "START_EDIT"; payload: CaseRecord }
+  | { type: "CLOSE_EDIT_DIALOG" }
+  | { type: "SET_DIALOG_LOADING"; payload: boolean }
+  | { type: "SHOW_SNACKBAR"; payload: { type: "success" | "error" | "info" | "warning"; message: string } }
+  | { type: "CLOSE_SNACKBAR" }
+  | { type: "RESET_FORM" };
+
+const initialState: SpisySprawState = {
+  selectedCode: INITIAL_SELECTED_CODE,
+  editingCaseRecord: null,
+  editDialogOpen: false,
+  dialogLoading: false,
+  snackbar: {
     open: false,
     type: "success",
     message: "",
-  });
+  },
+};
+
+function spisySprawReducer(state: SpisySprawState, action: SpisySprawAction): SpisySprawState {
+  switch (action.type) {
+    case "SET_SELECTED_CODE":
+      return {
+        ...state,
+        selectedCode: action.payload,
+      };
+
+    case "START_EDIT":
+      return {
+        ...state,
+        editingCaseRecord: action.payload,
+        editDialogOpen: true,
+      };
+
+    case "CLOSE_EDIT_DIALOG":
+      return {
+        ...state,
+        editDialogOpen: false,
+        editingCaseRecord: null,
+        dialogLoading: false,
+      };
+
+    case "SET_DIALOG_LOADING":
+      return {
+        ...state,
+        dialogLoading: action.payload,
+      };
+
+    case "SHOW_SNACKBAR":
+      return {
+        ...state,
+        snackbar: {
+          open: true,
+          type: action.payload.type,
+          message: action.payload.message,
+        },
+      };
+
+    case "CLOSE_SNACKBAR":
+      return {
+        ...state,
+        snackbar: {
+          ...state.snackbar,
+          open: false,
+        },
+      };
+
+    case "RESET_FORM":
+      return {
+        ...state,
+        editingCaseRecord: null,
+        editDialogOpen: false,
+        dialogLoading: false,
+      };
+
+    default:
+      return state;
+  }
+}
+
+export default function Acts() {
+  // Organized state management with useReducer
+  const [state, dispatch] = useReducer(spisySprawReducer, initialState);
+  const formRef = useRef<any>(null);
 
   const {
     control,
@@ -78,16 +161,19 @@ export default function Acts() {
 
   const sortedCaseRecords = useMemo(() => {
     return actRecords
-      .filter((record) => record.code === selectedCode.code)
+      .filter((record) => record.code === state.selectedCode.code)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  }, [actRecords, selectedCode.code]);
+  }, [actRecords, state.selectedCode.code]);
 
   const handleCodeChange = useCallback(
     (code: string) => {
       const option = actsOptions.find((opt) => opt.code === code);
-      setSelectedCode({
-        code,
-        title: option?.name || "",
+      dispatch({
+        type: "SET_SELECTED_CODE",
+        payload: {
+          code,
+          title: option?.name || "",
+        },
       });
     },
     [actsOptions]
@@ -96,17 +182,21 @@ export default function Acts() {
   const handleAddActRecord = async (data: CaseRecord) => {
     try {
       await addActRecord(data);
-      setSnackbar({
-        open: true,
-        type: "success",
-        message: "Akt sprawy został dodany pomyślnie.",
+      dispatch({
+        type: "SHOW_SNACKBAR",
+        payload: {
+          type: "success",
+          message: "Akt sprawy został dodany pomyślnie.",
+        },
       });
       reset();
     } catch (error) {
-      setSnackbar({
-        open: true,
-        type: "error",
-        message: "Wystąpił błąd podczas zapisywania danych.",
+      dispatch({
+        type: "SHOW_SNACKBAR",
+        payload: {
+          type: "error",
+          message: "Wystąpił błąd podczas zapisywania danych.",
+        },
       });
     }
   };
@@ -114,23 +204,26 @@ export default function Acts() {
   const handleDeleteCaseRecord = async (caseId: string) => {
     try {
       await removeActRecord(caseId);
-      setSnackbar({
-        open: true,
-        type: "success",
-        message: "Akt sprawy został usunięty pomyślnie.",
+      dispatch({
+        type: "SHOW_SNACKBAR",
+        payload: {
+          type: "success",
+          message: "Akt sprawy został usunięty pomyślnie.",
+        },
       });
     } catch (error) {
-      setSnackbar({
-        open: true,
-        type: "error",
-        message: "Wystąpił błąd podczas usuwania danych.",
+      dispatch({
+        type: "SHOW_SNACKBAR",
+        payload: {
+          type: "error",
+          message: "Wystąpił błąd podczas usuwania danych.",
+        },
       });
     }
   };
 
   const handleEditCaseRecord = (caseRecord: CaseRecord) => {
-    setEditingCaseRecord(caseRecord);
-    setEditDialogOpen(true);
+    dispatch({ type: "START_EDIT", payload: caseRecord });
   };
 
   const handleSaveCaseRecord = async () => {
@@ -140,36 +233,38 @@ export default function Acts() {
   };
 
   const handleFormSubmit = async (data: CaseRecord) => {
-    if (editingCaseRecord) {
-      setDialogLoading(true);
+    if (state.editingCaseRecord) {
+      dispatch({ type: "SET_DIALOG_LOADING", payload: true });
       try {
         await updateActRecord(data);
-        setSnackbar({
-          open: true,
-          type: "success",
-          message: "Akt sprawy został zaktualizowany pomyślnie.",
+        dispatch({
+          type: "SHOW_SNACKBAR",
+          payload: {
+            type: "success",
+            message: "Akt sprawy został zaktualizowany pomyślnie.",
+          },
         });
-        setEditDialogOpen(false);
-        setEditingCaseRecord(null);
+        dispatch({ type: "CLOSE_EDIT_DIALOG" });
       } catch (error) {
-        setSnackbar({
-          open: true,
-          type: "error",
-          message: "Wystąpił błąd podczas aktualizacji danych.",
+        dispatch({
+          type: "SHOW_SNACKBAR",
+          payload: {
+            type: "error",
+            message: "Wystąpił błąd podczas aktualizacji danych.",
+          },
         });
       } finally {
-        setDialogLoading(false);
+        dispatch({ type: "SET_DIALOG_LOADING", payload: false });
       }
     }
   };
 
   const handleCloseEditDialog = () => {
-    setEditDialogOpen(false);
-    setEditingCaseRecord(null);
+    dispatch({ type: "CLOSE_EDIT_DIALOG" });
   };
 
   const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
+    dispatch({ type: "CLOSE_SNACKBAR" });
   };
 
   // Render error messages
@@ -212,7 +307,7 @@ export default function Acts() {
 
       {/* Filter and Export Section */}
       <FilterSection
-        selectedCode={selectedCode}
+        selectedCode={state.selectedCode}
         actsOptions={actsOptions}
         sortedCaseRecords={sortedCaseRecords}
         onCodeChange={handleCodeChange}
@@ -228,26 +323,26 @@ export default function Acts() {
 
       {/* Snackbar for notifications */}
       <Snackbar
-        open={snackbar.open}
+        open={state.snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.type} sx={{ width: "100%" }}>
-          {snackbar.message}
+        <Alert onClose={handleCloseSnackbar} severity={state.snackbar.type} sx={{ width: "100%" }}>
+          {state.snackbar.message}
         </Alert>
       </Snackbar>
 
       {/* Edit Dialog */}
       <EditDialog
-        open={editDialogOpen}
+        open={state.editDialogOpen}
         onClose={handleCloseEditDialog}
         title="Edytuj akt sprawy"
         onSave={handleSaveCaseRecord}
-        loading={dialogLoading}
+        loading={state.dialogLoading}
         maxWidth="lg"
       >
-        <EditActForm ref={formRef} caseRecord={editingCaseRecord} actsOptions={actCodesOptions} onSubmit={handleFormSubmit} />
+        <EditActForm ref={formRef} caseRecord={state.editingCaseRecord} actsOptions={actCodesOptions} onSubmit={handleFormSubmit} />
       </EditDialog>
     </Container>
   );
