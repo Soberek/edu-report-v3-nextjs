@@ -27,8 +27,7 @@ const initialState: EducationalTasksState = {
 };
 
 // Reducer
-const educationalTasksReducer = (state: EducationalTasksState, action: EducationalTasksAction): EducationalTasksState => {
-  console.log("Educational tasks reducer action:", action);
+export const educationalTasksReducer = (state: EducationalTasksState, action: EducationalTasksAction): EducationalTasksState => {
   switch (action.type) {
     case "SET_LOADING":
       return { ...state, loading: action.payload };
@@ -63,6 +62,132 @@ const educationalTasksReducer = (state: EducationalTasksState, action: Education
   }
 };
 
+// Action creators for better testability
+export const actions = {
+  setLoading: (loading: boolean): EducationalTasksAction => ({ type: "SET_LOADING", payload: loading }),
+  setError: (error: string | null): EducationalTasksAction => ({ type: "SET_ERROR", payload: error }),
+  setTasks: (tasks: EducationalTask[]): EducationalTasksAction => ({ type: "SET_TASKS", payload: tasks }),
+  addTask: (task: EducationalTask): EducationalTasksAction => ({ type: "ADD_TASK", payload: task }),
+  updateTask: (task: EducationalTask): EducationalTasksAction => ({ type: "UPDATE_TASK", payload: task }),
+  deleteTask: (id: string): EducationalTasksAction => ({ type: "DELETE_TASK", payload: id }),
+};
+
+// Utility functions for better testability
+export const taskUtils = {
+  generateTaskId: (): string => `task_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+  createTaskFromData: (taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => ({
+    ...taskData,
+    id: taskUtils.generateTaskId(),
+    createdBy: userId,
+    createdAt: new Date().toISOString(),
+  }),
+  updateTaskFromData: (id: string, taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => ({
+    ...taskData,
+    id,
+    createdBy: userId,
+    updatedAt: new Date().toISOString(),
+    createdAt: "",
+  }),
+  getErrorMessage: (error: unknown, defaultMessage: string): string => {
+    return error instanceof Error ? error.message : defaultMessage;
+  },
+};
+
+// Custom hook for task operations
+const useTaskOperations = (
+  dispatch: React.Dispatch<EducationalTasksAction>,
+  user: any,
+  createItem: (item: EducationalTask) => Promise<EducationalTask | null>,
+  updateItem: (id: string, item: Partial<EducationalTask>) => Promise<boolean>,
+  deleteItem: (id: string) => Promise<boolean>
+) => {
+  const createTask = useCallback(
+    async (taskData: CreateEducationalTaskFormData) => {
+      if (!user?.uid) {
+        const error = "Użytkownik nie jest zalogowany";
+        dispatch(actions.setError(error));
+        throw new Error(error);
+      }
+
+      dispatch(actions.setLoading(true));
+      dispatch(actions.setError(null));
+
+      try {
+        const newTask = taskUtils.createTaskFromData(taskData, user.uid);
+        const savedTask = await createItem(newTask);
+
+        if (savedTask) {
+          dispatch(actions.addTask(savedTask));
+        }
+
+        return savedTask;
+      } catch (err) {
+        const errorMessage = taskUtils.getErrorMessage(err, "Błąd podczas tworzenia zadania");
+        dispatch(actions.setError(errorMessage));
+        throw err;
+      }
+    },
+    [user?.uid, createItem, dispatch]
+  );
+
+  const updateTask = useCallback(
+    async (id: string, taskData: CreateEducationalTaskFormData) => {
+      if (!user?.uid) {
+        const error = "Użytkownik nie jest zalogowany";
+        dispatch(actions.setError(error));
+        throw new Error(error);
+      }
+
+      dispatch(actions.setLoading(true));
+      dispatch(actions.setError(null));
+
+      try {
+        const updatedTask = taskUtils.updateTaskFromData(id, taskData, user.uid);
+        const success = await updateItem(id, updatedTask);
+
+        if (success) {
+          dispatch(actions.updateTask(updatedTask));
+        }
+
+        return updatedTask;
+      } catch (err) {
+        const errorMessage = taskUtils.getErrorMessage(err, "Błąd podczas aktualizacji zadania");
+        dispatch(actions.setError(errorMessage));
+        throw err;
+      }
+    },
+    [user?.uid, updateItem, dispatch]
+  );
+
+  const deleteTask = useCallback(
+    async (id: string) => {
+      if (!user?.uid) {
+        const error = "Użytkownik nie jest zalogowany";
+        dispatch(actions.setError(error));
+        throw new Error(error);
+      }
+
+      dispatch(actions.setLoading(true));
+      dispatch(actions.setError(null));
+
+      try {
+        const success = await deleteItem(id);
+        if (success) {
+          dispatch(actions.deleteTask(id));
+        }
+      } catch (err) {
+        const errorMessage = taskUtils.getErrorMessage(err, "Błąd podczas usuwania zadania");
+        dispatch(actions.setError(errorMessage));
+        throw err;
+      }
+    },
+    [user?.uid, deleteItem, dispatch]
+  );
+
+  return { createTask, updateTask, deleteTask };
+};
+
+// Main hook
 export const useEducationalTasks = () => {
   const { user } = useUser();
   const [state, dispatch] = useReducer(educationalTasksReducer, initialState);
@@ -79,114 +204,15 @@ export const useEducationalTasks = () => {
   // Update local state when Firebase data changes
   React.useEffect(() => {
     if (firebaseTasks) {
-      dispatch({ type: "SET_TASKS", payload: firebaseTasks });
+      dispatch(actions.setTasks(firebaseTasks));
     }
   }, [firebaseTasks]);
 
-  const createTask = useCallback(
-    async (taskData: CreateEducationalTaskFormData) => {
-      if (!user?.uid) {
-        const error = "Użytkownik nie jest zalogowany";
-        dispatch({ type: "SET_ERROR", payload: error });
-        throw new Error(error);
-      }
-
-      dispatch({ type: "SET_LOADING", payload: true });
-      dispatch({ type: "SET_ERROR", payload: null });
-
-      try {
-        const newTask: EducationalTask = {
-          ...taskData,
-          id: `task_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-          createdBy: user.uid,
-          createdAt: new Date().toISOString(),
-        };
-
-        // Save to Firebase
-        const savedTask = await createItem(newTask);
-
-        // Add task to local state
-        if (savedTask) {
-          dispatch({ type: "ADD_TASK", payload: savedTask });
-        }
-
-        return savedTask;
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Błąd podczas tworzenia zadania";
-        dispatch({ type: "SET_ERROR", payload: errorMessage });
-        throw err;
-      }
-    },
-    [user?.uid, createItem]
-  );
-
-  const updateTask = useCallback(
-    async (id: string, taskData: CreateEducationalTaskFormData) => {
-      if (!user?.uid) {
-        const error = "Użytkownik nie jest zalogowany";
-        dispatch({ type: "SET_ERROR", payload: error });
-        throw new Error(error);
-      }
-
-      dispatch({ type: "SET_LOADING", payload: true });
-      dispatch({ type: "SET_ERROR", payload: null });
-
-      try {
-        const updatedTask: EducationalTask = {
-          ...taskData,
-          id,
-          createdBy: user.uid,
-          updatedAt: new Date().toISOString(),
-          createdAt: "",
-        };
-
-        // Update in Firebase
-        const success = await updateItem(id, updatedTask);
-
-        // Update task in local state
-        if (success) {
-          dispatch({ type: "UPDATE_TASK", payload: updatedTask });
-        }
-
-        return updatedTask;
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Błąd podczas aktualizacji zadania";
-        dispatch({ type: "SET_ERROR", payload: errorMessage });
-        throw err;
-      }
-    },
-    [user?.uid, updateItem]
-  );
-
-  const deleteTask = useCallback(
-    async (id: string) => {
-      if (!user?.uid) {
-        const error = "Użytkownik nie jest zalogowany";
-        dispatch({ type: "SET_ERROR", payload: error });
-        throw new Error(error);
-      }
-
-      dispatch({ type: "SET_LOADING", payload: true });
-      dispatch({ type: "SET_ERROR", payload: null });
-
-      try {
-        // Delete from Firebase
-        await deleteItem(id);
-
-        // Remove task from local state
-        dispatch({ type: "DELETE_TASK", payload: id });
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Błąd podczas usuwania zadania";
-        dispatch({ type: "SET_ERROR", payload: errorMessage });
-        throw err;
-      }
-    },
-    [user?.uid, deleteItem]
-  );
+  const { createTask, updateTask, deleteTask } = useTaskOperations(dispatch, user, createItem, updateItem, deleteItem);
 
   const clearError = useCallback(() => {
-    dispatch({ type: "SET_ERROR", payload: null });
-  }, []);
+    dispatch(actions.setError(null));
+  }, [dispatch]);
 
   return {
     tasks: state.tasks,
