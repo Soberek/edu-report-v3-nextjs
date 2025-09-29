@@ -33,7 +33,7 @@ export const useTaskNumberManager = ({
   initialYear = getCurrentYear(),
   currentTaskNumber,
 }: UseTaskNumberManagerProps): TaskNumberManager => {
-  const [year, setYear] = useState(() => {
+  const [year] = useState(() => {
     // Extract year from currentTaskNumber or use initialYear
     const parsed = parseTaskNumber(currentTaskNumber);
     return parsed?.year || initialYear;
