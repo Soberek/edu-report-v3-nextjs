@@ -8,6 +8,7 @@ import { Description as DescriptionIcon } from "@mui/icons-material";
 interface ActCaseRecordsTableProps {
   caseRecords: CaseRecord[];
   deleteCaseRecord: (caseId: string) => void;
+  editCaseRecord: (caseRecord: CaseRecord) => void;
   loading?: boolean;
 }
 
@@ -22,10 +23,18 @@ const createColumns = (): GridColDef[] => [
   { field: "comments", headerName: "Uwagi", flex: 1.2, minWidth: 150 },
 ];
 
-export const ActCaseRecordsTable: React.FC<ActCaseRecordsTableProps> = ({ caseRecords, deleteCaseRecord, loading = false }) => {
+export const ActCaseRecordsTable: React.FC<ActCaseRecordsTableProps> = ({ caseRecords, deleteCaseRecord, editCaseRecord, loading = false }) => {
   const columns = createColumns();
 
-  const actions = [defaultActions.delete(deleteCaseRecord)];
+  const actions = [
+    defaultActions.edit((id: string) => {
+      const caseRecord = caseRecords.find((record) => record.id === id);
+      if (caseRecord) {
+        editCaseRecord(caseRecord);
+      }
+    }),
+    defaultActions.delete(deleteCaseRecord),
+  ];
 
   if (loading) {
     return <LoadingSpinner size={48} message="Ładowanie danych..." sx={{ minHeight: 200 }} />;
