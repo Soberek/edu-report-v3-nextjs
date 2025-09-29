@@ -4,10 +4,12 @@ import { Edit, Delete, ExpandMore, ExpandLess, CalendarToday, School, Assignment
 import type { TaskCardProps } from "../types";
 import { formatTaskDate } from "../utils";
 import { STYLE_CONSTANTS, BUTTON_LABELS } from "../constants";
+import { useSchoolsMap } from "../hooks/useSchoolsMap";
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpansion, onEdit, onDelete }) => {
   const taskDate = formatTaskDate(task.date);
   const activityCount = task.activities.length;
+  const { getSchoolName, getSchoolInfo } = useSchoolsMap();
 
   const renderTaskSummary = () => (
     <Box>
@@ -45,9 +47,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
             <School sx={{ fontSize: "1rem", color: "text.secondary" }} />
             <Typography variant="body2" color="text.secondary" sx={{ fontWeight: "medium" }}>
-              {task.programName}
+              {getSchoolName(task.schoolId)}
             </Typography>
           </Box>
+          
+          <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.85rem", fontStyle: "italic" }}>
+            {task.programName}
+          </Typography>
         </Box>
       </Box>
 
@@ -140,7 +146,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
               {task.programName}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {task.schoolId ? `Szkoła ID: ${task.schoolId}` : "Nie przypisano szkoły"}
+              {getSchoolInfo(task.schoolId)}
             </Typography>
           </Box>
         </Box>
