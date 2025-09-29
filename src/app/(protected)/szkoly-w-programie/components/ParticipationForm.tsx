@@ -1,20 +1,27 @@
+import React, { useMemo } from "react";
 import { Box, Typography, Paper, Fade } from "@mui/material";
 import { School, Group, Person, CalendarToday, Save, Add } from "@mui/icons-material";
 import { UseFormReturn } from "react-hook-form";
-import { useMemo } from "react";
 import type { Contact, Program, School as SchoolType } from "@/types";
-import { schoolYears } from "@/constants";
 import { SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
-import { AutocompleteField, FormField, ActionButton, type AutocompleteOption } from "@/components/shared";
-
-interface ParticipationFormProps {
-  schools: SchoolType[];
-  contacts: Contact[];
-  programs: Program[];
-  loading: boolean;
-  onSubmit: (data: SchoolProgramParticipationDTO) => Promise<void>;
-  formMethods: UseFormReturn<SchoolProgramParticipationDTO>;
-}
+import { AutocompleteField, FormField, ActionButton } from "@/components/shared";
+import {
+  transformSchoolsToOptions,
+  transformContactsToOptions,
+  transformProgramsToOptions,
+  transformSchoolYearsToOptions
+} from "../utils";
+import {
+  SCHOOL_YEAR_OPTIONS,
+  FIELD_LABELS,
+  FIELD_PLACEHOLDERS,
+  HELPER_TEXT,
+  BUTTON_LABELS,
+  STYLE_CONSTANTS,
+  PAGE_CONSTANTS,
+  UI_CONSTANTS
+} from "../constants";
+import type { ParticipationFormProps } from "../types";
 
 // Custom Paper Form Section Component
 const CustomFormSection: React.FC<{
@@ -25,18 +32,18 @@ const CustomFormSection: React.FC<{
   <Paper
     elevation={0}
     sx={{
-      borderRadius: 4,
-      background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+      borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.EXTRA_LARGE,
+      background: STYLE_CONSTANTS.COLORS.BACKGROUND_GRADIENT,
       overflow: "hidden",
-      mb: 4,
+      mb: STYLE_CONSTANTS.SPACING.LARGE,
       ...sx,
     }}
   >
     <Box
       sx={{
-        background: "rgba(255,255,255,0.9)",
+        background: STYLE_CONSTANTS.COLORS.HEADER_BACKGROUND,
         backdropFilter: "blur(10px)",
-        p: 2,
+        p: STYLE_CONSTANTS.SPACING.MEDIUM,
         borderBottom: "1px solid rgba(255,255,255,0.2)",
       }}
     >
@@ -47,14 +54,14 @@ const CustomFormSection: React.FC<{
           color: "#2c3e50",
           display: "flex",
           alignItems: "center",
-          gap: 1,
+          gap: STYLE_CONSTANTS.SPACING.SMALL,
         }}
       >
-        <Add sx={{ color: "#1976d2" }} />
+        <Add sx={{ color: STYLE_CONSTANTS.COLORS.PRIMARY }} />
         {title}
       </Typography>
     </Box>
-    <Box sx={{ p: 4 }}>
+    <Box sx={{ p: STYLE_CONSTANTS.SPACING.LARGE }}>
       <Fade in timeout={300}>
         <div>{children}</div>
       </Fade>
@@ -62,39 +69,26 @@ const CustomFormSection: React.FC<{
   </Paper>
 );
 
-export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, contacts, programs, loading, onSubmit, formMethods }) => {
+export const ParticipationForm: React.FC<ParticipationFormProps> = ({
+  schools,
+  contacts,
+  programs,
+  loading,
+  onSubmit,
+  formMethods
+}) => {
   const {
     control,
     handleSubmit,
     reset,
-    formState: { isDirty },
+    isDirty,
   } = formMethods;
 
-  // Transform data to AutocompleteOption format
-  const schoolsOptions: AutocompleteOption[] = useMemo(() => schools.map((school) => ({ id: school.id, name: school.name })), [schools]);
-
-  const contactsOptions: AutocompleteOption[] = useMemo(
-    () =>
-      contacts.map((contact) => ({
-        id: contact.id,
-        name: `${contact.firstName} ${contact.lastName}`,
-        firstName: contact.firstName,
-        lastName: contact.lastName,
-      })),
-    [contacts]
-  );
-
-  const programsOptions: AutocompleteOption[] = useMemo(
-    () =>
-      programs.map((program) => ({
-        id: program.id,
-        name: program.name,
-        code: program.code,
-      })),
-    [programs]
-  );
-
-  const schoolYearsOptions: AutocompleteOption[] = useMemo(() => schoolYears.map((year) => ({ id: year, name: year })), [schoolYears]);
+  // Transform data to options using utility functions
+  const schoolsOptions = useMemo(() => transformSchoolsToOptions(schools), [schools]);
+  const contactsOptions = useMemo(() => transformContactsToOptions(contacts), [contacts]);
+  const programsOptions = useMemo(() => transformProgramsToOptions(programs), [programs]);
+  const schoolYearsOptions = useMemo(() => transformSchoolYearsToOptions(SCHOOL_YEAR_OPTIONS), []);
 
   const handleFormSubmit = async (data: SchoolProgramParticipationDTO) => {
     try {
@@ -102,132 +96,145 @@ export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, c
       reset();
     } catch (error) {
       console.error("Form submission error:", error);
+      throw error;
     }
   };
 
+  const renderFormFields = () => (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: STYLE_CONSTANTS.SPACING.MEDIUM }}>
+      <Box sx={{
+        display: "grid",
+        gridTemplateColumns: UI_CONSTANTS.FORM_GRID_COLUMNS.TABLET,
+        gap: STYLE_CONSTANTS.SPACING.MEDIUM
+      }}>
+        {/* School Selection */}
+        <AutocompleteField
+          name="schoolId"
+          control={control}
+          label={FIELD_LABELS.SCHOOL}
+          options={schoolsOptions}
+          required
+          startAdornment={<School />}
+        />
+
+        {/* Program Selection */}
+        <AutocompleteField
+          name="programId"
+          control={control}
+          label={FIELD_LABELS.PROGRAM}
+          options={programsOptions}
+          required
+          startAdornment={<Group />}
+          getOptionLabel={(option) => `${option.code || "Brak kodu"} - ${option.name}`}
+        />
+
+        {/* Coordinator Selection */}
+        <AutocompleteField
+          name="coordinatorId"
+          control={control}
+          label={FIELD_LABELS.COORDINATOR}
+          options={contactsOptions}
+          required
+          startAdornment={<Person />}
+        />
+
+        {/* School Year Selection */}
+        <AutocompleteField
+          name="schoolYear"
+          control={control}
+          label={FIELD_LABELS.SCHOOL_YEAR}
+          options={schoolYearsOptions}
+          required
+          startAdornment={<CalendarToday />}
+        />
+
+        {/* Student Count */}
+        <FormField
+          name="studentCount"
+          control={control}
+          label={FIELD_LABELS.STUDENT_COUNT}
+          type="number"
+          required
+          helperText={HELPER_TEXT.STUDENT_COUNT}
+        />
+
+        {/* Previous Coordinator */}
+        <AutocompleteField
+          name="previousCoordinatorId"
+          control={control}
+          label={FIELD_LABELS.PREVIOUS_COORDINATOR}
+          options={contactsOptions}
+          startAdornment={<Person />}
+        />
+      </Box>
+
+      {/* Notes */}
+      <Box sx={{ gridColumn: "1 / -1" }}>
+        <FormField
+          name="notes"
+          control={control}
+          label={FIELD_LABELS.NOTES}
+          type="textarea"
+          rows={4}
+          helperText={HELPER_TEXT.NOTES}
+        />
+      </Box>
+    </Box>
+  );
+
+  const renderSubmitButton = () => (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "flex-end",
+        mt: STYLE_CONSTANTS.SPACING.MEDIUM,
+        pt: STYLE_CONSTANTS.SPACING.MEDIUM,
+        borderTop: "1px solid rgba(0,0,0,0.1)",
+      }}
+    >
+      <ActionButton
+        type="submit"
+        disabled={loading || !isDirty}
+        variant="contained"
+        startIcon={<Save />}
+        loading={loading}
+        sx={{
+          borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.LARGE,
+          textTransform: "none",
+          fontWeight: "bold",
+          px: STYLE_CONSTANTS.SPACING.LARGE,
+          py: STYLE_CONSTANTS.SPACING.SMALL,
+          background: STYLE_CONSTANTS.GRADIENTS.PRIMARY,
+          boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
+          "&:hover": {
+            background: STYLE_CONSTANTS.GRADIENTS.PRIMARY_HOVER,
+            boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
+            transform: "translateY(-1px)",
+          },
+          "&:disabled": {
+            background: "rgba(0,0,0,0.12)",
+            color: "rgba(0,0,0,0.26)",
+          },
+        }}
+      >
+        {BUTTON_LABELS.SAVE_PARTICIPATION}
+      </ActionButton>
+    </Box>
+  );
+
   return (
-    <CustomFormSection title="Dodaj nowe uczestnictwo">
+    <CustomFormSection title={PAGE_CONSTANTS.FORM_TITLE}>
       <Box
         component="form"
         onSubmit={handleSubmit(handleFormSubmit)}
         sx={{
           display: "flex",
           flexDirection: "column",
-          gap: 3,
+          gap: STYLE_CONSTANTS.SPACING.MEDIUM,
         }}
       >
-        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 3 }}>
-          {/* School Selection */}
-          <AutocompleteField
-            name="schoolId"
-            control={control}
-            label="Szkoła"
-            options={schoolsOptions}
-            required
-            startAdornment={<School />}
-          />
-
-          {/* Program Selection */}
-          <AutocompleteField
-            name="programId"
-            control={control}
-            label="Program Uczestnictwa"
-            options={programsOptions}
-            required
-            startAdornment={<Group />}
-            getOptionLabel={(option) => `${option.code || "Brak kodu"} - ${option.name}`}
-          />
-
-          {/* Coordinator Selection */}
-          <AutocompleteField
-            name="coordinatorId"
-            control={control}
-            label="Koordynator"
-            options={contactsOptions}
-            required
-            startAdornment={<Person />}
-          />
-
-          {/* School Year Selection */}
-          <AutocompleteField
-            name="schoolYear"
-            control={control}
-            label="Rok szkolny"
-            options={schoolYearsOptions}
-            required
-            startAdornment={<CalendarToday />}
-          />
-
-          {/* Student Count */}
-          <FormField
-            name="studentCount"
-            control={control}
-            label="Liczba uczniów"
-            type="number"
-            required
-            helperText="Wprowadź liczbę uczniów uczestniczących w programie"
-          />
-
-          {/* Previous Coordinator */}
-          <AutocompleteField
-            name="previousCoordinatorId"
-            control={control}
-            label="Poprzedni Koordynator (opcjonalne)"
-            options={contactsOptions}
-            startAdornment={<Person />}
-          />
-
-          {/* Notes */}
-          <Box sx={{ gridColumn: "1 / -1" }}>
-            <FormField
-              name="notes"
-              control={control}
-              label="Notatki"
-              type="textarea"
-              rows={4}
-              helperText="Opcjonalne uwagi dotyczące uczestnictwa"
-            />
-          </Box>
-        </Box>
-
-        {/* Submit Button */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            mt: 3,
-            pt: 3,
-            borderTop: "1px solid rgba(0,0,0,0.1)",
-          }}
-        >
-          <ActionButton
-            type="submit"
-            disabled={loading || !isDirty}
-            variant="contained"
-            startIcon={<Save />}
-            loading={loading}
-            sx={{
-              borderRadius: 3,
-              textTransform: "none",
-              fontWeight: "bold",
-              px: 4,
-              py: 1.5,
-              background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
-              boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
-              "&:hover": {
-                background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
-                boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
-                transform: "translateY(-1px)",
-              },
-              "&:disabled": {
-                background: "rgba(0,0,0,0.12)",
-                color: "rgba(0,0,0,0.26)",
-              },
-            }}
-          >
-            Zapisz uczestnictwo
-          </ActionButton>
-        </Box>
+        {renderFormFields()}
+        {renderSubmitButton()}
       </Box>
     </CustomFormSection>
   );
