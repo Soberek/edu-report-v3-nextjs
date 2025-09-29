@@ -6,7 +6,7 @@ export interface ValidationResult {
   errors: Record<string, string>;
 }
 
-export const useFormValidation = <T extends Record<string, any>>(schema: z.ZodSchema<T>) => {
+export const useFormValidation = <T extends Record<string, unknown>>(schema: z.ZodSchema<T>) => {
   const validate = useCallback(
     (data: Partial<T>): ValidationResult => {
       try {
@@ -28,9 +28,9 @@ export const useFormValidation = <T extends Record<string, any>>(schema: z.ZodSc
   );
 
   const validateField = useCallback(
-    (fieldName: keyof T, value: any): string | null => {
+    (fieldName: keyof T, value: unknown): string | null => {
       try {
-        const fieldSchema = schema.shape[fieldName as string];
+        const fieldSchema = (schema as z.ZodObject<any>).shape[fieldName as string];
         if (fieldSchema) {
           fieldSchema.parse(value);
           return null;
