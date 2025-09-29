@@ -189,3 +189,6 @@ export const truncateText = (text: string, maxLength: number): string => {
 export const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
+
+// Re-export material utilities
+export * from "./materialUtils";

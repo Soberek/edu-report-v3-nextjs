@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardActions, Typography, Box, Chip, Button, Collapse, IconButton, Avatar, Divider } from "@mui/material";
 import { Edit, Delete, ExpandMore, ExpandLess, CalendarToday, School, Assignment, Tag } from "@mui/icons-material";
 import type { TaskCardProps } from "../types";
-import { formatTaskDate } from "../utils";
+import { formatTaskDate, getMaterialsSummary, getMaterialsDetailsList, getTotalDistributedCount } from "../utils";
 import { STYLE_CONSTANTS, BUTTON_LABELS } from "../constants";
 import { useSchoolsMap } from "../hooks/useSchoolsMap";
 
@@ -10,6 +10,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
   const taskDate = formatTaskDate(task.date);
   const activityCount = task.activities.length;
   const { getSchoolName, getSchoolInfo } = useSchoolsMap();
+  
+  // Materials data
+  const materialsSummary = getMaterialsSummary(task.activities);
+  const materialsDetails = getMaterialsDetailsList(task.activities);
+  const totalMaterialsCount = getTotalDistributedCount(task.activities);
 
   const renderTaskSummary = () => (
     <Box>
@@ -85,6 +90,20 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
         {task.taskNumber && (
           <Chip label={`Nr: ${task.taskNumber}`} size="small" variant="outlined" sx={{ fontSize: "0.75rem", color: "text.secondary" }} />
         )}
+        
+        {totalMaterialsCount > 0 && (
+          <Chip 
+            label={`📦 ${totalMaterialsCount} materiałów`}
+            size="small" 
+            variant="outlined"
+            sx={{ 
+              fontSize: "0.75rem", 
+              color: "success.main",
+              borderColor: "success.main",
+              backgroundColor: "success.50",
+            }} 
+          />
+        )}
       </Box>
     </Box>
   );
@@ -150,6 +169,52 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
             </Typography>
           </Box>
         </Box>
+
+        {/* Materials Section */}
+        {materialsDetails.length > 0 && (
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2, fontWeight: "bold" }}>
+              📦 Dystrybuowane materiały ({materialsDetails.length})
+            </Typography>
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(auto-fit, minmax(280px, 1fr))" }, gap: 2 }}>
+              {materialsDetails.map((material, index) => (
+                <Box 
+                  key={index} 
+                  sx={{ 
+                    p: 2, 
+                    border: "1px solid #e8f5e8", 
+                    borderRadius: 2,
+                    bgcolor: "success.50",
+                    borderLeft: "4px solid",
+                    borderLeftColor: "success.main",
+                  }}
+                >
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                    <Typography variant="subtitle2" fontWeight="bold" sx={{ color: "success.dark" }}>
+                      {material.name}
+                    </Typography>
+                    <Chip 
+                      label={`${material.count} szt.`}
+                      size="small" 
+                      color="success"
+                      sx={{ fontSize: "0.7rem", fontWeight: "bold" }}
+                    />
+                  </Box>
+                  
+                  <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
+                    Typ: {material.type}
+                  </Typography>
+                  
+                  {material.description && (
+                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.85rem", lineHeight: 1.4 }}>
+                      {material.description}
+                    </Typography>
+                  )}
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        )}
 
         {/* Activities Section */}
         {task.activities.length > 0 && (
