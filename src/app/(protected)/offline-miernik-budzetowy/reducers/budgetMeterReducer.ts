@@ -6,26 +6,24 @@ export const initialBudgetMeterState: BudgetMeterState = {
   rawData: [],
   isLoading: false,
   fileError: null,
-  
+
   // Month selection
   selectedMonths: Array.from({ length: 12 }, (_, index) => ({
     monthNumber: index + 1,
     selected: false,
   })),
   monthError: null,
-  
+
   // Data processing
   aggregatedData: null,
   processingError: null,
-  
+
   // UI state
   isProcessing: false,
 };
 
-export const budgetMeterReducer = (
-  state: BudgetMeterState,
-  action: BudgetMeterAction
-): BudgetMeterState => {
+export const budgetMeterReducer = (state: BudgetMeterState, action: BudgetMeterAction): BudgetMeterState => {
+  console.log("action", action);
   switch (action.type) {
     case "RESET_STATE":
       return initialBudgetMeterState;
@@ -83,13 +81,11 @@ export const budgetMeterReducer = (
       if (state.monthError) {
         return state; // Don't allow changes when there's an error
       }
-      
+
       return {
         ...state,
         selectedMonths: state.selectedMonths.map((month) =>
-          month.monthNumber === action.payload
-            ? { ...month, selected: !month.selected }
-            : month
+          month.monthNumber === action.payload ? { ...month, selected: !month.selected } : month
         ),
         monthError: null,
         // Clear previous aggregated data when months change
