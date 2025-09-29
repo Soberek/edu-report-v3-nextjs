@@ -1,4 +1,5 @@
 import { Habit } from "../types";
+import { formatDate as formatDateDayjs } from "@/utils/shared/dayjsUtils";
 
 export const calculateProgress = (value: number, goal: number): number => {
   return Math.min((value / goal) * 100, 100);
@@ -12,13 +13,7 @@ export const getProgressColor = (progress: number): string => {
 };
 
 export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("pl-PL", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return formatDateDayjs(dateString, "full");
 };
 
 export const getMoodEmoji = (mood: Habit["mood"]): string => {

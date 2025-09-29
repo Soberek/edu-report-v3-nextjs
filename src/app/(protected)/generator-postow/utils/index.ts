@@ -1,4 +1,5 @@
 import { EducationalPost } from "../types";
+import { formatDate as formatDateDayjs } from "@/utils/shared/dayjsUtils";
 
 /**
  * Get template-specific styling for posts
@@ -122,11 +123,7 @@ export const sortPostsByDate = (posts: EducationalPost[]): EducationalPost[] => 
  * Format date for display
  */
 export const formatDate = (date: Date): string => {
-  return date.toLocaleDateString("pl-PL", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return formatDateDayjs(date, "long");
 };
 
 /**
