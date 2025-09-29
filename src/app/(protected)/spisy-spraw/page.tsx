@@ -202,7 +202,7 @@ export default function Acts() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Header */}
-      <PageHeader title="Spisy Spraw" subtitle="Zarządzaj aktami spraw administracyjnych" />
+      <PageHeader title="Spisy Spraw" subtitle="Zarządzanie aktami spraw administracyjnych" />
 
       {/* Error Alert */}
       {renderErrors()}

@@ -77,7 +77,7 @@ export const ActCaseRecordsTable: React.FC<ActCaseRecordsTableProps> = ({
           }}
         >
           <DescriptionIcon sx={{ color: "#1976d2" }} />
-          Akta spraw ({caseRecords.length})
+          Akta sprawy ({caseRecords.length})
         </Typography>
       </Box>
 

@@ -24,7 +24,7 @@ export const ActRecordsPdfPreview: React.FC<Props> = ({ caseRecords, selectedCod
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = "sample.pdf";
+    link.download = `akty_spraw_${selectedCode}_${year || new Date().getFullYear()}.pdf`;
     document.body.appendChild(link);
     link.click();
     link.remove();
