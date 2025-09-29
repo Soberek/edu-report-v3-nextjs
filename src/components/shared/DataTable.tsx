@@ -12,7 +12,7 @@ const polishLocalization = {
           // Pagination
           paginationPlaceholderLabel: "Ilość wierszy",
           paginationLabelRowsPerPage: "Wiersze na stronie:",
-          
+
           // Filter panel
           filterPanelAddFilter: "Dodaj filtr",
           filterPanelDeleteIconLabel: "Usuń",
@@ -22,7 +22,7 @@ const polishLocalization = {
           filterPanelColumns: "Kolumny",
           filterPanelInputLabel: "Wartość",
           filterPanelInputPlaceholder: "Wartość filtru",
-          
+
           // Column menu
           columnMenuLabel: "Menu kolumny",
           columnMenuShowColumns: "Pokaż kolumny",
@@ -31,60 +31,58 @@ const polishLocalization = {
           columnMenuUnsort: "Anuluj sortowanie",
           columnMenuSortAsc: "Sortuj rosnąco",
           columnMenuSortDesc: "Sortuj malejąco",
-          
+
           // Columns panel
           columnsPanelTextFieldLabel: "Znajdź kolumnę",
           columnsPanelTextFieldPlaceholder: "Tytuł kolumny",
           columnsPanelDragIconLabel: "Przeciągnij kolumnę",
           columnsPanelShowAllButton: "Pokaż wszystkie",
           columnsPanelHideAllButton: "Ukryj wszystkie",
-          
+
           // Status bars
           footerRowSelected: (count: number) =>
-            count !== 1
-              ? `${count.toLocaleString()} wierszy zaznaczonych`
-              : `${count.toLocaleString()} wiersz zaznaczony`,
+            count !== 1 ? `${count.toLocaleString()} wierszy zaznaczonych` : `${count.toLocaleString()} wiersz zaznaczony`,
           footerTotalRows: "Łączna liczba wierszy:",
-          
+
           // Density
           toolbarDensity: "Gęstość",
           toolbarDensityLabel: "Gęstość",
           toolbarDensityCompact: "Kompaktowa",
           toolbarDensityStandard: "Standardowa",
           toolbarDensityComfortable: "Komfortowa",
-          
+
           // Column selectors
           toolbarColumns: "Kolumny",
           toolbarColumnsLabel: "Wybierz kolumnę",
-          
+
           // Fields
           columnFieldsPlaceholderColumn: "Kolumna",
           switchColumnMoveLeft: (label: string) => `Przenieś ${label} w lewo`,
           switchColumnMoveRight: (label: string) => `Przenieś ${label} w prawo`,
-          
+
           // Row groups
           rowGroupingHeaderName: "Grupowanie",
           groupedColumnHeaderName: "Grupa",
           groupedColumnSortDescendingTooltip: (field: string) => `Sortuj ${field} malejąco`,
           groupedColumnSortAscendingTooltip: (field: string) => `Sortuj ${field} rosnąco`,
           groupedColumnUnsortTooltip: (field: string) => `Anuluj sortowanie ${field}`,
-          
+
           // Aggregation
           cellMore: "Więcej tekstu",
           noRowsLabel: "Brak danych",
           errorOverlayDefaultLabel: "Wystąpił błąd.",
           noResultsOverlayLabel: "Brak wyników wyszukiwania.",
           loadingOverlayLabelLabel: "Ładowanie danych...",
-          
+
           // Boolean filter
           booleanFilterTrueLabel: "tak",
           booleanFilterFalseLabel: "nie",
           booleanFilterEmptyLabel: "puste",
-          
+
           // Date picker
           datePickerTableLoadingLabel: "Ładowanie...",
           datePickerTableEmptyLabel: "Brak dat",
-          
+
           // Actions
           actionsCellMoreLabel: "więcej",
         },
@@ -237,8 +235,7 @@ export const polishDataTableLabels = {
   noData: "Brak danych do wyświetlenia",
   loading: "Ładowanie danych...",
   error: "Wystąpił błąd podczas ładowania danych",
-  paginationInfo: (from: number, to: number, total: number) => 
-    `${from}-${to} z ${total}`,
+  paginationInfo: (from: number, to: number, total: number) => `${from}-${to} z ${total}`,
   itemsPerPage: "Pozycji na stronie:",
   search: "Szukaj...",
   clearFilters: "Wyczyść filtry",

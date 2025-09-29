@@ -17,3 +17,9 @@ export {
   ActionButton,
   EditDialog,
 } from "@/components/shared";
+
+// Re-export local modules for easy access
+export * from "../types";
+export * from "../constants";
+export * from "../reducers/spisySprawReducer";
+export * from "../hooks";

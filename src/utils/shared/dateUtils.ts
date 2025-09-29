@@ -1,5 +1,3 @@
-import { formatDate as formatDateDayjs } from "./dayjsUtils";
-
 export const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOptions): string => {
   const dateObj = typeof date === "string" ? new Date(date) : date;
 
