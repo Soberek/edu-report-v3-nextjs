@@ -174,20 +174,20 @@ export const EDUCATIONAL_MATERIALS: MaterialItem[] = [
     category: "edukacyjny",
     defaultCount: 50,
   },
-] as const;
+];
 
 // Kategorie materiałów z polskimi nazwami
 export const MATERIAL_CATEGORIES = {
   EDUKACYJNY: "edukacyjny",
   PROMOCYJNY: "promocyjny",
   INFORMACYJNY: "informacyjny",
-} as const;
+};
 
 export const MATERIAL_CATEGORY_LABELS = {
   [MATERIAL_CATEGORIES.EDUKACYJNY]: "Materiały edukacyjne",
   [MATERIAL_CATEGORIES.PROMOCYJNY]: "Materiały promocyjne",
   [MATERIAL_CATEGORIES.INFORMACYJNY]: "Materiały informacyjne",
-} as const;
+};
 
 // Pomocnicze funkcje
 export const getMaterialsByType = (type: string) => EDUCATIONAL_MATERIALS.filter((material) => material.type === type);
