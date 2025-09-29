@@ -8,6 +8,7 @@ import { EditDialog, FormField, PrimaryButton, SecondaryButton } from "@/compone
 import { Autocomplete, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { formatDateForInput } from "@/utils/shared/dayjsUtils";
 import { createEducationalTaskSchema, type CreateEducationalTaskFormData } from "../schemas/educationalTaskSchemas";
 import { EducationalTask } from "@/types";
 import { ActivityForm } from "./ActivityForm";
@@ -119,7 +120,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
                       label="Data"
                       value={field.value ? dayjs(field.value) : null}
                       onChange={(date) => {
-                        field.onChange(date ? date.format("YYYY-MM-DD") : "");
+                        field.onChange(date ? formatDateForInput(date) : "");
                       }}
                       slotProps={{
                         textField: {
