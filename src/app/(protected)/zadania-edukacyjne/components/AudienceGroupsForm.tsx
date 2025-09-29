@@ -39,7 +39,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
   const getTotalAudience = () => {
     const audienceGroups = watch(basePath) || [];
     return audienceGroups.reduce((total: number, group: any) => {
-      const count = group.count || 0;
+      const count = Number(group.count) || 0;
       return total + count;
     }, 0);
   };
