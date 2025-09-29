@@ -12,7 +12,7 @@ const materialSchema = z.object({
   id: z.string().min(1, "ID materiału jest wymagane"),
   name: z.string().min(1, "Nazwa materiału jest wymagana").max(200, "Nazwa nie może być dłuższa niż 200 znaków"),
   type: z.enum(Object.values(MATERIAL_TYPES) as [string, ...string[]]),
-  distributedCount: z.number().min(1, "Ilość musi być co najmniej 1").max(10000, "Ilość nie może przekraczać 10000"),
+  distributedCount: z.coerce.number().min(1, "Ilość musi być co najmniej 1").max(10000, "Ilość nie może przekraczać 10000"),
   description: z.string().optional(),
 });
 
@@ -30,8 +30,8 @@ const activitySchema = z
   .object({
     type: z.enum(Object.values(TASK_TYPES).map((taskType) => taskType.label) as [string, ...string[]]),
     title: z.string().min(1, "Tytuł aktywności jest wymagany").max(200, "Tytuł nie może być dłuższy niż 200 znaków"),
-    actionCount: z.number().min(1, "Ilość działań musi być co najmniej 1").max(100, "Ilość działań nie może przekraczać 100").default(1),
-    audienceCount: z.number().min(0, "Liczba odbiorców nie może być ujemna").max(10000, "Liczba odbiorców nie może przekraczać 10000"),
+    actionCount: z.coerce.number().min(1, "Ilość działań musi być co najmniej 1").max(100, "Ilość działań nie może przekraczać 100").default(1),
+    audienceCount: z.coerce.number().min(0, "Liczba odbiorców nie może być ujemna").max(10000, "Liczba odbiorców nie może przekraczać 10000"),
     description: z.string().min(1, "Opis jest wymagany").max(1000, "Opis nie może być dłuższy niż 1000 znaków"),
     audienceGroups: z.array(audienceGroupSchema).optional().default([]),
     media: mediaSchema.optional(),
