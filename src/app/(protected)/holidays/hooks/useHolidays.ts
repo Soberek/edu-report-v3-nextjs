@@ -2,7 +2,7 @@ import { useReducer, useCallback } from "react";
 import { useOpenAIChat } from "@/hooks/useOpenAi";
 import { holidaysReducer, initialHolidaysState } from "../reducers/holidaysReducer";
 import { createHealthHolidaysPrompt, createPostsPrompt, parseHolidaysResponse, parsePostsResponse } from "../utils/aiUtils";
-import type { Holiday, EducationalHolidayWithQuery, Post } from "../types";
+// import type { Holiday, EducationalHolidayWithQuery, Post } from "../types";
 
 export const useHolidays = () => {
   const [state, dispatch] = useReducer(holidaysReducer, initialHolidaysState);
@@ -27,7 +27,7 @@ export const useHolidays = () => {
       } else {
         dispatch({ type: "SET_ERROR", payload: data.error || "Unknown error" });
       }
-    } catch (error) {
+    } catch {
       dispatch({ type: "SET_ERROR", payload: "Network error occurred" });
     }
   }, []);

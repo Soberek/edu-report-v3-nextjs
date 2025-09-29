@@ -21,7 +21,7 @@ import {
 export default function PostGeneratorPage() {
   // Custom hooks for state management
   const { state, actions } = usePostGenerator();
-  const { posts, aiLoading, actions: postActions } = usePostManagement();
+  const { aiLoading, actions: postActions } = usePostManagement();
 
   // Local state for posts
   const [educationalPostsState, setEducationalPostsState] = useState<EducationalPost[]>(initialPosts);

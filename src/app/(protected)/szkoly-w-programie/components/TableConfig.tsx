@@ -87,7 +87,7 @@ export const CUSTOM_STYLES = {
   },
 };
 
-const renderCellContent = (field: string, value: any) => {
+const renderCellContent = (field: string, value: unknown) => {
   switch (field) {
     case "schoolName":
       return <AvatarWithText text={value} />;

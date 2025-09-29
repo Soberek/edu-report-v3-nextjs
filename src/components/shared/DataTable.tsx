@@ -99,7 +99,7 @@ export interface DataTableAction {
   tooltip?: string;
 }
 
-export interface DataTableProps<T = any> {
+export interface DataTableProps<T = unknown> {
   data: T[];
   columns: GridColDef[];
   loading?: boolean;
@@ -111,7 +111,7 @@ export interface DataTableProps<T = any> {
   sx?: object;
 }
 
-export const DataTable = <T extends Record<string, any>>({
+export const DataTable = <T extends Record<string, unknown>>({
   data,
   columns,
   loading = false,

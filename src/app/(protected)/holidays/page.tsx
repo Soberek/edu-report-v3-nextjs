@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Container, Typography, Box } from "@mui/material";
+import { Container, Box } from "@mui/material";
 import { PageHeader, ErrorDisplay } from "@/components/shared";
 import { useHolidays } from "./hooks";
 import { UrlInput, HolidaysList, ActionSection, ResultsSection, ExportSection } from "./components";

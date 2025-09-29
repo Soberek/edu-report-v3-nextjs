@@ -28,11 +28,10 @@ import type { CreateTaskFormData, EditTaskFormData } from "../schemas/taskSchema
 
 interface Props extends TaskFormProps {
   createTask?: (itemData: CreateTaskFormData) => void;
-  refetch?: () => Promise<void>;
 }
 
-export default function TaskForm({ mode, task, onClose, onSave, userId, createTask, refetch, loading = false }: Props): React.ReactElement {
-  const { control, handleSubmit, formState, isFormValid, hasErrors } = useTaskForm({
+export default function TaskForm({ mode, task, onClose, onSave, userId, createTask, loading = false }: Props): React.ReactElement {
+  const { control, handleSubmit, formState, isFormValid } = useTaskForm({
     mode,
     task,
     userId,

@@ -1,10 +1,10 @@
 import { z } from "zod";
-import type { SchoolTypes } from "@/types";
+// import type { SchoolTypes } from "@/types";
 
 // School types enum for validation
 const schoolTypesEnum = z.enum([
   "Żłobek",
-  "Przedszkole", 
+  "Przedszkole",
   "Oddział przedszkolny",
   "Szkoła podstawowa",
   "Technikum",
@@ -13,7 +13,7 @@ const schoolTypesEnum = z.enum([
   "Szkoła policealna",
   "Szkoła specjalna",
   "Młodzieżowy ośrodek socjoterapii",
-  "Specjalny ośrodek szkolno-wychowawczy"
+  "Specjalny ośrodek szkolno-wychowawczy",
 ]);
 
 // Base school schema
@@ -22,7 +22,10 @@ export const schoolBaseSchema = z.object({
   email: z.string().email("Nieprawidłowy adres email").min(1, "Email jest wymagany"),
   address: z.string().min(1, "Adres jest wymagany").max(200, "Adres nie może przekraczać 200 znaków"),
   city: z.string().min(1, "Miasto jest wymagane").max(50, "Miasto nie może przekraczać 50 znaków"),
-  postalCode: z.string().min(1, "Kod pocztowy jest wymagany").regex(/^\d{2}-\d{3}$/, "Kod pocztowy musi być w formacie XX-XXX"),
+  postalCode: z
+    .string()
+    .min(1, "Kod pocztowy jest wymagany")
+    .regex(/^\d{2}-\d{3}$/, "Kod pocztowy musi być w formacie XX-XXX"),
   municipality: z.string().min(1, "Gmina jest wymagana").max(50, "Gmina nie może przekraczać 50 znaków"),
   type: z.array(schoolTypesEnum).min(1, "Wybierz co najmniej jeden typ szkoły"),
 });

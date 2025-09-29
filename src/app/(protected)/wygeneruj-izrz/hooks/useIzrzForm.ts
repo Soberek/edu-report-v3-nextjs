@@ -38,7 +38,7 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
 
   // Handle form submission with proper error handling
   const handleFormSubmit = useCallback(
-    handleSubmit(async (data: IzrzFormData) => {
+    async (data: IzrzFormData) => {
       setIsSubmitting(true);
       setSubmitMessage(null);
 
@@ -57,8 +57,8 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
       } finally {
         setIsSubmitting(false);
       }
-    }),
-    [handleSubmit, onSubmit]
+    },
+    [onSubmit]
   );
 
   // Set form value helper with validation

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Container, Box, Alert } from "@mui/material";
+import { Container, Box } from "@mui/material";
 import { Add, School, ContentCopy } from "@mui/icons-material";
 import { PageHeader, PrimaryButton, SecondaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
 import { useSchoolState } from "./hooks/useSchoolState";

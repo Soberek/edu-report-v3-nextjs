@@ -13,7 +13,7 @@ import type { CaseRecord } from "@/types";
 export default function Acts() {
   // Organized state management with useReducer
   const [state, dispatch] = useReducer(spisySprawReducer, INITIAL_STATE);
-  const formRef = useRef<any>(null);
+  const formRef = useRef<{ submit: () => void; isDirty: boolean } | null>(null);
 
   // Form management with proper typing
   const {
@@ -26,8 +26,7 @@ export default function Acts() {
   });
 
   // Business logic hooks
-  const { actRecords, actsOptions, actsOptionsCodes, sortedCaseRecords, actRecordsLoading, actRecordsError, getErrorMessages } =
-    useSpisySprawData(state);
+  const { actRecords, actsOptions, actsOptionsCodes, sortedCaseRecords, actRecordsLoading, getErrorMessages } = useSpisySprawData(state);
 
   const {
     handleAddActRecord,

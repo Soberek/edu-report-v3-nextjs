@@ -1,26 +1,12 @@
 import React, { useMemo } from "react";
 import { Box, Typography, Paper, Fade } from "@mui/material";
 import { School, Group, Person, CalendarToday, Save, Add } from "@mui/icons-material";
-import { UseFormReturn } from "react-hook-form";
-import type { Contact, Program, School as SchoolType } from "@/types";
+// import { UseFormReturn } from "react-hook-form";
+// import type { Contact, Program, School as SchoolType } from "@/types";
 import { SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { AutocompleteField, FormField, ActionButton } from "@/components/shared";
-import {
-  transformSchoolsToOptions,
-  transformContactsToOptions,
-  transformProgramsToOptions,
-  transformSchoolYearsToOptions
-} from "../utils";
-import {
-  SCHOOL_YEAR_OPTIONS,
-  FIELD_LABELS,
-  FIELD_PLACEHOLDERS,
-  HELPER_TEXT,
-  BUTTON_LABELS,
-  STYLE_CONSTANTS,
-  PAGE_CONSTANTS,
-  UI_CONSTANTS
-} from "../constants";
+import { transformSchoolsToOptions, transformContactsToOptions, transformProgramsToOptions, transformSchoolYearsToOptions } from "../utils";
+import { SCHOOL_YEAR_OPTIONS, FIELD_LABELS, HELPER_TEXT, BUTTON_LABELS, STYLE_CONSTANTS, PAGE_CONSTANTS, UI_CONSTANTS } from "../constants";
 import type { ParticipationFormProps } from "../types";
 
 // Custom Paper Form Section Component
@@ -69,20 +55,8 @@ const CustomFormSection: React.FC<{
   </Paper>
 );
 
-export const ParticipationForm: React.FC<ParticipationFormProps> = ({
-  schools,
-  contacts,
-  programs,
-  loading,
-  onSubmit,
-  formMethods
-}) => {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    isDirty,
-  } = formMethods;
+export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, contacts, programs, loading, onSubmit, formMethods }) => {
+  const { control, handleSubmit, reset, isDirty } = formMethods;
 
   // Transform data to options using utility functions
   const schoolsOptions = useMemo(() => transformSchoolsToOptions(schools), [schools]);
@@ -102,11 +76,13 @@ export const ParticipationForm: React.FC<ParticipationFormProps> = ({
 
   const renderFormFields = () => (
     <Box sx={{ display: "flex", flexDirection: "column", gap: STYLE_CONSTANTS.SPACING.MEDIUM }}>
-      <Box sx={{
-        display: "grid",
-        gridTemplateColumns: UI_CONSTANTS.FORM_GRID_COLUMNS.TABLET,
-        gap: STYLE_CONSTANTS.SPACING.MEDIUM
-      }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: UI_CONSTANTS.FORM_GRID_COLUMNS.TABLET,
+          gap: STYLE_CONSTANTS.SPACING.MEDIUM,
+        }}
+      >
         {/* School Selection */}
         <AutocompleteField
           name="schoolId"
@@ -170,14 +146,7 @@ export const ParticipationForm: React.FC<ParticipationFormProps> = ({
 
       {/* Notes */}
       <Box sx={{ gridColumn: "1 / -1" }}>
-        <FormField
-          name="notes"
-          control={control}
-          label={FIELD_LABELS.NOTES}
-          type="textarea"
-          rows={4}
-          helperText={HELPER_TEXT.NOTES}
-        />
+        <FormField name="notes" control={control} label={FIELD_LABELS.NOTES} type="textarea" rows={4} helperText={HELPER_TEXT.NOTES} />
       </Box>
     </Box>
   );

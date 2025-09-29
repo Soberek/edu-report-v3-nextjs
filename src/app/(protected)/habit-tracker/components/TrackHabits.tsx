@@ -2,20 +2,19 @@
 import React from "react";
 import { Controller } from "react-hook-form";
 import { useApp } from "../context/AppContext";
-import { Habit } from "../types";
+// import { Habit } from "../types";
 import { useHabitForm } from "../hooks/useHabitForm";
 
 export const TrackHabits = React.memo(() => {
-  const { state } = useApp();
+  const {} = useApp();
   const {
     control,
     formState: { errors },
     reset,
-    watch,
     onSubmit,
   } = useHabitForm();
 
-  const mood = watch("mood");
+  // const mood = watch("mood");
 
   const habitFields = [
     { name: "water" as const, label: "Woda (szklanki)", icon: "💧", type: "number", max: 20 },

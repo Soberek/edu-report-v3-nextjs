@@ -11,12 +11,11 @@ import {
   Grid,
   List,
   ListItem,
-  ListItemText,
   ListItemIcon,
   Divider,
 } from "@mui/material";
-import { CheckCircle, Cancel, Timer, Star } from "@mui/icons-material";
-import { QuizSession, QuizResult, QuizQuestion } from "../types";
+import { CheckCircle, Cancel, Star } from "@mui/icons-material";
+import { QuizSession, QuizQuestion } from "../types";
 
 interface QuizResultsProps {
   session: QuizSession;

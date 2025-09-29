@@ -13,9 +13,8 @@ import {
   Avatar,
   Fade,
   Paper,
-  Divider,
 } from "@mui/material";
-import { Close, Person, Email, Phone, Save, Edit } from "@mui/icons-material";
+import { Close, Person, Email, Phone, Save } from "@mui/icons-material";
 import { Controller, useForm } from "react-hook-form";
 import type { Contact } from "@/types";
 import type { ContactCreateDTO } from "@/hooks/useContact";

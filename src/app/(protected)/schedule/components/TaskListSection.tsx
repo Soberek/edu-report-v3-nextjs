@@ -24,7 +24,7 @@ export const TaskListSection: React.FC<TaskListSectionProps> = ({
   handleScheduledTaskDeletion,
   userId,
 }) => {
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [, setEditDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ScheduledTaskType | null>(null);
 
   const handleEditTask = (task: ScheduledTaskType) => {

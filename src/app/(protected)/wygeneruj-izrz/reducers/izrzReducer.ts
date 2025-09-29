@@ -1,5 +1,5 @@
 import type { IzrzState, IzrzAction } from "../types";
-import { izrzFormSchema, defaultFormValues } from "../schemas/izrzSchemas";
+import { defaultFormValues } from "../schemas/izrzSchemas";
 
 const initialState: IzrzState = {
   formData: defaultFormValues,

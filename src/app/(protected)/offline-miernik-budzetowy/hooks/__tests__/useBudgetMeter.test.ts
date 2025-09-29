@@ -1,4 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
+import { vi } from "vitest";
 import { useBudgetMeter } from "../useBudgetMeter";
 import { initialBudgetMeterState } from "../../reducers/budgetMeterReducer";
 
@@ -17,11 +18,11 @@ vi.mock("../../utils/dataProcessing", () => ({
 import { validateExcelFile, readExcelFile } from "../../utils/fileUtils";
 import { validateExcelData, aggregateData, exportToExcel } from "../../utils/dataProcessing";
 
-const mockValidateExcelFile = validateExcelFile as any;
-const mockReadExcelFile = readExcelFile as any;
-const mockValidateExcelData = validateExcelData as any;
-const mockAggregateData = aggregateData as any;
-const mockExportToExcel = exportToExcel as any;
+const mockValidateExcelFile = validateExcelFile as ReturnType<typeof vi.fn>;
+const mockReadExcelFile = readExcelFile as ReturnType<typeof vi.fn>;
+const mockValidateExcelData = validateExcelData as ReturnType<typeof vi.fn>;
+const mockAggregateData = aggregateData as ReturnType<typeof vi.fn>;
+const mockExportToExcel = exportToExcel as ReturnType<typeof vi.fn>;
 
 describe("useBudgetMeter", () => {
   beforeEach(() => {
@@ -46,8 +47,8 @@ describe("useBudgetMeter", () => {
       const { result } = renderHook(() => useBudgetMeter());
 
       const mockEvent = {
-        target: { files: null }
-      } as React.ChangeEvent<HTMLInputElement>;
+        target: { files: null },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
         await result.current.handleFileUpload(mockEvent);
@@ -61,12 +62,12 @@ describe("useBudgetMeter", () => {
 
       const mockFile = new File(["test"], "test.txt", { type: "text/plain" });
       const mockEvent = {
-        target: { files: [mockFile] }
-      } as React.ChangeEvent<HTMLInputElement>;
+        target: { files: [mockFile] },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       mockValidateExcelFile.mockReturnValue({
         isValid: false,
-        error: "Invalid file type"
+        error: "Invalid file type",
       });
 
       await act(async () => {
@@ -82,17 +83,15 @@ describe("useBudgetMeter", () => {
 
       const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
       const mockEvent = {
-        target: { files: [mockFile] }
-      } as React.ChangeEvent<HTMLInputElement>;
+        target: { files: [mockFile] },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
-      const mockData = [
-        { "Data": "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }
-      ];
+      const mockData = [{ Data: "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }];
 
       mockValidateExcelFile.mockReturnValue({ isValid: true });
       mockReadExcelFile.mockResolvedValue({
         fileName: "test.xlsx",
-        data: mockData
+        data: mockData,
       });
       mockValidateExcelData.mockReturnValue({ isValid: true });
 
@@ -113,8 +112,8 @@ describe("useBudgetMeter", () => {
 
       const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
       const mockEvent = {
-        target: { files: [mockFile] }
-      } as React.ChangeEvent<HTMLInputElement>;
+        target: { files: [mockFile] },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       mockValidateExcelFile.mockReturnValue({ isValid: true });
       mockReadExcelFile.mockRejectedValue(new Error("File read error"));
@@ -163,7 +162,7 @@ describe("useBudgetMeter", () => {
         result.current.handleMonthSelectAll();
       });
 
-      expect(result.current.state.selectedMonths.every(month => month.selected)).toBe(true);
+      expect(result.current.state.selectedMonths.every((month) => month.selected)).toBe(true);
     });
   });
 
@@ -181,7 +180,7 @@ describe("useBudgetMeter", () => {
         result.current.handleMonthDeselectAll();
       });
 
-      expect(result.current.state.selectedMonths.every(month => !month.selected)).toBe(true);
+      expect(result.current.state.selectedMonths.every((month) => !month.selected)).toBe(true);
     });
   });
 
@@ -189,13 +188,11 @@ describe("useBudgetMeter", () => {
     it("should process data successfully", async () => {
       const { result } = renderHook(() => useBudgetMeter());
 
-      const mockData = [
-        { "Data": "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }
-      ];
+      const mockData = [{ Data: "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }];
       const mockAggregated = {
         aggregated: {},
         allActions: 5,
-        allPeople: 10
+        allPeople: 10,
       };
 
       // Set up state
@@ -218,9 +215,7 @@ describe("useBudgetMeter", () => {
     it("should handle processing error", async () => {
       const { result } = renderHook(() => useBudgetMeter());
 
-      const mockData = [
-        { "Data": "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }
-      ];
+      const mockData = [{ Data: "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }];
 
       // Set up state
       act(() => {
@@ -247,7 +242,7 @@ describe("useBudgetMeter", () => {
       const mockAggregated = {
         aggregated: {},
         allActions: 5,
-        allPeople: 10
+        allPeople: 10,
       };
 
       // Set up state
@@ -270,7 +265,7 @@ describe("useBudgetMeter", () => {
       const mockAggregated = {
         aggregated: {},
         allActions: 5,
-        allPeople: 10
+        allPeople: 10,
       };
 
       // Set up state

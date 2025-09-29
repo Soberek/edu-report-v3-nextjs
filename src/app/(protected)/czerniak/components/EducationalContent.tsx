@@ -6,7 +6,6 @@ import {
   Typography,
   Grid,
   Chip,
-  Alert,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -93,7 +92,7 @@ export const EducationalContentComponent: React.FC<EducationalContentProps> = ({
           </Typography>
 
           <Grid container spacing={3}>
-            {abcdeFeatures.map((feature, index) => (
+            {abcdeFeatures.map((feature) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={feature.key}>
                 <Card variant="outlined">
                   <CardContent>

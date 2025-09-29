@@ -12,7 +12,6 @@ import {
   FormGroup,
   Chip,
   Alert,
-  LinearProgress,
 } from "@mui/material";
 import { QuizQuestion as QuizQuestionType } from "../types";
 
@@ -90,7 +89,7 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
     if (currentAnswer !== answerState.selectedAnswer) {
       dispatch({ type: "SELECT_ANSWER", payload: currentAnswer || "" });
     }
-  }, [currentAnswer]);
+  }, [currentAnswer, answerState.selectedAnswer]);
 
   React.useEffect(() => {
     if (showExplanation !== answerState.isSubmitted) {
@@ -98,11 +97,11 @@ export const QuizQuestionComponent: React.FC<QuizQuestionProps> = ({
         dispatch({ type: "SUBMIT_ANSWER", payload: { correctAnswer: question.correctAnswer } });
       }
     }
-  }, [showExplanation, question.correctAnswer]);
+  }, [showExplanation, answerState.isSubmitted, question.correctAnswer]);
 
   const isMultipleChoice = question.type === "multiple-choice" || question.type === "scenario";
   const isTrueFalse = question.type === "true-false";
-  const isImageAnalysis = question.type === "image-analysis";
+  // const isImageAnalysis = question.type === "image-analysis";
 
   const handleAnswerChange = (answer: string) => {
     if (showExplanation) return;

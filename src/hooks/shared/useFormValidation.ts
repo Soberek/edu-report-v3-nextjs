@@ -30,7 +30,7 @@ export const useFormValidation = <T extends Record<string, unknown>>(schema: z.Z
   const validateField = useCallback(
     (fieldName: keyof T, value: unknown): string | null => {
       try {
-        const fieldSchema = (schema as z.ZodObject<any>).shape[fieldName as string];
+        const fieldSchema = (schema as z.ZodObject<z.ZodRawShape>).shape[fieldName as string];
         if (fieldSchema) {
           fieldSchema.parse(value);
           return null;

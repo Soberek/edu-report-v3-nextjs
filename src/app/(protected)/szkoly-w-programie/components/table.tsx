@@ -1,20 +1,13 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import { School as SchoolIcon } from "@mui/icons-material";
-import type { Contact, Program, School } from "@/types";
+// import type { Contact, Program, School } from "@/types";
 import { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
 import { createColumns } from "./TableConfig";
 import { LoadingSpinner, EmptyState, DataTable, defaultActions, EditDialog } from "@/components/shared";
 import { EditParticipationForm } from "./EditParticipationForm";
 import { mapParticipationsForDisplay } from "../utils";
-import {
-  STYLE_CONSTANTS,
-  PAGE_CONSTANTS,
-  TABLE_CONSTANTS,
-  UI_CONSTANTS,
-  MESSAGES,
-  BUTTON_LABELS
-} from "../constants";
+import { STYLE_CONSTANTS, PAGE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
 import type { TableProps, MappedParticipation } from "../types";
 
 export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
@@ -33,7 +26,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   const [editingParticipation, setEditingParticipation] = useState<SchoolProgramParticipation | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
-  const formRef = useRef<any>(null);
+  const formRef = useRef<{ submit: () => void; isDirty: boolean } | null>(null);
 
   // Map participations for display using utility function
   const mappedParticipations: MappedParticipation[] = useMemo(
@@ -52,56 +45,55 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
     }
   }, []);
 
-  const handleFormSubmit = useCallback(async (data: any) => {
-    if (editingParticipation) {
-      setDialogLoading(true);
-      try {
-        await onUpdate(editingParticipation.id, data);
-        setEditDialogOpen(false);
-        setEditingParticipation(null);
-      } finally {
-        setDialogLoading(false);
+  const handleFormSubmit = useCallback(
+    async (data: SchoolProgramParticipation) => {
+      if (editingParticipation) {
+        setDialogLoading(true);
+        try {
+          await onUpdate(editingParticipation.id, data);
+          setEditDialogOpen(false);
+          setEditingParticipation(null);
+        } finally {
+          setDialogLoading(false);
+        }
       }
-    }
-  }, [editingParticipation, onUpdate]);
+    },
+    [editingParticipation, onUpdate]
+  );
 
   const handleCloseEditDialog = useCallback(() => {
     setEditDialogOpen(false);
     setEditingParticipation(null);
   }, []);
 
-  const handleDeleteParticipation = useCallback(async (id: string) => {
-    if (window.confirm(MESSAGES.CONFIRMATION.DELETE_CONFIRMATION)) {
-      await onDelete(id);
-    }
-  }, [onDelete]);
+  const handleDeleteParticipation = useCallback(
+    async (id: string) => {
+      if (window.confirm(MESSAGES.CONFIRMATION.DELETE_CONFIRMATION)) {
+        await onDelete(id);
+      }
+    },
+    [onDelete]
+  );
 
   const columns = useMemo(() => createColumns(), []);
-  const actions = useMemo(() => [
-    defaultActions.edit((id: string) => {
-      const participation = participations.find((p) => p.id === id);
-      if (participation) {
-        handleEditParticipation(participation);
-      }
-    }),
-    defaultActions.delete(handleDeleteParticipation),
-  ], [participations, handleEditParticipation, handleDeleteParticipation]);
+  const actions = useMemo(
+    () => [
+      defaultActions.edit((id: string) => {
+        const participation = participations.find((p) => p.id === id);
+        if (participation) {
+          handleEditParticipation(participation);
+        }
+      }),
+      defaultActions.delete(handleDeleteParticipation),
+    ],
+    [participations, handleEditParticipation, handleDeleteParticipation]
+  );
 
   const renderErrorState = () => (
-    <EmptyState
-      title={MESSAGES.EMPTY.ERROR_TITLE}
-      description={errorMessage || ""}
-      sx={{ mb: STYLE_CONSTANTS.SPACING.MEDIUM }}
-    />
+    <EmptyState title={MESSAGES.EMPTY.ERROR_TITLE} description={errorMessage || ""} sx={{ mb: STYLE_CONSTANTS.SPACING.MEDIUM }} />
   );
 
-  const renderLoadingState = () => (
-    <LoadingSpinner
-      size={48}
-      message={MESSAGES.LOADING.LOADING_DATA}
-      sx={{ minHeight: 200 }}
-    />
-  );
+  const renderLoadingState = () => <LoadingSpinner size={48} message={MESSAGES.LOADING.LOADING_DATA} sx={{ minHeight: 200 }} />;
 
   const renderTableHeader = () => (
     <Box
@@ -131,10 +123,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   const renderTableContent = () => (
     <Box sx={{ p: STYLE_CONSTANTS.SPACING.MEDIUM, background: "transparent" }}>
       {mappedParticipations.length === 0 ? (
-        <EmptyState
-          title={MESSAGES.EMPTY.NO_DATA}
-          description={MESSAGES.EMPTY.NO_DATA_DESCRIPTION}
-        />
+        <EmptyState title={MESSAGES.EMPTY.NO_DATA} description={MESSAGES.EMPTY.NO_DATA_DESCRIPTION} />
       ) : (
         <DataTable
           data={mappedParticipations}

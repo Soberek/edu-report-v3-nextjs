@@ -1,18 +1,11 @@
 import React from "react";
-import {
-  Autocomplete,
-  TextField,
-  Box,
-  FormControl,
-  FormHelperText,
-  Typography,
-} from "@mui/material";
+import { Autocomplete, TextField, Box, FormControl, FormHelperText, Typography } from "@mui/material";
 import { Controller, Control, FieldPath, FieldValues } from "react-hook-form";
 
 export interface AutocompleteOption {
   id: string;
   name: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface AutocompleteFieldProps<T extends FieldValues> {
@@ -54,17 +47,17 @@ export const AutocompleteField = <T extends FieldValues>({
       control={control}
       rules={{ required: required ? `${label} jest wymagane.` : false }}
       render={({ field, fieldState: { error } }) => {
-        const autocompleteValue = multiple 
-          ? (field.value || []).map((id: string) => options.find(opt => opt.id === id)).filter(Boolean) as AutocompleteOption[]
-          : field.value 
-            ? options.find(opt => opt.id === field.value) || null 
-            : null;
+        const autocompleteValue = multiple
+          ? ((field.value || []).map((id: string) => options.find((opt) => opt.id === id)).filter(Boolean) as AutocompleteOption[])
+          : field.value
+          ? options.find((opt) => opt.id === field.value) || null
+          : null;
 
-        const handleChange = (_: any, value: AutocompleteOption | AutocompleteOption[] | null) => {
+        const handleChange = (_: unknown, value: AutocompleteOption | AutocompleteOption[] | null) => {
           if (multiple) {
-            field.onChange((value as AutocompleteOption || []).map((item: AutocompleteOption) => item.id));
+            field.onChange(((value as AutocompleteOption) || []).map((item: AutocompleteOption) => item.id));
           } else {
-            field.onChange((value as AutocompleteOption)?.id || '');
+            field.onChange((value as AutocompleteOption)?.id || "");
           }
         };
 
@@ -89,9 +82,7 @@ export const AutocompleteField = <T extends FieldValues>({
                   InputProps={{
                     ...params.InputProps,
                     startAdornment: startAdornment ? (
-                      <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary", mr: 1 }}>
-                        {startAdornment}
-                      </Box>
+                      <Box sx={{ display: "flex", alignItems: "center", color: "text.secondary", mr: 1 }}>{startAdornment}</Box>
                     ) : undefined,
                   }}
                   sx={{
@@ -104,14 +95,8 @@ export const AutocompleteField = <T extends FieldValues>({
                 />
               )}
             />
-            {error && (
-              <FormHelperText sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
-                {error.message}
-              </FormHelperText>
-            )}
-            {!error && helperText && (
-              <FormHelperText sx={{ mt: 0.5 }}>{helperText}</FormHelperText>
-            )}
+            {error && <FormHelperText sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>{error.message}</FormHelperText>}
+            {!error && helperText && <FormHelperText sx={{ mt: 0.5 }}>{helperText}</FormHelperText>}
           </FormControl>
         );
       }}

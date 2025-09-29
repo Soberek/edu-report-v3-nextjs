@@ -14,7 +14,7 @@ export const useTemplateManager = ({ onTemplateSelect }: UseTemplateManagerProps
       return false;
     }
 
-    if (!TEMPLATE_CONSTANTS.ALLOWED_FILE_TYPES.includes(file.type as any)) {
+    if (!TEMPLATE_CONSTANTS.ALLOWED_FILE_TYPES.includes(file.type as string)) {
       setError(MESSAGES.ERROR.INVALID_FILE_TYPE);
       return false;
     }

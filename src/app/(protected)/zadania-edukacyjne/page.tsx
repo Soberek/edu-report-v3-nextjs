@@ -9,7 +9,7 @@ import { useEducationalTasksPage } from "./hooks/useEducationalTasksPage";
 import { MONTH_NAMES } from "./types";
 import { PAGE_CONSTANTS, UI_CONSTANTS, BUTTON_LABELS, MESSAGES, STYLE_CONSTANTS } from "./constants";
 import type { EducationalTaskFormProps } from "./types";
-import type { EducationalTask } from "@/types";
+// import type { EducationalTask } from "@/types";
 
 export default function EducationalTasks(): React.ReactNode {
   // Use custom hook for page logic

@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useContext, useReducer, useEffect } from "react";
-import { State, Action, initialState, Habit, User } from "../types";
+import { State, Action, initialState, User } from "../types";
 import { Dashboard } from "../components/Dashboard";
 import { TrackHabits } from "../components/TrackHabits";
 import { History } from "../components/History";
@@ -102,7 +102,6 @@ function AuthScreen() {
   const { dispatch } = useApp();
   const [isLogin, setIsLogin] = React.useState(true);
   const {
-    control,
     handleSubmit,
     formState: { errors },
     reset,
@@ -116,7 +115,7 @@ function AuthScreen() {
       dispatch({ type: "SET_USER", payload: user });
 
       reset();
-    } catch (error) {
+    } catch {
       dispatch({ type: "SET_ERROR", payload: "Authentication failed" });
     }
   };

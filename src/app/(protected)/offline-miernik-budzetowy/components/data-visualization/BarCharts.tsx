@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Card, CardContent, useTheme, Grid } from "@mui/material";
+import { Box, Typography, Card, CardContent, useTheme } from "@mui/material";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import type { Month, ExcelRow } from "../../types";
 import { MONTH_NAMES } from "../../types";
@@ -35,7 +35,7 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
           monthData[month].actions += Number(row["Liczba działań"]) || 0;
           monthData[month].people += Number(row["Liczba ludzi"]) || 0;
         }
-      } catch (error) {
+      } catch {
         // Skip invalid dates
       }
     });

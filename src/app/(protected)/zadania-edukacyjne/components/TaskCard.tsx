@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, CardActions, Typography, Box, Chip, Button, Collapse, IconButton, Avatar, Divider } from "@mui/material";
+import { Card, CardContent, CardActions, Typography, Box, Chip, Button, Collapse, Avatar, Divider } from "@mui/material";
 import { Edit, Delete, ExpandMore, ExpandLess, CalendarToday, School, Assignment, Tag } from "@mui/icons-material";
 import type { TaskCardProps } from "../types";
 import { formatTaskDate, getMaterialsSummary, getMaterialsDetailsList, getTotalDistributedCount } from "../utils";
@@ -10,9 +10,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
   const taskDate = formatTaskDate(task.date);
   const activityCount = task.activities.length;
   const { getSchoolName, getSchoolInfo } = useSchoolsMap();
-  
+
   // Materials data
-  const materialsSummary = getMaterialsSummary(task.activities);
   const materialsDetails = getMaterialsDetailsList(task.activities);
   const totalMaterialsCount = getTotalDistributedCount(task.activities);
 
@@ -90,18 +89,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
         {task.taskNumber && (
           <Chip label={`Nr: ${task.taskNumber}`} size="small" variant="outlined" sx={{ fontSize: "0.75rem", color: "text.secondary" }} />
         )}
-        
+
         {totalMaterialsCount > 0 && (
-          <Chip 
+          <Chip
             label={`📦 ${totalMaterialsCount} materiałów`}
-            size="small" 
+            size="small"
             variant="outlined"
-            sx={{ 
-              fontSize: "0.75rem", 
+            sx={{
+              fontSize: "0.75rem",
               color: "success.main",
               borderColor: "success.main",
               backgroundColor: "success.50",
-            }} 
+            }}
           />
         )}
       </Box>
@@ -178,11 +177,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
             </Typography>
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(auto-fit, minmax(280px, 1fr))" }, gap: 2 }}>
               {materialsDetails.map((material, index) => (
-                <Box 
-                  key={index} 
-                  sx={{ 
-                    p: 2, 
-                    border: "1px solid #e8f5e8", 
+                <Box
+                  key={index}
+                  sx={{
+                    p: 2,
+                    border: "1px solid #e8f5e8",
                     borderRadius: 2,
                     bgcolor: "success.50",
                     borderLeft: "4px solid",
@@ -193,18 +192,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
                     <Typography variant="subtitle2" fontWeight="bold" sx={{ color: "success.dark" }}>
                       {material.name}
                     </Typography>
-                    <Chip 
-                      label={`${material.count} szt.`}
-                      size="small" 
-                      color="success"
-                      sx={{ fontSize: "0.7rem", fontWeight: "bold" }}
-                    />
+                    <Chip label={`${material.count} szt.`} size="small" color="success" sx={{ fontSize: "0.7rem", fontWeight: "bold" }} />
                   </Box>
-                  
+
                   <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: "block" }}>
                     Typ: {material.type}
                   </Typography>
-                  
+
                   {material.description && (
                     <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.85rem", lineHeight: 1.4 }}>
                       {material.description}

@@ -1,4 +1,4 @@
-import type { Activity, DistributionActivity, Material } from "@/types";
+import type { Activity, Material } from "@/types";
 import { isDistributionActivity } from "@/types";
 
 /**

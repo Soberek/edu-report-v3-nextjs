@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, Grid, Card, CardContent, useTheme, Chip, Divider } from "@mui/material";
-import { TrendingUp, People, Assignment, CalendarMonth, Assessment, Timeline } from "@mui/icons-material";
+import { TrendingUp, People, Assignment, CalendarMonth } from "@mui/icons-material";
 import type { AggregatedData, Month, ExcelRow } from "../../types";
 import { MONTH_NAMES } from "../../types";
 
@@ -32,7 +32,7 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
           monthData[month].people += Number(row["Liczba ludzi"]) || 0;
           monthData[month].programs += 1;
         }
-      } catch (error) {
+      } catch {
         // Skip invalid dates
       }
     });
@@ -47,10 +47,10 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
     Object.entries(data.aggregated).forEach(([programType, programs]) => {
       stats[programType] = { count: 0, actions: 0, people: 0 };
 
-      Object.entries(programs).forEach(([programName, actions]) => {
+      Object.entries(programs).forEach(([, actions]) => {
         stats[programType].count += 1;
 
-        Object.entries(actions).forEach(([actionName, actionData]) => {
+        Object.entries(actions).forEach(([, actionData]) => {
           stats[programType].actions += actionData.actionNumber;
           stats[programType].people += actionData.people;
         });

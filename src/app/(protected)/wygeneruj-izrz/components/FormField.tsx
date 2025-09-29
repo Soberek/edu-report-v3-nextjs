@@ -55,7 +55,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
 
   // Handle text field value changes
   const handleTextFieldChange = useCallback(
-    (field: any, type: FormFieldType) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    (field: unknown, type: FormFieldType) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
 
       switch (type) {
@@ -74,7 +74,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
 
   // Handle select field changes
   const handleSelectChange = useCallback(
-    (field: any, options: readonly SelectOption[]) => (_: any, newValue: SelectOption | null) => {
+    (field: unknown) => (_: unknown, newValue: SelectOption | null) => {
       field.onChange(newValue?.value || "");
     },
     []
@@ -132,7 +132,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
                 options={props.options}
                 getOptionLabel={(option) => option.label}
                 value={findSelectedOption(field.value, props.options)}
-                onChange={handleSelectChange(field, props.options)}
+                onChange={handleSelectChange(field)}
                 disabled={disabled}
                 size="small"
                 renderInput={(params) => (

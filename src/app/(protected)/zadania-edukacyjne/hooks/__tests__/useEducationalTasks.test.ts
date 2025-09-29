@@ -10,7 +10,7 @@ const mockUser = {
   uid: "user-123",
   email: "test@example.com",
   displayName: "Test User",
-} as any;
+} as User;
 
 const mockFirebaseData = {
   data: [],

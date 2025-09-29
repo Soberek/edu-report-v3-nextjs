@@ -13,7 +13,7 @@ export interface ParticipationFormState {
   readonly isDirty: boolean;
   readonly isValid: boolean;
   readonly isSubmitting: boolean;
-  readonly errors: Record<string, any>;
+  readonly errors: Record<string, unknown>;
 }
 
 // Dialog types
@@ -37,7 +37,7 @@ export interface ParticipationFormProps {
   readonly programs: readonly Program[];
   readonly loading: boolean;
   readonly onSubmit: (data: SchoolProgramParticipationDTO) => Promise<void>;
-  readonly formMethods: any; // Will be properly typed with react-hook-form
+  readonly formMethods: unknown; // Will be properly typed with react-hook-form
 }
 
 export interface TableProps {
@@ -84,7 +84,7 @@ export type FormFieldType = "text" | "number" | "date" | "textarea" | "select" |
 
 export interface FormFieldProps {
   readonly name: string;
-  readonly control: any;
+  readonly control: unknown;
   readonly label: string;
   readonly required?: boolean;
   readonly disabled?: boolean;

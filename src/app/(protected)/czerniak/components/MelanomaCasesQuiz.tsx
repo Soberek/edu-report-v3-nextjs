@@ -1,19 +1,6 @@
 import React, { useState, useCallback } from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Chip,
-  Grid,
-  FormControlLabel,
-  Checkbox,
-  Alert,
-  LinearProgress,
-  Divider,
-} from "@mui/material";
-import { CheckCircle, Cancel, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Box, Card, CardContent, Typography, Button, Chip, Grid, Checkbox, Alert, LinearProgress } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { MelanomaCase, ABCDEFeature } from "../types";
 
 interface MelanomaCasesQuizProps {
@@ -71,7 +58,7 @@ export const MelanomaCasesQuiz: React.FC<MelanomaCasesQuizProps> = ({ cases, abc
 
     const incorrectSelected = selectedFeatures.filter((feature) => !correctFeatures.includes(feature)).length;
 
-    const missedCorrect = correctFeatures.filter((feature) => !selectedFeatures.includes(feature)).length;
+    // const missedCorrect = correctFeatures.filter((feature) => !selectedFeatures.includes(feature)).length;
 
     // Calculate score: correct selections - incorrect selections
     const score = Math.max(0, correctSelected - incorrectSelected);

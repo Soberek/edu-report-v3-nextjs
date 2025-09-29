@@ -1,6 +1,6 @@
 import { useReducer, useCallback } from "react";
 import { scheduleReducer, initialState } from "../reducers/scheduleReducer";
-import type { ScheduleState, ScheduleAction } from "../types";
+// import type { ScheduleState, ScheduleAction } from "../types";
 import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
 import type { Program } from "@/types";
 
@@ -38,9 +38,12 @@ export const useScheduleState = () => {
   }, []);
 
   // Filter actions
-  const setFilters = useCallback((filters: Partial<typeof state.filters>) => {
-    dispatch({ type: "SET_FILTERS", payload: filters });
-  }, []);
+  const setFilters = useCallback(
+    (filters: Partial<typeof state.filters>) => {
+      dispatch({ type: "SET_FILTERS", payload: filters });
+    },
+    [state]
+  );
 
   const resetFilters = useCallback(() => {
     dispatch({ type: "RESET_FILTERS" });

@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
     if (!file) return NextResponse.json({ message: "Brak szablonu w żądaniu." }, { status: 400 });
 
     const templateFile = Buffer.from(await file.arrayBuffer());
-    const rawData = Object.fromEntries(formData.entries());
+    // const rawData = Object.fromEntries(formData.entries());
     const data: CreateIzrzDocumentT = {
       templateFile,
       caseNumber: String(formData.get("caseNumber") ?? ""),

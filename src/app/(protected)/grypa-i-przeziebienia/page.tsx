@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import React from "react";
+import { Box } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -13,21 +13,21 @@ export default function GrypaIPrzeziebieniaPage() {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h1: ({ node, ...props }) => <h1 className="text-3xl font-bold text-blue-700 my-4" {...props} />,
-          h2: ({ node, ...props }) => <h2 className="text-2xl font-semibold text-blue-800 my-4" {...props} />,
-          h3: ({ node, ...props }) => <h3 className="text-xl font-semibold text-gray-800 my-3" {...props} />,
-          h4: ({ node, ...props }) => <h4 className="text-lg font-medium text-gray-700 my-2" {...props} />,
-          h5: ({ node, ...props }) => <h5 className="text-base font-medium text-gray-600 my-2" {...props} />,
-          h6: ({ node, ...props }) => <h6 className="text-sm font-normal text-gray-500 my-2" {...props} />,
-          p: ({ node, ...props }) => <p className="text-base text-gray-900 my-4" {...props} />,
-          ul: ({ node, ...props }) => <ul className="bg-gray-50 rounded p-4 list-disc ml-6 my-2" {...props} />,
-          ol: ({ node, ...props }) => <ol className="bg-gray-50 rounded p-4 list-decimal ml-6 my-2" {...props} />,
-          li: ({ node, ...props }) => <li className="text-base my-0" {...props} />,
-          blockquote: ({ node, ...props }) => (
+          h1: ({ ...props }) => <h1 className="text-3xl font-bold text-blue-700 my-4" {...props} />,
+          h2: ({ ...props }) => <h2 className="text-2xl font-semibold text-blue-800 my-4" {...props} />,
+          h3: ({ ...props }) => <h3 className="text-xl font-semibold text-gray-800 my-3" {...props} />,
+          h4: ({ ...props }) => <h4 className="text-lg font-medium text-gray-700 my-2" {...props} />,
+          h5: ({ ...props }) => <h5 className="text-base font-medium text-gray-600 my-2" {...props} />,
+          h6: ({ ...props }) => <h6 className="text-sm font-normal text-gray-500 my-2" {...props} />,
+          p: ({ ...props }) => <p className="text-base text-gray-900 my-4" {...props} />,
+          ul: ({ ...props }) => <ul className="bg-gray-50 rounded p-4 list-disc ml-6 my-2" {...props} />,
+          ol: ({ ...props }) => <ol className="bg-gray-50 rounded p-4 list-decimal ml-6 my-2" {...props} />,
+          li: ({ ...props }) => <li className="text-base my-0" {...props} />,
+          blockquote: ({ ...props }) => (
             <blockquote className="bg-blue-50 border-l-4 border-blue-700 text-blue-700 italic my-6 px-4 py-2" {...props} />
           ),
-          code: ({ node, ...props }) => <code className="bg-gray-800 text-white px-2 py-1 rounded text-sm font-mono" {...props} />,
-          a: ({ node, ...props }) => (
+          code: ({ ...props }) => <code className="bg-gray-800 text-white px-2 py-1 rounded text-sm font-mono" {...props} />,
+          a: ({ ...props }) => (
             <a
               className="text-blue-700 underline underline-dotted font-medium transition-colors hover:text-blue-900"
               target="_blank"
@@ -35,12 +35,12 @@ export default function GrypaIPrzeziebieniaPage() {
               {...props}
             />
           ),
-          table: ({ node, ...props }) => (
+          table: ({ ...props }) => (
             <table className="bg-gray-100 rounded overflow-hidden shadow-sm border-collapse w-full my-4" {...props} />
           ),
-          th: ({ node, ...props }) => <th className="bg-blue-100 text-blue-700 font-semibold px-3 py-2" {...props} />,
-          td: ({ node, ...props }) => <td className="bg-white px-3 py-2" {...props} />,
-          div: ({ node, ...props }) =>
+          th: ({ ...props }) => <th className="bg-blue-100 text-blue-700 font-semibold px-3 py-2" {...props} />,
+          td: ({ ...props }) => <td className="bg-white px-3 py-2" {...props} />,
+          div: ({ ...props }) =>
             props.style?.textAlign === "center" ? <div className="text-center text-2xl my-4">{props.children}</div> : <div {...props} />,
         }}
       >

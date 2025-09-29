@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  Box,
-  Typography,
-  Chip,
-  IconButton,
-  Button,
-} from "@mui/material";
+import { Card, CardContent, Box, Typography, Chip, IconButton, Button } from "@mui/material";
 import { Refresh, Download, Share, Favorite, Edit, Image as ImageIcon } from "@mui/icons-material";
 import { EducationalPostCardProps } from "../types";
 import { getTemplateStyle } from "../utils";
@@ -15,15 +7,7 @@ import { getTemplateStyle } from "../utils";
 /**
  * Component for displaying an educational post with an image
  */
-export function EducationalPostCard({
-  post,
-  imageUrl,
-  imageId,
-  onRefetchImage,
-  onEdit,
-  onPreview,
-  onToggleFavorite,
-}: EducationalPostCardProps) {
+export function EducationalPostCard({ post, imageUrl, onRefetchImage, onEdit, onPreview, onToggleFavorite }: EducationalPostCardProps) {
   // Local state for the image URL to enable individual updates
   const [localImageUrl, setLocalImageUrl] = useState(imageUrl);
 
@@ -80,24 +64,26 @@ export function EducationalPostCard({
       }}
     >
       <CardContent>
-        <Box sx={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "flex-start", 
-          mb: 3,
-          p: 2,
-          borderRadius: 2,
-          background: "linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(66, 165, 245, 0.05) 100%)",
-          border: "1px solid rgba(25, 118, 210, 0.1)"
-        }}>
-          <Chip 
-            label={post.platform} 
-            size="small" 
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            mb: 3,
+            p: 2,
+            borderRadius: 2,
+            background: "linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(66, 165, 245, 0.05) 100%)",
+            border: "1px solid rgba(25, 118, 210, 0.1)",
+          }}
+        >
+          <Chip
+            label={post.platform}
+            size="small"
             sx={{
               background: "linear-gradient(45deg, #1976d2, #42a5f5)",
               color: "white",
               fontWeight: "bold",
-              boxShadow: "0 2px 8px rgba(25, 118, 210, 0.3)"
+              boxShadow: "0 2px 8px rgba(25, 118, 210, 0.3)",
             }}
           />
           <Box sx={{ display: "flex", gap: 0.5 }}>
@@ -108,35 +94,35 @@ export function EducationalPostCard({
                 color: post.isFavorite ? "#e91e63" : "#666",
                 "&:hover": {
                   background: post.isFavorite ? "rgba(233, 30, 99, 0.1)" : "rgba(0,0,0,0.04)",
-                  transform: "scale(1.1)"
+                  transform: "scale(1.1)",
                 },
-                transition: "all 0.2s"
+                transition: "all 0.2s",
               }}
             >
               <Favorite />
             </IconButton>
-            <IconButton 
-              size="small" 
+            <IconButton
+              size="small"
               onClick={() => onEdit(post)}
               sx={{
                 "&:hover": {
                   background: "rgba(25, 118, 210, 0.1)",
-                  transform: "scale(1.1)"
+                  transform: "scale(1.1)",
                 },
-                transition: "all 0.2s"
+                transition: "all 0.2s",
               }}
             >
               <Edit />
             </IconButton>
-            <IconButton 
-              size="small" 
+            <IconButton
+              size="small"
               onClick={() => onPreview(post)}
               sx={{
                 "&:hover": {
                   background: "rgba(76, 175, 80, 0.1)",
-                  transform: "scale(1.1)"
+                  transform: "scale(1.1)",
                 },
-                transition: "all 0.2s"
+                transition: "all 0.2s",
               }}
             >
               <ImageIcon />
@@ -145,13 +131,15 @@ export function EducationalPostCard({
         </Box>
 
         {localImageUrl && (
-          <Box sx={{ 
-            position: "relative", 
-            mb: 3,
-            borderRadius: 3,
-            overflow: "hidden",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.15)"
-          }}>
+          <Box
+            sx={{
+              position: "relative",
+              mb: 3,
+              borderRadius: 3,
+              overflow: "hidden",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+            }}
+          >
             <img
               src={`${localImageUrl}?w=400&h=220`}
               alt={post.title}
@@ -160,7 +148,7 @@ export function EducationalPostCard({
                 height: "220px",
                 objectFit: "cover",
                 display: "block",
-                transition: "transform 0.3s ease"
+                transition: "transform 0.3s ease",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";
@@ -184,21 +172,23 @@ export function EducationalPostCard({
                   background: "rgba(0,0,0,0.4)",
                   backdropFilter: "blur(8px)",
                   borderRadius: 2,
-                  p: 1.5
+                  p: 1.5,
                 }}
               >
                 {post.textOverlay.text}
               </Box>
             )}
             {/* Gradient overlay for better text readability */}
-            <Box sx={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: "60px",
-              background: "linear-gradient(transparent, rgba(0,0,0,0.3))"
-            }} />
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: "60px",
+                background: "linear-gradient(transparent, rgba(0,0,0,0.3))",
+              }}
+            />
           </Box>
         )}
 
@@ -208,32 +198,39 @@ export function EducationalPostCard({
         <Typography variant="body2" sx={descStyle} paragraph>
           {post.description}
         </Typography>
-        <Box sx={{ 
-          mb: 3, 
-          p: 2,
-          borderRadius: 2,
-          background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-          border: "1px solid #e0e0e0"
-        }}>
-          <Typography variant="body2" sx={{ 
-            fontStyle: "italic",
-            lineHeight: 1.6,
-            color: "#495057"
-          }}>
+        <Box
+          sx={{
+            mb: 3,
+            p: 2,
+            borderRadius: 2,
+            background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
+            border: "1px solid #e0e0e0",
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              fontStyle: "italic",
+              lineHeight: 1.6,
+              color: "#495057",
+            }}
+          >
             {post.content}
           </Typography>
         </Box>
 
-        <Box sx={{ 
-          display: "flex", 
-          gap: 1.5, 
-          flexWrap: "wrap",
-          justifyContent: "center"
-        }}>
-          <Button 
-            size="small" 
-            startIcon={<Refresh />} 
-            onClick={handleRefetch} 
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1.5,
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          <Button
+            size="small"
+            startIcon={<Refresh />}
+            onClick={handleRefetch}
             variant="outlined"
             sx={{
               borderRadius: 2,
@@ -242,15 +239,15 @@ export function EducationalPostCard({
               "&:hover": {
                 background: "linear-gradient(45deg, #ff9800, #ffc107)",
                 color: "white",
-                border: "none"
-              }
+                border: "none",
+              },
             }}
           >
             Nowe zdjęcie
           </Button>
-          <Button 
-            size="small" 
-            startIcon={<Download />} 
+          <Button
+            size="small"
+            startIcon={<Download />}
             variant="outlined"
             sx={{
               borderRadius: 2,
@@ -259,15 +256,15 @@ export function EducationalPostCard({
               "&:hover": {
                 background: "linear-gradient(45deg, #4caf50, #8bc34a)",
                 color: "white",
-                border: "none"
-              }
+                border: "none",
+              },
             }}
           >
             Pobierz
           </Button>
-          <Button 
-            size="small" 
-            startIcon={<Share />} 
+          <Button
+            size="small"
+            startIcon={<Share />}
             variant="outlined"
             sx={{
               borderRadius: 2,
@@ -276,8 +273,8 @@ export function EducationalPostCard({
               "&:hover": {
                 background: "linear-gradient(45deg, #2196f3, #03a9f4)",
                 color: "white",
-                border: "none"
-              }
+                border: "none",
+              },
             }}
           >
             Udostępnij

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Grid, Paper, Stack } from "@mui/material";
+import { Box, Typography, Grid } from "@mui/material";
 import { School, Assignment, AssignmentInd } from "@mui/icons-material";
 import { StatsCard } from "@/components/shared";
 

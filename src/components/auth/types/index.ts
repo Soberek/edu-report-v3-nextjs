@@ -38,8 +38,8 @@ export interface AuthFormProps<T extends BaseAuthFormData> {
   readonly onSubmit: (data: T) => Promise<void>;
   readonly isLoading: boolean;
   readonly disabled?: boolean;
-  readonly schema: any; // Zod schema
-  readonly constants: any; // Constants object
+  readonly schema: unknown; // Zod schema
+  readonly constants: unknown; // Constants object
   readonly submitButtonText: string;
   readonly loadingText: string;
 }

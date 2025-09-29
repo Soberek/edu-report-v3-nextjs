@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useReducer } from "react";
+import React, { useCallback, useMemo, useReducer } from "react";
 import { QuizSession, QuizResult, QuizSettings, QuizQuestion } from "../types";
 
 // Quiz State Type
@@ -132,7 +132,7 @@ const quizReducer = (state: QuizState, action: QuizAction): QuizState => {
   }
 };
 
-export const useQuiz = (questions: QuizQuestion[], settings: QuizSettings) => {
+export const useQuiz = (questions: QuizQuestion[]) => {
   const [state, dispatch] = useReducer(quizReducer, {
     session: {
       id: Date.now().toString(),

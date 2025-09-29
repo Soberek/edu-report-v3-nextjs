@@ -18,8 +18,8 @@ export function GET() {
 // POST handler: fetch Unsplash photo(s) by tag
 export async function POST(request: Request) {
   try {
-    const { tag, count = 1, orientation = "landscape", size = "regular" }: UnsplashRequest = await request.json();
-    
+    const { tag, count = 1, orientation = "landscape" }: UnsplashRequest = await request.json();
+
     if (!tag) {
       return NextResponse.json({ error: "Tag is required." }, { status: 400 });
     }
@@ -41,37 +41,25 @@ export async function POST(request: Request) {
 
     if (!res.ok) {
       const errorText = await res.text().catch(() => "Unknown error");
-      return NextResponse.json(
-        { error: `Failed to fetch photo from Unsplash: ${errorText}` }, 
-        { status: res.status }
-      );
+      return NextResponse.json({ error: `Failed to fetch photo from Unsplash: ${errorText}` }, { status: res.status });
     }
 
     const data = await res.json();
-    
+
     // Handle both single photo and array of photos
     if (Array.isArray(data)) {
       if (data.length === 0) {
-        return NextResponse.json(
-          { error: `No photos found for tag "${tag}"` }, 
-          { status: 404 }
-        );
+        return NextResponse.json({ error: `No photos found for tag "${tag}"` }, { status: 404 });
       }
       return NextResponse.json(data);
     } else {
       if (!data || !data.id) {
-        return NextResponse.json(
-          { error: `Invalid photo data for tag "${tag}"` }, 
-          { status: 404 }
-        );
+        return NextResponse.json({ error: `Invalid photo data for tag "${tag}"` }, { status: 404 });
       }
       return NextResponse.json([data]);
     }
   } catch (error) {
     console.error("Unsplash API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error." }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }

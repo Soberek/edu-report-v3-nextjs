@@ -1,7 +1,7 @@
 import { useReducer, useCallback, useEffect } from "react";
 import { programsReducer, initialProgramsState } from "../reducers/programsReducer";
 import { loadInitialPrograms, generateProgramId, validateProgramCode } from "../utils/programUtils";
-import { Program, CreateProgramFormData, EditProgramFormData } from "../types";
+import { Program, CreateProgramFormData } from "../types";
 
 export const useProgramsState = () => {
   const [state, dispatch] = useReducer(programsReducer, initialProgramsState);

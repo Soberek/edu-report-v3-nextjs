@@ -1,23 +1,23 @@
 "use client";
 import React, { useMemo } from "react";
 import { Container, Alert, Snackbar } from "@mui/material";
-import { usePrograms } from "@/hooks/useProgram";
+// import { usePrograms } from "@/hooks/useProgram";
 import { useForm } from "react-hook-form";
-import type { Contact, Program, School as SchoolType } from "@/types";
+// import type { Contact, Program, School as SchoolType } from "@/types";
 import { SchoolProgramParticipationTable } from "./components/table";
 import { ParticipationForm } from "./components/ParticipationForm";
-import { useFirebaseData } from "@/hooks/useFirebaseData";
-import { useUser } from "@/hooks/useUser";
+// import { useFirebaseData } from "@/hooks/useFirebaseData";
+// import { useUser } from "@/hooks/useUser";
 import { PageHeader, LoadingSpinner } from "@/components/shared";
-import { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
-import { useParticipationForm } from "./hooks/useParticipationForm";
+import { SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
+// import { useParticipationForm } from "./hooks/useParticipationForm";
 import { useParticipationPage } from "./hooks/useParticipationPage";
 import { createDefaultFormValues } from "./utils";
 import { PAGE_CONSTANTS, STYLE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "./constants";
 import type { ParticipationFormProps } from "./types";
 
 export default function SchoolsProgramParticipation() {
-  const userContext = useUser();
+  // const userContext = useUser();
 
   // Use custom hook for page logic
   const {

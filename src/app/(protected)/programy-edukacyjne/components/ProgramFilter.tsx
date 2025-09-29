@@ -14,15 +14,15 @@ export const ProgramFilterComponent: React.FC<ProgramFilterProps> = ({ filter, o
     onFilterChange({ ...filter, search: event.target.value });
   };
 
-  const handleProgramTypeChange = (event: any) => {
+  const handleProgramTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     onFilterChange({ ...filter, programType: event.target.value });
   };
 
-  const handleSortByChange = (event: any) => {
+  const handleSortByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     onFilterChange({ ...filter, sortBy: event.target.value });
   };
 
-  const handleSortOrderChange = (event: any) => {
+  const handleSortOrderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     onFilterChange({ ...filter, sortOrder: event.target.value });
   };
 

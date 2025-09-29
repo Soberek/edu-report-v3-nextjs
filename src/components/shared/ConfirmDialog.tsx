@@ -102,7 +102,13 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <Button onClick={onClose} disabled={loading} variant="outlined" sx={{ minWidth: 100 }}>
           {cancelText}
         </Button>
-        <Button onClick={onConfirm} disabled={loading} variant="contained" color={getConfirmButtonColor() as any} sx={{ minWidth: 100 }}>
+        <Button
+          onClick={onConfirm}
+          disabled={loading}
+          variant="contained"
+          color={getConfirmButtonColor() as "primary" | "error" | "warning"}
+          sx={{ minWidth: 100 }}
+        >
           {finalConfirmText}
         </Button>
       </DialogActions>

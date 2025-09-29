@@ -18,7 +18,7 @@ export const createOptionalFormSchema = <T extends Record<string, unknown>>(
 };
 
 export const getFormDefaultValues = <T extends Record<string, unknown>>(schema: z.ZodSchema<T>): Partial<T> => {
-  const shape = (schema as z.ZodObject<any>).shape;
+  const shape = (schema as z.ZodObject<z.ZodRawShape>).shape;
   const defaults: Partial<T> = {};
 
   Object.entries(shape).forEach(([key, fieldSchema]) => {

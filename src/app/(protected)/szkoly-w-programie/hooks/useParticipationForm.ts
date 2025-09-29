@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useMemo } from "react";
 import { schoolProgramParticipationDTOSchema, type SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
-import { getCurrentSchoolYear, SCHOOL_YEAR_OPTIONS } from "../utils";
+import { getCurrentSchoolYear } from "../utils";
 import type { UseParticipationFormProps, SchoolYear } from "../types";
 
 export const useParticipationForm = ({ onSubmit, initialData }: UseParticipationFormProps) => {
@@ -30,7 +30,7 @@ export const useParticipationForm = ({ onSubmit, initialData }: UseParticipation
 
   // Handle form submission with error handling
   const handleFormSubmit = useCallback(
-    handleSubmit(async (data: SchoolProgramParticipationDTO) => {
+    async (data: SchoolProgramParticipationDTO) => {
       try {
         await onSubmit(data);
         reset();
@@ -38,8 +38,8 @@ export const useParticipationForm = ({ onSubmit, initialData }: UseParticipation
         console.error("Form submission error:", error);
         throw error;
       }
-    }),
-    [handleSubmit, onSubmit, reset]
+    },
+    [onSubmit, reset]
   );
 
   // Validation state

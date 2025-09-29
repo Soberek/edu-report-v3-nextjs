@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Tabs, Tab, Card, CardContent, Button, Chip, LinearProgress, Alert, Container } from "@mui/material";
-import { Quiz, School, Info, Assessment, Visibility } from "@mui/icons-material";
+import { Quiz, School, Assessment, Visibility } from "@mui/icons-material";
 
 // Import components and data
 import { QuizQuestionComponent } from "./components/QuizQuestion";
@@ -56,7 +56,7 @@ export default function MelanomaQuiz() {
     returnToFirst,
     selectAnswer,
     selectMultipleAnswers,
-    getScoreGrade,
+    // getScoreGrade,
     setTimeSpent,
   } = useQuiz(QUIZ_QUESTIONS, quizSettings);
 

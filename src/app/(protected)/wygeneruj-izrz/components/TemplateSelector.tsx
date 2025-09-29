@@ -3,7 +3,7 @@ import { Box, Button, Typography, Paper, Stack, Alert, CircularProgress } from "
 import { Description, CheckCircle, Error } from "@mui/icons-material";
 import type { TemplateSelectorProps } from "../types";
 import { useTemplateManager } from "../hooks/useTemplateManager";
-import { TEMPLATE_CONSTANTS, STYLE_CONSTANTS, MESSAGES } from "../constants";
+import { TEMPLATE_CONSTANTS, STYLE_CONSTANTS } from "../constants";
 
 export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   onTemplateSelect,

@@ -1,7 +1,7 @@
 import React, { useEffect, forwardRef, useImperativeHandle } from "react";
 import { Box } from "@mui/material";
 import { School, Group, Person, CalendarToday } from "@mui/icons-material";
-import { useForm, UseFormHandleSubmit } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import type { Contact, Program, School as SchoolType } from "@/types";
 import { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
 import { schoolYears } from "@/constants";
@@ -176,3 +176,5 @@ export const EditParticipationForm = forwardRef<EditParticipationFormRef, EditPa
     );
   }
 );
+
+EditParticipationForm.displayName = "EditParticipationForm";

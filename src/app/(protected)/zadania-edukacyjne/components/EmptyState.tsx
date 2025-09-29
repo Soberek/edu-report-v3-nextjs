@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { PrimaryButton } from "@/components/shared";
 import { PAGE_CONSTANTS, BUTTON_LABELS } from "../constants";

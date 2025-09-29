@@ -30,8 +30,8 @@ export const BudgetMeterPage: React.FC = () => {
   const selectedMonthsCount = getSelectedMonthsCount(state.selectedMonths);
   const currentError = getCurrentError(state.fileError, state.monthError, state.processingError);
   const showProcessingButton = canProcessData(state.rawData, state.selectedMonths, state.aggregatedData);
-  const showStatistics = hasValidData && state.aggregatedData;
-  const showDataVisualization = hasValidData && state.aggregatedData;
+  const showStatistics = Boolean(hasValidData && state.aggregatedData);
+  const showDataVisualization = Boolean(hasValidData && state.aggregatedData);
   const showEmptyState = !state.rawData.length && !currentError;
 
   // Auto-process data when conditions are met
@@ -93,9 +93,9 @@ const PageHeader: React.FC = () => (
  * File upload section props
  */
 interface FileUploadSectionProps {
-  readonly state: any; // TODO: Type this properly from useBudgetMeter
+  readonly state: ReturnType<typeof useBudgetMeter>["state"];
   readonly onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  readonly onExport: () => void;
+  readonly onExport: () => Promise<boolean>;
   readonly onReset: () => void;
   readonly canExport: boolean;
 }
@@ -120,7 +120,7 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({ state, onFileUplo
  * Month selection section props
  */
 interface MonthSelectionSectionProps {
-  readonly state: any; // TODO: Type this properly
+  readonly state: ReturnType<typeof useBudgetMeter>["state"];
   readonly selectedMonthsCount: number;
   readonly currentError: string | null;
   readonly onMonthToggle: (monthNumber: number) => void;
@@ -179,9 +179,9 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error }) => {
  */
 interface DataVisualizationProps {
   readonly show: boolean;
-  readonly activeTab: any; // TODO: Type this properly
-  readonly onTabChange: (tabId: any) => void;
-  readonly state: any; // TODO: Type this properly
+  readonly activeTab: ReturnType<typeof useTabManager>["activeTab"];
+  readonly onTabChange: ReturnType<typeof useTabManager>["handleTabChange"];
+  readonly state: ReturnType<typeof useBudgetMeter>["state"];
 }
 
 /**

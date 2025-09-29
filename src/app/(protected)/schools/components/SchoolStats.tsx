@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Box, Card, CardContent, Typography, Grid, useTheme, Chip, Fade, Button, Collapse } from "@mui/material";
-import { School, TrendingUp, Assessment, BarChart, ExpandMore, ExpandLess } from "@mui/icons-material";
+import { Box, Typography, useTheme, Button, Collapse } from "@mui/material";
+import { BarChart, ExpandMore, ExpandLess } from "@mui/icons-material";
 
 interface SchoolStatsProps {
   totalSchools: number;
@@ -11,16 +11,16 @@ export const SchoolStats: React.FC<SchoolStatsProps> = ({ totalSchools, typeStat
   const theme = useTheme();
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const getTypeIcon = (type: string) => {
-    if (type.includes("podstawowa")) return "🏫";
-    if (type.includes("liceum")) return "🎓";
-    if (type.includes("technikum")) return "⚙️";
-    if (type.includes("przedszkole")) return "🧸";
-    if (type.includes("żłobek")) return "👶";
-    if (type.includes("branżowa")) return "🔧";
-    if (type.includes("specjalna")) return "♿";
-    return "📚";
-  };
+  // const getTypeIcon = (type: string) => {
+  //   if (type.includes("podstawowa")) return "🏫";
+  //   if (type.includes("liceum")) return "🎓";
+  //   if (type.includes("technikum")) return "⚙️";
+  //   if (type.includes("przedszkole")) return "🧸";
+  //   if (type.includes("żłobek")) return "👶";
+  //   if (type.includes("branżowa")) return "🔧";
+  //   if (type.includes("specjalna")) return "♿";
+  //   return "📚";
+  // };
 
   const getTypeGradient = (index: number) => {
     const gradients = [

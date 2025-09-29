@@ -72,8 +72,8 @@ export interface TemplateSelectorProps {
 
 export interface FormFieldProps {
   readonly name: keyof IzrzFormData;
-  readonly control: any; // Will be properly typed in component
-  readonly error?: any; // Will be properly typed in component
+  readonly control: unknown; // Will be properly typed in component
+  readonly error?: unknown; // Will be properly typed in component
   readonly required?: boolean;
   readonly disabled?: boolean;
 }

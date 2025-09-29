@@ -11,8 +11,8 @@ vi.mock("xlsx", () => ({
 
 import * as XLSX from "xlsx";
 
-const mockXLSXRead = XLSX.read as any;
-const mockSheetToJson = XLSX.utils.sheet_to_json as any;
+const mockXLSXRead = XLSX.read as jest.MockedFunction<typeof XLSX.read>;
+const mockSheetToJson = XLSX.utils.sheet_to_json as jest.MockedFunction<typeof XLSX.utils.sheet_to_json>;
 
 describe("useExcelFileReader", () => {
   beforeEach(() => {
@@ -35,19 +35,17 @@ describe("useExcelFileReader", () => {
       const { result } = renderHook(() => useExcelFileReader());
 
       const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const mockWorkbook = { 
+      const mockWorkbook = {
         SheetNames: ["Sheet1"],
-        Sheets: { Sheet1: {} } 
+        Sheets: { Sheet1: {} },
       };
-      const mockData = [
-        { "Data": "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }
-      ];
+      const mockData = [{ Data: "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }];
 
       mockXLSXRead.mockReturnValue(mockWorkbook);
       mockSheetToJson.mockReturnValue(mockData);
 
       const mockEvent = {
-        target: { files: [mockFile] }
+        target: { files: [mockFile] },
       } as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
@@ -72,7 +70,7 @@ describe("useExcelFileReader", () => {
       });
 
       const mockEvent = {
-        target: { files: [mockFile] }
+        target: { files: [mockFile] },
       } as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
@@ -94,7 +92,7 @@ describe("useExcelFileReader", () => {
       mockXLSXRead.mockReturnValue(mockWorkbook);
 
       const mockEvent = {
-        target: { files: [mockFile] }
+        target: { files: [mockFile] },
       } as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
@@ -116,7 +114,7 @@ describe("useExcelFileReader", () => {
       mockSheetToJson.mockReturnValue([]);
 
       const mockEvent = {
-        target: { files: [mockFile] }
+        target: { files: [mockFile] },
       } as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
@@ -132,19 +130,17 @@ describe("useExcelFileReader", () => {
       const { result } = renderHook(() => useExcelFileReader());
 
       const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const mockWorkbook = { 
+      const mockWorkbook = {
         SheetNames: ["Sheet1"],
-        Sheets: { Sheet1: {} } 
+        Sheets: { Sheet1: {} },
       };
-      const mockData = [
-        { "Data": "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }
-      ];
+      const mockData = [{ Data: "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }];
 
       mockXLSXRead.mockReturnValue(mockWorkbook);
       mockSheetToJson.mockReturnValue(mockData);
 
       const mockEvent = {
-        target: { files: [mockFile] }
+        target: { files: [mockFile] },
       } as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
@@ -169,7 +165,7 @@ describe("useExcelFileReader", () => {
       mockSheetToJson.mockReturnValue(mockData);
 
       const mockEvent = {
-        target: { files: [mockFile] }
+        target: { files: [mockFile] },
       } as React.ChangeEvent<HTMLInputElement>;
 
       act(() => {
@@ -199,7 +195,7 @@ describe("useExcelFileReader", () => {
       });
 
       const mockEvent = {
-        target: { files: [mockFile] }
+        target: { files: [mockFile] },
       } as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
@@ -219,7 +215,7 @@ describe("useExcelFileReader", () => {
       });
 
       const mockEvent = {
-        target: { files: [mockFile] }
+        target: { files: [mockFile] },
       } as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
@@ -241,9 +237,9 @@ describe("useExcelFileReader", () => {
 
       for (const testCase of testCases) {
         const mockFile = new File(["test"], testCase.name, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-        const mockWorkbook = { 
+        const mockWorkbook = {
           SheetNames: ["Sheet1"],
-          Sheets: { Sheet1: {} } 
+          Sheets: { Sheet1: {} },
         };
         const mockData = [{ test: "data" }];
 
@@ -251,7 +247,7 @@ describe("useExcelFileReader", () => {
         mockSheetToJson.mockReturnValue(mockData);
 
         const mockEvent = {
-          target: { files: [mockFile] }
+          target: { files: [mockFile] },
         } as React.ChangeEvent<HTMLInputElement>;
 
         await act(async () => {

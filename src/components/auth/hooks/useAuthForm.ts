@@ -8,7 +8,7 @@ import type { BaseAuthFormData, UseAuthFormResult } from "../types";
  * Can be used for both login and registration
  */
 export const useAuthForm = <T extends BaseAuthFormData>(
-  authFunction: (data: T) => Promise<any>,
+  authFunction: (data: T) => Promise<unknown>,
   successRedirect: string,
   errorContext: string
 ): UseAuthFormResult<T> => {
@@ -20,24 +20,27 @@ export const useAuthForm = <T extends BaseAuthFormData>(
     setError(null);
   }, []);
 
-  const submit = useCallback(async (data: T): Promise<void> => {
-    setIsLoading(true);
-    setError(null);
+  const submit = useCallback(
+    async (data: T): Promise<void> => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const result = await authFunction(data);
-      
-      if (result?.user || result) {
-        router.push(successRedirect);
+      try {
+        const result = await authFunction(data);
+
+        if (result?.user || result) {
+          router.push(successRedirect);
+        }
+      } catch (error) {
+        const errorMessage = getAuthErrorMessage(error);
+        setError(errorMessage);
+        logErrorInDevelopment(error, errorContext);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      const errorMessage = getAuthErrorMessage(error);
-      setError(errorMessage);
-      logErrorInDevelopment(error, errorContext);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [authFunction, successRedirect, errorContext, router]);
+    },
+    [authFunction, successRedirect, errorContext, router]
+  );
 
   return {
     submit,

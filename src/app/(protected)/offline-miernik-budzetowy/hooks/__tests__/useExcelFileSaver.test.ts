@@ -12,10 +12,10 @@ vi.mock("xlsx", () => ({
 
 import * as XLSX from "xlsx";
 
-const mockJsonToSheet = XLSX.utils.json_to_sheet as any;
-const mockBookNew = XLSX.utils.book_new as any;
-const mockBookAppendSheet = XLSX.utils.book_append_sheet as any;
-const mockWriteFile = XLSX.writeFile as any;
+const mockJsonToSheet = XLSX.utils.json_to_sheet as jest.MockedFunction<typeof XLSX.utils.json_to_sheet>;
+const mockBookNew = XLSX.utils.book_new as jest.MockedFunction<typeof XLSX.utils.book_new>;
+const mockBookAppendSheet = XLSX.utils.book_append_sheet as jest.MockedFunction<typeof XLSX.utils.book_append_sheet>;
+const mockWriteFile = XLSX.writeFile as jest.MockedFunction<typeof XLSX.writeFile>;
 
 describe("saveExcelToFile", () => {
   beforeEach(() => {
@@ -39,7 +39,7 @@ describe("saveExcelToFile", () => {
   it("should handle null data", () => {
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    saveExcelToFile(null as any);
+    saveExcelToFile(null as unknown as Parameters<typeof saveExcelToFile>[0]);
 
     expect(consoleSpy).toHaveBeenCalledWith("No data provided for Excel export.");
     expect(mockJsonToSheet).not.toHaveBeenCalled();
@@ -53,7 +53,7 @@ describe("saveExcelToFile", () => {
   it("should handle undefined data", () => {
     const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    saveExcelToFile(undefined as any);
+    saveExcelToFile(undefined as unknown as Parameters<typeof saveExcelToFile>[0]);
 
     expect(consoleSpy).toHaveBeenCalledWith("No data provided for Excel export.");
     expect(mockJsonToSheet).not.toHaveBeenCalled();
@@ -151,10 +151,7 @@ describe("saveExcelToFile", () => {
 
     saveExcelToFile(mockData);
 
-    expect(mockJsonToSheet).toHaveBeenCalledWith([
-      ["Program Type"],
-      ["1", "Empty Program", {}],
-    ]);
+    expect(mockJsonToSheet).toHaveBeenCalledWith([["Program Type"], ["1", "Empty Program", {}]]);
 
     expect(mockBookNew).toHaveBeenCalled();
     expect(mockBookAppendSheet).toHaveBeenCalledWith(mockWorkbook, mockWorksheet, "Miernik");
@@ -198,7 +195,15 @@ describe("saveExcelToFile", () => {
       ["2", "Program A2", { "Action A2.1": { people: 20, actionNumber: 1 } }],
       ["2.1", "Action A2.1", 20, 1],
       ["Type B"],
-      ["1", "Program B1", { "Action B1.1": { people: 25, actionNumber: 4 }, "Action B1.2": { people: 30, actionNumber: 5 }, "Action B1.3": { people: 35, actionNumber: 6 } }],
+      [
+        "1",
+        "Program B1",
+        {
+          "Action B1.1": { people: 25, actionNumber: 4 },
+          "Action B1.2": { people: 30, actionNumber: 5 },
+          "Action B1.3": { people: 35, actionNumber: 6 },
+        },
+      ],
       ["1.1", "Action B1.1", 25, 4],
       ["1.2", "Action B1.2", 30, 5],
       ["1.3", "Action B1.3", 35, 6],
@@ -212,8 +217,8 @@ describe("saveExcelToFile", () => {
   it("should handle XLSX utility errors gracefully", () => {
     const mockData = {
       "Program Type": {
-        "Program": {
-          "Action": { people: 10, actionNumber: 5 },
+        Program: {
+          Action: { people: 10, actionNumber: 5 },
         },
       },
     };

@@ -29,7 +29,7 @@ export const useSpisySprawActions = ({ state, dispatch, formRef, reset }: UseSpi
           })
         );
         reset();
-      } catch (error) {
+      } catch {
         dispatch(
           actions.showSnackbar({
             type: "error",
@@ -51,7 +51,7 @@ export const useSpisySprawActions = ({ state, dispatch, formRef, reset }: UseSpi
             message: MESSAGES.DELETE_SUCCESS,
           })
         );
-      } catch (error) {
+      } catch {
         dispatch(
           actions.showSnackbar({
             type: "error",
@@ -76,7 +76,7 @@ export const useSpisySprawActions = ({ state, dispatch, formRef, reset }: UseSpi
             })
           );
           dispatch(actions.closeEditDialog());
-        } catch (error) {
+        } catch {
           dispatch(
             actions.showSnackbar({
               type: "error",

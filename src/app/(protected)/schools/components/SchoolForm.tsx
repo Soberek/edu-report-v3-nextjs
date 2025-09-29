@@ -1,18 +1,17 @@
 import React from "react";
-import { Button, Box, Typography, CircularProgress, Paper, Stack } from "@mui/material";
+import { Box, Typography, Stack } from "@mui/material";
 import { Controller } from "react-hook-form";
 import { TextField, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 import { useSchoolForm } from "../hooks/useSchoolForm";
 import { EditDialog } from "@/components/shared/EditDialog";
 import type { SchoolFormProps } from "../types";
-import type { CreateSchoolFormData, EditSchoolFormData } from "../schemas/schoolSchemas";
+// import type { CreateSchoolFormData, EditSchoolFormData } from "../schemas/schoolSchemas";
 
 export const SchoolForm: React.FC<SchoolFormProps> = ({ mode, school, onClose, onSave, loading = false }) => {
   const {
     control,
     handleSubmit,
     formState: { errors },
-    isFormValid,
     handleTypeChange,
     selectedTypes,
     schoolTypes,

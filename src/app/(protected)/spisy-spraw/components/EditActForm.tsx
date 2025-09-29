@@ -1,8 +1,8 @@
 import React, { useEffect, forwardRef, useImperativeHandle } from "react";
 import { Box, MenuItem, Select, FormControl, FormHelperText, SelectChangeEvent } from "@mui/material";
-import { useForm, UseFormHandleSubmit, Controller } from "react-hook-form";
+import { useForm, Controller, Control, FieldErrors } from "react-hook-form";
 import type { CaseRecord } from "@/types";
-import { FormField, FormSection } from "@/components/shared";
+import { FormField } from "@/components/shared";
 
 interface EditActFormProps {
   caseRecord: CaseRecord | null;
@@ -29,11 +29,11 @@ export interface EditActFormRef {
 }
 
 const CustomSelectField: React.FC<{
-  control: any;
+  control: Control<FormData>;
   name: "code";
   label: string;
   options: string[];
-  errors: any;
+  errors: FieldErrors<FormData>;
 }> = ({ control, name, label, options, errors }) => {
   return (
     <Controller
@@ -177,3 +177,5 @@ export const EditActForm = forwardRef<EditActFormRef, EditActFormProps>(({ caseR
     </Box>
   );
 });
+
+EditActForm.displayName = "EditActForm";

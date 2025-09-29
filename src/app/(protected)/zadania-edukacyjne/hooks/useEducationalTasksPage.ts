@@ -3,16 +3,12 @@ import { useEducationalTasks } from "./useEducationalTasks";
 import { useConfirmDialog } from "@/components/shared";
 import { educationalTasksPageReducer, actions } from "../reducers/educationalTasksPageReducer";
 import { INITIAL_PAGE_STATE } from "../types";
-import { applyFiltersAndGrouping, createDefaultFilters } from "../utils";
+import { applyFiltersAndGrouping } from "../utils";
 import { MESSAGES } from "../constants";
 import type { UseEducationalTasksPageProps, EducationalTasksFilters } from "../types";
 import type { EducationalTask, CreateEducationalTaskFormData } from "@/types";
 
-export const useEducationalTasksPage = ({
-  onCreate,
-  onUpdate,
-  onDelete,
-}: UseEducationalTasksPageProps = {}) => {
+export const useEducationalTasksPage = ({ onCreate, onUpdate, onDelete }: UseEducationalTasksPageProps = {}) => {
   const { tasks, loading, error, createTask, updateTask, deleteTask, clearError } = useEducationalTasks();
   const { showConfirm, ConfirmDialog } = useConfirmDialog();
 
@@ -23,10 +19,7 @@ export const useEducationalTasksPage = ({
   const { openForm, editTask, expandedTasks, filters } = state;
 
   // Memoized filter and grouping logic
-  const filteredResults = useMemo(
-    () => applyFiltersAndGrouping(tasks, filters),
-    [tasks, filters]
-  );
+  const filteredResults = useMemo(() => applyFiltersAndGrouping(tasks, filters), [tasks, filters]);
 
   // Event handlers
   const handleAddTask = useCallback(() => {
@@ -38,30 +31,36 @@ export const useEducationalTasksPage = ({
     dispatch(actions.setEditTask(task));
   }, []);
 
-  const handleDeleteTask = useCallback((id: string) => {
-    showConfirm(
-      MESSAGES.CONFIRMATION.DELETE_TITLE,
-      MESSAGES.CONFIRMATION.DELETE_MESSAGE,
-      () => deleteTask(id),
-      MESSAGES.CONFIRMATION.DELETE_ACTION
-    );
-  }, [showConfirm, deleteTask]);
+  const handleDeleteTask = useCallback(
+    (id: string) => {
+      showConfirm(
+        MESSAGES.CONFIRMATION.DELETE_TITLE,
+        MESSAGES.CONFIRMATION.DELETE_MESSAGE,
+        () => deleteTask(id),
+        MESSAGES.CONFIRMATION.DELETE_ACTION
+      );
+    },
+    [showConfirm, deleteTask]
+  );
 
-  const handleFormSave = useCallback(async (data: Record<string, unknown>) => {
-    try {
-      if (editTask) {
-        await updateTask(editTask.id, data as CreateEducationalTaskFormData);
-        onUpdate?.(editTask.id, data as CreateEducationalTaskFormData);
-      } else {
-        await createTask(data as CreateEducationalTaskFormData);
-        onCreate?.(data as CreateEducationalTaskFormData);
+  const handleFormSave = useCallback(
+    async (data: Record<string, unknown>) => {
+      try {
+        if (editTask) {
+          await updateTask(editTask.id, data as CreateEducationalTaskFormData);
+          onUpdate?.(editTask.id, data as CreateEducationalTaskFormData);
+        } else {
+          await createTask(data as CreateEducationalTaskFormData);
+          onCreate?.(data as CreateEducationalTaskFormData);
+        }
+        dispatch(actions.setFormClosed());
+      } catch (error) {
+        console.error("Error saving task:", error);
+        throw error;
       }
-      dispatch(actions.setFormClosed());
-    } catch (error) {
-      console.error("Error saving task:", error);
-      throw error;
-    }
-  }, [editTask, updateTask, createTask, onUpdate, onCreate]);
+    },
+    [editTask, updateTask, createTask, onUpdate, onCreate]
+  );
 
   const handleFormClose = useCallback(() => {
     dispatch(actions.setFormClosed());

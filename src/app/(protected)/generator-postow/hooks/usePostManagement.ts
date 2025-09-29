@@ -8,85 +8,86 @@ import { createNewPost, generateAIPrompt } from "../utils";
  * Custom hook for managing posts and AI content generation
  */
 export function usePostManagement() {
-  const { fetchPhotoByTag, generateImageForPost, fetchPhotosByTag } = useUnsplashPhotos();
+  const { generateImageForPost, fetchPhotosByTag } = useUnsplashPhotos();
   const { promptOpenAi, loading: aiLoading } = useOpenAIChat();
   const [posts, setPosts] = useState<EducationalPost[]>([]);
 
   /**
    * Generate AI content for a new post
    */
-  const generateContent = useCallback(async (topic: string): Promise<string> => {
-    if (!topic.trim()) return "";
+  const generateContent = useCallback(
+    async (topic: string): Promise<string> => {
+      if (!topic.trim()) return "";
 
-    const prompt = generateAIPrompt(topic);
-    try {
-      const response = await promptOpenAi(prompt);
-      return response;
-    } catch (error) {
-      console.error("Error generating content:", error);
-      return "";
-    }
-  }, [promptOpenAi]);
+      const prompt = generateAIPrompt(topic);
+      try {
+        const response = await promptOpenAi(prompt);
+        return response;
+      } catch (error) {
+        console.error("Error generating content:", error);
+        return "";
+      }
+    },
+    [promptOpenAi]
+  );
 
   /**
    * Create a new post with AI content and image
    */
-  const createPost = useCallback(async (topic: string, generatedContent: string): Promise<EducationalPost> => {
-    const newPost = createNewPost(topic, generatedContent);
+  const createPost = useCallback(
+    async (topic: string, generatedContent: string): Promise<EducationalPost> => {
+      const newPost = createNewPost(topic, generatedContent);
 
-    // Generate image for the new post using multiple tags
-    try {
-      const tags = [newPost.tag, topic, "education", "health", "awareness"];
-      const imageUrl = await generateImageForPost(tags, "education");
-      if (imageUrl) {
-        newPost.imageUrl = imageUrl;
+      // Generate image for the new post using multiple tags
+      try {
+        const tags = [newPost.tag, topic, "education", "health", "awareness"];
+        const imageUrl = await generateImageForPost(tags, "education");
+        if (imageUrl) {
+          newPost.imageUrl = imageUrl;
+        }
+      } catch (error) {
+        console.error("Error generating image:", error);
       }
-    } catch (error) {
-      console.error("Error generating image:", error);
-    }
 
-    setPosts((prev) => [...prev, newPost]);
-    return newPost;
-  }, [generateImageForPost]);
+      setPosts((prev) => [...prev, newPost]);
+      return newPost;
+    },
+    [generateImageForPost]
+  );
 
   /**
    * Refetch image for a specific post
    */
-  const refetchImage = useCallback(async (postId: string, tag: string): Promise<string | null> => {
-    try {
-      // Try multiple tags for better image selection
-      const tags = [tag, "education", "health", "awareness"];
-      const imageUrl = await generateImageForPost(tags, "education");
-      if (imageUrl) {
-        setPosts((prev) =>
-          prev.map((post) =>
-            post.id.toString() === postId ? { ...post, imageUrl } : post
-          )
-        );
-        return imageUrl;
+  const refetchImage = useCallback(
+    async (postId: string, tag: string): Promise<string | null> => {
+      try {
+        // Try multiple tags for better image selection
+        const tags = [tag, "education", "health", "awareness"];
+        const imageUrl = await generateImageForPost(tags, "education");
+        if (imageUrl) {
+          setPosts((prev) => prev.map((post) => (post.id.toString() === postId ? { ...post, imageUrl } : post)));
+          return imageUrl;
+        }
+      } catch (error) {
+        console.error("Error refetching image:", error);
       }
-    } catch (error) {
-      console.error("Error refetching image:", error);
-    }
-    return null;
-  }, [generateImageForPost]);
+      return null;
+    },
+    [generateImageForPost]
+  );
 
   /**
    * Toggle favorite status for a post
    */
   const toggleFavorite = useCallback((postId: number) => {
-    setPosts((prev) =>
-      prev.map((post) => (post.id === postId ? { ...post, isFavorite: !post.isFavorite } : post))
-    );
+    setPosts((prev) => prev.map((post) => (post.id === postId ? { ...post, isFavorite: !post.isFavorite } : post)));
   }, []);
 
   /**
    * Update a post
    */
   const updatePost = useCallback((updatedPost: EducationalPost) => {
-    setPosts((prev) =>
-      prev.map((post) => (post.id === updatedPost.id ? updatedPost : post))
-    );
+    setPosts((prev) => prev.map((post) => (post.id === updatedPost.id ? updatedPost : post)));
   }, []);
 
   /**
@@ -106,25 +107,31 @@ export function usePostManagement() {
   /**
    * Get posts by platform
    */
-  const getPostsByPlatform = useCallback((platform: EducationalPost["platform"]) => {
-    return posts.filter((post) => post.platform === platform);
-  }, [posts]);
+  const getPostsByPlatform = useCallback(
+    (platform: EducationalPost["platform"]) => {
+      return posts.filter((post) => post.platform === platform);
+    },
+    [posts]
+  );
 
   /**
    * Generate multiple image options for a post
    */
-  const generateImageOptions = useCallback(async (tag: string, count: number = 5): Promise<string[]> => {
-    try {
-      const photos = await fetchPhotosByTag(tag, count, { 
-        orientation: "landscape",
-        size: "regular"
-      });
-      return photos.map(photo => photo.urls.regular);
-    } catch (error) {
-      console.error("Error generating image options:", error);
-      return [];
-    }
-  }, [fetchPhotosByTag]);
+  const generateImageOptions = useCallback(
+    async (tag: string, count: number = 5): Promise<string[]> => {
+      try {
+        const photos = await fetchPhotosByTag(tag, count, {
+          orientation: "landscape",
+          size: "regular",
+        });
+        return photos.map((photo) => photo.urls.regular);
+      } catch (error) {
+        console.error("Error generating image options:", error);
+        return [];
+      }
+    },
+    [fetchPhotosByTag]
+  );
 
   return {
     posts,

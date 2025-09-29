@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Typography, Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 import { EditDialog, FormField, PrimaryButton, SecondaryButton } from "@/components/shared";
 import { createProgramSchema, type CreateProgramFormData } from "../schemas/programSchemas";

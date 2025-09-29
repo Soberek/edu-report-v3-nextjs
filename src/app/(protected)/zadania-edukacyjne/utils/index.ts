@@ -5,10 +5,7 @@ import { MONTH_NAMES } from "../types";
 /**
  * Filters tasks based on provided filters
  */
-export const filterTasks = (
-  tasks: readonly EducationalTask[],
-  filters: EducationalTasksFilters
-): EducationalTask[] => {
+export const filterTasks = (tasks: readonly EducationalTask[], filters: EducationalTasksFilters): EducationalTask[] => {
   return tasks.filter((task) => {
     const taskDate = new Date(task.date);
     const taskYear = taskDate.getFullYear().toString();
@@ -63,10 +60,7 @@ export const extractFilterOptions = (tasks: readonly EducationalTask[]): FilterO
 /**
  * Applies filters and grouping to tasks
  */
-export const applyFiltersAndGrouping = (
-  tasks: readonly EducationalTask[],
-  filters: EducationalTasksFilters
-): FilteredTasksResult => {
+export const applyFiltersAndGrouping = (tasks: readonly EducationalTask[], filters: EducationalTasksFilters): FilteredTasksResult => {
   const filteredTasks = filterTasks(tasks, filters);
   const groupedTasks = groupTasksByMonth(filteredTasks);
   const filterOptions = extractFilterOptions(tasks);
@@ -163,10 +157,7 @@ export const getActiveFilterCount = (filters: EducationalTasksFilters): number =
 /**
  * Debounce function for performance optimization
  */
-export const debounce = <T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): ((...args: Parameters<T>) => void) => {
+export const debounce = <T extends (...args: unknown[]) => unknown>(func: T, wait: number): ((...args: Parameters<T>) => void) => {
   let timeout: NodeJS.Timeout;
 
   return (...args: Parameters<T>) => {

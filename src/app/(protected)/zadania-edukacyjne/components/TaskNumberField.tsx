@@ -27,18 +27,24 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
   disabled = false,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [currentValue, setCurrentValue] = useState("");
+
+  // Create manager with current field value
+  const taskNumberManager = useTaskNumberManager({
+    tasks,
+    editTaskId,
+    currentTaskNumber: currentValue,
+  });
 
   return (
     <Controller
       name={name}
       control={control}
       render={({ field, fieldState }) => {
-        // Create manager with current field value (only when field is available)
-        const taskNumberManager = useTaskNumberManager({
-          tasks,
-          editTaskId,
-          currentTaskNumber: String(field.value || ""),
-        });
+        // Update current value when field value changes
+        if (String(field.value || "") !== currentValue) {
+          setCurrentValue(String(field.value || ""));
+        }
         const handleQuickSuggestion = () => {
           const nextNumber = taskNumberManager.getNextSuggestion();
           field.onChange(String(nextNumber));

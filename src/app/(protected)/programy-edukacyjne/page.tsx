@@ -9,8 +9,7 @@ import type { CreateProgramFormData, Program } from "./types";
 import type { ProgramFilter as ProgramFilterType } from "./hooks/useProgramFilters";
 
 export default function Programs(): React.ReactNode {
-  const { state, handleCreateProgram, handleUpdateProgram, handleDeleteProgram, toggleForm, setEditProgram, clearError } =
-    useProgramsState();
+  const { state, handleCreateProgram, handleUpdateProgram, handleDeleteProgram, toggleForm, setEditProgram } = useProgramsState();
   const { showConfirm, ConfirmDialog } = useConfirmDialog();
 
   const [filter, setFilter] = useState<ProgramFilterType>({
