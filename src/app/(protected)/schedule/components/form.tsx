@@ -20,6 +20,7 @@ import { Controller } from "react-hook-form";
 import { TASK_TYPES } from "@/constants/tasks";
 import { programs } from "@/constants/programs";
 import { DateField } from "@mui/x-date-pickers/DateField";
+import { formatDateForInput } from "@/utils/shared/dayjsUtils";
 import dayjs from "dayjs";
 import { useTaskForm } from "../hooks/useTaskForm";
 import type { TaskFormProps } from "../types";
@@ -150,7 +151,7 @@ export default function TaskForm({ mode, task, onClose, onSave, userId, createTa
                     label="Data zaplanowana"
                     value={field.value ? dayjs(field.value) : null}
                     onChange={(newValue) => {
-                      field.onChange(newValue ? newValue.format("YYYY-MM-DD") : "");
+                      field.onChange(newValue ? formatDateForInput(newValue) : "");
                     }}
                     format="DD-MM-YYYY"
                     fullWidth
@@ -182,7 +183,7 @@ export default function TaskForm({ mode, task, onClose, onSave, userId, createTa
                     label="Data wykonania (opcjonalne)"
                     value={field.value ? dayjs(field.value) : null}
                     onChange={(newValue) => {
-                      field.onChange(newValue ? newValue.format("YYYY-MM-DD") : "");
+                      field.onChange(newValue ? formatDateForInput(newValue) : "");
                     }}
                     format="DD-MM-YYYY"
                     fullWidth

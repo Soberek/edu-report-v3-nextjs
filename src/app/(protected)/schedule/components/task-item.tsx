@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { formatDateForInput } from "@/utils/shared/dayjsUtils";
 
 import { type TaskType } from "@/constants/tasks";
 
@@ -139,7 +140,7 @@ export const Task: React.FC<Props> = ({
                   label="Data ukończenia"
                   value={field.value ? dayjs(field.value) : null}
                   onChange={(newValue) => {
-                    field.onChange(newValue ? newValue.format("YYYY-MM-DD") : "");
+                    field.onChange(newValue ? formatDateForInput(newValue) : "");
                   }}
                   format="DD-MM-YYYY"
                   fullWidth
