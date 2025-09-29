@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Typography, Card, CardContent, useTheme, Grid } from "@mui/material";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import type { Month, ExcelRow } from "../types";
-import { MONTH_NAMES } from "../types";
+import type { Month, ExcelRow } from "../../types";
+import { MONTH_NAMES } from "../../types";
 
 interface BarChartsProps {
   rawData: ExcelRow[];
@@ -18,9 +18,7 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
       return [];
     }
 
-    const selectedMonthNumbers = selectedMonths
-      .filter((m) => m.selected)
-      .map((m) => m.monthNumber);
+    const selectedMonthNumbers = selectedMonths.filter((m) => m.selected).map((m) => m.monthNumber);
 
     const monthData: { [key: number]: { actions: number; people: number } } = {};
 
@@ -61,9 +59,7 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
         <Typography variant="h6" sx={{ mb: 2 }}>
           Brak danych do wyświetlenia
         </Typography>
-        <Typography variant="body1">
-          Wczytaj plik Excel i wybierz miesiące, aby zobaczyć wykresy
-        </Typography>
+        <Typography variant="body1">Wczytaj plik Excel i wybierz miesiące, aby zobaczyć wykresy</Typography>
       </Box>
     );
   }
@@ -88,15 +84,8 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fontSize: 12 }}
-                  stroke={theme.palette.text.secondary}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  stroke={theme.palette.text.secondary}
-                />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke={theme.palette.text.secondary} />
+                <YAxis tick={{ fontSize: 12 }} stroke={theme.palette.text.secondary} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: theme.palette.background.paper,
@@ -106,12 +95,7 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
                   labelStyle={{ color: theme.palette.text.primary }}
                 />
                 <Legend />
-                <Bar
-                  dataKey="actions"
-                  name="Liczba działań"
-                  fill={theme.palette.primary.main}
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="actions" name="Liczba działań" fill={theme.palette.primary.main} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Box>
@@ -136,15 +120,8 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fontSize: 12 }}
-                  stroke={theme.palette.text.secondary}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  stroke={theme.palette.text.secondary}
-                />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke={theme.palette.text.secondary} />
+                <YAxis tick={{ fontSize: 12 }} stroke={theme.palette.text.secondary} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: theme.palette.background.paper,
@@ -154,12 +131,7 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
                   labelStyle={{ color: theme.palette.text.primary }}
                 />
                 <Legend />
-                <Bar
-                  dataKey="people"
-                  name="Liczba odbiorców"
-                  fill={theme.palette.success.main}
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="people" name="Liczba odbiorców" fill={theme.palette.success.main} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Box>
@@ -184,15 +156,8 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fontSize: 12 }}
-                  stroke={theme.palette.text.secondary}
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  stroke={theme.palette.text.secondary}
-                />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke={theme.palette.text.secondary} />
+                <YAxis tick={{ fontSize: 12 }} stroke={theme.palette.text.secondary} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: theme.palette.background.paper,
@@ -202,18 +167,8 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
                   labelStyle={{ color: theme.palette.text.primary }}
                 />
                 <Legend />
-                <Bar
-                  dataKey="actions"
-                  name="Liczba działań"
-                  fill={theme.palette.primary.main}
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="people"
-                  name="Liczba odbiorców"
-                  fill={theme.palette.success.main}
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="actions" name="Liczba działań" fill={theme.palette.primary.main} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="people" name="Liczba odbiorców" fill={theme.palette.success.main} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Box>
@@ -230,15 +185,9 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ backgroundColor: theme.palette.grey[100] }}>
-                  <th style={{ padding: "12px", textAlign: "left", borderBottom: `1px solid ${theme.palette.divider}` }}>
-                    Miesiąc
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "right", borderBottom: `1px solid ${theme.palette.divider}` }}>
-                    Działania
-                  </th>
-                  <th style={{ padding: "12px", textAlign: "right", borderBottom: `1px solid ${theme.palette.divider}` }}>
-                    Odbiorcy
-                  </th>
+                  <th style={{ padding: "12px", textAlign: "left", borderBottom: `1px solid ${theme.palette.divider}` }}>Miesiąc</th>
+                  <th style={{ padding: "12px", textAlign: "right", borderBottom: `1px solid ${theme.palette.divider}` }}>Działania</th>
+                  <th style={{ padding: "12px", textAlign: "right", borderBottom: `1px solid ${theme.palette.divider}` }}>Odbiorcy</th>
                   <th style={{ padding: "12px", textAlign: "right", borderBottom: `1px solid ${theme.palette.divider}` }}>
                     Średnia odbiorców/działanie
                   </th>
@@ -289,8 +238,11 @@ export const BarCharts: React.FC<BarChartsProps> = React.memo(({ rawData, select
                   </td>
                   <td style={{ padding: "12px", textAlign: "right", fontWeight: "bold" }}>
                     <Typography variant="body1" fontWeight="bold" color="white">
-                      {monthlyData.reduce((sum, data) => sum + data.actions, 0) > 0 
-                        ? Math.round(monthlyData.reduce((sum, data) => sum + data.people, 0) / monthlyData.reduce((sum, data) => sum + data.actions, 0))
+                      {monthlyData.reduce((sum, data) => sum + data.actions, 0) > 0
+                        ? Math.round(
+                            monthlyData.reduce((sum, data) => sum + data.people, 0) /
+                              monthlyData.reduce((sum, data) => sum + data.actions, 0)
+                          )
                         : 0}
                     </Typography>
                   </td>
