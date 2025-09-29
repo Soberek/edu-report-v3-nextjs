@@ -254,26 +254,32 @@ export const ActivityForm: React.FC = () => {
             </Box>
 
             <Stack spacing={2}>
-              <FormField
+              <Controller
                 name={`activities.${index}.type`}
                 control={control}
-                label="Typ aktywności"
-                type="select"
-                required
-                fullWidth
-                options={Object.values(TASK_TYPES).map((taskType) => ({
-                  value: taskType.label,
-                  label: taskType.label,
-                }))}
-                onChange={(value) => {
-                  // Clear materials and media when activity type changes
-                  if (value !== "dystrybucja") {
-                    setValue(`activities.${index}.materials`, []);
-                  }
-                  if (value !== "publikacja media") {
-                    setValue(`activities.${index}.media`, undefined);
-                  }
-                }}
+                render={({ field }) => (
+                  <FormField
+                    {...field}
+                    label="Typ aktywności"
+                    type="select"
+                    required
+                    fullWidth
+                    options={Object.values(TASK_TYPES).map((taskType) => ({
+                      value: taskType.label,
+                      label: taskType.label,
+                    }))}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      // Clear materials and media when activity type changes
+                      if (value !== "dystrybucja") {
+                        setValue(`activities.${index}.materials`, []);
+                      }
+                      if (value !== "publikacja media") {
+                        setValue(`activities.${index}.media`, undefined);
+                      }
+                    }}
+                  />
+                )}
               />
 
               <FormField name={`activities.${index}.title`} control={control} label="Tytuł aktywności" required fullWidth />
