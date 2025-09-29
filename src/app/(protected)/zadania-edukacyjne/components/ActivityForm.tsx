@@ -268,7 +268,7 @@ export const ActivityForm: React.FC = () => {
                       value: taskType.label,
                       label: taskType.label,
                     }))}
-                    onChange={(value) => {
+                    onChange={(value: string) => {
                       field.onChange(value);
                       // Clear materials and media when activity type changes
                       if (value !== "dystrybucja") {
