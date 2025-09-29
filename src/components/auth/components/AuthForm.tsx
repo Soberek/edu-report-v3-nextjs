@@ -51,9 +51,9 @@ export const AuthForm = <T extends BaseAuthFormData>({
         variant="outlined"
         fullWidth
         disabled={isFormDisabled}
-        {...register("email" as keyof T)}
+        {...register("email" as any)}
         error={Boolean(errors.email)}
-        helperText={errors.email?.message}
+        helperText={errors.email?.message as string}
         autoComplete={SHARED_AUTH_CONSTANTS.FIELDS.EMAIL.AUTOCOMPLETE}
       />
 
@@ -63,9 +63,9 @@ export const AuthForm = <T extends BaseAuthFormData>({
         variant="outlined"
         fullWidth
         disabled={isFormDisabled}
-        {...register("password" as keyof T)}
+        {...register("password" as any)}
         error={Boolean(errors.password)}
-        helperText={errors.password?.message}
+        helperText={errors.password?.message as string}
         autoComplete={constants?.FIELDS?.PASSWORD?.AUTOCOMPLETE || "current-password"}
       />
 
