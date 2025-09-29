@@ -15,9 +15,9 @@ import {
 } from "@mui/material";
 import { Add, Delete, LocalLibrary } from "@mui/icons-material";
 import { Controller, Control, FieldArrayWithId } from "react-hook-form";
-import { FormField } from "@/components/shared";
+// import { FormField } from "@/components/shared";
 import { EDUCATIONAL_MATERIALS, MATERIAL_CATEGORY_LABELS, getMaterialById } from "@/constants/materials";
-import type { MaterialItem } from "@/constants/materials";
+// import type { MaterialItem } from "@/constants/materials";
 
 interface MaterialSelectorProps {
   control: Control<Record<string, unknown>>;
@@ -55,13 +55,13 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fie
   };
 
   // Group materials by category for better UX
-  const groupedMaterials = Object.values(MATERIAL_CATEGORY_LABELS).map((categoryLabel) => {
-    const categoryKey = Object.keys(MATERIAL_CATEGORY_LABELS).find(
-      (key) => MATERIAL_CATEGORY_LABELS[key as keyof typeof MATERIAL_CATEGORY_LABELS] === categoryLabel
-    );
-    const materials = EDUCATIONAL_MATERIALS.filter((material) => material.category === categoryKey?.toLowerCase());
-    return { category: categoryLabel, materials };
-  });
+  // const groupedMaterials = Object.values(MATERIAL_CATEGORY_LABELS).map((categoryLabel) => {
+  //   const categoryKey = Object.keys(MATERIAL_CATEGORY_LABELS).find(
+  //     (key) => MATERIAL_CATEGORY_LABELS[key as keyof typeof MATERIAL_CATEGORY_LABELS] === categoryLabel
+  //   );
+  //   const materials = EDUCATIONAL_MATERIALS.filter((material) => material.category === categoryKey?.toLowerCase());
+  //   return { category: categoryLabel, materials };
+  // });
 
   return (
     <Box>

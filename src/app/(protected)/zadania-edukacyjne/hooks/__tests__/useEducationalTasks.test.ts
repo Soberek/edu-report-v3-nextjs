@@ -10,7 +10,7 @@ const mockUser = {
   uid: "user-123",
   email: "test@example.com",
   displayName: "Test User",
-} as { uid: string; email: string; displayName: string };
+} as any;
 
 const mockFirebaseData = {
   data: [],
@@ -179,7 +179,7 @@ describe("useEducationalTasks", () => {
       await act(async () => {
         try {
           await result.current.createTask(mockTaskData);
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });
@@ -220,7 +220,7 @@ describe("useEducationalTasks", () => {
 
       const { result } = renderHook(() => useEducationalTasks());
 
-      const updatedTask = { ...mockTask, title: "Updated Task" };
+      // const updatedTask = { ...mockTask, title: "Updated Task" };
       mockFirebaseData.updateItem.mockResolvedValue(true);
 
       let resultTask: EducationalTask | null | undefined;
@@ -261,7 +261,7 @@ describe("useEducationalTasks", () => {
       await act(async () => {
         try {
           await result.current.updateTask("task-1", mockTaskData);
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });
@@ -323,7 +323,7 @@ describe("useEducationalTasks", () => {
       await act(async () => {
         try {
           await result.current.deleteTask("task-1");
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });
@@ -400,7 +400,7 @@ describe("useEducationalTasks", () => {
       await act(async () => {
         try {
           await result.current.createTask(mockTaskData);
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });
@@ -416,7 +416,7 @@ describe("useEducationalTasks", () => {
       await act(async () => {
         try {
           await result.current.updateTask("task-1", mockTaskData);
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });
@@ -432,7 +432,7 @@ describe("useEducationalTasks", () => {
       await act(async () => {
         try {
           await result.current.deleteTask("task-1");
-        } catch (error) {
+        } catch {
           // Expected to throw
         }
       });

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useForm, FormProvider, Controller, useFieldArray } from "react-hook-form";
+import { useForm, FormProvider, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Typography, Stack, Alert } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
@@ -16,7 +16,7 @@ import { TaskNumberField } from "./TaskNumberField";
 import { usePrograms } from "@/hooks/useProgram";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
-import { schoolTypes } from "@/constants";
+// import { schoolTypes } from "@/constants";
 import { suggestNextTaskNumber } from "../utils/taskNumberUtils";
 
 interface EducationalTaskFormProps {
@@ -36,7 +36,7 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
     user?.uid
   );
 
-  const [selectedSchoolId, setSelectedSchoolId] = React.useState<string>("");
+  // const [selectedSchoolId, setSelectedSchoolId] = React.useState<string>("");
 
   // Calculate default task number for new tasks
   const defaultTaskNumber = React.useMemo(() => {
@@ -214,14 +214,14 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
                 <Controller
                   name="schoolId"
                   control={form.control}
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <Autocomplete
                       options={schools || []}
                       getOptionLabel={(option) => `${option.name} - ${option.address}, ${option.city} (${option.type.join(", ")})`}
                       value={schools?.find((school) => school.id === field.value) || null}
                       onChange={(_, newValue) => {
                         field.onChange(newValue?.id || "");
-                        setSelectedSchoolId(newValue?.id || "");
+                        // setSelectedSchoolId(newValue?.id || "");
                       }}
                       renderInput={(params) => <TextField {...params} label="Szkoła" placeholder="Wybierz szkołę" required />}
                       isOptionEqualToValue={(option, value) => option.id === value.id}

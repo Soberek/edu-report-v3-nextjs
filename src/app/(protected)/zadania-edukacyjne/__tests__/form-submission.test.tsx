@@ -1,10 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 // Mock the form component
-const MockEducationalTaskForm = ({ onSubmit, onCancel, initialData }: { onSubmit: (data: Record<string, unknown>) => void; onCancel: () => void; initialData?: Record<string, unknown> }) => {
+const MockEducationalTaskForm = ({
+  onSubmit,
+  onCancel,
+  initialData,
+}: {
+  onSubmit: (data: Record<string, unknown>) => void;
+  onCancel: () => void;
+  initialData?: Record<string, unknown>;
+}) => {
   const [formData, setFormData] = React.useState({
     title: initialData?.title || "",
     programName: initialData?.programName || "",
@@ -78,10 +86,10 @@ const MockEducationalTasksPage = () => {
     setIsFormOpen(true);
   };
 
-  const handleEditTask = (task: Record<string, unknown>) => {
-    setEditTask(task);
-    setIsFormOpen(true);
-  };
+  // const handleEditTask = (task: Record<string, unknown>) => {
+  //   setEditTask(task);
+  //   setIsFormOpen(true);
+  // };
 
   const handleFormSubmit = (data: Record<string, unknown>) => {
     setSubmittedData(data);
@@ -224,7 +232,7 @@ describe("Form Submission Integration Tests", () => {
       const [isFormOpen, setIsFormOpen] = React.useState(false);
       const [editTask, setEditTask] = React.useState<Record<string, unknown>>(existingTask);
 
-      const handleFormSubmit = (data: Record<string, unknown>) => {
+      const handleFormSubmit = () => {
         setIsFormOpen(false);
         setEditTask(null);
       };

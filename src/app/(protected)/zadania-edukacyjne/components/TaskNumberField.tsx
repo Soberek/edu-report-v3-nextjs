@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { TextField, Box, Typography, Chip, Button, Alert } from "@mui/material";
 import { Refresh, Warning } from "@mui/icons-material";
 import type { EducationalTask } from "@/types";
@@ -27,7 +27,7 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
   disabled = false,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
-  
+
   // Create manager with current field value
   const taskNumberManager = useTaskNumberManager({
     tasks,
@@ -41,23 +41,23 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
       control={control}
       rules={{
         required: required ? "Numer zadania jest wymagany" : false,
-        validate: (value: string) => {
-          if (!value.trim()) {
+        validate: (value: unknown) => {
+          const stringValue = String(value || "");
+          if (!stringValue.trim()) {
             return required ? "Numer zadania jest wymagany" : true;
           }
           return true; // Validation will be handled by taskNumberManager in render
         },
       }}
       render={({ field, fieldState }) => {
-
         const handleQuickSuggestion = () => {
           const nextNumber = taskNumberManager.getNextSuggestion();
-          field.onChange(nextNumber);
+          field.onChange(String(nextNumber));
           setShowSuggestions(false);
         };
 
         return (
-          <Box>
+          <div>
             <TextField
               {...field}
               label={label}
@@ -65,7 +65,7 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
               fullWidth
               required={required}
               disabled={disabled}
-              value={field.value || ""}
+              value={String(field.value || "")}
               error={fieldState.error !== undefined || !taskNumberManager.isValid}
               helperText={fieldState.error?.message || taskNumberManager.errorMessage || helperText || "Format: liczba/rok (np. 45/2025)"}
               onChange={(e) => {
@@ -82,7 +82,7 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
             />
 
             {/* Quick Actions */}
-            <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
               <Button
                 variant="outlined"
                 size="small"
@@ -95,7 +95,7 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
                   fontWeight: "medium",
                 }}
               >
-                Następny dostępny: {taskNumberManager.getNextSuggestion()}
+                Następny dostępny: {String(taskNumberManager.getNextSuggestion() || "")}
               </Button>
 
               <Button
@@ -111,10 +111,10 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
               >
                 {showSuggestions ? "Ukryj sugestie" : "Pokaż sugestie"}
               </Button>
-            </Box>
+            </div>
 
             {/* Validation Status */}
-            {field.value && (
+            {Boolean(field.value) && (
               <Box sx={{ mb: 1 }}>
                 {taskNumberManager.isValid ? (
                   <Alert severity="success" sx={{ py: 0.5 }}>
@@ -129,21 +129,21 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
             )}
 
             {/* Suggestions */}
-            {showSuggestions && (
+            {Boolean(showSuggestions) && (
               <Box>
                 <Typography variant="body2" fontWeight="medium" sx={{ mb: 1 }}>
-                  Sugerowane numery zadania dla roku {taskNumberManager.year}:
+                  Sugerowane numery zadania dla roku {String(taskNumberManager.year)}:
                 </Typography>
 
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                   {taskNumberManager.suggestions.map((suggestion, index) => (
                     <Chip
                       key={`${suggestion}-${index}`}
-                      label={suggestion}
+                      label={String(suggestion)}
                       variant={suggestion === field.value ? "filled" : "outlined"}
                       color={suggestion === field.value ? "primary" : "default"}
                       onClick={() => {
-                        field.onChange(suggestion);
+                        field.onChange(String(suggestion));
                         setShowSuggestions(false);
                       }}
                       sx={{
@@ -167,24 +167,24 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
             )}
 
             {/* Usage Statistics */}
-            {tasks.length > 0 && (
+            {Boolean(tasks.length > 0) && (
               <Box sx={{ mt: 2, p: 2, bgcolor: "grey.50", borderRadius: 2 }}>
                 <Typography variant="body2" fontWeight="medium" sx={{ mb: 1 }}>
-                  Statystyki użycia dla roku {taskNumberManager.year}:
+                  Statystyki użycia dla roku {String(taskNumberManager.year)}:
                 </Typography>
 
                 <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                   <Typography variant="caption" color="text.secondary">
-                    Całkowita liczba zadań: {tasks.filter((t) => t.taskNumber.includes(`/${taskNumberManager.year}`)).length}
+                    Całkowita liczba zadań: {tasks.filter((t) => t.taskNumber.includes(`/${String(taskNumberManager.year)}`)).length}
                   </Typography>
 
                   <Typography variant="caption" color="text.secondary">
-                    Dostępne numery: {taskNumberManager.suggestions.length}
+                    Dostępne numery: {String(taskNumberManager.suggestions.length)}
                   </Typography>
                 </Box>
               </Box>
             )}
-          </Box>
+          </div>
         );
       }}
     />
