@@ -120,26 +120,44 @@ export const ActivityForm: React.FC = () => {
 
   // Helper component for activity audience groups
   const ActivityAudienceGroups: React.FC<{ activityIndex: number }> = ({ activityIndex }) => {
-    const { fields: audienceFields, append: appendAudience, remove: removeAudience } = useFieldArray({
-      control,
-      name: `activities.${activityIndex}.audienceGroups`,
-    });
+    const { setValue } = useFormContext();
+    const audienceGroups =
+      useWatch({
+        control,
+        name: `activities.${activityIndex}.audienceGroups`,
+      }) || [];
 
     const addAudienceGroup = () => {
-      const nextGroupNumber = audienceFields.length + 1;
-      appendAudience({
+      const nextGroupNumber = audienceGroups.length + 1;
+      const newGroup = {
+        id: `audience-${activityIndex}-${nextGroupNumber}`,
         name: `Grupa ${nextGroupNumber}`,
         type: "dorośli",
         count: 30,
-      });
+      };
+      const updatedGroups = [...audienceGroups, newGroup];
+
+      // Use setValue to update the form field
+      setValue(`activities.${activityIndex}.audienceGroups`, updatedGroups);
     };
+
+    const removeAudienceGroup = (removeIndex: number) => {
+      const updatedGroups = audienceGroups.filter((_: any, index: number) => index !== removeIndex);
+      setValue(`activities.${activityIndex}.audienceGroups`, updatedGroups);
+    };
+
+    // Create fields array compatible with AudienceGroupsForm
+    const fields = audienceGroups.map((group: any, index: number) => ({
+      id: group.id || `audience-${activityIndex}-${index}`,
+      ...group,
+    }));
 
     return (
       <AudienceGroupsForm
         control={control}
-        fields={audienceFields}
-        append={(_value) => addAudienceGroup()}
-        remove={removeAudience}
+        fields={fields}
+        append={() => addAudienceGroup()}
+        remove={removeAudienceGroup}
         basePath={`activities.${activityIndex}.audienceGroups`}
       />
     );
