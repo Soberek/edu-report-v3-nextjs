@@ -75,19 +75,33 @@ export const actions = {
 // Utility functions for better testability
 export const taskUtils = {
   generateTaskId: (): string => `task_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-  createTaskFromData: (taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => ({
-    ...taskData,
-    id: taskUtils.generateTaskId(),
-    createdBy: userId,
-    createdAt: new Date().toISOString(),
-  }),
-  updateTaskFromData: (id: string, taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => ({
-    ...taskData,
-    id,
-    createdBy: userId,
-    updatedAt: new Date().toISOString(),
-    createdAt: "",
-  }),
+  createTaskFromData: (taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => {
+    // Remove undefined values to prevent Firebase errors
+    const cleanTaskData = Object.fromEntries(
+      Object.entries(taskData).filter(([_, value]) => value !== undefined)
+    );
+    
+    return {
+      ...cleanTaskData,
+      id: taskUtils.generateTaskId(),
+      createdBy: userId,
+      createdAt: new Date().toISOString(),
+    } as EducationalTask;
+  },
+  updateTaskFromData: (id: string, taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => {
+    // Remove undefined values to prevent Firebase errors
+    const cleanTaskData = Object.fromEntries(
+      Object.entries(taskData).filter(([_, value]) => value !== undefined)
+    );
+    
+    return {
+      ...cleanTaskData,
+      id,
+      createdBy: userId,
+      updatedAt: new Date().toISOString(),
+      createdAt: "",
+    } as EducationalTask;
+  },
   getErrorMessage: (error: unknown, defaultMessage: string): string => {
     return error instanceof Error ? error.message : defaultMessage;
   },
