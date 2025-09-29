@@ -26,6 +26,11 @@ export default function EducationalTasks(): React.ReactNode {
     setOpenForm(true);
   };
 
+  const handleFormClose = () => {
+    setOpenForm(false);
+    setEditTask(null);
+  };
+
   const handleEditTask = (task: EducationalTask) => {
     setEditTask(task);
     setOpenForm(true);
