@@ -39,16 +39,6 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
     <Controller
       name={name}
       control={control}
-      rules={{
-        required: required ? "Numer zadania jest wymagany" : false,
-        validate: (value: unknown) => {
-          const stringValue = String(value || "");
-          if (!stringValue.trim()) {
-            return required ? "Numer zadania jest wymagany" : true;
-          }
-          return true; // Validation will be handled by taskNumberManager in render
-        },
-      }}
       render={({ field, fieldState }) => {
         const handleQuickSuggestion = () => {
           const nextNumber = taskNumberManager.getNextSuggestion();
@@ -66,8 +56,8 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
               required={required}
               disabled={disabled}
               value={String(field.value || "")}
-              error={fieldState.error !== undefined || !taskNumberManager.isValid}
-              helperText={fieldState.error?.message || taskNumberManager.errorMessage || helperText || "Format: liczba/rok (np. 45/2025)"}
+              error={!!fieldState.error || !taskNumberManager.isValid}
+              helperText={fieldState.error?.message || taskNumberManager.errorMessage || helperText}
               onChange={(e) => {
                 const newValue = e.target.value;
                 field.onChange(newValue);
