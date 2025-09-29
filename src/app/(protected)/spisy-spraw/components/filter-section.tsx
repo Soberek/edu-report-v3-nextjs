@@ -11,12 +11,7 @@ interface FilterSectionProps {
   onCodeChange: (code: string) => void;
 }
 
-export const FilterSection: React.FC<FilterSectionProps> = ({
-  selectedCode,
-  actsOptions,
-  sortedCaseRecords,
-  onCodeChange,
-}) => {
+export const FilterSection: React.FC<FilterSectionProps> = ({ selectedCode, actsOptions, sortedCaseRecords, onCodeChange }) => {
   return (
     <Paper
       elevation={0}
@@ -49,7 +44,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
           >
             Filtrowanie i eksport
           </Typography>
-          
+
           <FormControl sx={{ minWidth: 250 }}>
             <Select
               value={selectedCode.code}
@@ -85,11 +80,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
           </FormControl>
 
           {selectedCode.title && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ ml: "auto" }}
-            >
+            <Typography variant="body2" color="text.secondary" sx={{ ml: "auto" }}>
               Wybrany: {selectedCode.title}
             </Typography>
           )}
@@ -97,12 +88,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <ActRecordsPdfPreview 
-          caseRecords={sortedCaseRecords} 
-          selectedCode={selectedCode.code} 
-          title={selectedCode.title} 
-          year="2025" 
-        />
+        <ActRecordsPdfPreview caseRecords={sortedCaseRecords} selectedCode={selectedCode.code} title={selectedCode.title} year="2025" />
       </Box>
     </Paper>
   );
