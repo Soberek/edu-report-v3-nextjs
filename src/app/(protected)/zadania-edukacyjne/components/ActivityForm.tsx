@@ -177,7 +177,8 @@ export const ActivityForm: React.FC = () => {
   const getMaterialsFields = (activityIndex: number) => {
     const materials = watchedAllMaterials[activityIndex] || [];
     return materials.map((material: any, index: number) => ({
-      id: material.id || `material-${activityIndex}-${index}`,
+      id: `field-${activityIndex}-${index}`, // Unique React key
+      originalId: material.id || `material-${activityIndex}-${index}`,
       ...material,
     }));
   };

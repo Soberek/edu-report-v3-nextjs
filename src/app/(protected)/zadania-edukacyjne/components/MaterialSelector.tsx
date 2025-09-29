@@ -21,7 +21,11 @@ import type { MaterialItem } from "@/constants/materials";
 
 interface MaterialSelectorProps {
   control: Control<any, any>;
-  fields: FieldArrayWithId<any, any, "id">[];
+  fields: (FieldArrayWithId<any, any, "id"> & {
+    originalId?: string;
+    name?: string;
+    type?: string;
+  })[];
   append: (value: any) => void;
   remove: (index: number) => void;
   activityIndex: number;
@@ -135,15 +139,15 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fie
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
                   <Stack spacing={1}>
                     <Typography variant="subtitle2" fontWeight="bold">
-                      {EDUCATIONAL_MATERIALS.find((m) => m.id === field.id)?.name || `Materiał ${index + 1}`}
+                      {EDUCATIONAL_MATERIALS.find((m) => m.id === field.originalId)?.name || field.name || `Materiał ${index + 1}`}
                     </Typography>
                     <Box sx={{ display: "flex", gap: 1 }}>
                       <Chip
-                        label={EDUCATIONAL_MATERIALS.find((m) => m.id === field.id)?.type || "brak typu"}
+                        label={EDUCATIONAL_MATERIALS.find((m) => m.id === field.originalId)?.type || field.type || "brak typu"}
                         size="small"
                         variant="outlined"
                       />
-                      <Chip label={`ID: ${field.id}`} size="small" variant="outlined" color="secondary" />
+                      <Chip label={`ID: ${field.originalId || field.id}`} size="small" variant="outlined" color="secondary" />
                     </Box>
                   </Stack>
                   <IconButton onClick={() => removeMaterial(index)} size="small" sx={{ color: "error.main" }} title="Usuń materiał">
