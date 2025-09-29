@@ -14,12 +14,12 @@ const MockEducationalTaskForm = ({
   initialData?: Record<string, unknown>;
 }) => {
   const [formData, setFormData] = React.useState({
-    title: initialData?.title || "",
-    programName: initialData?.programName || "",
-    date: initialData?.date || "",
-    schoolId: initialData?.schoolId || "",
-    taskNumber: initialData?.taskNumber || "",
-    referenceNumber: initialData?.referenceNumber || "",
+    title: String(initialData?.title || ""),
+    programName: String(initialData?.programName || ""),
+    date: String(initialData?.date || ""),
+    schoolId: String(initialData?.schoolId || ""),
+    taskNumber: String(initialData?.taskNumber || ""),
+    referenceNumber: String(initialData?.referenceNumber || ""),
     activities: initialData?.activities || [],
   });
 
@@ -78,7 +78,7 @@ const MockEducationalTaskForm = ({
 // Mock the page component
 const MockEducationalTasksPage = () => {
   const [isFormOpen, setIsFormOpen] = React.useState(false);
-  const [editTask, setEditTask] = React.useState(null);
+  const [editTask, setEditTask] = React.useState<Record<string, unknown> | null>(null);
   const [submittedData, setSubmittedData] = React.useState<Record<string, unknown> | null>(null);
 
   const handleAddTask = () => {
@@ -107,16 +107,16 @@ const MockEducationalTasksPage = () => {
       <button onClick={handleAddTask} data-testid="add-task-button">
         Dodaj zadanie
       </button>
-      {isFormOpen && <MockEducationalTaskForm onSubmit={handleFormSubmit} onCancel={handleFormCancel} initialData={editTask} />}
+      {isFormOpen && <MockEducationalTaskForm onSubmit={handleFormSubmit} onCancel={handleFormCancel} initialData={editTask || undefined} />}
       {submittedData && (
         <div data-testid="submitted-data">
           <h3>Zadanie zostało dodane:</h3>
-          <p>Tytuł: {submittedData.title}</p>
-          <p>Program: {submittedData.programName}</p>
-          <p>Data: {submittedData.date}</p>
-          <p>Szkoła: {submittedData.schoolId}</p>
-          <p>Numer zadania: {submittedData.taskNumber}</p>
-          <p>Numer referencyjny: {submittedData.referenceNumber}</p>
+          <p>Tytuł: {String(submittedData.title || "")}</p>
+          <p>Program: {String(submittedData.programName || "")}</p>
+          <p>Data: {String(submittedData.date || "")}</p>
+          <p>Szkoła: {String(submittedData.schoolId || "")}</p>
+          <p>Numer zadania: {String(submittedData.taskNumber || "")}</p>
+          <p>Numer referencyjny: {String(submittedData.referenceNumber || "")}</p>
         </div>
       )}
     </div>
@@ -234,12 +234,12 @@ describe("Form Submission Integration Tests", () => {
 
       const handleFormSubmit = () => {
         setIsFormOpen(false);
-        setEditTask(null);
+        setEditTask({});
       };
 
       const handleFormCancel = () => {
         setIsFormOpen(false);
-        setEditTask(null);
+        setEditTask({});
       };
 
       return (
