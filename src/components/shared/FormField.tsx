@@ -21,7 +21,7 @@ export interface FormFieldProps<T extends FieldValues> {
   name: FieldPath<T>;
   control: Control<T>;
   label: string;
-  type?: "text" | "email" | "password" | "number" | "textarea" | "select" | "checkbox" | "radio";
+  type?: "text" | "email" | "password" | "number" | "textarea" | "select" | "checkbox" | "radio" | "date";
   options?: Array<{ value: string | number; label: string }>;
   multiline?: boolean;
   rows?: number;

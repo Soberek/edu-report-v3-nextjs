@@ -1,6 +1,7 @@
 import React from "react";
 import { Avatar, Typography, Box, Chip, Tooltip } from "@mui/material";
 import { CalendarToday, Group, Notes } from "@mui/icons-material";
+import { formatDateForTable, formatDate } from "@/utils/shared/dayjsUtils";
 
 // Utility functions
 export const getInitials = (name: string): string => {
@@ -255,10 +256,10 @@ export const DateCell: React.FC<DateCellProps> = ({ date, format = "short" }) =>
     }}
   >
     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: "500" }}>
-      {new Date(date).toLocaleDateString(
-        "pl-PL",
-        format === "short" ? { day: "2-digit", month: "2-digit" } : { day: "2-digit", month: "2-digit", year: "numeric" }
-      )}
+      {format === "short" 
+        ? formatDateForTable(date)
+        : formatDate(date, format === "full" ? "long" : "medium")
+      }
     </Typography>
   </Box>
 );
