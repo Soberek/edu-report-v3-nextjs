@@ -1,12 +1,14 @@
 "use client";
+
 import { useForm } from "react-hook-form";
-import { Alert, Box, MenuItem, Select } from "@mui/material";
+import { Container, Alert, Snackbar, Box } from "@mui/material";
 import { useCallback, useMemo, useState } from "react";
 
 import type { CaseRecord } from "@/types";
 import { ActForm } from "./components/form";
 import { ActCaseRecordsTable } from "./components/table";
-import { ActRecordsPdfPreview } from "./components/pdf-preview";
+import { FilterSection } from "./components/filter-section";
+import { PageHeader, LoadingSpinner, EmptyState } from "./components";
 import { WYKAZ_AKT } from "@/constants/acts";
 import { useAct } from "@/hooks/useAct";
 
@@ -29,11 +31,21 @@ const INITIAL_SELECTED_CODE = {
 
 export default function Acts() {
   const [selectedCode, setSelectedCode] = useState(INITIAL_SELECTED_CODE);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    type: "success" | "error" | "info" | "warning";
+    message: string;
+  }>({
+    open: false,
+    type: "success",
+    message: "",
+  });
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<CaseRecord>({
     defaultValues: DEFAULT_VALUES,
   });
@@ -43,9 +55,9 @@ export default function Acts() {
     actRecordsError,
     addActRecord,
     actRecordsLoading,
-    // updateActRecord,
     removeActRecord,
   } = useAct();
+
   const actsOptions = useMemo(() => {
     return Object.values(WYKAZ_AKT).reduce<{ code: string; name: string }[]>((acc, akt) => {
       acc.push({ code: akt.code, name: akt.name });
@@ -80,58 +92,125 @@ export default function Acts() {
     [actsOptions]
   );
 
+  const handleAddActRecord = async (data: CaseRecord) => {
+    try {
+      await addActRecord(data);
+      setSnackbar({
+        open: true,
+        type: "success",
+        message: "Akt sprawy został dodany pomyślnie.",
+      });
+      reset();
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        type: "error",
+        message: "Wystąpił błąd podczas zapisywania danych.",
+      });
+    }
+  };
+
+  const handleDeleteCaseRecord = async (caseId: string) => {
+    try {
+      await removeActRecord(caseId);
+      setSnackbar({
+        open: true,
+        type: "success",
+        message: "Akt sprawy został usunięty pomyślnie.",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        type: "error",
+        message: "Wystąpił błąd podczas usuwania danych.",
+      });
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Render error messages
   const renderErrors = () => {
     if (!actRecordsError) return null;
 
     const errors = Array.isArray(actRecordsError) ? actRecordsError : [actRecordsError];
 
-    return errors.map((error, index) => (
-      <Alert key={index} severity="error">
-        {error}
-      </Alert>
-    ));
+    return (
+      <Box sx={{ mb: 3 }}>
+        {errors.map((error, index) => (
+          <Alert key={index} severity="error" sx={{ mb: 1 }}>
+            {error}
+          </Alert>
+        ))}
+      </Box>
+    );
   };
 
-  const renderCodeSelect = () => (
-    <Box sx={{ mb: 2, display: "flex", gap: 2, mx: 2 }}>
-      <Select
-        value={selectedCode.code}
-        onChange={(event) => handleCodeChange(event.target.value)}
-        displayEmpty
-        inputProps={{ "aria-label": "Choose code" }}
-      >
-        <MenuItem value="" disabled>
-          <em>Choose code</em>
-        </MenuItem>
-        <MenuItem value="">
-          <em>All</em>
-        </MenuItem>
-        {actsOptions.map((option) => (
-          <MenuItem key={option.code} value={option.code}>
-            {option.code} - {option.name}
-          </MenuItem>
-        ))}
-      </Select>
-
-      <ActRecordsPdfPreview caseRecords={sortedCaseRecords} selectedCode={selectedCode.code} title={selectedCode.title} year="2025" />
-    </Box>
+  const actCodesOptions = useMemo(
+    () => actsOptions.map((option) => option.code),
+    [actsOptions]
   );
 
+  if (actRecordsLoading) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        <LoadingSpinner
+          size={48}
+          message="Ładowanie danych..."
+          sx={{ minHeight: 400 }}
+        />
+      </Container>
+    );
+  }
+
   return (
-    <>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      {/* Header */}
+      <PageHeader
+        title="Spisy Spraw"
+        subtitle="Zarządzaj aktami spraw administracyjnych"
+      />
+
+      {/* Error Alert */}
       {renderErrors()}
 
+      {/* Add New Act Section */}
       <ActForm
         control={control}
         handleSubmit={handleSubmit}
-        onSubmit={addActRecord}
+        onSubmit={handleAddActRecord}
         errors={errors}
-        actsOptions={actsOptions.map((option) => option.code)}
+        actsOptions={actCodesOptions}
       />
 
-      {renderCodeSelect()}
+      {/* Filter and Export Section */}
+      <FilterSection
+        selectedCode={selectedCode}
+        actsOptions={actsOptions}
+        sortedCaseRecords={sortedCaseRecords}
+        onCodeChange={handleCodeChange}
+      />
 
-      <ActCaseRecordsTable caseRecords={actRecords} loading={actRecordsLoading} deleteCaseRecord={removeActRecord} />
-    </>
+      {/* Cases Table */}
+      <ActCaseRecordsTable
+        caseRecords={actRecords}
+        loading={actRecordsLoading}
+        deleteCaseRecord={handleDeleteCaseRecord}
+      />
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.type} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Container>
   );
 }
