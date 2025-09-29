@@ -7,7 +7,7 @@ export interface AsyncOperationState {
 }
 
 export interface AsyncOperationOptions {
-  onSuccess?: (data?: any) => void;
+  onSuccess?: (data?: unknown) => void;
   onError?: (error: Error) => void;
   onFinally?: () => void;
 }
@@ -20,7 +20,7 @@ export const useAsyncOperation = (options: AsyncOperationOptions = {}) => {
   });
 
   const execute = useCallback(
-    async (operation: () => Promise<any>) => {
+    async (operation: () => Promise<unknown>) => {
       setState({ loading: true, error: null, success: false });
 
       try {
