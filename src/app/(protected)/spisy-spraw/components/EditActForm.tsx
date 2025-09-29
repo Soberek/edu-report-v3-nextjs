@@ -143,16 +143,16 @@ export const EditActForm = forwardRef<EditActFormRef, EditActFormProps>(({ caseR
         />
 
         {/* Date */}
-        <FormField name="date" control={control} label="Data" required />
+        <FormField name="date" control={control} label="Data" type="date" required />
 
         {/* Title */}
         <FormField name="title" control={control} label="Tytuł" required />
 
         {/* Start Date */}
-        <FormField name="startDate" control={control} label="Data wszczęcia sprawy" required />
+        <FormField name="startDate" control={control} label="Data wszczęcia sprawy" type="date" required />
 
         {/* End Date */}
-        <FormField name="endDate" control={control} label="Data zakończenia sprawy" required />
+        <FormField name="endDate" control={control} label="Data zakończenia sprawy" type="date" required />
 
         {/* Sender */}
         <FormField name="sender" control={control} label="Nadawca" />
