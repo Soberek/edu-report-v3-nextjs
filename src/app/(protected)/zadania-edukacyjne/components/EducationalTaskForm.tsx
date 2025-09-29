@@ -2,7 +2,7 @@
 import React from "react";
 import { useForm, FormProvider, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Typography, Stack } from "@mui/material";
+import { Box, Typography, Stack, Alert } from "@mui/material";
 import { Add, Edit } from "@mui/icons-material";
 import { EditDialog, FormField, PrimaryButton, SecondaryButton } from "@/components/shared";
 import { Autocomplete, TextField } from "@mui/material";
@@ -88,6 +88,8 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
     const formErrors = form.formState.errors;
     if (Object.keys(formErrors).length > 0) {
       console.error("❌ Form validation errors:", formErrors);
+      // Don't submit if there are validation errors
+      return;
     }
     
     try {
@@ -232,6 +234,22 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
             {/* Activities */}
             <Box>
               <ActivityForm />
+              
+              {/* Display form validation errors */}
+              {form.formState.errors.activities && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" fontWeight="bold">
+                    Błędy w aktywnościach:
+                  </Typography>
+                  {form.formState.errors.activities.map((activityError: any, index: number) => (
+                    <Box key={index} sx={{ mt: 1 }}>
+                      <Typography variant="body2">
+                        <strong>Aktywność {index + 1}:</strong> {activityError.message}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Alert>
+              )}
             </Box>
 
             {/* Form Actions */}
