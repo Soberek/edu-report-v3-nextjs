@@ -88,7 +88,7 @@ describe("educationalTaskSchemas", () => {
         media: {
           title: "Zdrowy styl życia",
           link: "https://facebook.com/post/123",
-          platform: "facebook",
+          platform: "Facebook",
         },
         estimatedReach: 1000,
       },
@@ -442,7 +442,7 @@ describe("educationalTaskSchemas", () => {
             media: {
               title: "",
               link: "invalid-url",
-              platform: "facebook",
+              platform: "Facebook",
             },
           },
         ],
