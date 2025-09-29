@@ -2,13 +2,14 @@
 
 import { useForm } from "react-hook-form";
 import { Container, Alert, Snackbar, Box } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useRef } from "react";
 
 import type { CaseRecord } from "@/types";
 import { ActForm } from "./components/form";
 import { ActCaseRecordsTable } from "./components/table";
 import { FilterSection } from "./components/filter-section";
-import { PageHeader, LoadingSpinner, EmptyState } from "./components";
+import { EditActForm } from "./components/EditActForm";
+import { PageHeader, LoadingSpinner, EmptyState, EditDialog } from "./components";
 import { WYKAZ_AKT } from "@/constants/acts";
 import { useAct } from "@/hooks/useAct";
 
@@ -31,6 +32,11 @@ const INITIAL_SELECTED_CODE = {
 
 export default function Acts() {
   const [selectedCode, setSelectedCode] = useState(INITIAL_SELECTED_CODE);
+  const [editingCaseRecord, setEditingCaseRecord] = useState<CaseRecord | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [dialogLoading, setDialogLoading] = useState(false);
+  const formRef = useRef<any>(null);
+
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     type: "success" | "error" | "info" | "warning";
@@ -50,13 +56,7 @@ export default function Acts() {
     defaultValues: DEFAULT_VALUES,
   });
 
-  const {
-    actRecords,
-    actRecordsError,
-    addActRecord,
-    actRecordsLoading,
-    removeActRecord,
-  } = useAct();
+  const { actRecords, actRecordsError, addActRecord, actRecordsLoading, removeActRecord, updateActRecord } = useAct();
 
   const actsOptions = useMemo(() => {
     return Object.values(WYKAZ_AKT).reduce<{ code: string; name: string }[]>((acc, akt) => {
@@ -127,6 +127,46 @@ export default function Acts() {
     }
   };
 
+  const handleEditCaseRecord = (caseRecord: CaseRecord) => {
+    setEditingCaseRecord(caseRecord);
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveCaseRecord = async () => {
+    if (formRef.current && formRef.current.submit) {
+      await formRef.current.submit();
+    }
+  };
+
+  const handleFormSubmit = async (data: CaseRecord) => {
+    if (editingCaseRecord) {
+      setDialogLoading(true);
+      try {
+        await updateActRecord(data);
+        setSnackbar({
+          open: true,
+          type: "success",
+          message: "Akt sprawy został zaktualizowany pomyślnie.",
+        });
+        setEditDialogOpen(false);
+        setEditingCaseRecord(null);
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          type: "error",
+          message: "Wystąpił błąd podczas aktualizacji danych.",
+        });
+      } finally {
+        setDialogLoading(false);
+      }
+    }
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+    setEditingCaseRecord(null);
+  };
+
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -148,19 +188,12 @@ export default function Acts() {
     );
   };
 
-  const actCodesOptions = useMemo(
-    () => actsOptions.map((option) => option.code),
-    [actsOptions]
-  );
+  const actCodesOptions = useMemo(() => actsOptions.map((option) => option.code), [actsOptions]);
 
   if (actRecordsLoading) {
     return (
       <Container maxWidth="xl" sx={{ py: 4 }}>
-        <LoadingSpinner
-          size={48}
-          message="Ładowanie danych..."
-          sx={{ minHeight: 400 }}
-        />
+        <LoadingSpinner size={48} message="Ładowanie danych..." sx={{ minHeight: 400 }} />
       </Container>
     );
   }
@@ -168,22 +201,13 @@ export default function Acts() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Header */}
-      <PageHeader
-        title="Spisy Spraw"
-        subtitle="Zarządzaj aktami spraw administracyjnych"
-      />
+      <PageHeader title="Spisy Spraw" subtitle="Zarządzaj aktami spraw administracyjnych" />
 
       {/* Error Alert */}
       {renderErrors()}
 
       {/* Add New Act Section */}
-      <ActForm
-        control={control}
-        handleSubmit={handleSubmit}
-        onSubmit={handleAddActRecord}
-        errors={errors}
-        actsOptions={actCodesOptions}
-      />
+      <ActForm control={control} handleSubmit={handleSubmit} onSubmit={handleAddActRecord} errors={errors} actsOptions={actCodesOptions} />
 
       {/* Filter and Export Section */}
       <FilterSection
@@ -198,6 +222,7 @@ export default function Acts() {
         caseRecords={actRecords}
         loading={actRecordsLoading}
         deleteCaseRecord={handleDeleteCaseRecord}
+        editCaseRecord={handleEditCaseRecord}
       />
 
       {/* Snackbar for notifications */}
@@ -211,6 +236,18 @@ export default function Acts() {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Edit Dialog */}
+      <EditDialog
+        open={editDialogOpen}
+        onClose={handleCloseEditDialog}
+        title="Edytuj akt sprawy"
+        onSave={handleSaveCaseRecord}
+        loading={dialogLoading}
+        maxWidth="lg"
+      >
+        <EditActForm ref={formRef} caseRecord={editingCaseRecord} actsOptions={actCodesOptions} onSubmit={handleFormSubmit} />
+      </EditDialog>
     </Container>
   );
 }
