@@ -119,14 +119,20 @@ export const ActivityForm: React.FC = () => {
     name: "activities",
   });
 
-  // Watch all materials for all activities at once to avoid conditional hooks
-  const watchedAllMaterials =
-    watchedActivities?.map((_: any, index: number) =>
-      useWatch({
-        control,
-        name: `activities.${index}.materials`,
-      })
-    ) || [];
+  // Pre-define maximum number of activities to avoid conditional hooks
+  const maxActivities = 10;
+  const materialWatches = Array.from({ length: maxActivities }, (_, index) =>
+    useWatch({
+      control,
+      name: `activities.${index}.materials`,
+    })
+  );
+
+  // Only use the materials for existing activities
+  const watchedAllMaterials = React.useMemo(() => {
+    if (!watchedActivities) return [];
+    return materialWatches.slice(0, watchedActivities.length);
+  }, [watchedActivities, materialWatches]);
 
   // Helper component for activity audience groups
   const ActivityAudienceGroups: React.FC<{ activityIndex: number }> = ({ activityIndex }) => {
