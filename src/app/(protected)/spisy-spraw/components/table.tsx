@@ -1,7 +1,7 @@
 import React from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import type { CaseRecord } from "@/types";
-import { DataTable, defaultActions, LoadingSpinner, EmptyState } from "@/components/shared";
+import { DataTable, defaultActions, LoadingSpinner, EmptyState, DateCell } from "@/components/shared";
 import { Box, Typography, Paper } from "@mui/material";
 import { Description as DescriptionIcon } from "@mui/icons-material";
 
@@ -16,9 +16,27 @@ const createColumns = (): GridColDef[] => [
   { field: "code", headerName: "Kod", flex: 0.8, minWidth: 100 },
   { field: "referenceNumber", headerName: "Numer referencyjny", flex: 1.5, minWidth: 200 },
   { field: "title", headerName: "Tytuł", flex: 2, minWidth: 250 },
-  { field: "date", headerName: "Data", flex: 0.8, minWidth: 120 },
-  { field: "startDate", headerName: "Data rozpoczęcia", flex: 0.8, minWidth: 120 },
-  { field: "endDate", headerName: "Data zakończenia", flex: 0.8, minWidth: 120 },
+  {
+    field: "date",
+    headerName: "Data",
+    flex: 0.8,
+    minWidth: 120,
+    renderCell: (params) => <DateCell date={params.value} format="short" />,
+  },
+  {
+    field: "startDate",
+    headerName: "Data rozpoczęcia",
+    flex: 0.8,
+    minWidth: 120,
+    renderCell: (params) => <DateCell date={params.value} format="short" />,
+  },
+  {
+    field: "endDate",
+    headerName: "Data zakończenia",
+    flex: 0.8,
+    minWidth: 120,
+    renderCell: (params) => <DateCell date={params.value} format="short" />,
+  },
   { field: "sender", headerName: "Nadawca", flex: 1, minWidth: 150 },
   { field: "comments", headerName: "Uwagi", flex: 1.2, minWidth: 150 },
 ];
