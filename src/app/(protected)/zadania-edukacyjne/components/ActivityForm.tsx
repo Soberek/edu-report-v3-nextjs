@@ -265,6 +265,15 @@ export const ActivityForm: React.FC = () => {
                   value: taskType.label,
                   label: taskType.label,
                 }))}
+                onChange={(value) => {
+                  // Clear materials and media when activity type changes
+                  if (value !== "dystrybucja") {
+                    setValue(`activities.${index}.materials`, []);
+                  }
+                  if (value !== "publikacja media") {
+                    setValue(`activities.${index}.media`, undefined);
+                  }
+                }}
               />
 
               <FormField name={`activities.${index}.title`} control={control} label="Tytuł aktywności" required fullWidth />
