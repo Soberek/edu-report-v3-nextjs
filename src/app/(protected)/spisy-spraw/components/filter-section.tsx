@@ -40,6 +40,10 @@ export const FilterSection: React.FC<FilterSectionProps> = ({ selectedCode, acts
             sx={{
               fontWeight: "bold",
               color: "#2c3e50",
+              wordBreak: "break-word",
+              whiteSpace: "normal",
+              overflowWrap: "break-word",
+              lineHeight: 1.3,
             }}
           >
             Filtrowanie i eksport

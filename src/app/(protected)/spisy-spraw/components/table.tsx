@@ -92,10 +92,16 @@ export const ActCaseRecordsTable: React.FC<ActCaseRecordsTableProps> = ({
             display: "flex",
             alignItems: "center",
             gap: 1,
+            flexWrap: "wrap",
+            wordBreak: "break-word",
+            whiteSpace: "normal",
+            lineHeight: 1.3,
           }}
         >
-          <DescriptionIcon sx={{ color: "#1976d2" }} />
-          Akta sprawy ({caseRecords.length})
+          <DescriptionIcon sx={{ color: "#1976d2", flexShrink: 0 }} />
+          <Box component="span" sx={{ wordBreak: "break-word", overflowWrap: "break-word" }}>
+            Akta sprawy ({caseRecords.length})
+          </Box>
         </Typography>
       </Box>
 
