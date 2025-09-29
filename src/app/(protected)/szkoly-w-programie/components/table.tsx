@@ -2,10 +2,10 @@ import type { Contact, Program, School } from "@/types";
 import { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
 import { Box, Typography, Paper } from "@mui/material";
 import { School as SchoolIcon } from "@mui/icons-material";
-import EditDialog from "./edit-dialog";
 import { createColumns, CUSTOM_STYLES } from "./TableConfig";
-import { LoadingSpinner, EmptyState, DataTable, defaultActions } from "@/components/shared";
-import { useState } from "react";
+import { LoadingSpinner, EmptyState, DataTable, defaultActions, EditDialog } from "@/components/shared";
+import { EditParticipationForm } from "./EditParticipationForm";
+import { useState, useRef } from "react";
 
 interface SchoolProgramParticipationTableProps {
   schoolsMap: Record<string, School>;
@@ -36,16 +36,31 @@ export const SchoolProgramParticipationTable: React.FC<SchoolProgramParticipatio
 }) => {
   const [editingParticipation, setEditingParticipation] = useState<SchoolProgramParticipation | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [dialogLoading, setDialogLoading] = useState(false);
+  const formRef = useRef<any>(null);
 
   const handleEditParticipation = (participation: SchoolProgramParticipation) => {
     setEditingParticipation(participation);
     setEditDialogOpen(true);
   };
 
-  const handleSaveParticipation = async (id: string, data: Partial<SchoolProgramParticipation>) => {
-    await onUpdate(id, data);
-    setEditDialogOpen(false);
-    setEditingParticipation(null);
+  const handleSaveParticipation = async () => {
+    if (formRef.current && formRef.current.submit) {
+      await formRef.current.submit();
+    }
+  };
+
+  const handleFormSubmit = async (data: any) => {
+    if (editingParticipation) {
+      setDialogLoading(true);
+      try {
+        await onUpdate(editingParticipation.id, data);
+        setEditDialogOpen(false);
+        setEditingParticipation(null);
+      } finally {
+        setDialogLoading(false);
+      }
+    }
   };
 
   const handleCloseEditDialog = () => {
@@ -153,14 +168,21 @@ export const SchoolProgramParticipationTable: React.FC<SchoolProgramParticipatio
       {/* Edit Dialog */}
       <EditDialog
         open={editDialogOpen}
-        participation={editingParticipation}
-        schools={schools}
-        contacts={contacts}
-        programs={programs}
         onClose={handleCloseEditDialog}
+        title="Edytuj uczestnictwo szkoły"
         onSave={handleSaveParticipation}
-        loading={loading}
-      />
+        loading={dialogLoading}
+        maxWidth="lg"
+      >
+        <EditParticipationForm
+          ref={formRef}
+          participation={editingParticipation}
+          schools={schools}
+          contacts={contacts}
+          programs={programs}
+          onSubmit={handleFormSubmit}
+        />
+      </EditDialog>
     </>
   );
 };
