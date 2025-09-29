@@ -3,113 +3,14 @@ import { useFieldArray, useFormContext, useWatch, Controller } from "react-hook-
 import { Box, Typography, Button, IconButton, Stack, Divider, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import { FormField } from "@/components/shared";
-import { MEDIA_PLATFORMS, MATERIAL_TYPES } from "@/constants/educationalTasks";
-import {
-  CreateEducationalTaskFormData,
-  isPresentationActivity,
-  isDistributionActivity,
-  isMediaPublicationActivity,
-  hasAudienceGroups,
-  hasActionCount,
-} from "@/types";
+import { MEDIA_PLATFORMS } from "@/constants/educationalTasks";
+import { isDistributionActivity, isMediaPublicationActivity, hasAudienceGroups, hasActionCount } from "@/types";
 import { AudienceGroupsForm } from "./AudienceGroupsForm";
 import { MaterialSelector } from "./MaterialSelector";
 
-interface MaterialsFormProps {
-  activityIndex: number;
-}
-
-const MaterialsForm: React.FC<MaterialsFormProps> = ({ activityIndex }) => {
-  const { control } = useFormContext();
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: `activities.${activityIndex}.materials`,
-  });
-
-  const addMaterial = () => {
-    append({
-      type: "ulotka",
-      name: "",
-      distributedCount: 1,
-    });
-  };
-
-  return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="subtitle2" fontWeight="bold">
-          Materiały
-        </Typography>
-        <Button startIcon={<Add />} onClick={addMaterial} variant="outlined" size="small">
-          Dodaj materiał
-        </Button>
-      </Box>
-
-      {fields.map((field, materialIndex) => (
-        <Box
-          key={field.id}
-          sx={{
-            p: 2,
-            mb: 1,
-            backgroundColor: "grey.50",
-            borderRadius: 1,
-            border: "1px solid",
-            borderColor: "divider",
-          }}
-        >
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-            <Typography variant="body2" fontWeight="bold">
-              Materiał {materialIndex + 1}
-            </Typography>
-            <IconButton onClick={() => remove(materialIndex)} color="error" size="small" disabled={fields.length === 1}>
-              <Delete />
-            </IconButton>
-          </Box>
-
-          <Stack spacing={2}>
-            <FormField
-              name={`activities.${activityIndex}.materials.${materialIndex}.type`}
-              control={control}
-              label="Typ materiału"
-              type="select"
-              required
-              fullWidth
-              options={Object.entries(MATERIAL_TYPES).map(([key, value]) => ({
-                value,
-                label: value,
-              }))}
-            />
-
-            <FormField
-              name={`activities.${activityIndex}.materials.${materialIndex}.name`}
-              control={control}
-              label="Nazwa materiału"
-              required
-              fullWidth
-            />
-
-            <Controller
-              name={`activities.${activityIndex}.materials.${materialIndex}.distributedCount`}
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Ilość rozdanych egzemplarzy"
-                  type="number"
-                  required
-                  fullWidth
-                  inputProps={{ min: 1, max: 10000 }}
-                  onChange={(e) => field.onChange(Number(e.target.value) || 1)}
-                />
-              )}
-            />
-          </Stack>
-        </Box>
-      ))}
-    </Box>
-  );
-};
+// interface MaterialsFormProps {
+//   activityIndex: number;
+// }
 
 export const ActivityForm: React.FC = () => {
   const { control, setValue } = useFormContext();
@@ -242,7 +143,7 @@ export const ActivityForm: React.FC = () => {
 
       {fields.map((field, index) => {
         const activity = watchedActivities?.[index];
-        const isPresentation = activity && isPresentationActivity(activity);
+        // const isPresentation = activity && isPresentationActivity(activity);
         const isDistribution = activity && isDistributionActivity(activity);
         const isMediaPublication = activity && isMediaPublicationActivity(activity);
         const hasAudience = activity && hasAudienceGroups(activity);
@@ -357,7 +258,7 @@ export const ActivityForm: React.FC = () => {
                     type="select"
                     required
                     fullWidth
-                    options={Object.entries(MEDIA_PLATFORMS).map(([key, value]) => ({
+                    options={Object.entries(MEDIA_PLATFORMS).map(([, value]) => ({
                       value,
                       label: value,
                     }))}
