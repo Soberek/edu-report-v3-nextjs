@@ -4,12 +4,11 @@ import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import theme from "@/providers/ThemeProvider";
 import { ThemeProvider } from "@mui/material";
-import Navbar from "@/components/ui/top-navbar";
 import { NavProvider } from "@/providers/NavProvider";
-import SideDrawer from "@/components/ui/side-drawer";
 import { UserProvider } from "@/providers/UserContext";
 import { SearchProvider } from "@/providers/SearchProvider";
 import LocalizationProviderClient from "@/providers/LocalizationProvder";
+import { AuthenticatedLayout } from "@/components/layout/AuthenticatedLayout";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -40,9 +39,7 @@ export default function RootLayout({
               <SearchProvider>
                 <UserProvider>
                   <NavProvider>
-                    <Navbar />
-                    <SideDrawer />
-                    {children}
+                    <AuthenticatedLayout>{children}</AuthenticatedLayout>
                   </NavProvider>
                 </UserProvider>
               </SearchProvider>

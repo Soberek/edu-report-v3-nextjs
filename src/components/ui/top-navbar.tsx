@@ -39,6 +39,9 @@ const Navbar: React.FC = () => {
   const navContext = useNavContext();
   const { handleDrawerOpen } = navContext;
 
+  // Determine if menu button should be shown (only for authenticated users)
+  const showMenuButton = Boolean(authContext.user);
+
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -52,7 +55,7 @@ const Navbar: React.FC = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.push("/sign-in");
+      router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -76,27 +79,29 @@ const Navbar: React.FC = () => {
       <Toolbar sx={{ justifyContent: "space-between", minHeight: 80, px: 3 }}>
         {/* Left Section - Logo and Menu */}
         <Box display="flex" alignItems="center" gap={2}>
-          <IconButton
-            color="inherit"
-            aria-label="open navigation menu"
-            edge="start"
-            onClick={handleDrawerOpen}
-            sx={{
-              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-              color: "white",
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              borderRadius: "12px",
-              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              "&:hover": {
-                background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                transform: "translateY(-2px)",
-                boxShadow: `0 8px 25px ${theme.palette.primary.main}40`,
-              },
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
+          {showMenuButton && (
+            <IconButton
+              color="inherit"
+              aria-label="open navigation menu"
+              edge="start"
+              onClick={handleDrawerOpen}
+              sx={{
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                color: "white",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                borderRadius: "12px",
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+                  transform: "translateY(-2px)",
+                  boxShadow: `0 8px 25px ${theme.palette.primary.main}40`,
+                },
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
 
           <Box display="flex" alignItems="center" gap={1.5}>
             <Box
@@ -258,31 +263,55 @@ const Navbar: React.FC = () => {
               </Menu>
             </>
           ) : (
-            <Button
-              onClick={() => router.push("/sign-in")}
-              variant="contained"
-              sx={{
-                background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
-                color: "white",
-                border: "1px solid rgba(255,255,255,0.3)",
-                borderRadius: 3,
-                px: 4,
-                py: 1.5,
-                fontWeight: 600,
-                fontSize: "0.95rem",
-                textTransform: "none",
-                backdropFilter: "blur(10px)",
-                boxShadow: `0 4px 15px ${theme.palette.secondary.main}30`,
-                "&:hover": {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                  transform: "translateY(-3px)",
-                  boxShadow: `0 15px 35px ${theme.palette.primary.main}40`,
-                },
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-            >
-              ✨ Zaloguj się
-            </Button>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Button
+                onClick={() => router.push("/login")}
+                variant="outlined"
+                sx={{
+                  borderColor: theme.palette.primary.main,
+                  color: theme.palette.primary.main,
+                  borderRadius: 3,
+                  px: 3,
+                  py: 1.2,
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  textTransform: "none",
+                  "&:hover": {
+                    borderColor: theme.palette.primary.dark,
+                    backgroundColor: `${theme.palette.primary.main}10`,
+                    transform: "translateY(-1px)",
+                  },
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+              >
+                Zaloguj się
+              </Button>
+              <Button
+                onClick={() => router.push("/register")}
+                variant="contained"
+                sx={{
+                  background: `linear-gradient(135deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
+                  color: "white",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  borderRadius: 3,
+                  px: 3,
+                  py: 1.2,
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  textTransform: "none",
+                  backdropFilter: "blur(10px)",
+                  boxShadow: `0 4px 15px ${theme.palette.secondary.main}30`,
+                  "&:hover": {
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                    transform: "translateY(-2px)",
+                    boxShadow: `0 12px 30px ${theme.palette.primary.main}40`,
+                  },
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+              >
+                Utwórz konto
+              </Button>
+            </Box>
           )}
         </Box>
       </Toolbar>
