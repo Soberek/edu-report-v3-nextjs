@@ -100,7 +100,7 @@ export const taskUtils = {
     const cleanedTaskData = deepClean(taskData);
 
     return {
-      ...cleanedTaskData,
+      ...(cleanedTaskData as Record<string, unknown>),
       id: taskUtils.generateTaskId(),
       createdBy: userId,
       createdAt: new Date().toISOString(),
@@ -131,7 +131,7 @@ export const taskUtils = {
     const cleanedTaskData = deepClean(taskData);
 
     return {
-      ...cleanedTaskData,
+      ...(cleanedTaskData as Record<string, unknown>),
       id,
       createdBy: userId,
       updatedAt: new Date().toISOString(),
@@ -205,7 +205,7 @@ const useTaskOperations = (
               type: activity.type,
               materials: "materials" in activity ? activity.materials : undefined,
               media: "media" in activity ? activity.media : undefined,
-              hasUndefinedValues: Object.entries(activity).some(([key, value]) => value === undefined),
+              hasUndefinedValues: Object.entries(activity).some(([, value]) => value === undefined),
             });
           });
         }
