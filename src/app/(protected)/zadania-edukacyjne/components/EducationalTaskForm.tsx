@@ -82,11 +82,20 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
   });
 
   const handleFormSubmit = async (data: any) => {
+    console.log("📋 Form submitted with data:", data);
+    
+    // Check for validation errors
+    const formErrors = form.formState.errors;
+    if (Object.keys(formErrors).length > 0) {
+      console.error("❌ Form validation errors:", formErrors);
+    }
+    
     try {
       await onSave(data as CreateEducationalTaskFormData);
+      console.log("✅ Form saved successfully");
       form.reset();
     } catch (error) {
-      console.error("Form submission error:", error);
+      console.error("❌ Form submission error:", error);
     }
   };
 

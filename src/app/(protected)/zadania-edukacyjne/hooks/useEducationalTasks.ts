@@ -77,10 +77,8 @@ export const taskUtils = {
   generateTaskId: (): string => `task_${Date.now()}_${Math.random().toString(36).slice(2)}`,
   createTaskFromData: (taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => {
     // Remove undefined values to prevent Firebase errors
-    const cleanTaskData = Object.fromEntries(
-      Object.entries(taskData).filter(([_, value]) => value !== undefined)
-    );
-    
+    const cleanTaskData = Object.fromEntries(Object.entries(taskData).filter(([_, value]) => value !== undefined));
+
     return {
       ...cleanTaskData,
       id: taskUtils.generateTaskId(),
@@ -90,10 +88,8 @@ export const taskUtils = {
   },
   updateTaskFromData: (id: string, taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => {
     // Remove undefined values to prevent Firebase errors
-    const cleanTaskData = Object.fromEntries(
-      Object.entries(taskData).filter(([_, value]) => value !== undefined)
-    );
-    
+    const cleanTaskData = Object.fromEntries(Object.entries(taskData).filter(([_, value]) => value !== undefined));
+
     return {
       ...cleanTaskData,
       id,
@@ -146,8 +142,11 @@ const useTaskOperations = (
 
   const updateTask = useCallback(
     async (id: string, taskData: CreateEducationalTaskFormData) => {
+      console.log("🔄 updateTask called with:", { id, taskData });
+      
       if (!user?.uid) {
         const error = "Użytkownik nie jest zalogowany";
+        console.error("❌ User not logged in");
         dispatch(actions.setError(error));
         throw new Error(error);
       }
@@ -157,7 +156,22 @@ const useTaskOperations = (
 
       try {
         const updatedTask = taskUtils.updateTaskFromData(id, taskData, user.uid);
+        console.log("📝 Updated task data:", updatedTask);
+        
+        // Check for undefined values in activities
+        if (updatedTask.activities) {
+          updatedTask.activities.forEach((activity, index) => {
+            console.log(`🎯 Activity ${index}:`, {
+              type: activity.type,
+              materials: activity.materials,
+              media: activity.media,
+              hasUndefinedValues: Object.entries(activity).some(([key, value]) => value === undefined)
+            });
+          });
+        }
+        
         const success = await updateItem(id, updatedTask);
+        console.log("✅ Update success:", success);
 
         if (success) {
           dispatch(actions.updateTask(updatedTask));
@@ -165,6 +179,7 @@ const useTaskOperations = (
 
         return updatedTask;
       } catch (err) {
+        console.error("❌ Update error:", err);
         const errorMessage = taskUtils.getErrorMessage(err, "Błąd podczas aktualizacji zadania");
         dispatch(actions.setError(errorMessage));
         throw err;

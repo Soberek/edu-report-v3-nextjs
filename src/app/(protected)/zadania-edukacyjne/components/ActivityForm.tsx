@@ -265,12 +265,15 @@ export const ActivityForm: React.FC = () => {
                       label="Typ aktywności"
                       onChange={(e) => {
                         const value = e.target.value as string;
+                        console.log(`🔄 Activity ${index} type changed to:`, value);
                         field.onChange(value);
                         // Clear materials and media when activity type changes
                         if (value !== "dystrybucja") {
+                          console.log(`🧹 Clearing materials for activity ${index}`);
                           setValue(`activities.${index}.materials`, []);
                         }
                         if (value !== "publikacja media") {
+                          console.log(`🧹 Clearing media for activity ${index}`);
                           setValue(`activities.${index}.media`, undefined);
                         }
                       }}
