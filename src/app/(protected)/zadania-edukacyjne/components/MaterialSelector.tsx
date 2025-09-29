@@ -87,7 +87,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fie
             <TextField {...params} label="Wybierz materiał z listy" placeholder="Wpisz nazwę lub wybierz z listy..." fullWidth />
           )}
           renderGroup={(params) => (
-            <Box key={`group-${params.group}-${params.index}`}>
+            <Box key={`group-${params.group}`}></Box>
               <Typography
                 variant="subtitle2"
                 sx={{
@@ -203,7 +203,6 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fie
                     )}
                   />
                 </Stack>
-                ..................
               </CardContent>
             </Card>
           ))}
