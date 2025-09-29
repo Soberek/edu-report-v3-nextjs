@@ -58,23 +58,39 @@ const mockTaskData: CreateEducationalTaskFormData = {
   schoolId: "school-2",
   taskNumber: "2/2025",
   referenceNumber: "TEST.002.2025",
-  activities: [
-    {
-      type: "prelekcja",
-      title: "New Activity",
-      actionCount: 1,
-      audienceCount: 25,
-      description: "New description",
-      audienceGroups: [
+      activities: [
         {
-          id: "group-2",
-          name: "Grupa II",
-          type: "dzieci",
-          count: 25,
+          type: "prelekcja",
+          title: "New Activity",
+          actionCount: 1,
+          audienceCount: 25,
+          description: "New description",
+          audienceGroups: [
+            {
+              id: "group-2",
+              name: "Grupa II",
+              type: "dzieci",
+              count: 25,
+            },
+          ],
+          materials: [
+            {
+              id: "ulotka_zdrowie_psychiczne",
+              name: "Ulotka - Zdrowie psychiczne młodzieży",
+              type: "ulotka",
+              distributedCount: 50,
+              description: "Materiały edukacyjne o zdrowiu psychicznym młodzieży",
+            },
+            {
+              id: "plakat_aktywnosc_fizyczna",
+              name: "Plakat - Aktywność fizyczna",
+              type: "plakat",
+              distributedCount: 10,
+              description: "Promocja aktywności fizycznej wśród młodzieży",
+            },
+          ],
         },
       ],
-    },
-  ],
 };
 
 vi.mock("@/hooks/useUser", () => ({
