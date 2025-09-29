@@ -23,7 +23,12 @@ const createColumns = (): GridColDef[] => [
   { field: "comments", headerName: "Uwagi", flex: 1.2, minWidth: 150 },
 ];
 
-export const ActCaseRecordsTable: React.FC<ActCaseRecordsTableProps> = ({ caseRecords, deleteCaseRecord, editCaseRecord, loading = false }) => {
+export const ActCaseRecordsTable: React.FC<ActCaseRecordsTableProps> = ({
+  caseRecords,
+  deleteCaseRecord,
+  editCaseRecord,
+  loading = false,
+}) => {
   const columns = createColumns();
 
   const actions = [

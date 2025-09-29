@@ -12,14 +12,15 @@ import { EditActForm } from "./components/EditActForm";
 import { PageHeader, LoadingSpinner, EmptyState, EditDialog } from "./components";
 import { WYKAZ_AKT } from "@/constants/acts";
 import { useAct } from "@/hooks/useAct";
+import { getTodayForInput } from "@/utils/shared/dayjsUtils";
 
 const DEFAULT_VALUES: Omit<CaseRecord, "id" | "createdAt" | "userId"> = {
   code: "",
   referenceNumber: "OZiPZ.966",
-  date: new Date().toISOString().split("T")[0],
+  date: getTodayForInput(),
   title: "",
-  startDate: new Date().toISOString().split("T")[0],
-  endDate: new Date().toISOString().split("T")[0],
+  startDate: getTodayForInput(),
+  endDate: getTodayForInput(),
   comments: "OZ",
   sender: "-",
   notes: "",
