@@ -21,6 +21,18 @@ export { TabPanel, AnimatedTabPanel } from "./TabPanel";
 export { EmptyState, NoDataEmptyState, ErrorEmptyState } from "./EmptyState";
 export { default as ResponseDisplay } from "./response-display";
 
+// New components
+export { AutocompleteField } from "./AutocompleteField";
+export { 
+  AvatarWithText, 
+  Tag, 
+  InfoBadge, 
+  NotesCell, 
+  DateCell,
+  getInitials,
+  getRandomColor 
+} from "./TableCellComponents";
+
 // Re-export types
 export type { DataTableAction, DataTableProps } from "./DataTable";
 export type { LoadingSpinnerProps } from "./LoadingSpinner";
@@ -31,3 +43,5 @@ export type { StatsCardProps } from "./StatsCard";
 export type { PageHeaderProps, BreadcrumbItem } from "./PageHeader";
 export type { TabPanelProps } from "./TabPanel";
 export type { EmptyStateProps } from "./EmptyState";
+export type { AutocompleteFieldProps, AutocompleteOption } from "./AutocompleteField";
+export type { AvatarWithTextProps, TagProps, InfoBadgeProps, NotesCellProps, DateCellProps } from "./TableCellComponents";
