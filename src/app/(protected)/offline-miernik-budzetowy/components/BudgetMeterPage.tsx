@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 import { Container, Typography, Box, Alert } from "@mui/material";
-import { useBudgetMeter } from "../hooks/useBudgetMeter";
-import { useTabManager } from "../hooks/useTabManager";
+import { useBudgetMeter, useTabManager } from "../hooks";
 import { FileUploader, MonthSelector, ProcessingButton, StatisticsCards, TabNavigation, TabContent, EmptyState } from "./";
 import { UI_CONFIG, AUTO_PROCESSING } from "../constants";
-import { canProcessData, getSelectedMonthsCount, shouldAutoProcess, getCurrentError } from "../utils/dataProcessingUtils";
+import { canProcessData, getSelectedMonthsCount, shouldAutoProcess, getCurrentError } from "../utils";
 
 /**
  * Main Budget Meter page component

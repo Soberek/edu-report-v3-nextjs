@@ -1,10 +1,10 @@
 import React from "react";
 import { Box } from "@mui/material";
-import { TABS, type TabId } from "../constants";
-import { AdvancedStats } from "./AdvancedStats";
-import { BarCharts } from "./BarCharts";
-import { DataTable } from "./DataTable";
-import type { AggregatedData, ExcelRow, Month } from "../types";
+import { TABS, type TabId } from "../../constants";
+import { AdvancedStats } from "../data-visualization/AdvancedStats";
+import { BarCharts } from "../data-visualization/BarCharts";
+import { DataTable } from "../data-visualization/DataTable";
+import type { AggregatedData, ExcelRow, Month } from "../../types";
 
 interface TabContentProps {
   readonly activeTab: TabId;

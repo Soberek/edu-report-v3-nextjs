@@ -1,17 +1,19 @@
+/**
+ * Components Barrel Export
+ * Organized by component categories
+ */
+
 // Main page component
 export { BudgetMeterPage } from "./BudgetMeterPage";
 
-// Core functionality components
-export { StatsCard } from "./StatsCard";
-export { MonthSelector } from "./MonthSelector";
-export { FileUploader } from "./FileUploader";
-export { DataTable } from "./DataTable";
-export { AdvancedStats } from "./AdvancedStats";
-export { BarCharts } from "./BarCharts";
+// UI Components (reusable micro-components)
+export * from "./ui";
 
-// New modular components
-export { TabNavigation } from "./TabNavigation";
-export { TabContent } from "./TabContent";
-export { ProcessingButton } from "./ProcessingButton";
-export { StatisticsCards } from "./StatisticsCards";
-export { EmptyState } from "./EmptyState";
+// Form Components (input and form-related)
+export * from "./forms";
+
+// Data Visualization Components (charts, tables)
+export * from "./data-visualization";
+
+// Layout Components (containers and layout)
+export * from "./layout";

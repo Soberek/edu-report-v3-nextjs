@@ -1,7 +1,7 @@
 import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
 import { Assessment, BarChart, TableChart } from "@mui/icons-material";
-import { TAB_CONFIG, UI_CONFIG, type TabId } from "../constants";
+import { TAB_CONFIG, UI_CONFIG, type TabId } from "../../constants";
 
 interface TabNavigationProps {
   readonly activeTab: TabId;

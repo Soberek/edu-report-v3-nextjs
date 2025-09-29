@@ -1,8 +1,8 @@
 import React from "react";
 import { Box } from "@mui/material";
 import { StatsCard } from "./StatsCard";
-import { UI_CONFIG } from "../constants";
-import type { AggregatedData } from "../types";
+import { UI_CONFIG } from "../../constants";
+import type { AggregatedData } from "../../types";
 
 interface StatisticsCardsProps {
   readonly data: AggregatedData;
