@@ -23,7 +23,7 @@ const audienceGroupSchema = z.object({
   type: z.enum(["dorośli", "młodzież", "dzieci", "seniorzy"], {
     message: "Wybierz prawidłowy typ odbiorcy",
   }),
-  count: z.number().min(1, "Liczba osób musi być większa od 0").max(1000, "Maksymalnie 1000 osób"),
+  count: z.coerce.number().min(1, "Liczba osób musi być większa od 0").max(1000, "Maksymalnie 1000 osób"),
 });
 
 const activitySchema = z
