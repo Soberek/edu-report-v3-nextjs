@@ -3,9 +3,9 @@ import React, { useReducer, useMemo } from "react";
 import { Container, Box, Typography, Collapse, Chip, FormControl, InputLabel, Select, MenuItem, Stack } from "@mui/material";
 import { Add, ExpandMore, ExpandLess, FilterList } from "@mui/icons-material";
 import { PageHeader, PrimaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
-import { useSimplifiedEducationalTasks, SimplifiedEducationalTask } from "./hooks/useSimplifiedEducationalTasks";
-import { SimplifiedEducationalTaskForm } from "./components/SimplifiedEducationalTaskForm";
-import { SimplifiedTaskFormData } from "./hooks/useSimplifiedEducationalTasks";
+import { useSimplifiedEducationalTasks, SimplifiedEducationalTask } from "../zadania-edukacyjne/hooks/useSimplifiedEducationalTasks";
+import { SimplifiedEducationalTaskForm } from "../zadania-edukacyjne/components/SimplifiedEducationalTaskForm";
+import { SimplifiedTaskFormData } from "../zadania-edukacyjne/hooks/useSimplifiedEducationalTasks";
 
 // Simplified page state
 interface SimplifiedPageState {
@@ -69,7 +69,10 @@ const simplifiedActions = {
   setFormOpen: (open: boolean): SimplifiedPageAction => ({ type: "SET_FORM_OPEN", payload: open }),
   setEditTask: (task: SimplifiedEducationalTask | null): SimplifiedPageAction => ({ type: "SET_EDIT_TASK", payload: task }),
   toggleTaskExpansion: (taskId: string): SimplifiedPageAction => ({ type: "TOGGLE_TASK_EXPANSION", payload: taskId }),
-  setFilter: (key: keyof SimplifiedPageState["filters"], value: string): SimplifiedPageAction => ({ type: "SET_FILTER", payload: { key, value } }),
+  setFilter: (key: keyof SimplifiedPageState["filters"], value: string): SimplifiedPageAction => ({
+    type: "SET_FILTER",
+    payload: { key, value },
+  }),
   resetFilters: (): SimplifiedPageAction => ({ type: "RESET_FILTERS" }),
   setFormClosed: (): SimplifiedPageAction => ({ type: "SET_FORM_OPEN", payload: false }),
 };
@@ -198,11 +201,7 @@ export default function SimplifiedEducationalTasks(): React.ReactNode {
 
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Rok</InputLabel>
-            <Select
-              value={filters.year}
-              onChange={(e) => dispatch(simplifiedActions.setFilter("year", e.target.value))}
-              label="Rok"
-            >
+            <Select value={filters.year} onChange={(e) => dispatch(simplifiedActions.setFilter("year", e.target.value))} label="Rok">
               <MenuItem value="">Wszystkie</MenuItem>
               {filterOptions.years.map((year) => (
                 <MenuItem key={year} value={year.toString()}>
@@ -214,11 +213,7 @@ export default function SimplifiedEducationalTasks(): React.ReactNode {
 
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Miesiąc</InputLabel>
-            <Select
-              value={filters.month}
-              onChange={(e) => dispatch(simplifiedActions.setFilter("month", e.target.value))}
-              label="Miesiąc"
-            >
+            <Select value={filters.month} onChange={(e) => dispatch(simplifiedActions.setFilter("month", e.target.value))} label="Miesiąc">
               <MenuItem value="">Wszystkie</MenuItem>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                 <MenuItem key={month} value={month.toString()}>
@@ -260,11 +255,7 @@ export default function SimplifiedEducationalTasks(): React.ReactNode {
             </Select>
           </FormControl>
 
-          <PrimaryButton
-            variant="outlined"
-            size="small"
-            onClick={() => dispatch(simplifiedActions.resetFilters())}
-          >
+          <PrimaryButton variant="outlined" size="small" onClick={() => dispatch(simplifiedActions.resetFilters())}>
             Wyczyść filtry
           </PrimaryButton>
         </Stack>
@@ -351,19 +342,10 @@ export default function SimplifiedEducationalTasks(): React.ReactNode {
                               )}
                             </Box>
                             <Stack direction="row" spacing={1}>
-                              <PrimaryButton
-                                variant="outlined"
-                                size="small"
-                                onClick={() => handleEditTask(task)}
-                              >
+                              <PrimaryButton variant="outlined" size="small" onClick={() => handleEditTask(task)}>
                                 Edytuj
                               </PrimaryButton>
-                              <PrimaryButton
-                                variant="outlined"
-                                size="small"
-                                color="error"
-                                onClick={() => handleDeleteTask(task.id)}
-                              >
+                              <PrimaryButton variant="outlined" size="small" color="error" onClick={() => handleDeleteTask(task.id)}>
                                 Usuń
                               </PrimaryButton>
                             </Stack>
