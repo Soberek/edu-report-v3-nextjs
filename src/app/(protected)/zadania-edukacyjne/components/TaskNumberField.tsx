@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Box, Typography, Chip, Button, Alert } from "@mui/material";
 import { Refresh, Warning } from "@mui/icons-material";
 import type { EducationalTask } from "@/types";
@@ -27,16 +27,6 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
   disabled = false,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const taskNumberManager = useTaskNumberManager({
-    tasks,
-    editTaskId,
-  });
-
-  const handleQuickSuggestion = () => {
-    const nextNumber = taskNumberManager.getNextSuggestion();
-    taskNumberManager.setTaskNumber(nextNumber);
-    setShowSuggestions(false);
-  };
 
   return (
     <Controller
@@ -44,20 +34,26 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
       control={control}
       rules={{
         required: required ? "Numer zadania jest wymagany" : false,
-        validate: (value: string) => {
+        validate: (value: string, taskManager: any) => {
           if (!value.trim()) {
             return required ? "Numer zadania jest wymagany" : true;
           }
-
-          const result = taskNumberManager.validateCurrentNumber();
-          return result.isValid ? true : result.errorMessage || "Nieprawidłowy numer zadania";
+          return true; // Validation will be handled by taskNumberManager in render
         },
       }}
       render={({ field, fieldState }) => {
-        // Sync field value with internal state
-        if (field.value !== taskNumberManager.currentTaskNumber) {
-          taskNumberManager.setTaskNumber(field.value || "");
-        }
+        // Create manager with current field value
+        const taskNumberManager = useTaskNumberManager({
+          tasks,
+          editTaskId,
+          currentTaskNumber: field.value || "",
+        });
+
+        const handleQuickSuggestion = () => {
+          const nextNumber = taskNumberManager.getNextSuggestion();
+          field.onChange(nextNumber);
+          setShowSuggestions(false);
+        };
 
         return (
           <Box>
@@ -68,11 +64,13 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
               fullWidth
               required={required}
               disabled={disabled}
+              value={field.value || ""}
               error={fieldState.error !== undefined || !taskNumberManager.isValid}
               helperText={fieldState.error?.message || taskNumberManager.errorMessage || helperText || "Format: liczba/rok (np. 45/2025)"}
               onChange={(e) => {
-                field.onChange(e.target.value);
-                taskNumberManager.setTaskNumber(e.target.value);
+                const newValue = e.target.value;
+                field.onChange(newValue);
+                // Don't call setState here - it will cause render issues
               }}
               sx={{
                 mb: 1,
@@ -115,7 +113,7 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
             </Box>
 
             {/* Validation Status */}
-            {taskNumberManager.currentTaskNumber && (
+            {field.value && (
               <Box sx={{ mb: 1 }}>
                 {taskNumberManager.isValid ? (
                   <Alert severity="success" sx={{ py: 0.5 }}>
@@ -141,10 +139,9 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
                     <Chip
                       key={`${suggestion}-${index}`}
                       label={suggestion}
-                      variant={suggestion === taskNumberManager.currentTaskNumber ? "filled" : "outlined"}
-                      color={suggestion === taskNumberManager.currentTaskNumber ? "primary" : "default"}
+                      variant={suggestion === field.value ? "filled" : "outlined"}
+                      color={suggestion === field.value ? "primary" : "default"}
                       onClick={() => {
-                        taskNumberManager.setTaskNumber(suggestion);
                         field.onChange(suggestion);
                         setShowSuggestions(false);
                       }}

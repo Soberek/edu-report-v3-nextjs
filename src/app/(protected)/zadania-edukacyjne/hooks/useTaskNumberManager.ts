@@ -13,35 +13,31 @@ interface UseTaskNumberManagerProps {
   tasks: EducationalTask[];
   editTaskId?: string; // For editing existing tasks
   initialYear?: number;
+  currentTaskNumber: string; // Current value from form
 }
 
 interface TaskNumberManager {
-  currentTaskNumber: string;
   isValid: boolean;
   errorMessage?: string;
   suggestions: string[];
   year: number;
 
-  // Actions
-  setTaskNumber: (taskNumber: string) => void;
-  setYear: (year: number) => void;
-  generateSuggestions: () => void;
+  // Actions (no setState methods)
   getNextSuggestion: () => string;
-  validateCurrentNumber: () => { isValid: boolean; errorMessage?: string };
-  clearError: () => void;
+  validateNumber: (taskNumber: string) => { isValid: boolean; errorMessage?: string };
 }
 
 export const useTaskNumberManager = ({
   tasks,
   editTaskId,
   initialYear = getCurrentYear(),
+  currentTaskNumber,
 }: UseTaskNumberManagerProps): TaskNumberManager => {
-  const [year, setYear] = useState(initialYear);
-  const [currentTaskNumber, setCurrentTaskNumber] = useState(() =>
-    editTaskId ? tasks.find((t) => t.id === editTaskId)?.taskNumber || "" : `${year}`
-  );
-
-  const [validationError, setValidationError] = useState<string>("");
+  const [year, setYear] = useState(() => {
+    // Extract year from currentTaskNumber or use initialYear
+    const parsed = parseTaskNumber(currentTaskNumber);
+    return parsed?.year || initialYear;
+  });
 
   // Generate suggestions based on current year and tasks
   const suggestions = useMemo(() => {
@@ -61,70 +57,36 @@ export const useTaskNumberManager = ({
     return validateTaskNumber(currentTaskNumber, tasks, editTaskId);
   }, [currentTaskNumber, tasks, editTaskId]);
 
-  const isValid = validation.isValid && !validationError;
-  const errorMessage = validationError || validation.errorMessage;
+  const isValid = validation.isValid;
+  const errorMessage = validation.errorMessage;
 
-  const handleSetTaskNumber = useCallback(
+  // Static validation function that takes taskNumber as parameter
+  const validateNumber = useCallback(
     (taskNumber: string) => {
-      setCurrentTaskNumber(taskNumber);
-      setValidationError("");
-
-      // If the task number has a different year, update the year
-      const parsed = parseTaskNumber(taskNumber);
-      if (parsed && parsed.year !== year) {
-        setYear(parsed.year);
+      if (!taskNumber.trim()) {
+        return { isValid: false, errorMessage: "Numer zadania jest wymagany" };
       }
-    },
-    [year]
-  );
 
-  const handleSetYear = useCallback(
-    (newYear: number) => {
-      setYear(newYear);
-      setValidationError("");
-
-      // Generate new task number with updated year
-      if (year !== newYear && currentTaskNumber.includes("/")) {
-        const [numberPart] = currentTaskNumber.split("/");
-        const number = parseInt(numberPart, 10);
-        if (!isNaN(number)) {
-          setCurrentTaskNumber(`${number}/${newYear}`);
-        }
+      if (!isValidTaskNumberFormat(taskNumber)) {
+        return { isValid: false, errorMessage: "Numer zadania musi mieć format: liczba/rok (np. 45/2025)" };
       }
-    },
-    [currentTaskNumber, year]
-  );
 
-  const generateSuggestions = useCallback(() => {
-    // This will trigger the useMemo to recalculate suggestions
-  }, []);
+      return validateTaskNumber(taskNumber, tasks, editTaskId);
+    },
+    [tasks, editTaskId]
+  );
 
   const getNextSuggestion = useCallback(() => {
     return suggestNextTaskNumber(tasks, year, editTaskId);
   }, [tasks, year, editTaskId]);
 
-  const validateCurrentNumber = useCallback(() => {
-    const result = validateTaskNumber(currentTaskNumber, tasks, editTaskId);
-    setValidationError(result.errorMessage || "");
-    return result;
-  }, [currentTaskNumber, tasks, editTaskId]);
-
-  const clearError = useCallback(() => {
-    setValidationError("");
-  }, []);
-
   return {
-    currentTaskNumber,
     isValid,
     errorMessage,
     suggestions,
     year,
 
-    setTaskNumber: handleSetTaskNumber,
-    setYear: handleSetYear,
-    generateSuggestions,
     getNextSuggestion,
-    validateCurrentNumber,
-    clearError,
+    validateNumber,
   };
 };
