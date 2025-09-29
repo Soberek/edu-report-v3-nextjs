@@ -1,13 +1,13 @@
 import React from "react";
 import { Box, Typography, Stack, IconButton, Chip } from "@mui/material";
 import { Add, Delete, People } from "@mui/icons-material";
-import { Controller, Control, FieldArrayWithId, useFormContext } from "react-hook-form";
-import { AudienceGroup, CreateEducationalTaskFormData, AudienceType } from "@/types";
+import { Controller, Control, useFormContext } from "react-hook-form";
+import { AudienceType } from "@/types";
 import { FormField, ActionButton } from "@/components/shared";
 
 interface AudienceGroupsFormProps {
   control: Control<Record<string, unknown>>;
-  fields: FieldArrayWithId<Record<string, unknown>, "audienceGroups", "id">[];
+  fields: Array<{ id: string; [key: string]: unknown }>;
   append: (value: Record<string, unknown>) => void;
   remove: (index: number) => void;
   basePath: string; // ścieżka bazowa, np. "audienceGroups" lub "activities.0.audienceGroups"
@@ -82,7 +82,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
                   required: "Nazwa grupy jest wymagana",
                   minLength: { value: 1, message: "Nazwa nie może być pusta" },
                 }}
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <FormField
                     name={field.name}
                     control={control}
@@ -102,7 +102,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
                     name={`${basePath}.${index}.type`}
                     control={control}
                     rules={{ required: "Wybierz typ odbiorcy" }}
-                    render={({ field, fieldState }) => (
+                    render={({ field }) => (
                       <FormField
                         name={field.name}
                         control={control}
@@ -127,7 +127,7 @@ export const AudienceGroupsForm: React.FC<AudienceGroupsFormProps> = ({ control,
                       min: { value: 1, message: "Minimum 1 osoba" },
                       max: { value: 1000, message: "Maksimum 1000 osób" },
                     }}
-                    render={({ field, fieldState }) => (
+                    render={({ field }) => (
                       <FormField
                         name={field.name}
                         control={control}
