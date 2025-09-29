@@ -1,0 +1,179 @@
+import React, { useEffect, forwardRef, useImperativeHandle } from "react";
+import { Box, MenuItem, Select, FormControl, FormHelperText, SelectChangeEvent } from "@mui/material";
+import { useForm, UseFormHandleSubmit, Controller } from "react-hook-form";
+import type { CaseRecord } from "@/types";
+import { FormField, FormSection } from "@/components/shared";
+
+interface EditActFormProps {
+  caseRecord: CaseRecord | null;
+  actsOptions: string[];
+  onSubmit: (data: CaseRecord) => void;
+}
+
+// Form data type that matches the form structure
+type FormData = {
+  code: string;
+  referenceNumber: string;
+  date: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  sender: string;
+  comments: string;
+  notes: string;
+};
+
+export interface EditActFormRef {
+  submit: () => void;
+  isDirty: boolean;
+}
+
+const CustomSelectField: React.FC<{
+  control: any;
+  name: "code";
+  label: string;
+  options: string[];
+  errors: any;
+}> = ({ control, name, label, options, errors }) => {
+  return (
+    <Controller
+      name={name}
+      control={control}
+      rules={{ required: "Kod jest wymagany" }}
+      render={({ field }) => (
+        <FormControl fullWidth error={!!errors[name]}>
+          <Select
+            {...field}
+            displayEmpty
+            inputProps={{ "aria-placeholder": label }}
+            onChange={(event: SelectChangeEvent) => field.onChange(event.target.value)}
+            sx={{
+              borderRadius: 2,
+              background: "white",
+            }}
+          >
+            <MenuItem value="" disabled>
+              <em>{label}</em>
+            </MenuItem>
+            {options.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+          {errors[name] && <FormHelperText>{errors[name]?.message}</FormHelperText>}
+        </FormControl>
+      )}
+    />
+  );
+};
+
+export const EditActForm = forwardRef<EditActFormRef, EditActFormProps>(({ caseRecord, actsOptions, onSubmit }, ref) => {
+  const formMethods = useForm<FormData>({
+    defaultValues: {
+      code: "",
+      referenceNumber: "",
+      date: "",
+      title: "",
+      startDate: "",
+      endDate: "",
+      sender: "",
+      comments: "",
+      notes: "",
+    },
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty },
+  } = formMethods;
+
+  // Expose form methods to parent
+  useImperativeHandle(ref, () => ({
+    submit: () => handleSubmit(handleFormSubmit)(),
+    isDirty,
+  }));
+
+  // Update form when caseRecord changes
+  useEffect(() => {
+    if (caseRecord) {
+      reset({
+        code: caseRecord.code,
+        referenceNumber: caseRecord.referenceNumber,
+        date: caseRecord.date,
+        title: caseRecord.title,
+        startDate: caseRecord.startDate,
+        endDate: caseRecord.endDate,
+        sender: caseRecord.sender,
+        comments: caseRecord.comments,
+        notes: caseRecord.notes,
+      });
+    }
+  }, [caseRecord, reset]);
+
+  const handleFormSubmit = (data: FormData) => {
+    // Convert FormData back to CaseRecord format
+    const caseRecordData: CaseRecord = {
+      id: caseRecord?.id || "",
+      ...data,
+      createdAt: caseRecord?.createdAt || "",
+      userId: caseRecord?.userId || "",
+    };
+    onSubmit(caseRecordData);
+  };
+
+  return (
+    <Box component="form" onSubmit={handleSubmit(handleFormSubmit)} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 3 }}>
+        {/* Code Selection */}
+        <Box>
+          <CustomSelectField control={control} name="code" label="Wybierz kod" options={actsOptions} errors={{}} />
+        </Box>
+
+        {/* Reference Number */}
+        <FormField
+          name="referenceNumber"
+          control={control}
+          label="Numer referencyjny"
+          placeholder="Wprowadź numer referencyjny np. OZiPZ.0442.1.2024"
+          required
+          helperText="Format: OZiPZ.XXXX.X.YYYY"
+        />
+
+        {/* Date */}
+        <FormField name="date" control={control} label="Data" required />
+
+        {/* Title */}
+        <FormField name="title" control={control} label="Tytuł" required />
+
+        {/* Start Date */}
+        <FormField name="startDate" control={control} label="Data wszczęcia sprawy" required />
+
+        {/* End Date */}
+        <FormField name="endDate" control={control} label="Data zakończenia sprawy" required />
+
+        {/* Sender */}
+        <FormField name="sender" control={control} label="Nadawca" />
+
+        {/* Comments */}
+        <FormField name="comments" control={control} label="Uwagi" />
+      </Box>
+
+      {/* Notes - spanning full width */}
+      <Box sx={{ gridColumn: "1 / -1" }}>
+        <FormField
+          name="notes"
+          control={control}
+          label="Notatki"
+          type="textarea"
+          rows={4}
+          helperText="Szczegółowe uwagi dotyczące akt sprawy"
+        />
+      </Box>
+
+      {/* Form is controlled via parent onSubmit prop */}
+    </Box>
+  );
+});
