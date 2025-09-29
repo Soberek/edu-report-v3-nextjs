@@ -258,6 +258,7 @@ export default function EducationalTasks(): React.ReactNode {
         <EducationalTaskForm
           mode={editTask ? "edit" : "create"}
           task={editTask}
+          tasks={tasks}
           onClose={handleFormClose}
           onSave={handleFormSave}
           loading={loading}

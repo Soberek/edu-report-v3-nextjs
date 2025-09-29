@@ -12,6 +12,7 @@ import { formatDateForInput } from "@/utils/shared/dayjsUtils";
 import { createEducationalTaskSchema, type CreateEducationalTaskFormData } from "../schemas/educationalTaskSchemas";
 import { EducationalTask } from "@/types";
 import { ActivityForm } from "./ActivityForm";
+import { TaskNumberField } from "./TaskNumberField";
 import { usePrograms } from "@/hooks/useProgram";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
@@ -20,12 +21,13 @@ import { schoolTypes } from "@/constants";
 interface EducationalTaskFormProps {
   mode: "create" | "edit";
   task?: EducationalTask | null;
+  tasks?: EducationalTask[]; // For number validation
   onClose: () => void;
   onSave: (data: CreateEducationalTaskFormData) => Promise<void>;
   loading?: boolean;
 }
 
-export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, task, onClose, onSave, loading = false }) => {
+export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, task, tasks = [], onClose, onSave, loading = false }) => {
   const { user } = useUser();
   const { programs } = usePrograms();
   const { data: schools } = useFirebaseData<{ id: string; name: string; address: string; city: string; type: string[] }>(
@@ -139,13 +141,14 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
                   )}
                 />
 
-                <FormField
-                  name="referenceNumber"
+                <TaskNumberField
                   control={form.control}
+                  name="referenceNumber"
+                  tasks={tasks}
+                  editTaskId={mode === "edit" ? task?.id : undefined}
                   label="Numer referencyjny"
-                  placeholder="Wprowadź numer referencyjny zadania"
+                  helperText="Unikalny identyfikator zadania"
                   required
-                  fullWidth
                 />
 
                 <FormField

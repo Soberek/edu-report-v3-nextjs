@@ -1,6 +1,7 @@
 import { WYKAZ_AKT } from "@/constants/acts";
 import { getTodayForInput } from "@/utils/shared/dayjsUtils";
-import type { CaseRecord, ActOption } from "../types";
+import type { ActOption } from "../types";
+import type { CaseRecord } from "@/types";
 
 // Default form values
 export const DEFAULT_FORM_VALUES: Omit<CaseRecord, "id" | "createdAt" | "userId"> = {

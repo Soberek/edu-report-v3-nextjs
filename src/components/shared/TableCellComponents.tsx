@@ -255,10 +255,10 @@ export const DateCell: React.FC<DateCellProps> = ({ date, format = "short" }) =>
       py: 1,
     }}
   >
-    <Typography 
-      variant="caption" 
-      color="text.secondary" 
-      sx={{ 
+    <Typography
+      variant="caption"
+      color="text.secondary"
+      sx={{
         fontWeight: "500",
         wordBreak: "break-word",
         whiteSpace: "normal",
