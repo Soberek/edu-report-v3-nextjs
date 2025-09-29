@@ -76,22 +76,62 @@ export const actions = {
 export const taskUtils = {
   generateTaskId: (): string => `task_${Date.now()}_${Math.random().toString(36).slice(2)}`,
   createTaskFromData: (taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => {
-    // Remove undefined values to prevent Firebase errors
-    const cleanTaskData = Object.fromEntries(Object.entries(taskData).filter(([_, value]) => value !== undefined));
+    // Deep clean undefined values to prevent Firebase errors
+    const deepClean = (obj: any): any => {
+      if (obj === null || obj === undefined) return null;
+      if (Array.isArray(obj)) {
+        return obj.map(deepClean).filter(item => item !== null && item !== undefined);
+      }
+      if (typeof obj === 'object') {
+        const cleaned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+          if (value !== undefined) {
+            const cleanedValue = deepClean(value);
+            if (cleanedValue !== null && cleanedValue !== undefined) {
+              cleaned[key] = cleanedValue;
+            }
+          }
+        }
+        return cleaned;
+      }
+      return obj;
+    };
+    
+    const cleanedTaskData = deepClean(taskData);
 
     return {
-      ...cleanTaskData,
+      ...cleanedTaskData,
       id: taskUtils.generateTaskId(),
       createdBy: userId,
       createdAt: new Date().toISOString(),
     } as EducationalTask;
   },
   updateTaskFromData: (id: string, taskData: CreateEducationalTaskFormData, userId: string): EducationalTask => {
-    // Remove undefined values to prevent Firebase errors
-    const cleanTaskData = Object.fromEntries(Object.entries(taskData).filter(([_, value]) => value !== undefined));
+    // Deep clean undefined values to prevent Firebase errors
+    const deepClean = (obj: any): any => {
+      if (obj === null || obj === undefined) return null;
+      if (Array.isArray(obj)) {
+        return obj.map(deepClean).filter((item) => item !== null && item !== undefined);
+      }
+      if (typeof obj === "object") {
+        const cleaned: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+          if (value !== undefined) {
+            const cleanedValue = deepClean(value);
+            if (cleanedValue !== null && cleanedValue !== undefined) {
+              cleaned[key] = cleanedValue;
+            }
+          }
+        }
+        return cleaned;
+      }
+      return obj;
+    };
+
+    const cleanedTaskData = deepClean(taskData);
 
     return {
-      ...cleanTaskData,
+      ...cleanedTaskData,
       id,
       createdBy: userId,
       updatedAt: new Date().toISOString(),
@@ -143,7 +183,7 @@ const useTaskOperations = (
   const updateTask = useCallback(
     async (id: string, taskData: CreateEducationalTaskFormData) => {
       console.log("🔄 updateTask called with:", { id, taskData });
-      
+
       if (!user?.uid) {
         const error = "Użytkownik nie jest zalogowany";
         console.error("❌ User not logged in");
@@ -157,7 +197,7 @@ const useTaskOperations = (
       try {
         const updatedTask = taskUtils.updateTaskFromData(id, taskData, user.uid);
         console.log("📝 Updated task data:", updatedTask);
-        
+
         // Check for undefined values in activities
         if (updatedTask.activities) {
           updatedTask.activities.forEach((activity, index) => {
@@ -165,11 +205,11 @@ const useTaskOperations = (
               type: activity.type,
               materials: activity.materials,
               media: activity.media,
-              hasUndefinedValues: Object.entries(activity).some(([key, value]) => value === undefined)
+              hasUndefinedValues: Object.entries(activity).some(([key, value]) => value === undefined),
             });
           });
         }
-        
+
         const success = await updateItem(id, updatedTask);
         console.log("✅ Update success:", success);
 
