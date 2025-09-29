@@ -1,12 +1,10 @@
 // Main components (now using shared components)
 export { SchoolProgramParticipationTable } from "./table";
 export { ParticipationForm } from "./ParticipationForm";
+export { EditParticipationForm } from "./EditParticipationForm";
 
 // Table configuration
 export { createColumns, CUSTOM_STYLES, TABLE_COLUMNS, type TableColumnConfig } from "./TableConfig";
-
-// Specific components
-export { default as EditDialog } from "./edit-dialog";
 
 // Re-export shared components for easy access
 export {
