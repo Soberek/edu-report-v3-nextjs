@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  IconButton, 
-  Stack, 
-  Card, 
+import {
+  Box,
+  Typography,
+  Button,
+  IconButton,
+  Stack,
+  Card,
   CardContent,
   Chip,
   TextField,
   InputAdornment,
   Autocomplete,
-  Alert
+  Alert,
 } from "@mui/material";
 import { Add, Delete, LocalLibrary } from "@mui/icons-material";
 import { Controller, Control, FieldArrayWithId } from "react-hook-form";
@@ -27,13 +27,7 @@ interface MaterialSelectorProps {
   activityIndex: number;
 }
 
-export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
-  control,
-  fields,
-  append,
-  remove,
-  activityIndex
-}) => {
+export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fields, append, remove, activityIndex }) => {
   const [selectedMaterialId, setSelectedMaterialId] = useState<string>("");
 
   const addMaterial = () => {
@@ -57,13 +51,11 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
   };
 
   // Group materials by category for better UX
-  const groupedMaterials = Object.values(MATERIAL_CATEGORY_LABELS).map(categoryLabel => {
+  const groupedMaterials = Object.values(MATERIAL_CATEGORY_LABELS).map((categoryLabel) => {
     const categoryKey = Object.keys(MATERIAL_CATEGORY_LABELS).find(
-      key => MATERIAL_CATEGORY_LABELS[key as keyof typeof MATERIAL_CATEGORY_LABELS] === categoryLabel
+      (key) => MATERIAL_CATEGORY_LABELS[key as keyof typeof MATERIAL_CATEGORY_LABELS] === categoryLabel
     );
-    const materials = EDUCATIONAL_MATERIALS.filter(
-      material => material.category === categoryKey?.toLowerCase()
-    );
+    const materials = EDUCATIONAL_MATERIALS.filter((material) => material.category === categoryKey?.toLowerCase());
     return { category: categoryLabel, materials };
   });
 
@@ -74,13 +66,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
           <LocalLibrary sx={{ color: "#1976d2" }} />
           Materiały edukacyjne
         </Typography>
-        <Button 
-          startIcon={<Add />} 
-          onClick={addMaterial}
-          variant="outlined"
-          disabled={!selectedMaterialId}
-          sx={{ fontWeight: "medium" }}
-        >
+        <Button startIcon={<Add />} onClick={addMaterial} variant="outlined" disabled={!selectedMaterialId} sx={{ fontWeight: "medium" }}>
           Dodaj materiał
         </Button>
       </Box>
@@ -88,18 +74,13 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
       {/* Material selection */}
       <Box sx={{ mb: 3 }}>
         <Autocomplete
-          value={selectedMaterialId ? EDUCATIONAL_MATERIALS.find(m => m.id === selectedMaterialId) : null}
+          value={selectedMaterialId ? EDUCATIONAL_MATERIALS.find((m) => m.id === selectedMaterialId) : null}
           onChange={(_, material) => setSelectedMaterialId(material?.id || "")}
           options={EDUCATIONAL_MATERIALS}
           getOptionLabel={(option) => option.name}
           groupBy={(option) => MATERIAL_CATEGORY_LABELS[option.category as keyof typeof MATERIAL_CATEGORY_LABELS]}
           renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Wybierz materiał z listy"
-              placeholder="Wpisz nazwę lub wybierz z listy..."
-              fullWidth
-            />
+            <TextField {...params} label="Wybierz materiał z listy" placeholder="Wpisz nazwę lub wybierz z listy..." fullWidth />
           )}
           renderGroup={(params) => (
             <Box key={params.group}>
@@ -140,9 +121,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
         {selectedMaterialId && (
           <Alert severity="info" sx={{ mb: 2 }}>
             Wybrano: {getMaterialById(selectedMaterialId)?.name}
-            {getMaterialById(selectedMaterialId)?.description && 
-              ` - ${getMaterialById(selectedMaterialId)?.description}`
-            }
+            {getMaterialById(selectedMaterialId)?.description && ` - ${getMaterialById(selectedMaterialId)?.description}`}
           </Alert>
         )}
       </Box>
@@ -156,32 +135,21 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
                   <Stack spacing={1}>
                     <Typography variant="subtitle2" fontWeight="bold">
-                      {field.name || `Materiał ${index + 1}`}
+                      {EDUCATIONAL_MATERIALS.find((m) => m.id === field.id)?.name || `Materiał ${index + 1}`}
                     </Typography>
                     <Box sx={{ display: "flex", gap: 1 }}>
-                      <Chip 
-                        label={field.type || "brak typu"} 
-                        size="small" 
-                        variant="outlined" 
+                      <Chip
+                        label={EDUCATIONAL_MATERIALS.find((m) => m.id === field.id)?.type || "brak typu"}
+                        size="small"
+                        variant="outlined"
                       />
-                      <Chip 
-                        label={`ID: ${field.id}`} 
-                        size="small" 
-                        variant="outlined" 
-                        color="secondary"
-                      />
+                      <Chip label={`ID: ${field.id}`} size="small" variant="outlined" color="secondary" />
                     </Box>
                   </Stack>
-                  <IconButton
-                    onClick={() => removeMaterial(index)}
-                    size="small"
-                    sx={{ color: "error.main" }}
-                    title="Usuń materiał"
-                  >
+                  <IconButton onClick={() => removeMaterial(index)} size="small" sx={{ color: "error.main" }} title="Usuń materiał">
                     <Delete />
                   </IconButton>
                 </Box>
-
                 <Stack spacing={2}>
                   <Controller
                     name={`activities.${activityIndex}.materials.${index}.distributedCount`}
@@ -231,7 +199,8 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
                     )}
                   />
                 </Stack>
-..................</CardContent>
+                ..................
+              </CardContent>
             </Card>
           ))}
         </Box>
@@ -249,7 +218,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({
             textAlign: "center",
           }}
         >
-          <LocalLibrary sx={{ fontSize: 48, color: "grey.400", mb: 2 });
+          <LocalLibrary sx={{ fontSize: 48, color: "grey.400", mb: 2 }} />
 
           <Typography variant="h6" color="text.secondary" gutterBottom>
             Brak materiałów

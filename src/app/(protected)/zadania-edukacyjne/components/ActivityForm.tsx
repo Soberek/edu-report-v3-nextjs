@@ -119,6 +119,15 @@ export const ActivityForm: React.FC = () => {
     name: "activities",
   });
 
+  // Watch all materials for all activities at once to avoid conditional hooks
+  const watchedAllMaterials =
+    watchedActivities?.map((_: any, index: number) =>
+      useWatch({
+        control,
+        name: `activities.${index}.materials`,
+      })
+    ) || [];
+
   // Helper component for activity audience groups
   const ActivityAudienceGroups: React.FC<{ activityIndex: number }> = ({ activityIndex }) => {
     const { setValue } = useFormContext();
@@ -166,37 +175,25 @@ export const ActivityForm: React.FC = () => {
 
   // Helper functions for activity materials
   const getMaterialsFields = (activityIndex: number) => {
-    const materials = useWatch({
-      control,
-      name: `activities.${activityIndex}.materials`,
-    }) || [];
-    
+    const materials = watchedAllMaterials[activityIndex] || [];
     return materials.map((material: any, index: number) => ({
       id: material.id || `material-${activityIndex}-${index}`,
-      ...material
+      ...material,
     }));
   };
 
   const appendMaterial = (activityIndex: number, value: any) => {
-    const currentMaterials = useWatch({
-      control,
-      name: `activities.${activityIndex}.materials`,
-    }) || [];
-    
+    const currentMaterials = watchedAllMaterials[activityIndex] || [];
     const newMaterial = {
       ...value,
-      id: value.id || `material-${activityIndex}-${currentMaterials.length}`
+      id: value.id || `material-${activityIndex}-${currentMaterials.length}`,
     };
     const updatedMaterials = [...currentMaterials, newMaterial];
     setValue(`activities.${activityIndex}.materials`, updatedMaterials);
   };
 
   const removeMaterial = (activityIndex: number, materialIndex: number) => {
-    const currentMaterials = useWatch({
-      control,
-      name: `activities.${activityIndex}.materials`,
-    }) || [];
-    
+    const currentMaterials = watchedAllMaterials[activityIndex] || [];
     const updatedMaterials = currentMaterials.filter((_: any, index: number) => index !== materialIndex);
     setValue(`activities.${activityIndex}.materials`, updatedMaterials);
   };
@@ -345,7 +342,7 @@ export const ActivityForm: React.FC = () => {
                     Materiały do dystrybucji
                   </Typography>
 
-                  <MaterialSelector 
+                  <MaterialSelector
                     control={control}
                     fields={getMaterialsFields(index)}
                     append={(value) => appendMaterial(index, value)}
