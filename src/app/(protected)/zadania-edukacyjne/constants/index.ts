@@ -31,6 +31,13 @@ export const FILTER_CONSTANTS = {
   MONTH_LABEL: "Miesiąc",
   PROGRAM_LABEL: "Program",
   ACTIVITY_TYPE_LABEL: "Typ aktywności",
+  MIN_WIDTH: 120,
+  SELECT_WIDTHS: {
+    YEAR: 120,
+    MONTH: 120,
+    PROGRAM: 200,
+    ACTIVITY_TYPE: 150,
+  },
   ACTIVE_FILTERS: {
     YEAR: "Rok",
     MONTH: "Miesiąc",
