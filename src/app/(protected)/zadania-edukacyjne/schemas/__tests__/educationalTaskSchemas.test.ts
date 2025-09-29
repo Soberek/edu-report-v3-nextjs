@@ -177,7 +177,10 @@ describe("educationalTaskSchemas", () => {
       const result = createEducationalTaskSchema.safeParse(data);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.activities[0].actionCount).toBe(5);
+        const activity = result.data.activities[0];
+        if (activity.type === "presentation" || activity.type === "lecture") {
+          expect(activity.actionCount).toBe(5);
+        }
       }
     });
 
