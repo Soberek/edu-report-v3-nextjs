@@ -11,7 +11,7 @@ import type { LoginPageProps, LoginFormData } from "./types";
  * Handles user authentication with proper error handling and redirects
  */
 export default function LoginPage({ redirectTo }: LoginPageProps = {}): React.ReactNode {
-  const { login, isLoading, error, clearError } = useLogin();
+  const { submit, isLoading, error, clearError } = useLogin();
   const { shouldRedirect } = useAuthRedirect(redirectTo);
 
   // Don't render anything if user is already authenticated
@@ -20,7 +20,7 @@ export default function LoginPage({ redirectTo }: LoginPageProps = {}): React.Re
   }
 
   const handleSubmit = async (data: LoginFormData): Promise<void> => {
-    await login(data);
+    await submit(data);
   };
 
   return (

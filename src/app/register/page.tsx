@@ -11,7 +11,7 @@ import type { RegisterPageProps, RegisterFormData } from "./types";
  * Handles user registration with proper error handling and redirects
  */
 export default function RegisterPage({ redirectTo }: RegisterPageProps = {}): React.ReactNode {
-  const { register, isLoading, error, clearError } = useRegister();
+  const { submit, isLoading, error, clearError } = useRegister();
   const { shouldRedirect } = useAuthRedirect(redirectTo);
 
   // Don't render anything if user is already authenticated
@@ -20,7 +20,7 @@ export default function RegisterPage({ redirectTo }: RegisterPageProps = {}): Re
   }
 
   const handleSubmit = async (data: RegisterFormData): Promise<void> => {
-    await register(data);
+    await submit(data);
   };
 
   return (

@@ -1,59 +1,36 @@
-/**
- * Constants for the login module
- */
+import { SHARED_AUTH_CONSTANTS } from "@/components/auth";
 
+/**
+ * Login-specific constants that extend shared auth constants
+ */
 export const LOGIN_CONSTANTS = {
-  // Form validation
-  VALIDATION: {
-    EMAIL_REQUIRED: "Email jest wymagany",
-    EMAIL_INVALID: "Nieprawidłowy format email",
-    PASSWORD_REQUIRED: "Hasło jest wymagane",
-    PASSWORD_MIN_LENGTH: 6,
-    PASSWORD_MIN_LENGTH_MESSAGE: "Hasło musi mieć co najmniej 6 znaków",
-  },
-  
-  // UI text
+  // Inherit shared validation
+  VALIDATION: SHARED_AUTH_CONSTANTS.VALIDATION,
+
+  // Login-specific UI text
   TEXT: {
+    ...SHARED_AUTH_CONSTANTS.TEXT,
     TITLE: "Zaloguj się",
     SUBMIT_BUTTON: "Zaloguj",
     SUBMIT_LOADING: "Logowanie...",
     REGISTER_LINK_TEXT: "Nie masz konta?",
     REGISTER_LINK: "Zarejestruj się",
-    UNKNOWN_ERROR: "Wystąpił nieznany błąd",
-    ERROR_PREFIX: "Wystąpił błąd:",
     DEFAULT_LOGIN_ERROR: "Wystąpił błąd podczas logowania.",
   },
 
-  // Form fields
+  // Login-specific form fields
   FIELDS: {
-    EMAIL: {
-      LABEL: "Email",
-      TYPE: "email",
-      AUTOCOMPLETE: "email",
-    },
+    ...SHARED_AUTH_CONSTANTS.FIELDS,
     PASSWORD: {
-      LABEL: "Hasło",
-      TYPE: "password",
+      ...SHARED_AUTH_CONSTANTS.FIELDS.PASSWORD,
       AUTOCOMPLETE: "current-password",
     },
   },
 
-  // Routes
-  ROUTES: {
-    REGISTER: "/register",
-    HOME: "/",
-  },
-
-  // Styling
-  STYLES: {
-    BACKGROUND_GRADIENT: "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)",
-    PRIMARY_COLOR: "#7b1fa2",
-    PAPER_ELEVATION: 6,
-    BORDER_RADIUS: 3,
-    MIN_WIDTH: 320,
-    MAX_WIDTH: 400,
-    BUTTON_PADDING_Y: 1.5,
-  },
+  // Inherit shared routes and styles
+  ROUTES: SHARED_AUTH_CONSTANTS.ROUTES,
+  STYLES: SHARED_AUTH_CONSTANTS.STYLES,
 } as const;
 
-export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Re-export shared regex
+export { EMAIL_REGEX } from "@/components/auth";

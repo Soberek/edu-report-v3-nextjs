@@ -1,50 +1,20 @@
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/config";
-import { getAuthErrorMessage } from "../utils";
+import { useAuthForm } from "@/components/auth";
 import { REGISTER_CONSTANTS } from "../constants";
-import type { RegisterFormData, UseRegisterResult } from "../types";
+import type { RegisterFormData } from "../utils";
 
 /**
- * Custom hook for handling user registration
+ * Custom hook for handling user registration using shared auth form logic
  */
-export const useRegister = (): UseRegisterResult => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  const register = useCallback(async (data: RegisterFormData): Promise<void> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth, 
-        data.email, 
-        data.password
-      );
-      
-      if (userCredential.user) {
-        // Successful registration - redirect to login
-        router.push(REGISTER_CONSTANTS.ROUTES.LOGIN);
-      }
-    } catch (error) {
-      const errorMessage = getAuthErrorMessage(error);
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [router]);
-
-  return {
-    register,
-    isLoading,
-    error,
-    clearError,
+export const useRegister = () => {
+  const authFunction = async (data: RegisterFormData) => {
+    return await createUserWithEmailAndPassword(auth, data.email, data.password);
   };
+
+  return useAuthForm(
+    authFunction,
+    REGISTER_CONSTANTS.ROUTES.LOGIN,
+    "Registration error"
+  );
 };
