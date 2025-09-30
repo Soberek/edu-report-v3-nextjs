@@ -28,7 +28,7 @@ export const useAuthForm = <T extends BaseAuthFormData>(
       try {
         const result = await authFunction(data);
 
-        if (result?.user || result) {
+        if ((result as { user?: unknown })?.user || (result && !(result as { user?: unknown })?.hasOwnProperty("user"))) {
           router.push(successRedirect);
         }
       } catch (error) {
