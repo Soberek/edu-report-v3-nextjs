@@ -19,6 +19,7 @@ import { DateField } from "@mui/x-date-pickers/DateField";
 import { Controller, Control, FieldPath, FieldValues } from "react-hook-form";
 import { formatDateForInput } from "@/utils/shared/dayjsUtils";
 import dayjs from "dayjs";
+import { PickerValue } from "@mui/x-date-pickers/internals";
 
 // Polish validation helpers
 export const getPolishValidationMessage = (type: string, label: string): string => {
@@ -88,18 +89,19 @@ export const FormField = <T extends FieldValues>({
   const theme = useTheme();
 
   const renderField = (field: unknown, fieldState: unknown) => {
-    const error = fieldState.error;
+    const error = (fieldState as { error?: { message?: string } }).error;
     const hasError = !!error;
+    const fieldObj = field as { value?: unknown; onChange?: (value: unknown) => void };
 
     const commonProps = {
-      ...field,
+      ...(field as Record<string, unknown>),
       label,
       required,
       disabled,
       fullWidth,
       size,
       error: hasError,
-      helperText: hasError ? error.message : helperText,
+      helperText: hasError ? (error as { message?: string }).message : helperText,
       // Polish-specific improvements for better UX
       autoComplete: type === "email" ? "email" : type === "password" ? "new-password" : type === "date" ? "bday" : undefined,
       placeholder,
@@ -146,14 +148,14 @@ export const FormField = <T extends FieldValues>({
         return (
           <FormControl fullWidth={fullWidth} error={hasError} size={size}>
             <InputLabel required={required}>{label}</InputLabel>
-            <Select {...field} label={label} disabled={disabled}>
+            <Select {...(field as Record<string, unknown>)} label={label} disabled={disabled}>
               {options.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
               ))}
             </Select>
-            {hasError && <FormHelperText>{error.message}</FormHelperText>}
+            {hasError && <FormHelperText>{(error as { message?: string }).message}</FormHelperText>}
             {!hasError && helperText && <FormHelperText>{helperText}</FormHelperText>}
           </FormControl>
         );
@@ -161,7 +163,14 @@ export const FormField = <T extends FieldValues>({
       case "checkbox":
         return (
           <FormControlLabel
-            control={<Checkbox {...field} checked={field.value || false} disabled={disabled} color="primary" />}
+            control={
+              <Checkbox
+                {...(field as Record<string, unknown>)}
+                checked={(field as { value?: boolean }).value || false}
+                disabled={disabled}
+                color="primary"
+              />
+            }
             label={
               <Box>
                 <Typography variant="body2" component="span">
@@ -184,27 +193,31 @@ export const FormField = <T extends FieldValues>({
             <FormLabel component="legend" required={required}>
               {label}
             </FormLabel>
-            <RadioGroup {...field} row>
+            <RadioGroup {...(field as Record<string, unknown>)} row>
               {options.map((option) => (
                 <FormControlLabel key={option.value} value={option.value} control={<Radio disabled={disabled} />} label={option.label} />
               ))}
             </RadioGroup>
-            {hasError && <FormHelperText>{error.message}</FormHelperText>}
+            {hasError && <FormHelperText>{(error as { message?: string }).message}</FormHelperText>}
             {!hasError && helperText && <FormHelperText>{helperText}</FormHelperText>}
           </FormControl>
         );
 
       case "date":
         // Use MUI DateField for proper Polish localization
-        const dateValue = field.value ? (field.value instanceof dayjs ? field.value : dayjs(field.value)) : null;
+        const dateValue = fieldObj.value
+          ? fieldObj.value instanceof dayjs
+            ? fieldObj.value
+            : dayjs(fieldObj.value as string | number | Date)
+          : null;
 
         return (
           <FormControl fullWidth={fullWidth} error={hasError}>
             <DateField
               label={label}
-              value={dateValue}
+              value={dateValue as PickerValue}
               onChange={(newValue) => {
-                field.onChange(newValue ? formatDateForInput(newValue) : "");
+                fieldObj.onChange?.(newValue ? formatDateForInput(newValue) : "");
               }}
               format="DD.MM.YYYY"
               fullWidth
@@ -214,7 +227,7 @@ export const FormField = <T extends FieldValues>({
                 textField: {
                   size: size,
                   error: hasError,
-                  helperText: hasError ? error.message : helperText,
+                  helperText: hasError ? error?.message : helperText,
                 },
               }}
               sx={{
