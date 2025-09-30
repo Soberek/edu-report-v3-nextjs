@@ -88,18 +88,17 @@ export const AuthenticatedLayout: React.FC<AuthenticatedLayoutProps> = ({ childr
     );
   }
 
-  // For non-authenticated users or auth routes: show only navbar (no side drawer)
+  // For non-authenticated users or auth routes: show no navigation (clean landing page)
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Navbar />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          minHeight: "calc(100vh - 80px)", // Account for navbar height
+          minHeight: "100vh", // Full height for landing page
           display: "flex",
           flexDirection: "column",
-          pt: 0, // Remove top padding since navbar is not fixed
+          pt: 0, // No top padding for clean landing page
         }}
       >
         {children}
