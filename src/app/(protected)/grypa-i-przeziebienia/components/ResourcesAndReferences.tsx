@@ -153,7 +153,7 @@ export const ResourcesAndReferences: React.FC<ResourcesAndReferencesProps> = ({
 
       <Grid container spacing={3}>
         {resources.map((category, categoryIndex) => (
-          <Grid item xs={12} md={6} key={categoryIndex}>
+          <Grid size={{ xs: 12, md: 6 }} key={categoryIndex}>
             <Card
               sx={{
                 height: "100%",

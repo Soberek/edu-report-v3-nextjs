@@ -58,7 +58,7 @@ export default function MelanomaQuiz() {
     selectMultipleAnswers,
     // getScoreGrade,
     setTimeSpent,
-  } = useQuiz(QUIZ_QUESTIONS, quizSettings);
+  } = useQuiz(QUIZ_QUESTIONS);
 
   // Timer effect
   useEffect(() => {

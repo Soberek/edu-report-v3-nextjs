@@ -67,7 +67,7 @@ export const RedFlagsSection: React.FC<RedFlagsSectionProps> = ({
 
       <Grid container spacing={2}>
         {RED_FLAGS.map((flag) => (
-          <Grid item xs={12} md={6} key={flag.id}>
+          <Grid size={{ xs: 12, md: 6 }} key={flag.id}>
             <Card
               sx={{
                 height: "100%",

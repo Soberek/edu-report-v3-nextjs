@@ -230,7 +230,7 @@ export const InteractiveQuiz: React.FC = () => {
 
   const score = useMemo(() => {
     if (!quizState.showResults) return 0;
-    return quizState.answers.reduce((acc, answer, index) => {
+    return quizState.answers.reduce((acc: number, answer, index) => {
       return acc + (answer === QUIZ_QUESTIONS[index].correctAnswer ? 1 : 0);
     }, 0);
   }, [quizState.answers, quizState.showResults]);

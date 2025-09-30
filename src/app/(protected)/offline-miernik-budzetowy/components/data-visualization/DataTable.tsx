@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip, useTheme } from "@mui/material";
-import type { ProgramsData } from "../types";
+import type { ProgramsData } from "../../types";
 
 interface DataTableProps {
   data: ProgramsData;
@@ -10,7 +10,7 @@ interface DataTableProps {
 
 export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allActions, allPeople }) => {
   const theme = useTheme();
-  
+
   const getProgramTypeColor = (index: number) => {
     const colors = [
       theme.palette.primary.main,
@@ -22,13 +22,13 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
     ];
     return colors[index % colors.length];
   };
-  
+
   return (
     <Box sx={{ mt: 4 }}>
       <Typography variant="h5" fontWeight="bold" color="text.primary" sx={{ mb: 3 }}>
         Szczegółowe dane programów
       </Typography>
-      
+
       <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 2 }}>
         <Table>
           <TableHead>
@@ -36,8 +36,12 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
               <TableCell sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>Typ programu</TableCell>
               <TableCell sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>Nazwa programu</TableCell>
               <TableCell sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>Działanie</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>Liczba działań</TableCell>
-              <TableCell align="right" sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>Liczba odbiorców</TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                Liczba działań
+              </TableCell>
+              <TableCell align="right" sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>
+                Liczba odbiorców
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -59,18 +63,16 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
                     </Box>
                   </TableCell>
                 </TableRow>
-                
+
                 {/* Program Details */}
                 {Object.entries(programs).map(([programName, actions]) => (
                   <React.Fragment key={programName}>
                     {/* Program Name Row */}
-                    <TableRow sx={{ backgroundColor: theme.palette.grey[25] }}>
-                      <TableCell sx={{ pl: 4, fontWeight: 600, color: "text.secondary" }}>
-                        {programName}
-                      </TableCell>
+                    <TableRow sx={{ backgroundColor: "#252525" }}>
+                      <TableCell sx={{ pl: 4, fontWeight: 600, color: "text.secondary" }}>{programName}</TableCell>
                       <TableCell colSpan={4} />
                     </TableRow>
-                    
+
                     {/* Actions */}
                     {Object.entries(actions).map(([actionName, stats]) => (
                       <TableRow key={actionName} hover>
@@ -89,7 +91,7 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
                 ))}
               </React.Fragment>
             ))}
-            
+
             {/* Summary Row */}
             <TableRow sx={{ backgroundColor: theme.palette.primary.main, color: "white" }}>
               <TableCell colSpan={3} sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
