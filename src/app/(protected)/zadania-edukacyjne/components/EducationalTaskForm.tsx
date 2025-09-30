@@ -236,15 +236,15 @@ export const EducationalTaskForm: React.FC<EducationalTaskFormProps> = ({ mode, 
               <ActivityForm />
 
               {/* Display form validation errors */}
-              {form.formState.errors.activities && (
+              {form.formState.errors.activities && Array.isArray(form.formState.errors.activities) && (
                 <Alert severity="error" sx={{ mt: 2 }}>
                   <Typography variant="subtitle2" fontWeight="bold">
                     Błędy w aktywnościach:
                   </Typography>
-                  {form.formState.errors.activities.map((activityError: Record<string, unknown>, index: number) => (
+                  {form.formState.errors.activities.map((activityError: { message?: string }, index: number) => (
                     <Box key={index} sx={{ mt: 1 }}>
                       <Typography variant="body2">
-                        <strong>Aktywność {index + 1}:</strong> {activityError.message}
+                        <strong>Aktywność {index + 1}:</strong> {activityError?.message || "Błąd walidacji"}
                       </Typography>
                     </Box>
                   ))}
