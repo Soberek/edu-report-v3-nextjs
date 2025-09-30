@@ -4,7 +4,8 @@ import { Box, Typography, Paper } from "@mui/material";
 import { useRegister, useAuthRedirect } from "./hooks";
 import { RegisterForm, ErrorAlert, LoginPrompt } from "./components";
 import { REGISTER_CONSTANTS } from "./constants";
-import type { RegisterPageProps, RegisterFormData } from "./types";
+import type { RegisterPageProps } from "./types";
+import type { RegisterFormData } from "./utils";
 
 /**
  * Registration page component
