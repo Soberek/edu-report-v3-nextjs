@@ -2,10 +2,7 @@
  * Types and interfaces for the login module
  */
 
-export interface LoginFormData {
-  readonly email: string;
-  readonly password: string;
-}
+// LoginFormData is exported from utils/validationUtils.ts
 
 export interface LoginFormErrors {
   readonly email?: string;
@@ -23,7 +20,7 @@ export interface LoginPageProps {
 }
 
 export interface UseLoginResult {
-  readonly login: (data: LoginFormData) => Promise<void>;
+  readonly login: (data: import("../utils/validationUtils").LoginFormData) => Promise<void>;
   readonly isLoading: boolean;
   readonly error: string | null;
   readonly clearError: () => void;
