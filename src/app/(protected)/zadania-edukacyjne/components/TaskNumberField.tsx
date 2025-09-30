@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { TextField, Box, Typography, Chip, Button, Alert } from "@mui/material";
 import { Refresh, Warning } from "@mui/icons-material";
 import type { EducationalTask } from "@/types";
-import { Controller, Control } from "react-hook-form";
+import { Controller, Control, FieldValues, Path } from "react-hook-form";
 import { useTaskNumberManager } from "../hooks/useTaskNumberManager";
 
-interface TaskNumberFieldProps {
-  control: Control<Record<string, unknown>>;
-  name: string;
+interface TaskNumberFieldProps<T extends FieldValues = FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
   tasks: EducationalTask[];
   editTaskId?: string;
   label?: string;
@@ -16,7 +16,7 @@ interface TaskNumberFieldProps {
   disabled?: boolean;
 }
 
-export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
+export const TaskNumberField = <T extends FieldValues = FieldValues>({
   control,
   name,
   tasks,
@@ -25,7 +25,7 @@ export const TaskNumberField: React.FC<TaskNumberFieldProps> = ({
   helperText,
   required = true,
   disabled = false,
-}) => {
+}: TaskNumberFieldProps<T>) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [currentValue, setCurrentValue] = useState("");
 
