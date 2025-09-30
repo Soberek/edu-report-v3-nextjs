@@ -109,7 +109,7 @@ export const useHolidayGraphics = () => {
         error: error instanceof Error ? error.message : "Unknown error occurred",
       }));
     }
-  }, [templateConfig]);
+  }, []);
 
   const clearError = useCallback(() => {
     setState(prev => ({ ...prev, error: null }));
@@ -123,63 +123,9 @@ export const useHolidayGraphics = () => {
     });
   }, []);
 
-  const refreshGraphics = useCallback(async () => {
-    if (state.posts.length === 0) {
-      setState(prev => ({ ...prev, error: "No posts available to refresh" }));
-      return;
-    }
-
-    setState(prev => ({ ...prev, loading: true, error: null }));
-
-    try {
-      // Regenerate graphics for existing posts using current template config
-      const refreshedPosts = await Promise.all(
-        state.posts.map(async (post) => {
-          try {
-            const generatedImageUrl = await graphicsGenerator.generateHolidayPost({
-              title: post.title,
-              date: post.literalDate,
-              backgroundImageUrl: post.imageUrl, // Use existing Unsplash image
-              templateImageUrl: templateConfig.templateImageUrl,
-              datePosition: templateConfig.datePosition,
-              titlePosition: templateConfig.titlePosition,
-              imagePlaceholder: templateConfig.imagePlaceholder
-            });
-            
-            return {
-              ...post,
-              generatedImageUrl
-            };
-          } catch (error) {
-            console.error(`Failed to refresh graphics for ${post.title}:`, error);
-            return {
-              ...post,
-              generatedImageUrl: post.imageUrl // Fallback to original image
-            };
-          }
-        })
-      );
-      
-      setState(prev => ({
-        ...prev,
-        posts: refreshedPosts,
-        loading: false,
-        error: null,
-      }));
-    } catch (error) {
-      console.error("Error refreshing graphics:", error);
-      setState(prev => ({
-        ...prev,
-        loading: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
-      }));
-    }
-  }, [state.posts, templateConfig]);
-
   return {
     state,
     generatePostsWithGraphics,
-    refreshGraphics,
     clearError,
     resetState,
     templateConfig,
