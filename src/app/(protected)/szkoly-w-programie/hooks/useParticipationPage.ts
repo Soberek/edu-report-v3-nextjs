@@ -1,8 +1,8 @@
-import { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { usePrograms } from "@/hooks/useProgram";
-// import type { Contact, Program, School as SchoolType } from "@/types";
+import type { Contact, Program, School as SchoolType } from "@/types";
 import type { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { createLookupMaps, mapParticipationsForDisplay } from "../utils";
 import { UI_CONSTANTS, MESSAGES } from "../constants";

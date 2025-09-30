@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { School } from "@/types";
+import type { School, SchoolTypes } from "@/types";
 import type { SchoolFilterFormData } from "../schemas/schoolSchemas";
 
 interface UseSchoolFiltersProps {
@@ -14,27 +14,24 @@ export const useSchoolFilters = ({ schools, filter }: UseSchoolFiltersProps) => 
     // Apply search filter
     if (filter.search) {
       const searchTerm = filter.search.toLowerCase();
-      filtered = filtered.filter((school) =>
-        school.name.toLowerCase().includes(searchTerm) ||
-        school.email.toLowerCase().includes(searchTerm) ||
-        school.city.toLowerCase().includes(searchTerm) ||
-        school.address.toLowerCase().includes(searchTerm) ||
-        school.municipality.toLowerCase().includes(searchTerm)
+      filtered = filtered.filter(
+        (school) =>
+          school.name.toLowerCase().includes(searchTerm) ||
+          school.email.toLowerCase().includes(searchTerm) ||
+          school.city.toLowerCase().includes(searchTerm) ||
+          school.address.toLowerCase().includes(searchTerm) ||
+          school.municipality.toLowerCase().includes(searchTerm)
       );
     }
 
     // Apply type filter
     if (filter.type) {
-      filtered = filtered.filter((school) =>
-        school.type && school.type.includes(filter.type)
-      );
+      filtered = filtered.filter((school) => school.type && school.type.includes(filter.type as SchoolTypes));
     }
 
     // Apply city filter
     if (filter.city) {
-      filtered = filtered.filter((school) =>
-        school.city.toLowerCase().includes(filter.city.toLowerCase())
-      );
+      filtered = filtered.filter((school) => school.city.toLowerCase().includes(filter.city.toLowerCase()));
     }
 
     return filtered;

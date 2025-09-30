@@ -9,6 +9,7 @@ import { EditParticipationForm } from "./EditParticipationForm";
 import { mapParticipationsForDisplay } from "../utils";
 import { STYLE_CONSTANTS, PAGE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
 import type { TableProps, MappedParticipation } from "../types";
+import { Contact, Program, School } from "@/types";
 
 export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   schoolsMap,
@@ -46,11 +47,15 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   }, []);
 
   const handleFormSubmit = useCallback(
-    async (data: SchoolProgramParticipation) => {
+    async (data: Partial<SchoolProgramParticipation>) => {
       if (editingParticipation) {
         setDialogLoading(true);
         try {
-          await onUpdate(editingParticipation.id, data);
+          const updatedParticipation: SchoolProgramParticipation = {
+            ...editingParticipation,
+            ...data,
+          };
+          await onUpdate(editingParticipation.id, updatedParticipation);
           setEditDialogOpen(false);
           setEditingParticipation(null);
         } finally {
@@ -126,13 +131,13 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
         <EmptyState title={MESSAGES.EMPTY.NO_DATA} description={MESSAGES.EMPTY.NO_DATA_DESCRIPTION} />
       ) : (
         <DataTable
-          data={mappedParticipations}
+          data={mappedParticipations as unknown as Record<string, unknown>[]}
           columns={columns}
           actions={actions}
           loading={loading}
           height={UI_CONSTANTS.TABLE_HEIGHT}
-          pageSizeOptions={UI_CONSTANTS.PAGE_SIZE_OPTIONS}
-          getRowId={(row) => row.id}
+          pageSizeOptions={[...UI_CONSTANTS.PAGE_SIZE_OPTIONS]}
+          getRowId={(row) => (row as unknown as MappedParticipation).id}
           sx={{
             background: "white",
             borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.LARGE,
@@ -155,9 +160,9 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
       <EditParticipationForm
         ref={formRef}
         participation={editingParticipation}
-        schools={schools}
-        contacts={contacts}
-        programs={programs}
+        schools={schools as School[]}
+        contacts={contacts as Contact[]}
+        programs={programs as Program[]}
         onSubmit={handleFormSubmit}
       />
     </EditDialog>

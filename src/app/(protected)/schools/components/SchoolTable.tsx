@@ -221,12 +221,12 @@ export const SchoolTable: React.FC<SchoolTableProps> = ({ schools, onEdit, onDel
 
   return (
     <DataTable
-      data={schools}
+      data={schools as unknown as Record<string, unknown>[]}
       columns={columns}
       actions={actions}
       loading={loading}
       height={600}
-      getRowId={(row) => row.id}
+      getRowId={(row) => row.id as string}
       sx={{
         "& .MuiDataGrid-root": {
           border: "none",

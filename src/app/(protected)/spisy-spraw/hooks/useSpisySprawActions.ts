@@ -9,7 +9,7 @@ import type { CaseRecord } from "@/types";
 export interface UseSpisySprawActionsProps {
   state: SpisySprawState;
   dispatch: React.Dispatch<SpisySprawAction>;
-  formRef: React.RefObject<{ submit: () => void }>;
+  formRef: React.RefObject<{ submit: () => void; isDirty: boolean } | null>;
   reset: () => void;
 }
 

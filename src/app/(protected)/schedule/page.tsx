@@ -77,7 +77,7 @@ function Schedule(): JSX.Element {
       </Box>
 
       {/* Statistics Cards */}
-      <StatisticsCards tasks={tasks} percentageOfCompletedTasks={percentageOfCompletedTasks} />
+      <StatisticsCards tasks={tasks} />
 
       {/* Filters */}
       <FilterSection filter={filter} setFilter={setFilter} filteredPrograms={filteredPrograms} months={months} />
@@ -122,7 +122,14 @@ function Schedule(): JSX.Element {
             </Typography>
           </Box>
           <Box sx={{ p: 4 }}>
-            <TaskForm createTask={handleScheduledTaskCreation} refetch={refetch} userId={user?.uid} loading={loading} />
+            <TaskForm
+              mode="create"
+              onClose={() => setOpenScheduleTaskForm(false)}
+              onSave={() => {}}
+              createTask={(data) => handleScheduledTaskCreation({ ...data, status: "pending" as const })}
+              userId={user?.uid}
+              loading={loading}
+            />
           </Box>
         </Box>
       </Modal>

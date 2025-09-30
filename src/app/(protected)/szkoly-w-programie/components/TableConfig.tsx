@@ -90,18 +90,18 @@ export const CUSTOM_STYLES = {
 const renderCellContent = (field: string, value: unknown) => {
   switch (field) {
     case "schoolName":
-      return <AvatarWithText text={value} />;
+      return <AvatarWithText text={value as string} />;
     case "programName":
-      return <Tag label={value} />;
+      return <Tag label={value as string} />;
     case "coordinatorName":
-      return <AvatarWithText text={value} avatarSize={28} fontSize="0.7rem" fontWeight="500" />;
+      return <AvatarWithText text={value as string} avatarSize={28} fontSize="0.7rem" fontWeight="500" />;
     case "schoolYear":
-      return <InfoBadge icon={<CalendarToday />} text={value} />;
+      return <InfoBadge icon={<CalendarToday />} text={value as string} />;
     case "studentCount":
       return (
         <InfoBadge
           icon={<Group />}
-          text={value}
+          text={value as string}
           backgroundColor="linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%)"
           borderColor="#4caf50"
           iconColor="#4caf50"
@@ -109,11 +109,11 @@ const renderCellContent = (field: string, value: unknown) => {
         />
       );
     case "notes":
-      return <NotesCell notes={value} />;
+      return <NotesCell notes={value as string} />;
     case "createdAt":
-      return <DateCell date={value} />;
+      return <DateCell date={value as string} />;
     default:
-      return <Typography variant="body2">{value}</Typography>;
+      return <Typography variant="body2">{value as string}</Typography>;
   }
 };
 

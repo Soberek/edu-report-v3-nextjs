@@ -1,6 +1,7 @@
 import type { Contact, Program, School as SchoolType } from "@/types";
 import type { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
-import type { SelectOption, MappedParticipation } from "../types";
+import type { SelectOption } from "../types/shared";
+import type { MappedParticipation } from "../types";
 
 /**
  * Transforms school data to select options
@@ -141,7 +142,7 @@ export const createDefaultFormValues = (): SchoolProgramParticipation => ({
   programId: "",
   coordinatorId: "",
   previousCoordinatorId: "",
-  schoolYear: getCurrentSchoolYear(),
+  schoolYear: getCurrentSchoolYear() as "2024/2025" | "2025/2026" | "2026/2027" | "2027/2028",
   studentCount: 0,
   notes: "",
   createdAt: "",

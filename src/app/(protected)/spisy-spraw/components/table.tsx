@@ -107,13 +107,13 @@ export const ActCaseRecordsTable: React.FC<ActCaseRecordsTableProps> = ({
 
       <Box sx={{ p: 2, background: "transparent" }}>
         <DataTable
-          data={caseRecords}
+          data={caseRecords as unknown as Record<string, unknown>[]}
           columns={columns}
           actions={actions}
           loading={loading}
           height={600}
           pageSizeOptions={[5, 10, 25, 50]}
-          getRowId={(row) => row.id}
+          getRowId={(row) => row.id as string}
           sx={{
             background: "white",
             borderRadius: 2,

@@ -4,6 +4,7 @@ import type { SelectOption } from "./shared";
 
 // Message types
 export interface SnackbarMessage {
+  readonly open: boolean;
   readonly type: "success" | "error" | "info" | "warning";
   readonly message: string;
 }

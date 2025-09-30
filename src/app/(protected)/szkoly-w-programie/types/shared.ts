@@ -6,4 +6,5 @@ export interface SelectOption {
   readonly code?: string;
   readonly firstName?: string;
   readonly lastName?: string;
+  [key: string]: unknown;
 }

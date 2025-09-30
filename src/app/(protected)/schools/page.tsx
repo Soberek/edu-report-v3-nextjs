@@ -2,6 +2,7 @@
 import React from "react";
 import { Container, Box } from "@mui/material";
 import { Add, School, ContentCopy } from "@mui/icons-material";
+import type { School as SchoolType } from "@/types";
 import { PageHeader, PrimaryButton, SecondaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
 import { useSchoolState } from "./hooks/useSchoolState";
 import { useSchoolFilters } from "./hooks/useSchoolFilters";
@@ -30,7 +31,7 @@ export default function Schools(): React.ReactNode {
     toggleForm(true);
   };
 
-  const handleEditSchool = (school: School) => {
+  const handleEditSchool = (school: SchoolType) => {
     setEditSchool(school);
     toggleForm(true);
   };

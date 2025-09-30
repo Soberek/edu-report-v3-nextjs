@@ -8,6 +8,7 @@ import { AutocompleteField, FormField, ActionButton } from "@/components/shared"
 import { transformSchoolsToOptions, transformContactsToOptions, transformProgramsToOptions, transformSchoolYearsToOptions } from "../utils";
 import { SCHOOL_YEAR_OPTIONS, FIELD_LABELS, HELPER_TEXT, BUTTON_LABELS, STYLE_CONSTANTS, PAGE_CONSTANTS, UI_CONSTANTS } from "../constants";
 import type { ParticipationFormProps } from "../types";
+import { Control } from "react-hook-form";
 
 // Custom Paper Form Section Component
 const CustomFormSection: React.FC<{
@@ -56,7 +57,14 @@ const CustomFormSection: React.FC<{
 );
 
 export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, contacts, programs, loading, onSubmit, formMethods }) => {
-  const { control, handleSubmit, reset, isDirty } = formMethods;
+  const { control, handleSubmit, reset, isDirty } = formMethods as {
+    control: Control<SchoolProgramParticipationDTO>;
+    handleSubmit: (
+      onValid: (data: SchoolProgramParticipationDTO) => void | Promise<void>
+    ) => (e?: React.BaseSyntheticEvent) => Promise<void>;
+    reset: () => void;
+    isDirty: boolean;
+  };
 
   // Transform data to options using utility functions
   const schoolsOptions = useMemo(() => transformSchoolsToOptions(schools), [schools]);
