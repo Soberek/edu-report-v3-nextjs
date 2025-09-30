@@ -9,7 +9,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { formatDateForInput } from "@/utils/shared/dayjsUtils";
 import { z } from "zod";
-import { EducationalTask } from "@/types";
+import { EducationalTask, AudienceGroup } from "@/types";
 import { usePrograms } from "@/hooks/useProgram";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
@@ -76,9 +76,27 @@ export const SimplifiedEducationalTaskForm: React.FC<SimplifiedEducationalTaskFo
       activityType: task?.activities?.[0]?.type || "prelekcja",
       activityTitle: task?.activities?.[0]?.title || "",
       activityDescription: task?.activities?.[0]?.description || "",
-      audienceCount: task?.activities?.[0]?.audienceCount || 0,
-      materials: task?.activities?.[0]?.materials?.[0]?.name || "",
-      mediaLink: task?.activities?.[0]?.media?.link || "",
+      audienceCount: (() => {
+        const activity = task?.activities?.[0];
+        if (activity && "audienceGroups" in activity) {
+          return activity.audienceGroups?.reduce((sum: number, group: AudienceGroup) => sum + group.count, 0) || 0;
+        }
+        return 0;
+      })(),
+      materials: (() => {
+        const activity = task?.activities?.[0];
+        if (activity && "materials" in activity) {
+          return activity.materials?.[0]?.name || "";
+        }
+        return "";
+      })(),
+      mediaLink: (() => {
+        const activity = task?.activities?.[0];
+        if (activity && "media" in activity) {
+          return activity.media?.link || "";
+        }
+        return "";
+      })(),
     },
   });
 
