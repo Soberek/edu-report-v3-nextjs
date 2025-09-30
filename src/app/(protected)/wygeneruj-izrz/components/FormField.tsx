@@ -55,7 +55,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
 
   // Handle text field value changes
   const handleTextFieldChange = useCallback(
-    (field: { onChange: (value: any) => void }, type: FormFieldType) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    (field: { onChange: (value: string | number) => void }, type: FormFieldType) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
 
       switch (type) {
@@ -74,7 +74,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
 
   // Handle select field changes
   const handleSelectChange = useCallback(
-    (field: { onChange: (value: any) => void }) => (_: unknown, newValue: SelectOption | null) => {
+    (field: { onChange: (value: string) => void }) => (_: unknown, newValue: SelectOption | null) => {
       field.onChange(newValue?.value || "");
     },
     []
