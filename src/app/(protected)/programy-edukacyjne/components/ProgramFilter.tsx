@@ -1,7 +1,8 @@
 import React from "react";
-import { Box, TextField, FormControl, InputLabel, Select, MenuItem, Stack, Paper } from "@mui/material";
+import { Box, TextField, FormControl, InputLabel, Select, MenuItem, Stack, Paper, SelectChangeEvent } from "@mui/material";
 import { Search, FilterList } from "@mui/icons-material";
 import { ProgramFilter } from "../hooks/useProgramFilters";
+import { Program } from "../types";
 
 interface ProgramFilterProps {
   filter: ProgramFilter;
@@ -14,16 +15,16 @@ export const ProgramFilterComponent: React.FC<ProgramFilterProps> = ({ filter, o
     onFilterChange({ ...filter, search: event.target.value });
   };
 
-  const handleProgramTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onFilterChange({ ...filter, programType: event.target.value });
+  const handleProgramTypeChange = (event: SelectChangeEvent) => {
+    onFilterChange({ ...filter, programType: event.target.value as "all" | "programowy" | "nieprogramowy" });
   };
 
-  const handleSortByChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onFilterChange({ ...filter, sortBy: event.target.value });
+  const handleSortByChange = (event: SelectChangeEvent) => {
+    onFilterChange({ ...filter, sortBy: event.target.value as keyof Program });
   };
 
-  const handleSortOrderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onFilterChange({ ...filter, sortOrder: event.target.value });
+  const handleSortOrderChange = (event: SelectChangeEvent) => {
+    onFilterChange({ ...filter, sortOrder: event.target.value as "asc" | "desc" });
   };
 
   return (

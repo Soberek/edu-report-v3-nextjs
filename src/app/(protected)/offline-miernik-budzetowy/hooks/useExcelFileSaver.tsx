@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import type { ProgramsData } from "./processExcelData";
+import type { ProgramsData } from "../types";
 
 export default function saveExcelToFile(data: ProgramsData) {
   if (!data || Object.keys(data).length === 0) {
@@ -16,12 +16,7 @@ export default function saveExcelToFile(data: ProgramsData) {
 
       Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
         const { people, actionNumber: action_number } = actionData;
-        dataArray.push([
-          `${idx}.${++actionIdx}`,
-          actionName,
-          people,
-          action_number,
-        ]);
+        dataArray.push([`${idx}.${++actionIdx}`, actionName, people, action_number]);
       });
     });
   });

@@ -28,8 +28,8 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ data, show }) 
         mb: UI_CONFIG.SECTION_SPACING,
       }}
     >
-      <StatsCard icon="📊" label="Ogólna liczba działań" value={data.allActions} color="primary" testId="total-actions-card" />
-      <StatsCard icon="👥" label="Ogólna liczba odbiorców" value={data.allPeople} color="success" testId="total-people-card" />
+      <StatsCard icon="📊" label="Ogólna liczba działań" value={data.allActions} color="primary" />
+      <StatsCard icon="👥" label="Ogólna liczba odbiorców" value={data.allPeople} color="success" />
     </Box>
   );
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Button, Chip } from "@mui/material";
 import { MdOutlineDownload, MdOutlineUpload, MdInsertDriveFile } from "react-icons/md";
-import type { ProgramsData } from "./processExcelData";
+import type { ProgramsData } from "../../types";
 
 interface Props {
   fileName: string;

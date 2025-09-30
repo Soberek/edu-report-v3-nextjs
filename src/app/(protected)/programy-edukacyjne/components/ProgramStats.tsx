@@ -17,34 +17,16 @@ export const ProgramStats: React.FC<ProgramStatsProps> = ({ totalPrograms, progr
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={4}>
-          <StatsCard
-            title="Łączna liczba programów"
-            value={totalPrograms}
-            icon={<School />}
-            color="primary"
-            gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-          />
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <StatsCard title="Łączna liczba programów" value={totalPrograms} icon={<School />} color="primary" />
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <StatsCard
-            title="Programy programowe"
-            value={programowyCount}
-            icon={<Assignment />}
-            color="secondary"
-            gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
-          />
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <StatsCard title="Programy programowe" value={programowyCount} icon={<Assignment />} color="secondary" />
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <StatsCard
-            title="Programy nieprogramowe"
-            value={nieprogramowyCount}
-            icon={<AssignmentInd />}
-            color="info"
-            gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
-          />
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <StatsCard title="Programy nieprogramowe" value={nieprogramowyCount} icon={<AssignmentInd />} color="info" />
         </Grid>
       </Grid>
     </Box>

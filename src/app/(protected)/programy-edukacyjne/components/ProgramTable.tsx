@@ -172,12 +172,12 @@ export const ProgramTable: React.FC<ProgramTableProps> = ({ programs, onEdit, on
 
   return (
     <DataTable
-      data={programs}
+      data={programs as unknown as Record<string, unknown>[]}
       columns={columns}
       actions={actions}
       loading={loading}
       height={600}
-      getRowId={(row) => row.id}
+      getRowId={(row) => row.id as string}
       sx={{
         "& .MuiDataGrid-root": {
           border: "none",

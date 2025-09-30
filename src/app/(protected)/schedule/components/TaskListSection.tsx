@@ -184,7 +184,6 @@ export const TaskListSection: React.FC<TaskListSectionProps> = ({
         onSave={handleSaveTask}
         userId={userId}
         createTask={() => {}}
-        refetch={async () => {}}
         loading={false}
       />
     </Paper>

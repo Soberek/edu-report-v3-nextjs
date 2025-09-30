@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import type { Month } from "./month-buttons";
+import type { Month } from "../types";
 
 /**
  * Custom hook for managing month selection state in Excel report generator.

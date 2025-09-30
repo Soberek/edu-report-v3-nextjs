@@ -1,7 +1,7 @@
 import { DataGrid } from "@mui/x-data-grid";
 import type { GridColDef } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
-import type { ProgramsData } from "./processExcelData";
+import type { ProgramsData } from "../../types";
 
 interface TableRow {
   id: string;
