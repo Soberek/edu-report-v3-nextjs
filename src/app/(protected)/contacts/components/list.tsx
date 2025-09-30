@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { Delete, Edit, Email, Phone, Person, ViewList, ViewModule } from "@mui/icons-material";
 import type { Contact } from "@/types";
+import type { ContactCreateDTO } from "@/hooks/useContact";
 import EditDialog from "./edit-dialog";
 
 interface Props {
@@ -30,7 +31,7 @@ interface Props {
   loading: boolean;
   error: string | null;
   handleContactDelete: (id: string) => void;
-  handleContactUpdate: (id: string, data: Partial<Contact>) => void;
+  handleContactUpdate: (id: string, data: ContactCreateDTO) => void;
 }
 
 export default function ContactList({ contacts, loading, error, handleContactDelete, handleContactUpdate }: Props) {
@@ -70,7 +71,7 @@ export default function ContactList({ contacts, loading, error, handleContactDel
     setEditDialogOpen(true);
   };
 
-  const handleSaveContact = (id: string, data: Partial<Contact>) => {
+  const handleSaveContact = (id: string, data: ContactCreateDTO) => {
     handleContactUpdate(id, data);
     setEditDialogOpen(false);
     setEditingContact(null);

@@ -58,7 +58,7 @@ export default function ContactStats({ contacts, loading }: ContactStatsProps) {
     return (
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {[1, 2, 3, 4].map((i) => (
-          <Grid item xs={12} sm={6} md={3} key={i}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
             <Card
               sx={{
                 borderRadius: 3,
@@ -108,7 +108,7 @@ export default function ContactStats({ contacts, loading }: ContactStatsProps) {
   return (
     <Grid container spacing={3} sx={{ mb: 4 }}>
       {statCards.map((stat, index) => (
-        <Grid item xs={12} sm={6} md={3} key={index}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
           <Card
             sx={{
               borderRadius: 3,
