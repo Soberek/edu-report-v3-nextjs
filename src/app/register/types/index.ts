@@ -2,10 +2,7 @@
  * Types and interfaces for the registration module
  */
 
-export interface RegisterFormData {
-  readonly email: string;
-  readonly password: string;
-}
+// RegisterFormData is exported from utils/validationUtils.ts
 
 export interface RegisterFormErrors {
   readonly email?: string;
@@ -23,7 +20,7 @@ export interface RegisterPageProps {
 }
 
 export interface UseRegisterResult {
-  readonly register: (data: RegisterFormData) => Promise<void>;
+  readonly register: (data: import("../utils/validationUtils").RegisterFormData) => Promise<void>;
   readonly isLoading: boolean;
   readonly error: string | null;
   readonly clearError: () => void;
