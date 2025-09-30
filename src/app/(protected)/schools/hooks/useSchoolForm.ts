@@ -10,6 +10,7 @@ import {
   type EditSchoolFormData,
 } from "../schemas/schoolSchemas";
 import type { UseSchoolFormProps } from "../types";
+import { SchoolTypes } from "@/types";
 
 export const useSchoolForm = ({ mode, school, onSubmit }: UseSchoolFormProps) => {
   const schema = mode === "create" ? createSchoolSchema : editSchoolSchema;
@@ -50,7 +51,7 @@ export const useSchoolForm = ({ mode, school, onSubmit }: UseSchoolFormProps) =>
   const handleTypeChange = (typeLabel: string, checked: boolean) => {
     const currentTypes = watch("type") || [];
     if (checked) {
-      setValue("type", [...currentTypes, typeLabel], { shouldValidate: true });
+      setValue("type", [...currentTypes, typeLabel as SchoolTypes], { shouldValidate: true });
     } else {
       setValue(
         "type",
