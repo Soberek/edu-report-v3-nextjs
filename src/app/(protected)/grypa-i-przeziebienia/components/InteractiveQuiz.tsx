@@ -1,469 +1,438 @@
+"use client";
+
 import React, { useState, useCallback, useMemo } from "react";
 import {
   Box,
-  Typography,
   Card,
   CardContent,
+  Typography,
   Button,
-  RadioGroup,
-  FormControlLabel,
   Radio,
+  RadioGroup,
   FormControl,
-  Alert,
-  AlertTitle,
-  Chip,
+  FormControlLabel,
+  FormLabel,
   LinearProgress,
-  Grid,
+  Alert,
+  Chip,
+  Stack,
+  Paper,
+  Divider,
+  IconButton,
 } from "@mui/material";
-import { CheckCircle, Cancel, Quiz, EmojiEvents } from "@mui/icons-material";
-import { QUIZ_CONSTANTS } from "../constants";
-import type { QuizQuestion, QuizState, QuizResult } from "../types";
+import { CheckCircle, Cancel, Refresh, Quiz, EmojiEvents, TrendingUp } from "@mui/icons-material";
 
-interface InteractiveQuizProps {
-  readonly title?: string;
-  readonly showTitle?: boolean;
+interface QuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+  category: "symptoms" | "treatment" | "prevention" | "differences" | "complications";
 }
 
-export const InteractiveQuiz: React.FC<InteractiveQuizProps> = ({ title = "🧠 Quiz sprawdzający wiedzę", showTitle = true }) => {
+const QUIZ_QUESTIONS: QuizQuestion[] = [
+  {
+    id: 1,
+    question: "Który objaw jest najbardziej charakterystyczny dla grypy?",
+    options: ["Stopniowy rozwój objawów", "Nagły początek z wysoką gorączką", "Głównie katar i kichanie", "Łagodne osłabienie"],
+    correctAnswer: 1,
+    explanation: "Grypa charakteryzuje się nagłym początkiem choroby z wysoką gorączką (39-40°C), co odróżnia ją od przeziębienia.",
+    category: "symptoms",
+  },
+  {
+    id: 2,
+    question: "Jak długo trwa zwykle przeziębienie?",
+    options: ["2-3 dni", "7-10 dni", "2-3 tygodnie", "1 miesiąc"],
+    correctAnswer: 1,
+    explanation: "Przeziębienie trwa zwykle 7-10 dni, podczas gdy grypa może trwać 2-7 dni plus tydzień osłabienia.",
+    category: "differences",
+  },
+  {
+    id: 3,
+    question: "Która droga zakażenia jest najczęstsza dla wirusów grypy?",
+    options: ["Przez skórę", "Drogą kropelkową", "Przez pokarm", "Przez wodę"],
+    correctAnswer: 1,
+    explanation: "Wirusy grypy przenoszą się głównie drogą kropelkową - przez kichanie, kaszel i rozmowę.",
+    category: "prevention",
+  },
+  {
+    id: 4,
+    question: "Kiedy należy udać się do lekarza z objawami grypy?",
+    options: [
+      "Zawsze przy pierwszym objawie",
+      "Gdy gorączka przekracza 40°C i utrzymuje się >3 dni",
+      "Tylko u osób starszych",
+      "Nigdy, grypa przechodzi sama",
+    ],
+    correctAnswer: 1,
+    explanation:
+      "Do lekarza należy udać się gdy gorączka przekracza 40°C i utrzymuje się dłużej niż 3 dni, lub przy innych objawach alarmowych.",
+    category: "treatment",
+  },
+  {
+    id: 5,
+    question: "Które powikłanie jest najgroźniejsze w przypadku grypy?",
+    options: ["Katar", "Zapalenie płuc", "Ból gardła", "Kichanie"],
+    correctAnswer: 1,
+    explanation: "Zapalenie płuc to jedno z najgroźniejszych powikłań grypy, szczególnie u osób z grup ryzyka.",
+    category: "complications",
+  },
+  {
+    id: 6,
+    question: "Jaka jest najskuteczniejsza metoda profilaktyki grypy?",
+    options: ["Witamina C", "Szczepienia przeciw grypie", "Czosnek", "Echinacea"],
+    correctAnswer: 1,
+    explanation: "Szczepienia przeciw grypie to najskuteczniejsza metoda profilaktyki, zmniejszająca ryzyko zachorowania o 40-60%.",
+    category: "prevention",
+  },
+  {
+    id: 7,
+    question: "Który objaw NIE jest typowy dla przeziębienia?",
+    options: ["Katar", "Kichanie", "Wysoka gorączka (39-40°C)", "Ból gardła"],
+    correctAnswer: 2,
+    explanation:
+      "Wysoka gorączka (39-40°C) jest charakterystyczna dla grypy, nie dla przeziębienia, które ma łagodną gorączkę poniżej 38°C.",
+    category: "symptoms",
+  },
+  {
+    id: 8,
+    question: "Jak często należy myć ręce, aby zmniejszyć ryzyko zakażenia?",
+    options: ["Raz dziennie", "Tylko po wyjściu z toalety", "Często, mydłem przez min. 20 sekund", "Tylko gdy są brudne"],
+    correctAnswer: 2,
+    explanation:
+      "Ręce należy myć często, mydłem przez minimum 20 sekund, szczególnie po kontakcie z chorymi lub zakażonymi powierzchniami.",
+    category: "prevention",
+  },
+  {
+    id: 9,
+    question: "Które wirusy najczęściej wywołują przeziębienie?",
+    options: ["Wirusy grypy", "Rinowirusy", "Adenowirusy", "Wirusy opryszczki"],
+    correctAnswer: 1,
+    explanation: "Rinowirusy odpowiadają za około 40% przypadków przeziębienia, podczas gdy wirusy grypy wywołują grypę.",
+    category: "differences",
+  },
+  {
+    id: 10,
+    question: "Jak długo wirus grypy może przetrwać na powierzchniach?",
+    options: ["Kilka minut", "Kilka godzin", "Kilka dni", "Kilka tygodni"],
+    correctAnswer: 1,
+    explanation: "Wirus grypy może przetrwać na powierzchniach przez kilka godzin, dlatego ważne jest regularne czyszczenie powierzchni.",
+    category: "prevention",
+  },
+  {
+    id: 11,
+    question: "Który lek jest najskuteczniejszy w leczeniu grypy?",
+    options: ["Antybiotyki", "Leki przeciwwirusowe", "Witamina C", "Paracetamol"],
+    correctAnswer: 1,
+    explanation:
+      "Leki przeciwwirusowe (jak oseltamiwir) są najskuteczniejsze w leczeniu grypy, ale działają tylko w pierwszych 48 godzinach.",
+    category: "treatment",
+  },
+  {
+    id: 12,
+    question: "Która grupa osób jest najbardziej narażona na powikłania grypy?",
+    options: ["Młodzi dorośli", "Seniorzy i osoby przewlekle chore", "Dzieci w wieku szkolnym", "Sportowcy"],
+    correctAnswer: 1,
+    explanation: "Seniorzy, osoby przewlekle chore, kobiety w ciąży i małe dzieci są najbardziej narażone na powikłania grypy.",
+    category: "complications",
+  },
+  {
+    id: 13,
+    question: "Czy antybiotyki pomagają w leczeniu grypy?",
+    options: ["Tak, zawsze", "Nie, grypa to infekcja wirusowa", "Tylko w ciężkich przypadkach", "Tylko u dzieci"],
+    correctAnswer: 1,
+    explanation: "Antybiotyki nie pomagają w leczeniu grypy, ponieważ to infekcja wirusowa. Antybiotyki działają tylko na bakterie.",
+    category: "treatment",
+  },
+  {
+    id: 14,
+    question: "Który objaw jest charakterystyczny dla przeziębienia, ale rzadki w grypie?",
+    options: ["Gorączka", "Ból głowy", "Katar i kichanie", "Bóle mięśni"],
+    correctAnswer: 2,
+    explanation: "Katar i kichanie są bardzo charakterystyczne dla przeziębienia, podczas gdy w grypie występują rzadziej.",
+    category: "symptoms",
+  },
+  {
+    id: 15,
+    question: "Jak często należy szczepić się przeciw grypie?",
+    options: ["Raz w życiu", "Co 2 lata", "Co roku", "Tylko w czasie pandemii"],
+    correctAnswer: 2,
+    explanation:
+      "Szczepienia przeciw grypie należy powtarzać co roku, ponieważ wirusy grypy mutują i skład szczepionki jest aktualizowany.",
+    category: "prevention",
+  },
+  {
+    id: 16,
+    question: "Które powikłanie może wystąpić po grypie u dzieci?",
+    options: ["Zapalenie wyrostka", "Zespół Reye'a", "Zapalenie stawów", "Cukrzyca"],
+    correctAnswer: 1,
+    explanation:
+      "Zespół Reye'a to rzadkie, ale groźne powikłanie, które może wystąpić u dzieci po grypie, szczególnie przy podawaniu aspiryny.",
+    category: "complications",
+  },
+  {
+    id: 17,
+    question: "Która temperatura gorączki jest typowa dla grypy?",
+    options: ["37-38°C", "38-39°C", "39-40°C", "Powyżej 40°C"],
+    correctAnswer: 2,
+    explanation: "Grypa charakteryzuje się wysoką gorączką 39-40°C, podczas gdy przeziębienie ma łagodną gorączkę poniżej 38°C.",
+    category: "symptoms",
+  },
+  {
+    id: 18,
+    question: "Czy można zachorować na grypę mimo szczepienia?",
+    options: [
+      "Nie, szczepienie daje 100% ochrony",
+      "Tak, ale objawy będą łagodniejsze",
+      "Tylko u osób starszych",
+      "Tylko w pierwszym roku",
+    ],
+    correctAnswer: 1,
+    explanation:
+      "Szczepienie nie daje 100% ochrony, ale znacznie zmniejsza ryzyko zachorowania i łagodzi objawy jeśli dojdzie do infekcji.",
+    category: "prevention",
+  },
+  {
+    id: 19,
+    question: "Który domowy sposób może pomóc w leczeniu przeziębienia?",
+    options: ["Aspiryna u dzieci", "Miód z mlekiem", "Alkohol", "Zimne kąpiele"],
+    correctAnswer: 1,
+    explanation: "Miód z mlekiem to tradycyjny, bezpieczny sposób łagodzenia objawów przeziębienia, szczególnie kaszlu.",
+    category: "treatment",
+  },
+  {
+    id: 20,
+    question: "Kiedy szczyt sezonu grypowego w Polsce?",
+    options: ["Lato (czerwiec-sierpień)", "Jesień (wrzesień-listopad)", "Zima (grudzień-luty)", "Wiosna (marzec-maj)"],
+    correctAnswer: 2,
+    explanation: "Szczyt sezonu grypowego w Polsce przypada na zimę (grudzień-luty), dlatego szczepienia zaleca się jesienią.",
+    category: "prevention",
+  },
+];
+
+interface QuizState {
+  currentQuestion: number;
+  answers: (number | null)[];
+  showResults: boolean;
+  isCompleted: boolean;
+}
+
+export const InteractiveQuiz: React.FC = () => {
   const [quizState, setQuizState] = useState<QuizState>({
     currentQuestion: 0,
-    selectedAnswers: [],
+    answers: new Array(QUIZ_QUESTIONS.length).fill(null),
     showResults: false,
-    quizCompleted: false,
+    isCompleted: false,
   });
 
-  const quizQuestions = QUIZ_CONSTANTS.QUESTIONS;
+  const progress = useMemo(() => ((quizState.currentQuestion + 1) / QUIZ_QUESTIONS.length) * 100, [quizState.currentQuestion]);
+
+  const score = useMemo(() => {
+    if (!quizState.showResults) return 0;
+    return quizState.answers.reduce((acc, answer, index) => {
+      return acc + (answer === QUIZ_QUESTIONS[index].correctAnswer ? 1 : 0);
+    }, 0);
+  }, [quizState.answers, quizState.showResults]);
+
+  const percentage = useMemo(() => Math.round((score / QUIZ_QUESTIONS.length) * 100), [score]);
 
   const handleAnswerSelect = useCallback((answerIndex: number) => {
+    setQuizState((prev) => ({
+      ...prev,
+      answers: prev.answers.map((answer, index) => (index === prev.currentQuestion ? answerIndex : answer)),
+    }));
+  }, []);
+
+  const handleNext = useCallback(() => {
     setQuizState((prev) => {
-      const newAnswers = [...prev.selectedAnswers];
-      newAnswers[prev.currentQuestion] = answerIndex;
-      return {
-        ...prev,
-        selectedAnswers: newAnswers,
-      };
+      if (prev.currentQuestion < QUIZ_QUESTIONS.length - 1) {
+        return { ...prev, currentQuestion: prev.currentQuestion + 1 };
+      } else {
+        return { ...prev, showResults: true, isCompleted: true };
+      }
     });
   }, []);
 
-  const handleNextQuestion = useCallback(() => {
-    setQuizState((prev) => {
-      if (prev.currentQuestion < quizQuestions.length - 1) {
-        return { ...prev, currentQuestion: prev.currentQuestion + 1 };
-      } else {
-        return { ...prev, showResults: true, quizCompleted: true };
-      }
-    });
-  }, [quizQuestions.length]);
-
-  const handlePreviousQuestion = useCallback(() => {
+  const handlePrevious = useCallback(() => {
     setQuizState((prev) => ({
       ...prev,
       currentQuestion: Math.max(0, prev.currentQuestion - 1),
     }));
   }, []);
 
-  const handleRestartQuiz = useCallback(() => {
+  const handleRestart = useCallback(() => {
     setQuizState({
       currentQuestion: 0,
-      selectedAnswers: [],
+      answers: new Array(QUIZ_QUESTIONS.length).fill(null),
       showResults: false,
-      quizCompleted: false,
+      isCompleted: false,
     });
   }, []);
 
-  const quizResult = useMemo((): QuizResult => {
-    const correctAnswers: number[] = [];
-    const incorrectAnswers: number[] = [];
+  const getCategoryColor = useCallback((category: QuizQuestion["category"]) => {
+    const colors = {
+      symptoms: "error",
+      treatment: "success",
+      prevention: "info",
+      differences: "warning",
+      complications: "error",
+    } as const;
+    return colors[category] || "default";
+  }, []);
 
-    quizQuestions.forEach((question, index) => {
-      if (quizState.selectedAnswers[index] === question.correctAnswer) {
-        correctAnswers.push(index);
-      } else {
-        incorrectAnswers.push(index);
-      }
-    });
-
-    const score = correctAnswers.length;
-    const total = quizQuestions.length;
-    const percentage = Math.round((score / total) * 100);
-
-    return {
-      score,
-      total,
-      percentage,
-      correctAnswers,
-      incorrectAnswers,
+  const getCategoryLabel = useCallback((category: QuizQuestion["category"]) => {
+    const labels = {
+      symptoms: "Objawy",
+      treatment: "Leczenie",
+      prevention: "Profilaktyka",
+      differences: "Różnice",
+      complications: "Powikłania",
     };
-  }, [quizQuestions, quizState.selectedAnswers]);
-
-  const getScoreColor = useCallback((percentage: number) => {
-    if (percentage >= QUIZ_CONSTANTS.SCORING.EXCELLENT) return "success";
-    if (percentage >= QUIZ_CONSTANTS.SCORING.GOOD) return "warning";
-    return "error";
+    return labels[category] || category;
   }, []);
 
   const getScoreMessage = useCallback((percentage: number) => {
-    if (percentage >= QUIZ_CONSTANTS.SCORING.EXCELLENT) return QUIZ_CONSTANTS.MESSAGES.EXCELLENT;
-    if (percentage >= QUIZ_CONSTANTS.SCORING.GOOD) return QUIZ_CONSTANTS.MESSAGES.GOOD;
-    return QUIZ_CONSTANTS.MESSAGES.NEEDS_IMPROVEMENT;
+    if (percentage >= 90) return { message: "Doskonały wynik! 🎉", color: "success" as const };
+    if (percentage >= 70) return { message: "Bardzo dobry wynik! 👏", color: "info" as const };
+    if (percentage >= 50) return { message: "Dobry wynik! 👍", color: "warning" as const };
+    return { message: "Spróbuj ponownie! 💪", color: "error" as const };
   }, []);
 
-  const currentQuestionData = quizQuestions[quizState.currentQuestion];
-  const progress = ((quizState.currentQuestion + 1) / quizQuestions.length) * 100;
+  const currentQuestion = QUIZ_QUESTIONS[quizState.currentQuestion];
+  const currentAnswer = quizState.answers[quizState.currentQuestion];
+  const scoreMessage = getScoreMessage(percentage);
 
   if (quizState.showResults) {
-    const scoreColor = getScoreColor(quizResult.percentage);
-    const scoreMessage = getScoreMessage(quizResult.percentage);
-
     return (
-      <Box sx={{ mb: 4 }}>
-        {showTitle && (
-          <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600, color: "primary.main" }}>
-            {title}
-          </Typography>
-        )}
-
-        <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: 6,
-            background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-            border: "2px solid",
-            borderColor: `${scoreColor}.main`,
-          }}
-        >
-          <CardContent sx={{ textAlign: "center", p: 6 }}>
-            <Box
-              sx={{
-                width: 120,
-                height: 120,
-                borderRadius: "50%",
-                background: `linear-gradient(135deg, ${
-                  scoreColor === "success" ? "#4caf50" : scoreColor === "warning" ? "#ff9800" : "#f44336"
-                } 0%, ${scoreColor === "success" ? "#66bb6a" : scoreColor === "warning" ? "#ffb74d" : "#ef5350"} 100%)`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                mx: "auto",
-                mb: 3,
-                boxShadow: 4,
-              }}
-            >
-              <EmojiEvents sx={{ fontSize: 60, color: "white" }} />
+      <Box sx={{ maxWidth: 800, mx: "auto" }}>
+        <Card>
+          <CardContent sx={{ textAlign: "center", p: 4 }}>
+            <Box sx={{ mb: 3 }}>
+              <EmojiEvents sx={{ fontSize: 64, color: "primary.main", mb: 2 }} />
+              <Typography variant="h4" gutterBottom>
+                Quiz zakończony!
+              </Typography>
+              <Typography variant="h2" color="primary" fontWeight="bold">
+                {score}/{QUIZ_QUESTIONS.length}
+              </Typography>
+              <Typography variant="h6" color="text.secondary">
+                ({percentage}%)
+              </Typography>
             </Box>
 
-            <Typography variant="h3" gutterBottom sx={{ fontWeight: 800, color: `${scoreColor}.main`, mb: 2 }}>
-              {scoreMessage}
+            <Alert severity={scoreMessage.color} sx={{ mb: 3 }}>
+              <Typography variant="h6">{scoreMessage.message}</Typography>
+            </Alert>
+
+            <Button variant="contained" size="large" startIcon={<Refresh />} onClick={handleRestart} sx={{ mb: 3 }}>
+              Rozwiąż ponownie
+            </Button>
+
+            <Divider sx={{ my: 3 }} />
+
+            <Typography variant="h6" gutterBottom>
+              Szczegółowe wyniki:
             </Typography>
 
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, color: "text.secondary", mb: 3 }}>
-              Twój wynik: {quizResult.score}/{quizResult.total} ({quizResult.percentage}%)
-            </Typography>
+            <Stack spacing={2}>
+              {QUIZ_QUESTIONS.map((question, index) => {
+                const userAnswer = quizState.answers[index];
+                const isCorrect = userAnswer === question.correctAnswer;
 
-            <Chip
-              label={`${quizResult.score}/${quizResult.total} poprawnych odpowiedzi`}
-              color={scoreColor}
-              size="medium"
-              sx={{
-                mb: 4,
-                fontSize: "1.2rem",
-                py: 3,
-                px: 2,
-                fontWeight: 700,
-                height: "auto",
-              }}
-            />
-
-            <Box sx={{ mt: 4 }}>
-              <Button
-                variant="contained"
-                size="large"
-                onClick={handleRestartQuiz}
-                sx={{
-                  px: 6,
-                  py: 2,
-                  borderRadius: 3,
-                  fontWeight: 700,
-                  fontSize: "1.1rem",
-                  background: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
-                  boxShadow: 4,
-                  "&:hover": {
-                    background: "linear-gradient(135deg, #1565c0 0%, #1976d2 100%)",
-                    boxShadow: 6,
-                    transform: "translateY(-2px)",
-                  },
-                }}
-              >
-                🔄 Rozwiąż quiz ponownie
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
-
-        <Grid container spacing={3} sx={{ mt: 4 }}>
-          {quizQuestions.map((question, index) => {
-            const userAnswer = quizState.selectedAnswers[index];
-            const isCorrect = userAnswer === question.correctAnswer;
-            const correctAnswer = question.options[question.correctAnswer];
-
-            return (
-              <Grid size={{ xs: 12, md: 6 }} key={question.id}>
-                <Card
-                  sx={{
-                    border: `3px solid`,
-                    borderColor: isCorrect ? "success.main" : "error.main",
-                    borderRadius: 3,
-                    boxShadow: 4,
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: 6,
-                    },
-                    background: isCorrect
-                      ? "linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%)"
-                      : "linear-gradient(135deg, #ffebee 0%, #fce4ec 100%)",
-                  }}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                      <Box
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: "50%",
-                          backgroundColor: isCorrect ? "success.main" : "error.main",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          mr: 2,
-                        }}
-                      >
-                        {isCorrect ? (
-                          <CheckCircle sx={{ color: "white", fontSize: 24 }} />
-                        ) : (
-                          <Cancel sx={{ color: "white", fontSize: 24 }} />
-                        )}
-                      </Box>
-                      <Typography variant="h6" sx={{ fontWeight: 700, color: isCorrect ? "success.dark" : "error.dark" }}>
+                return (
+                  <Paper key={question.id} sx={{ p: 2, textAlign: "left" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                      {isCorrect ? <CheckCircle color="success" /> : <Cancel color="error" />}
+                      <Typography variant="subtitle1" fontWeight="bold">
                         Pytanie {index + 1}
                       </Typography>
+                      <Chip label={getCategoryLabel(question.category)} color={getCategoryColor(question.category)} size="small" />
                     </Box>
 
-                    <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, lineHeight: 1.4, color: "primary.dark" }}>
+                    <Typography variant="body2" sx={{ mb: 1 }}>
                       {question.question}
                     </Typography>
 
-                    <Box sx={{ mb: 2, p: 2, backgroundColor: "white", borderRadius: 2, border: "1px solid", borderColor: "grey.300" }}>
-                      <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-                        <strong>Twoja odpowiedź:</strong>
-                      </Typography>
-                      <Typography variant="body1" sx={{ color: isCorrect ? "success.dark" : "error.dark", fontWeight: 500 }}>
-                        {userAnswer !== undefined ? question.options[userAnswer] : "Brak odpowiedzi"}
-                      </Typography>
-                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Twoja odpowiedź:</strong> {userAnswer !== null ? question.options[userAnswer] : "Brak odpowiedzi"}
+                    </Typography>
 
-                    <Box sx={{ mb: 2, p: 2, backgroundColor: "success.light", borderRadius: 2, opacity: 0.9 }}>
-                      <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-                        <strong>Poprawna odpowiedź:</strong>
+                    {!isCorrect && (
+                      <Typography variant="body2" color="success.main">
+                        <strong>Poprawna odpowiedź:</strong> {question.options[question.correctAnswer]}
                       </Typography>
-                      <Typography variant="body1" sx={{ color: "success.dark", fontWeight: 500 }}>
-                        {correctAnswer}
-                      </Typography>
-                    </Box>
+                    )}
 
-                    <Box sx={{ p: 2, backgroundColor: "info.light", borderRadius: 2, opacity: 0.9 }}>
-                      <Typography variant="body2" sx={{ mb: 1, fontWeight: 600, color: "info.dark" }}>
-                        <strong>Wyjaśnienie:</strong>
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: "info.dark", lineHeight: 1.5 }}>
-                        {question.explanation}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            );
-          })}
-        </Grid>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontStyle: "italic" }}>
+                      {question.explanation}
+                    </Typography>
+                  </Paper>
+                );
+              })}
+            </Stack>
+          </CardContent>
+        </Card>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ mb: 4 }}>
-      {showTitle && (
-        <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600, color: "primary.main" }}>
-          {title}
-        </Typography>
-      )}
-
-      <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
-        <AlertTitle>Sprawdź swoją wiedzę!</AlertTitle>
-        Rozwiąż quiz, aby sprawdzić, ile wiesz o infekcjach wirusowych. Każde pytanie ma tylko jedną poprawną odpowiedź.
-      </Alert>
-
-      <Card
-        sx={{
-          borderRadius: 3,
-          boxShadow: 4,
-          background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-          border: "1px solid",
-          borderColor: "primary.light",
-        }}
-      >
-        <CardContent sx={{ p: 4 }}>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Quiz sx={{ mr: 2, color: "primary.main", fontSize: 28 }} />
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "primary.main" }}>
-                Pytanie {quizState.currentQuestion + 1} z {quizQuestions.length}
+    <Box sx={{ maxWidth: 800, mx: "auto" }}>
+      <Card>
+        <CardContent>
+          {/* Header */}
+          <Box sx={{ mb: 3 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+              <Quiz color="primary" />
+              <Typography variant="h5" fontWeight="bold">
+                Quiz: Grypa vs Przeziębienie
               </Typography>
             </Box>
-            <Chip label={`${Math.round(progress)}%`} color="primary" variant="outlined" sx={{ fontWeight: 600 }} />
+
+            <LinearProgress variant="determinate" value={progress} sx={{ height: 8, borderRadius: 4, mb: 1 }} />
+
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Typography variant="body2" color="text.secondary">
+                Pytanie {quizState.currentQuestion + 1} z {QUIZ_QUESTIONS.length}
+              </Typography>
+              <Chip label={getCategoryLabel(currentQuestion.category)} color={getCategoryColor(currentQuestion.category)} size="small" />
+            </Box>
           </Box>
 
-          <LinearProgress
-            variant="determinate"
-            value={progress}
-            sx={{
-              mb: 4,
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: "rgba(0,0,0,0.1)",
-              "& .MuiLinearProgress-bar": {
-                borderRadius: 6,
-                background: "linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)",
-              },
-            }}
-          />
+          {/* Question */}
+          <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+            {currentQuestion.question}
+          </Typography>
 
-          <Card
-            sx={{
-              mb: 4,
-              p: 3,
-              borderRadius: 2,
-              backgroundColor: "white",
-              boxShadow: 2,
-              border: "2px solid",
-              borderColor: "primary.light",
-            }}
-          >
-            <Typography
-              variant="h5"
-              sx={{
-                mb: 3,
-                fontWeight: 700,
-                lineHeight: 1.4,
-                color: "primary.dark",
-                textAlign: "center",
-              }}
-            >
-              {currentQuestionData.question}
-            </Typography>
-          </Card>
-
-          <FormControl component="fieldset" sx={{ width: "100%", mb: 4 }}>
-            <RadioGroup
-              value={quizState.selectedAnswers[quizState.currentQuestion] ?? ""}
-              onChange={(e) => handleAnswerSelect(parseInt(e.target.value))}
-            >
-              {currentQuestionData.options.map((option, index) => (
-                <Card
+          {/* Options */}
+          <FormControl component="fieldset" sx={{ width: "100%", mb: 3 }}>
+            <RadioGroup value={currentAnswer ?? ""} onChange={(e) => handleAnswerSelect(parseInt(e.target.value))}>
+              {currentQuestion.options.map((option, index) => (
+                <FormControlLabel
                   key={index}
+                  value={index}
+                  control={<Radio />}
+                  label={option}
                   sx={{
-                    mb: 2,
-                    borderRadius: 2,
-                    border: "2px solid",
-                    borderColor: quizState.selectedAnswers[quizState.currentQuestion] === index ? "primary.main" : "grey.300",
-                    backgroundColor: quizState.selectedAnswers[quizState.currentQuestion] === index ? "primary.light" : "white",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      borderColor: "primary.main",
-                      backgroundColor: quizState.selectedAnswers[quizState.currentQuestion] === index ? "primary.light" : "primary.light",
-                      opacity: 0.8,
-                      transform: "translateY(-2px)",
-                      boxShadow: 3,
-                    },
+                    mb: 1,
+                    p: 1,
+                    borderRadius: 1,
+                    "&:hover": { backgroundColor: "action.hover" },
                   }}
-                >
-                  <FormControlLabel
-                    value={index}
-                    control={
-                      <Radio
-                        sx={{
-                          color: "primary.main",
-                          "&.Mui-checked": {
-                            color: "primary.main",
-                          },
-                        }}
-                      />
-                    }
-                    label={
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: quizState.selectedAnswers[quizState.currentQuestion] === index ? 600 : 500,
-                          color: quizState.selectedAnswers[quizState.currentQuestion] === index ? "primary.dark" : "text.primary",
-                          p: 1,
-                        }}
-                      >
-                        {option}
-                      </Typography>
-                    }
-                    sx={{
-                      width: "100%",
-                      m: 0,
-                      p: 2,
-                    }}
-                  />
-                </Card>
+                />
               ))}
             </RadioGroup>
           </FormControl>
 
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-            <Button
-              variant="outlined"
-              onClick={handlePreviousQuestion}
-              disabled={quizState.currentQuestion === 0}
-              sx={{
-                px: 4,
-                py: 1.5,
-                borderRadius: 2,
-                fontWeight: 600,
-                fontSize: "1rem",
-                borderWidth: 2,
-                "&:hover": {
-                  borderWidth: 2,
-                },
-              }}
-            >
-              ← Poprzednie
+          {/* Navigation */}
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Button variant="outlined" onClick={handlePrevious} disabled={quizState.currentQuestion === 0}>
+              Poprzednie
             </Button>
-            <Button
-              variant="contained"
-              onClick={handleNextQuestion}
-              disabled={quizState.selectedAnswers[quizState.currentQuestion] === undefined}
-              sx={{
-                px: 4,
-                py: 1.5,
-                borderRadius: 2,
-                fontWeight: 600,
-                fontSize: "1rem",
-                background: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
-                boxShadow: 3,
-                "&:hover": {
-                  background: "linear-gradient(135deg, #1565c0 0%, #1976d2 100%)",
-                  boxShadow: 4,
-                  transform: "translateY(-1px)",
-                },
-                "&:disabled": {
-                  background: "grey.400",
-                  color: "white",
-                },
-              }}
-            >
-              {quizState.currentQuestion === quizQuestions.length - 1 ? "🏁 Zakończ quiz" : "Następne →"}
+
+            <Button variant="contained" onClick={handleNext} disabled={currentAnswer === null}>
+              {quizState.currentQuestion === QUIZ_QUESTIONS.length - 1 ? "Zakończ" : "Następne"}
             </Button>
           </Box>
         </CardContent>

@@ -14,3 +14,7 @@ export { CommonMistakes } from "./CommonMistakes";
 export { InteractiveQuiz } from "./InteractiveQuiz";
 export { GoldenRules } from "./GoldenRules";
 export { ResourcesAndReferences } from "./ResourcesAndReferences";
+
+// New tabbed interface components
+export { PresentationViewer } from "./PresentationViewer";
+export { TabbedInterface } from "./TabbedInterface";

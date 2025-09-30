@@ -69,7 +69,7 @@ export default function ContactForm({ onAddContact, loading }: Props) {
           <Box component="form" onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={3}>
               {/* First Name */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="firstName"
                   control={control}
@@ -106,7 +106,7 @@ export default function ContactForm({ onAddContact, loading }: Props) {
               </Grid>
 
               {/* Last Name */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="lastName"
                   control={control}
@@ -143,7 +143,7 @@ export default function ContactForm({ onAddContact, loading }: Props) {
               </Grid>
 
               {/* Email */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="email"
                   control={control}
@@ -187,7 +187,7 @@ export default function ContactForm({ onAddContact, loading }: Props) {
               </Grid>
 
               {/* Phone */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="phone"
                   control={control}
@@ -229,7 +229,7 @@ export default function ContactForm({ onAddContact, loading }: Props) {
               </Grid>
 
               {/* Action Buttons */}
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Box
                   sx={{
                     display: "flex",
