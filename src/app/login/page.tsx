@@ -4,7 +4,8 @@ import { Box, Typography, Paper } from "@mui/material";
 import { useLogin, useAuthRedirect } from "./hooks";
 import { LoginForm, ErrorAlert, RegisterPrompt } from "./components";
 import { LOGIN_CONSTANTS } from "./constants";
-import type { LoginPageProps, LoginFormData } from "./types";
+import type { LoginPageProps } from "./types";
+import type { LoginFormData } from "./utils";
 
 /**
  * Login page component
