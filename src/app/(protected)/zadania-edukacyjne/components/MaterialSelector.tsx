@@ -14,14 +14,14 @@ import {
   Alert,
 } from "@mui/material";
 import { Add, Delete, LocalLibrary } from "@mui/icons-material";
-import { Controller, Control, FieldArrayWithId } from "react-hook-form";
+import { Controller, Control, FieldArrayWithId, FieldValues, Path, ArrayPath } from "react-hook-form";
 // import { FormField } from "@/components/shared";
 import { EDUCATIONAL_MATERIALS, MATERIAL_CATEGORY_LABELS, getMaterialById } from "@/constants/materials";
 // import type { MaterialItem } from "@/constants/materials";
 
-interface MaterialSelectorProps {
-  control: Control<Record<string, unknown>>;
-  fields: (FieldArrayWithId<Record<string, unknown>, "materials", "id"> & {
+interface MaterialSelectorProps<T extends FieldValues = FieldValues> {
+  control: Control<T>;
+  fields: (FieldArrayWithId<T, ArrayPath<T>, "id"> & {
     originalId?: string;
     name?: string;
     type?: string;
@@ -31,7 +31,13 @@ interface MaterialSelectorProps {
   activityIndex: number;
 }
 
-export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fields, append, remove, activityIndex }) => {
+export const MaterialSelector = <T extends FieldValues = FieldValues>({
+  control,
+  fields,
+  append,
+  remove,
+  activityIndex,
+}: MaterialSelectorProps<T>) => {
   const [selectedMaterialId, setSelectedMaterialId] = useState<string>("");
 
   const addMaterial = () => {
@@ -160,7 +166,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fie
                 </Box>
                 <Stack spacing={2}>
                   <Controller
-                    name={`activities.${activityIndex}.materials.${index}.distributedCount`}
+                    name={`activities.${activityIndex}.materials.${index}.distributedCount` as Path<T>}
                     control={control}
                     rules={{
                       required: "Ilość jest wymagana",
@@ -192,7 +198,7 @@ export const MaterialSelector: React.FC<MaterialSelectorProps> = ({ control, fie
                   />
 
                   <Controller
-                    name={`activities.${activityIndex}.materials.${index}.description`}
+                    name={`activities.${activityIndex}.materials.${index}.description` as Path<T>}
                     control={control}
                     render={({ field }) => (
                       <TextField
