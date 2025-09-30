@@ -21,8 +21,7 @@ export default function Home() {
   const {
     state,
     dispatch,
-    formState,
-    formDispatch,
+    // formState, formDispatch, not used for now
     addTodo,
     toggleTodo,
     deleteTodo,
@@ -30,9 +29,6 @@ export default function Home() {
     addSubtask,
     toggleSubtask,
     deleteSubtask,
-    startTimeTracking,
-    stopTimeTracking,
-    getElapsedTime,
     getTodoById,
   } = useTodoApp();
 

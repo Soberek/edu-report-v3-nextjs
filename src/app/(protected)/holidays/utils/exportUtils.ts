@@ -1,6 +1,20 @@
 import * as XLSX from "xlsx";
 import type { Post, CsvRow, EducationalHolidayWithQuery } from "../types";
 
+interface GeneratedPostWithGraphics {
+  id: number;
+  title: string;
+  description: string;
+  query: string;
+  literalDate: string;
+  dateForThisYear: string;
+  text: string;
+  imageUrl: string;
+  generatedImageUrl: string;
+  tags: string;
+  postingTime: string;
+}
+
 /**
  * Export posts to CSV file and trigger download
  */
@@ -36,6 +50,60 @@ export const exportPostsToCSV = (posts: Post[], filename?: string): string[][] =
   } catch (error) {
     console.error("Error exporting CSV:", error);
     throw new Error("Failed to export CSV file");
+  }
+};
+
+/**
+ * Export posts with graphics to CSV file and trigger download
+ */
+export const exportPostsWithGraphicsToCSV = (posts: GeneratedPostWithGraphics[], filename?: string): string[][] => {
+  try {
+    const csvRows: string[][] = [];
+
+    // Header
+    csvRows.push([
+      "Title", 
+      "Text", 
+      "Date", 
+      "Original Image URL", 
+      "Generated Image URL", 
+      "Tags", 
+      "Posting Time"
+    ]);
+
+    // Data rows
+    for (const post of posts) {
+      csvRows.push([
+        post.title,
+        post.text, 
+        post.literalDate,
+        post.imageUrl, // Original Unsplash image
+        post.generatedImageUrl, // Generated image with template
+        post.tags, 
+        post.postingTime
+      ]);
+    }
+
+    // Convert to CSV string
+    const csvOutput = csvRows.map((row) => row.map((item) => `"${item.replace(/"/g, '""')}"`).join(",")).join("\n");
+
+    // Create a blob and trigger download
+    const blob = new Blob([csvOutput], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename || `holiday_posts_with_graphics_${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    return csvRows;
+  } catch (error) {
+    console.error("Error exporting posts with graphics CSV:", error);
+    throw new Error("Failed to export posts with graphics CSV file");
   }
 };
 
@@ -104,5 +172,26 @@ export const validateHolidaysForExport = (holidays: EducationalHolidayWithQuery[
       typeof holiday.query === "string" &&
       typeof holiday.literalDate === "string" &&
       typeof holiday.dateForThisYear === "string"
+  );
+};
+
+/**
+ * Validate posts with graphics data before export
+ */
+export const validatePostsWithGraphicsForExport = (posts: GeneratedPostWithGraphics[]): boolean => {
+  if (!Array.isArray(posts) || posts.length === 0) {
+    return false;
+  }
+
+  return posts.every(
+    (post) =>
+      typeof post.id === "number" &&
+      typeof post.title === "string" &&
+      typeof post.text === "string" &&
+      typeof post.literalDate === "string" &&
+      typeof post.imageUrl === "string" &&
+      typeof post.generatedImageUrl === "string" &&
+      typeof post.tags === "string" &&
+      typeof post.postingTime === "string"
   );
 };
