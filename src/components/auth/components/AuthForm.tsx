@@ -1,7 +1,8 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FieldValues, Path, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TextField, Button, CircularProgress, Box } from "@mui/material";
+import { z } from "zod";
 import { SHARED_AUTH_CONSTANTS } from "../constants";
 import type { BaseAuthFormData, AuthFormProps } from "../types";
 
@@ -9,7 +10,7 @@ import type { BaseAuthFormData, AuthFormProps } from "../types";
  * Generic authentication form component
  * Can be configured for login, registration, or other auth forms
  */
-export const AuthForm = <T extends BaseAuthFormData>({
+export const AuthForm = <T extends BaseAuthFormData & FieldValues>({
   onSubmit,
   isLoading,
   disabled = false,
@@ -23,14 +24,14 @@ export const AuthForm = <T extends BaseAuthFormData>({
     handleSubmit,
     formState: { errors, isSubmitting },
     clearErrors,
-  } = useForm<T>({
-    resolver: zodResolver(schema),
+  } = useForm<FieldValues>({
+    resolver: zodResolver(schema as never),
     mode: "onBlur",
   });
 
-  const handleFormSubmit = async (data: T) => {
+  const handleFormSubmit = async (data: FieldValues) => {
     clearErrors();
-    await onSubmit(data);
+    await onSubmit(data as T);
   };
 
   const isFormDisabled = isLoading || isSubmitting || disabled;
@@ -53,7 +54,7 @@ export const AuthForm = <T extends BaseAuthFormData>({
         disabled={isFormDisabled}
         {...register("email")}
         error={Boolean(errors.email)}
-        helperText={errors.email?.message}
+        helperText={errors.email?.message as string}
         autoComplete={SHARED_AUTH_CONSTANTS.FIELDS.EMAIL.AUTOCOMPLETE}
       />
 
@@ -65,8 +66,10 @@ export const AuthForm = <T extends BaseAuthFormData>({
         disabled={isFormDisabled}
         {...register("password")}
         error={Boolean(errors.password)}
-        helperText={errors.password?.message}
-        autoComplete={constants?.FIELDS?.PASSWORD?.AUTOCOMPLETE || "current-password"}
+        helperText={errors.password?.message as string}
+        autoComplete={
+          (constants as { FIELDS?: { PASSWORD?: { AUTOCOMPLETE?: string } } })?.FIELDS?.PASSWORD?.AUTOCOMPLETE ?? "current-password"
+        }
       />
 
       <Button
