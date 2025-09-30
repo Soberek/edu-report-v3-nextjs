@@ -137,7 +137,7 @@ export const DataTable = <T extends Record<string, unknown>>({
         color={action.color || "primary"}
         onClick={(e) => {
           e.stopPropagation();
-          action.onClick(getRowId ? getRowId(params.row) : params.row.id);
+          action.onClick(getRowId ? getRowId(params.row) : String(params.row.id));
         }}
         title={action.tooltip}
       >
