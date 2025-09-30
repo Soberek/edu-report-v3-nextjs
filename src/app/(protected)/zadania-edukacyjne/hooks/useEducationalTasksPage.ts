@@ -47,11 +47,11 @@ export const useEducationalTasksPage = ({ onCreate, onUpdate, onDelete }: UseEdu
     async (data: Record<string, unknown>) => {
       try {
         if (editTask) {
-          await updateTask(editTask.id, data as CreateEducationalTaskFormData);
-          onUpdate?.(editTask.id, data as CreateEducationalTaskFormData);
+          await updateTask(editTask.id, data as unknown as CreateEducationalTaskFormData);
+          onUpdate?.(editTask.id, data as unknown as CreateEducationalTaskFormData);
         } else {
-          await createTask(data as CreateEducationalTaskFormData);
-          onCreate?.(data as CreateEducationalTaskFormData);
+          await createTask(data as unknown as CreateEducationalTaskFormData);
+          onCreate?.(data as unknown as CreateEducationalTaskFormData);
         }
         dispatch(actions.setFormClosed());
       } catch (error) {
@@ -71,7 +71,7 @@ export const useEducationalTasksPage = ({ onCreate, onUpdate, onDelete }: UseEdu
   }, []);
 
   const handleFilterChange = useCallback((key: keyof EducationalTasksFilters, value: string) => {
-    dispatch(actions.setFilter({ key, value }));
+    dispatch(actions.setFilter(key, value));
   }, []);
 
   const resetFilters = useCallback(() => {
