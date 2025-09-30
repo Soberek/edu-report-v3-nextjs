@@ -53,52 +53,31 @@ export const ProgramForm: React.FC<ProgramFormProps> = ({ mode, program, onClose
     <EditDialog open={true} onClose={handleClose} title={isEdit ? "Edytuj program" : "Dodaj nowy program"} maxWidth="md" fullWidth>
       <Box component="form" onSubmit={handleSubmit(handleFormSubmit)}>
         <Stack spacing={3}>
-          <FormField
-            name="code"
-            control={control}
-            label="Kod programu"
-            placeholder="Wprowadź kod programu"
-            required
-            error={!!errors.code}
-            helperText={errors.code?.message}
-            fullWidth
-          />
+          <FormField name="code" control={control} label="Kod programu" placeholder="Wprowadź kod programu" required fullWidth />
 
-          <FormField
-            name="name"
-            control={control}
-            label="Nazwa programu"
-            placeholder="Wprowadź nazwę programu"
-            required
-            error={!!errors.name}
-            helperText={errors.name?.message}
-            fullWidth
-          />
+          <FormField name="name" control={control} label="Nazwa programu" placeholder="Wprowadź nazwę programu" required fullWidth />
 
           <FormField
             name="programType"
             control={control}
             label="Typ programu"
-            select
+            type="select"
+            options={[
+              { value: PROGRAM_TYPE.PROGRAMOWY, label: "Programowy" },
+              { value: PROGRAM_TYPE.NIEPROGRAMOWY, label: "Nieprogramowy" },
+            ]}
             required
-            error={!!errors.programType}
-            helperText={errors.programType?.message}
             fullWidth
-          >
-            <option value={PROGRAM_TYPE.PROGRAMOWY}>Programowy</option>
-            <option value={PROGRAM_TYPE.NIEPROGRAMOWY}>Nieprogramowy</option>
-          </FormField>
+          />
 
           <FormField
             name="description"
             control={control}
             label="Opis programu"
             placeholder="Wprowadź opis programu"
-            multiline
-            minRows={3}
+            type="textarea"
+            rows={3}
             required
-            error={!!errors.description}
-            helperText={errors.description?.message}
             fullWidth
           />
 
