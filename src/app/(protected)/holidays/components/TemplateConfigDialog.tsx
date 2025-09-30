@@ -109,16 +109,19 @@ export const TemplateConfigDialog: React.FC<TemplateConfigDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth>
       <DialogTitle>Template Configuration</DialogTitle>
       <DialogContent>
         <Alert severity="info" sx={{ mb: 2 }}>
           Upload your template image and configure text positioning. You can upload a file or use a URL from the public folder.
         </Alert>
 
-        <Grid container spacing={3}>
-          {/* Template Upload */}
-          <Grid size={12}>
+        <Box sx={{ display: "flex", gap: 3, height: "70vh" }}>
+          {/* Left Column - Configuration Fields */}
+          <Box sx={{ flex: 1, overflow: "auto" }}>
+            <Grid container spacing={2}>
+              {/* Template Upload */}
+              <Grid size={12}>
             <TemplateUpload
               onUpload={handleTemplateUpload}
               onRemove={handleTemplateRemove}
@@ -126,23 +129,24 @@ export const TemplateConfigDialog: React.FC<TemplateConfigDialogProps> = ({
             />
           </Grid>
 
-          {/* PostImages Upload Section */}
-          {uploadedTemplate && (
-            <Grid size={12}>
-              <Box sx={{ p: 2, border: "1px solid", borderColor: "grey.300", borderRadius: 1 }}>
-                <Typography variant="h6" gutterBottom>
+              {/* PostImages Upload Section */}
+              {uploadedTemplate && (
+                <Grid size={12}>
+              <Box sx={{ p: 1.5, border: "1px solid", borderColor: "grey.300", borderRadius: 1 }}>
+                <Typography variant="subtitle1" gutterBottom>
                   Upload to PostImages
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
                   Upload your template to PostImages to get a public URL for sharing and backup.
                 </Typography>
                 
-                <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
+                <Box sx={{ display: "flex", gap: 1.5, alignItems: "center", mb: 1.5 }}>
                   <Button
                     variant="contained"
+                    size="small"
                     onClick={handleUploadToPostImages}
                     disabled={uploadingToPostImages}
-                    startIcon={uploadingToPostImages ? <CircularProgress size={20} /> : <CloudUpload />}
+                    startIcon={uploadingToPostImages ? <CircularProgress size={16} /> : <CloudUpload />}
                   >
                     {uploadingToPostImages ? "Uploading..." : "Upload to PostImages"}
                   </Button>
@@ -150,6 +154,7 @@ export const TemplateConfigDialog: React.FC<TemplateConfigDialogProps> = ({
                   {postImagesResult && (
                     <Button
                       variant="outlined"
+                      size="small"
                       onClick={() => navigator.clipboard.writeText(postImagesResult.url)}
                     >
                       Copy URL
@@ -158,17 +163,17 @@ export const TemplateConfigDialog: React.FC<TemplateConfigDialogProps> = ({
                 </Box>
 
                 {postImagesResult && (
-                  <Box sx={{ mt: 2 }}>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
+                  <Box sx={{ mt: 1.5 }}>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>
                       <strong>PostImages URL:</strong>
                     </Typography>
                     <Box sx={{
                       backgroundColor: "grey.100",
-                      p: 1,
+                      p: 0.75,
                       borderRadius: 1,
                       wordBreak: "break-all",
                       fontFamily: "monospace",
-                      fontSize: "0.875rem"
+                      fontSize: "0.75rem"
                     }}>
                       {postImagesResult.url}
                     </Box>
@@ -179,246 +184,258 @@ export const TemplateConfigDialog: React.FC<TemplateConfigDialogProps> = ({
                 )}
 
                 {error && (
-                  <Alert severity="error" sx={{ mt: 2 }}>
+                  <Alert severity="error" sx={{ mt: 1.5 }}>
                     {error}
                   </Alert>
-                )}
+                  )}
+                </Box>
+              </Grid>
+            )}
+
+            <Grid size={12}>
+              <Divider>
+                <Typography variant="caption" color="text.secondary">
+                  OR
+                </Typography>
+              </Divider>
+            </Grid>
+
+            {/* Template Image URL */}
+            <Grid size={12}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Template Image URL"
+                value={config.templateImageUrl}
+                onChange={(e) => setConfig(prev => ({ ...prev, templateImageUrl: e.target.value }))}
+                placeholder="/templates/holiday-template.png"
+                helperText="Path to your template image in the public folder (leave empty for default overlays)"
+                disabled={!!uploadedTemplate}
+              />
+            </Grid>
+
+            {/* Presets */}
+            <Grid size={12}>
+              <Typography variant="subtitle1" gutterBottom>
+                Quick Presets
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1, mb: 1.5 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handlePresetChange('default')}
+                >
+                  Default
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handlePresetChange('centered')}
+                >
+                  Centered
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handlePresetChange('rightAligned')}
+                >
+                  Right Aligned
+                </Button>
               </Box>
             </Grid>
-          )}
 
-          <Grid size={12}>
-            <Divider>
-              <Typography variant="body2" color="text.secondary">
-                OR
+            {/* Date Position */}
+            <Grid size={12}>
+              <Typography variant="subtitle1" gutterBottom>
+                Date Text Position
               </Typography>
-            </Divider>
-          </Grid>
-
-          {/* Template Image URL */}
-          <Grid size={12}>
-            <TextField
-              fullWidth
-              label="Template Image URL"
-              value={config.templateImageUrl}
-              onChange={(e) => setConfig(prev => ({ ...prev, templateImageUrl: e.target.value }))}
-              placeholder="/templates/holiday-template.png"
-              helperText="Path to your template image in the public folder (leave empty for default overlays)"
-              disabled={!!uploadedTemplate}
-            />
-          </Grid>
-
-          {/* Presets */}
-          <Grid size={12}>
-            <Typography variant="h6" gutterBottom>
-              Quick Presets
-            </Typography>
-            <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-              <Button
-                variant="outlined"
+            </Grid>
+            <Grid size={3}>
+              <TextField
+                fullWidth
                 size="small"
-                onClick={() => handlePresetChange('default')}
-              >
-                Default
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => handlePresetChange('centered')}
-              >
-                Centered
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => handlePresetChange('rightAligned')}
-              >
-                Right Aligned
-              </Button>
-            </Box>
-          </Grid>
-
-          {/* Date Position */}
-          <Grid size={12}>
-            <Typography variant="h6" gutterBottom>
-              Date Text Position
-            </Typography>
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="X Position"
-              type="number"
-              value={config.datePosition.x}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                datePosition: { ...prev.datePosition, x: parseInt(e.target.value) || 0 }
-              }))}
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="Y Position"
-              type="number"
-              value={config.datePosition.y}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                datePosition: { ...prev.datePosition, y: parseInt(e.target.value) || 0 }
-              }))}
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="Font Size"
-              type="number"
-              value={config.datePosition.fontSize}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                datePosition: { ...prev.datePosition, fontSize: parseInt(e.target.value) || 12 }
-              }))}
-            />
-          </Grid>
-          <Grid size={6}>
-            <FormControl fullWidth>
-              <InputLabel>Text Align</InputLabel>
-              <Select
-                value={config.datePosition.textAlign}
+                label="X"
+                type="number"
+                value={config.datePosition.x}
                 onChange={(e) => setConfig(prev => ({
                   ...prev,
-                  datePosition: { ...prev.datePosition, textAlign: e.target.value as any }
+                  datePosition: { ...prev.datePosition, x: parseInt(e.target.value) || 0 }
                 }))}
-              >
-                <MenuItem value="left">Left</MenuItem>
-                <MenuItem value="center">Center</MenuItem>
-                <MenuItem value="right">Right</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={12}>
-            <TextField
-              fullWidth
-              label="Text Color"
-              value={config.datePosition.color}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                datePosition: { ...prev.datePosition, color: e.target.value }
-              }))}
-              placeholder="#FFFFFF"
-            />
-          </Grid>
-
-          {/* Title Position */}
-          <Grid size={12}>
-            <Typography variant="h6" gutterBottom>
-              Title Text Position
-            </Typography>
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="X Position"
-              type="number"
-              value={config.titlePosition.x}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                titlePosition: { ...prev.titlePosition, x: parseInt(e.target.value) || 0 }
-              }))}
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="Y Position"
-              type="number"
-              value={config.titlePosition.y}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                titlePosition: { ...prev.titlePosition, y: parseInt(e.target.value) || 0 }
-              }))}
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="Font Size"
-              type="number"
-              value={config.titlePosition.fontSize}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                titlePosition: { ...prev.titlePosition, fontSize: parseInt(e.target.value) || 12 }
-              }))}
-            />
-          </Grid>
-          <Grid size={6}>
-            <FormControl fullWidth>
-              <InputLabel>Text Align</InputLabel>
-              <Select
-                value={config.titlePosition.textAlign}
+              />
+            </Grid>
+            <Grid size={3}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Y"
+                type="number"
+                value={config.datePosition.y}
                 onChange={(e) => setConfig(prev => ({
                   ...prev,
-                  titlePosition: { ...prev.titlePosition, textAlign: e.target.value as any }
+                  datePosition: { ...prev.datePosition, y: parseInt(e.target.value) || 0 }
                 }))}
-              >
-                <MenuItem value="left">Left</MenuItem>
-                <MenuItem value="center">Center</MenuItem>
-                <MenuItem value="right">Right</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="Text Color"
-              value={config.titlePosition.color}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                titlePosition: { ...prev.titlePosition, color: e.target.value }
-              }))}
-              placeholder="#FFFFFF"
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="Max Width"
-              type="number"
-              value={config.titlePosition.maxWidth}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                titlePosition: { ...prev.titlePosition, maxWidth: parseInt(e.target.value) || 600 }
-              }))}
-              helperText="Maximum width for text wrapping"
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="Line Height"
-              type="number"
-              value={config.titlePosition.lineHeight || 1.2}
-              onChange={(e) => setConfig(prev => ({
-                ...prev,
-                titlePosition: { ...prev.titlePosition, lineHeight: parseFloat(e.target.value) || 1.2 }
-              }))}
-              helperText="Line spacing multiplier (1.0 = normal, 1.2 = 20% more)"
-              inputProps={{ step: 0.1, min: 0.5, max: 3.0 }}
-            />
-          </Grid>
+              />
+            </Grid>
+            <Grid size={3}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Font Size"
+                type="number"
+                value={config.datePosition.fontSize}
+                onChange={(e) => setConfig(prev => ({
+                  ...prev,
+                  datePosition: { ...prev.datePosition, fontSize: parseInt(e.target.value) || 12 }
+                }))}
+              />
+            </Grid>
+            <Grid size={3}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Align</InputLabel>
+                <Select
+                  value={config.datePosition.textAlign}
+                  onChange={(e) => setConfig(prev => ({
+                    ...prev,
+                    datePosition: { ...prev.datePosition, textAlign: e.target.value as any }
+                  }))}
+                >
+                  <MenuItem value="left">Left</MenuItem>
+                  <MenuItem value="center">Center</MenuItem>
+                  <MenuItem value="right">Right</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={12}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Text Color"
+                value={config.datePosition.color}
+                onChange={(e) => setConfig(prev => ({
+                  ...prev,
+                  datePosition: { ...prev.datePosition, color: e.target.value }
+                }))}
+                placeholder="#FFFFFF"
+              />
+            </Grid>
+
+            {/* Title Position */}
+            <Grid size={12}>
+              <Typography variant="subtitle1" gutterBottom>
+                Title Text Position
+              </Typography>
+            </Grid>
+            <Grid size={3}>
+              <TextField
+                fullWidth
+                size="small"
+                label="X"
+                type="number"
+                value={config.titlePosition.x}
+                onChange={(e) => setConfig(prev => ({
+                  ...prev,
+                  titlePosition: { ...prev.titlePosition, x: parseInt(e.target.value) || 0 }
+                }))}
+              />
+            </Grid>
+            <Grid size={3}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Y"
+                type="number"
+                value={config.titlePosition.y}
+                onChange={(e) => setConfig(prev => ({
+                  ...prev,
+                  titlePosition: { ...prev.titlePosition, y: parseInt(e.target.value) || 0 }
+                }))}
+              />
+            </Grid>
+            <Grid size={3}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Font Size"
+                type="number"
+                value={config.titlePosition.fontSize}
+                onChange={(e) => setConfig(prev => ({
+                  ...prev,
+                  titlePosition: { ...prev.titlePosition, fontSize: parseInt(e.target.value) || 12 }
+                }))}
+              />
+            </Grid>
+            <Grid size={3}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Align</InputLabel>
+                <Select
+                  value={config.titlePosition.textAlign}
+                  onChange={(e) => setConfig(prev => ({
+                    ...prev,
+                    titlePosition: { ...prev.titlePosition, textAlign: e.target.value as any }
+                  }))}
+                >
+                  <MenuItem value="left">Left</MenuItem>
+                  <MenuItem value="center">Center</MenuItem>
+                  <MenuItem value="right">Right</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Text Color"
+                value={config.titlePosition.color}
+                onChange={(e) => setConfig(prev => ({
+                  ...prev,
+                  titlePosition: { ...prev.titlePosition, color: e.target.value }
+                }))}
+                placeholder="#FFFFFF"
+              />
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Max Width"
+                type="number"
+                value={config.titlePosition.maxWidth}
+                onChange={(e) => setConfig(prev => ({
+                  ...prev,
+                  titlePosition: { ...prev.titlePosition, maxWidth: parseInt(e.target.value) || 600 }
+                }))}
+                helperText="Max width for wrapping"
+              />
+            </Grid>
+            <Grid size={4}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Line Height"
+                type="number"
+                value={config.titlePosition.lineHeight || 1.2}
+                onChange={(e) => setConfig(prev => ({
+                  ...prev,
+                  titlePosition: { ...prev.titlePosition, lineHeight: parseFloat(e.target.value) || 1.2 }
+                }))}
+                helperText="Line spacing (1.0 = normal)"
+                inputProps={{ step: 0.1, min: 0.5, max: 3.0 }}
+              />
+            </Grid>
 
           {/* Image Placeholder Position */}
           <Grid size={12}>
-            <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+            <Typography variant="subtitle1" gutterBottom sx={{ mt: 1 }}>
               Image Placeholder Position
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
               Configure the circular area where Unsplash images will be placed
             </Typography>
           </Grid>
           <Grid size={4}>
             <TextField
               fullWidth
+              size="small"
               label="Center X"
               type="number"
               value={config.imagePlaceholder.x}
@@ -432,6 +449,7 @@ export const TemplateConfigDialog: React.FC<TemplateConfigDialogProps> = ({
           <Grid size={4}>
             <TextField
               fullWidth
+              size="small"
               label="Center Y"
               type="number"
               value={config.imagePlaceholder.y}
@@ -445,6 +463,7 @@ export const TemplateConfigDialog: React.FC<TemplateConfigDialogProps> = ({
           <Grid size={4}>
             <TextField
               fullWidth
+              size="small"
               label="Radius"
               type="number"
               value={config.imagePlaceholder.radius}
@@ -454,12 +473,27 @@ export const TemplateConfigDialog: React.FC<TemplateConfigDialogProps> = ({
               }))}
               helperText="Circle radius in pixels"
             />
-          </Grid>
-        </Grid>
+            </Grid>
+            </Grid>
+          </Box>
 
-        {/* Template Preview */}
-        <Box sx={{ mt: 3 }}>
-          <TemplatePreview templateConfig={config} />
+          {/* Right Column - Preview */}
+          <Box sx={{ 
+            flex: 1,
+            position: 'sticky', 
+            top: 0, 
+            height: 'fit-content',
+            border: '1px solid',
+            borderColor: 'grey.300',
+            borderRadius: 2,
+            p: 2,
+            backgroundColor: 'grey.50'
+          }}>
+            <Typography variant="subtitle1" gutterBottom sx={{ textAlign: 'center' }}>
+              Live Preview
+            </Typography>
+            <TemplatePreview templateConfig={config} />
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions>
