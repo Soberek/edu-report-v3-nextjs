@@ -49,7 +49,7 @@ export const readExcelFile = (file: File): Promise<{ fileName: string; data: Exc
 
             resolve({
               fileName: file.name,
-              data,
+              data: data as ExcelRow[],
             });
           })
           .catch(reject);
