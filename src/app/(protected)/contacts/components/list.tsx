@@ -280,7 +280,7 @@ export default function ContactList({ contacts, loading, error, handleContactDel
   const renderCardView = () => (
     <Grid container spacing={3}>
       {contacts.map((contact, index) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={contact.id}>
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={contact.id}>
           <Fade in timeout={300} style={{ transitionDelay: `${index * 100}ms` }}>
             <Card
               sx={{
