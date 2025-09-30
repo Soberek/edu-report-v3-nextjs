@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useEducationalTasks, educationalTasksReducer, actions, taskUtils } from "../useEducationalTasks";
 import type { EducationalTask, CreateEducationalTaskFormData } from "@/types";
+import type { User } from "firebase/auth";
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 
