@@ -3,18 +3,26 @@ import React, { useState } from "react";
 import { Container, Box } from "@mui/material";
 import { PageHeader, ErrorDisplay } from "@/components/shared";
 import { useHolidays } from "./hooks";
-import { UrlInput, HolidaysList, ActionSection, ResultsSection, ExportSection } from "./components";
+import { useHolidayGraphics } from "./hooks/useHolidayGraphics";
+import { UrlInput, HolidaysList, ActionSection, ResultsSection, ExportSection, MockTemplateTest } from "./components";
+import { GeneratedPostsWithGraphics } from "./components/GeneratedPostsWithGraphics";
 
 // Main component
 export default function Holidays() {
   const [url, setUrl] = useState("https://www.kalbi.pl/kalendarz-swiat-nietypowych-pazdziernik");
 
   const { state, aiLoading, fetchHolidays, extractHealthHolidays, generatePosts, clearError } = useHolidays();
+  const { state: graphicsState, generatePostsWithGraphics, refreshGraphics, clearError: clearGraphicsError, setTemplateConfig } = useHolidayGraphics();
 
   // Handler functions
   const handleFetchHolidays = () => fetchHolidays(url);
   const handleExtractHealthHolidays = () => extractHealthHolidays();
   const handleGeneratePosts = () => generatePosts();
+  const handleGeneratePostsWithGraphics = () => generatePostsWithGraphics(state.separatedHolidaysFromOpenAi);
+  const handleRefreshGraphics = () => refreshGraphics();
+  const handleTemplateConfigUpdate = (config: any) => {
+    setTemplateConfig(config);
+  };
 
   // Error handling
   if (state.error) {
@@ -42,10 +50,15 @@ export default function Holidays() {
         onFetchHolidays={handleFetchHolidays}
         onExtractHealthHolidays={handleExtractHealthHolidays}
         onGeneratePosts={handleGeneratePosts}
+        onGeneratePostsWithGraphics={handleGeneratePostsWithGraphics}
+        onRefreshGraphics={handleRefreshGraphics}
+        onTemplateConfigUpdate={handleTemplateConfigUpdate}
         loading={state.loading}
         aiLoading={aiLoading}
+        graphicsLoading={graphicsState.loading}
         hasHolidays={state.holidays.length > 0}
         hasHealthHolidays={state.separatedHolidaysFromOpenAi.length > 0}
+        hasGeneratedPosts={graphicsState.posts.length > 0}
       />
 
       {/* Holidays List */}
@@ -54,12 +67,27 @@ export default function Holidays() {
       {/* Results Section */}
       <ResultsSection healthHolidays={state.separatedHolidaysFromOpenAi} posts={state.posts} />
 
+      {/* Generated Posts with Graphics */}
+      <Box sx={{ mb: 4 }}>
+        <GeneratedPostsWithGraphics
+          posts={graphicsState.posts}
+          loading={graphicsState.loading}
+          error={graphicsState.error}
+          onError={clearGraphicsError}
+        />
+      </Box>
+
       {/* Export Section */}
       <ExportSection
         posts={state.posts}
         holidays={state.separatedHolidaysFromOpenAi}
         onError={(error) => console.error("Export error:", error)}
       />
+
+      {/* Mock Template Test Section */}
+      <Box sx={{ mt: 6 }}>
+        <MockTemplateTest />
+      </Box>
     </Container>
   );
 }
