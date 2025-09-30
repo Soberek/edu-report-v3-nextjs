@@ -14,6 +14,7 @@ import {
   TodoEditDialog,
   TodoKanban,
 } from "@/app/(protected)/todo";
+import type { Todo } from "@/app/(protected)/todo/types";
 
 export default function Home() {
   const { user, loading } = useUser();
@@ -39,7 +40,7 @@ export default function Home() {
     useTodoUtils(state);
 
   // Edit dialog handlers
-  const handleEditTodo = (todo: any, updates: any) => {
+  const handleEditTodo = (todo: Todo | null, updates: Partial<Todo>) => {
     if (todo) {
       updateTodo(todo.id, updates);
     } else {
