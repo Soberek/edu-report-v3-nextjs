@@ -50,17 +50,78 @@ const showHydrationReminderNotification = () => {
   if (typeof window === "undefined") return;
 
   const message = "Przypomnienie: wypij szklankę wody, aby utrzymać dobre nawodnienie.";
+
   if ("Notification" in window && Notification.permission === "granted") {
     try {
-      new Notification("HealthHub 💧", {
+      const notification = new Notification("HealthHub 💧", {
         body: message,
         tag: "healthhub-hydration",
+        icon: "/favicon.ico", // Use app icon
+        requireInteraction: false, // Changed to false for better compatibility
+        silent: false, // Allow sound
       });
-    } catch {
-      console.info("HealthHub:", message);
+
+      // Handle notification clicks
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+
+      // Auto-close after 5 seconds
+      setTimeout(() => {
+        notification.close();
+      }, 5000);
+    } catch (error) {
+      console.error("Failed to show notification:", error);
+      // Fallback to alert
+      alert(`💧 ${message}`);
     }
   } else {
     console.info("HealthHub:", message);
+  }
+};
+
+// Export function to manually trigger hydration notification
+export const triggerHydrationNotification = async () => {
+  if (typeof window === "undefined") {
+    console.log("Window is undefined");
+    return;
+  }
+
+  console.log("Triggering hydration notification...");
+  console.log("Notification support:", "Notification" in window);
+  console.log("Current permission:", Notification.permission);
+
+  // Request notification permission if not already granted
+  if ("Notification" in window) {
+    if (Notification.permission === "default") {
+      console.log("Requesting notification permission...");
+      const permission = await Notification.requestPermission();
+      console.log("Permission result:", permission);
+      if (permission === "granted") {
+        showHydrationReminderNotification();
+      } else {
+        console.log("Permission denied, showing alert");
+        alert("💧 Przypomnienie: wypij szklankę wody, aby utrzymać dobre nawodnienie.");
+      }
+    } else if (Notification.permission === "granted") {
+      console.log("Permission already granted, showing notification");
+      showHydrationReminderNotification();
+    } else {
+      console.log("Permission denied, showing alert with instructions");
+      alert(`💧 Przypomnienie: wypij szklankę wody, aby utrzymać dobre nawodnienie.
+
+🔔 Aby otrzymywać powiadomienia w Safari:
+1. Safari → Preferencje (Cmd + ,)
+2. Zakładka "Strony internetowe" → "Powiadomienia"
+3. Znajdź tę stronę i zmień na "Zezwól"
+4. Odśwież stronę (Cmd + R)
+
+Lub kliknij "aA" w pasku adresu → "Ustawienia dla tej strony"`);
+    }
+  } else {
+    console.log("Notifications not supported, showing alert");
+    alert("💧 Przypomnienie: wypij szklankę wody, aby utrzymać dobre nawodnienie.");
   }
 };
 
