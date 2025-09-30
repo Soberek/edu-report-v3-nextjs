@@ -28,7 +28,7 @@ export const ActionSection: React.FC<ActionSectionProps> = ({
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
+        <Grid size={4}>
           <Paper elevation={2} sx={{ p: 3, textAlign: "center" }}>
             <CloudDownload color="primary" sx={{ fontSize: 48, mb: 2 }} />
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
@@ -43,7 +43,7 @@ export const ActionSection: React.FC<ActionSectionProps> = ({
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid size={4}>
           <Paper elevation={2} sx={{ p: 3, textAlign: "center" }}>
             <Psychology color="primary" sx={{ fontSize: 48, mb: 2 }} />
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
@@ -64,7 +64,7 @@ export const ActionSection: React.FC<ActionSectionProps> = ({
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid size={4}>
           <Paper elevation={2} sx={{ p: 3, textAlign: "center" }}>
             <PostAdd color="primary" sx={{ fontSize: 48, mb: 2 }} />
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
