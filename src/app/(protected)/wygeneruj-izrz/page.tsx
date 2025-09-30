@@ -47,7 +47,7 @@ export default function IzrzForm() {
     () => ({
       programs: programs.map((program) => ({ value: program.name, label: program.name })),
       taskTypes: Object.values(TASK_TYPES).map((taskType) => ({ value: taskType.label, label: taskType.label })),
-      schools: schools?.map((school) => ({ value: school.name, label: school.name })) || [],
+      schools: schools || [],
     }),
     [schools]
   );
@@ -137,7 +137,10 @@ export default function IzrzForm() {
         control={control}
         error={errors.address}
         label={FIELD_LABELS.ADDRESS}
-        options={selectOptions.schools}
+        options={selectOptions.schools.map((school) => ({
+          value: `${school.name}, ${school.address}, ${school.postalCode} ${school.city}`,
+          label: `${school.name}, ${school.address}, ${school.postalCode} ${school.city}`,
+        }))}
         required
       />
       <FormField type="date" name="dateInput" control={control} error={errors.dateInput} label={FIELD_LABELS.DATE_INPUT} required />

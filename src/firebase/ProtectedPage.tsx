@@ -1,51 +1,61 @@
 "use client";
 
 import { useUser } from "@/hooks/useUser";
-import { Box } from "@mui/material";
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useCallback, memo } from "react";
 
-export default function ProtectedPage({ children }: { children: React.ReactNode }) {
-  const auth = useUser();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!auth.loading && !auth.user) {
-      router.push("/login");
-    }
-  }, [auth.loading, auth.user, router]);
-
-  console.log("ProtectedPage loading:", auth.loading);
-  if (auth.loading) {
-    return (
-      <Box
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-          background: "linear-gradient(135deg, #d400a6ff 0%, #da0000ff 100%)",
-        }}
-      >
-        <Box
-          style={{
-            padding: "2rem 3rem",
-            borderRadius: "1rem",
-            background: "#fff",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
-            fontSize: "1.25rem",
-            fontWeight: 500,
-            color: "#2d3748",
-          }}
-        >
-          Ładuje się strona, poczekaj...
-        </Box>
-      </Box>
-    );
-  }
-
-  console.log("ProtectedPage user:", auth.user);
-
-  return auth.user ? children : null;
+interface ProtectedPageProps {
+  children: React.ReactNode;
+  redirectTo?: string;
+  fallback?: React.ReactNode;
+  loadingMessage?: string;
 }
+
+/**
+ * ProtectedPage component that ensures user authentication before rendering children.
+ * Redirects unauthenticated users to login page and shows loading state during auth check.
+ */
+const ProtectedPage = memo<ProtectedPageProps>(
+  ({ children, redirectTo = "/login", fallback = null, loadingMessage = "Ładuje się strona, poczekaj..." }) => {
+    const auth = useUser();
+    const router = useRouter();
+
+    const handleRedirect = useCallback(() => {
+      router.push(redirectTo);
+    }, [router, redirectTo]);
+
+    useEffect(() => {
+      if (!auth.loading && !auth.user) {
+        handleRedirect();
+      }
+    }, [auth.loading, auth.user, handleRedirect]);
+
+    // Show loading state while authentication is being checked
+    if (auth.loading) {
+      return (
+        <LoadingSpinner
+          fullScreen
+          message={loadingMessage}
+          size={48}
+          color="primary"
+          sx={{
+            background: "linear-gradient(135deg, #d400a6ff 0%, #da0000ff 100%)",
+          }}
+        />
+      );
+    }
+
+    // Show fallback or nothing if user is not authenticated
+    if (!auth.user) {
+      return fallback;
+    }
+
+    // Render protected content for authenticated users
+    return <>{children}</>;
+  }
+);
+
+ProtectedPage.displayName = "ProtectedPage";
+
+export default ProtectedPage;

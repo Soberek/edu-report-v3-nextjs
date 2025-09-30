@@ -89,7 +89,7 @@ export const useIzrzForm = ({ onSubmit, defaultValues }: UseIzrzFormProps) => {
   return {
     // Form controls
     control,
-    handleSubmit: handleFormSubmit,
+    handleSubmit: handleSubmit(handleFormSubmit),
     setValue: setFormValue,
     watch,
     reset: resetForm,
