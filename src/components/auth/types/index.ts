@@ -2,6 +2,9 @@
  * Shared types and interfaces for authentication modules
  */
 
+import { FieldValues } from "react-hook-form";
+import { z } from "zod";
+
 export interface BaseAuthFormData {
   readonly email: string;
   readonly password: string;
@@ -21,7 +24,7 @@ export interface UseAuthRedirectResult {
   readonly redirectPath: string;
 }
 
-export interface UseAuthFormResult<T extends BaseAuthFormData> {
+export interface UseAuthFormResult<T extends BaseAuthFormData & FieldValues> {
   readonly submit: (data: T) => Promise<void>;
   readonly isLoading: boolean;
   readonly error: string | null;
@@ -38,7 +41,7 @@ export interface AuthFormProps<T extends BaseAuthFormData> {
   readonly onSubmit: (data: T) => Promise<void>;
   readonly isLoading: boolean;
   readonly disabled?: boolean;
-  readonly schema: unknown; // Zod schema
+  readonly schema: z.ZodSchema<T>; // Zod schema
   readonly constants: unknown; // Constants object
   readonly submitButtonText: string;
   readonly loadingText: string;
