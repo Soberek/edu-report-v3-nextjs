@@ -55,7 +55,7 @@ export const AutocompleteField = <T extends FieldValues>({
 
         const handleChange = (_: unknown, value: AutocompleteOption | AutocompleteOption[] | null) => {
           if (multiple) {
-            field.onChange(((value as AutocompleteOption) || []).map((item: AutocompleteOption) => item.id));
+            field.onChange(((value as AutocompleteOption[]) || []).map((item: AutocompleteOption) => item.id));
           } else {
             field.onChange((value as AutocompleteOption)?.id || "");
           }

@@ -16,9 +16,9 @@ export const baseAuthFormSchema = z.object({
 });
 
 /**
- * Type-safe base form data
+ * Type-safe base form data (re-exported from types to avoid duplication)
  */
-export type BaseAuthFormData = z.infer<typeof baseAuthFormSchema>;
+export type BaseAuthFormDataFromSchema = z.infer<typeof baseAuthFormSchema>;
 
 /**
  * Validates email format

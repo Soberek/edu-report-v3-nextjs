@@ -24,7 +24,7 @@ export const createApiError = (message: string, status?: number, code?: string):
 });
 
 export const handleApiError = (error: unknown): ApiError => {
-  if (error && typeof error === 'object' && 'response' in error) {
+  if (error && typeof error === "object" && "response" in error) {
     const apiError = error as { response: { data?: { message?: string; code?: string }; status: number } };
     // Server responded with error status
     return {
@@ -32,7 +32,7 @@ export const handleApiError = (error: unknown): ApiError => {
       status: apiError.response.status,
       code: apiError.response.data?.code,
     };
-  } else if (error && typeof error === 'object' && 'request' in error) {
+  } else if (error && typeof error === "object" && "request" in error) {
     // Request was made but no response received
     return {
       message: "Brak połączenia z serwerem",
@@ -40,9 +40,8 @@ export const handleApiError = (error: unknown): ApiError => {
     };
   } else {
     // Something else happened
-    const message = error && typeof error === 'object' && 'message' in error 
-      ? (error as { message: string }).message 
-      : "Wystąpił nieoczekiwany błąd";
+    const message =
+      error && typeof error === "object" && "message" in error ? (error as { message: string }).message : "Wystąpił nieoczekiwany błąd";
     return {
       message,
     };
@@ -80,7 +79,7 @@ export const debounceApiCall = <T extends (...args: unknown[]) => Promise<unknow
       timeoutId = setTimeout(async () => {
         try {
           const result = await apiCall(...args);
-          resolve(result);
+          resolve(result as ReturnType<T> extends Promise<infer U> ? U : never);
         } catch (error) {
           reject(error);
         }
