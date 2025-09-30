@@ -12,10 +12,7 @@ export const baseAuthFormSchema = z.object({
   password: z
     .string()
     .min(1, SHARED_AUTH_CONSTANTS.VALIDATION.PASSWORD_REQUIRED)
-    .min(
-      SHARED_AUTH_CONSTANTS.VALIDATION.PASSWORD_MIN_LENGTH,
-      SHARED_AUTH_CONSTANTS.VALIDATION.PASSWORD_MIN_LENGTH_MESSAGE
-    ),
+    .min(SHARED_AUTH_CONSTANTS.VALIDATION.PASSWORD_MIN_LENGTH, SHARED_AUTH_CONSTANTS.VALIDATION.PASSWORD_MIN_LENGTH_MESSAGE),
 });
 
 /**
@@ -40,12 +37,12 @@ export const isValidPassword = (password: string): boolean => {
 /**
  * Generic form validation function
  */
-export const validateAuthForm = <T extends BaseAuthFormData>(
+export const validateAuthForm = <T>(
   data: T,
   schema: z.ZodSchema<T>
-): { 
-  isValid: boolean; 
-  errors: Record<string, string> 
+): {
+  isValid: boolean;
+  errors: Record<string, string>;
 } => {
   try {
     schema.parse(data);
