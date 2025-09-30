@@ -3,9 +3,11 @@ import React from "react";
 import { useApp } from "../context/AppContext";
 import { Habit, Goals } from "../types";
 import { calculateProgress, getProgressColor } from "../utils";
+import { triggerHydrationNotification } from "./HydrationReminder";
 
 export const Dashboard = React.memo(() => {
   const { state } = useApp();
+  const [notificationSent, setNotificationSent] = React.useState(false);
 
   const habitData: Partial<Habit> = state.todayHabits || {
     water: 0,
@@ -86,6 +88,57 @@ export const Dashboard = React.memo(() => {
           </div>
         </div>
       )}
+
+      {/* Hydration reminder button */}
+      <div className="mt-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-semibold mb-2">💧 Przypomnienie o nawodnieniu</h3>
+            <p className="text-cyan-100 mb-4">Kliknij, aby otrzymać przypomnienie o wypiciu wody</p>
+            <div className="flex flex-col space-y-2">
+              <button
+                onClick={async () => {
+                  await triggerHydrationNotification();
+                  setNotificationSent(true);
+                  setTimeout(() => setNotificationSent(false), 3000);
+                }}
+                className={`px-6 py-2 rounded-lg font-semibold transition-all transform hover:scale-105 shadow-lg ${
+                  notificationSent ? "bg-green-500 text-white" : "bg-white text-cyan-600 hover:bg-cyan-50"
+                }`}
+              >
+                {notificationSent ? "✅ Wysłano!" : "Wyślij przypomnienie"}
+              </button>
+
+              {typeof window !== "undefined" && "Notification" in window && Notification.permission === "denied" && (
+                <button
+                  onClick={() => {
+                    alert(`🔔 Powiadomienia są zablokowane w Safari!
+
+Aby je włączyć w Safari:
+1. Safari → Preferencje (Cmd + ,)
+2. Kliknij zakładkę "Strony internetowe"
+3. W lewym menu wybierz "Powiadomienia"
+4. Znajdź tę stronę i zmień na "Zezwól"
+5. Odśwież stronę (Cmd + R)
+
+Lub przez pasek adresu:
+1. Kliknij ikonę "aA" w pasku adresu
+2. Wybierz "Ustawienia dla tej strony"
+3. Zmień "Powiadomienia" na "Zezwól"
+4. Odśwież stronę
+
+Uwaga: Safari może wymagać HTTPS dla powiadomień!`);
+                  }}
+                  className="px-4 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-all"
+                >
+                  🔧 Jak włączyć powiadomienia?
+                </button>
+              )}
+            </div>
+          </div>
+          <span className="text-6xl opacity-50">💧</span>
+        </div>
+      </div>
 
       {/* Quick stats */}
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
