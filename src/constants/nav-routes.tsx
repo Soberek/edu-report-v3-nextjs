@@ -14,6 +14,20 @@ import {
   FaTasks,
   FaCheckSquare,
   FaUserMd,
+  FaVirus,
+  FaChartLine,
+  FaHeartbeat,
+  FaClipboardList,
+  FaFileExport,
+  FaCog,
+  FaUsers,
+  FaGraduationCap,
+  FaLightbulb,
+  FaChartBar,
+  FaDatabase,
+  FaTools,
+  FaShieldAlt,
+  FaQuestionCircle,
 } from "react-icons/fa";
 
 export interface NavRoute {
@@ -68,6 +82,22 @@ export const navRoutes: NavRoute[] = [
     isPrivate: true,
     icon: <FaUserMd />,
     description: "Moduł edukacyjny o czerniaku",
+  },
+  {
+    title: "Grypa i przeziębienia",
+    path: "grypa-i-przeziebienia",
+    category: "education",
+    isPrivate: true,
+    icon: <FaVirus />,
+    description: "Edukacja na temat grypy i przeziębień",
+  },
+  {
+    title: "Śledzenie nawyków",
+    path: "habit-tracker",
+    category: "education",
+    isPrivate: true,
+    icon: <FaChartLine />,
+    description: "Monitorowanie i śledzenie nawyków zdrowotnych",
   },
 
   // Database Management
@@ -145,6 +175,46 @@ export const navRoutes: NavRoute[] = [
     icon: <FaCheckSquare />,
     description: "Lista zadań do wykonania",
   },
+  {
+    title: "Analiza danych",
+    path: "analiza-danych",
+    category: "tools",
+    isPrivate: true,
+    icon: <FaChartBar />,
+    description: "Narzędzia do analizy i wizualizacji danych",
+  },
+  {
+    title: "Eksport raportów",
+    path: "eksport-raportow",
+    category: "tools",
+    isPrivate: true,
+    icon: <FaFileExport />,
+    description: "Eksportowanie danych i raportów",
+  },
+  {
+    title: "Zarządzanie użytkownikami",
+    path: "uzytkownicy",
+    category: "tools",
+    isPrivate: true,
+    icon: <FaUsers />,
+    description: "Administracja użytkownikami systemu",
+  },
+  {
+    title: "Ustawienia systemu",
+    path: "ustawienia",
+    category: "tools",
+    isPrivate: true,
+    icon: <FaCog />,
+    description: "Konfiguracja i ustawienia aplikacji",
+  },
+  {
+    title: "Pomoc i wsparcie",
+    path: "pomoc",
+    category: "tools",
+    isPrivate: true,
+    icon: <FaQuestionCircle />,
+    description: "Centrum pomocy i dokumentacja",
+  },
 
   // Authentication
   {
@@ -162,6 +232,22 @@ export const navRoutes: NavRoute[] = [
     isPrivate: false,
     icon: <FaUserPlus />,
     description: "Rejestracja nowego użytkownika",
+  },
+  {
+    title: "Profil użytkownika",
+    path: "profil",
+    category: "auth",
+    isPrivate: true,
+    icon: <FaUserMd />,
+    description: "Zarządzanie profilem użytkownika",
+  },
+  {
+    title: "Wyloguj się",
+    path: "logout",
+    category: "auth",
+    isPrivate: true,
+    icon: <FaSignInAlt />,
+    description: "Wylogowanie z systemu",
   },
 ];
 
