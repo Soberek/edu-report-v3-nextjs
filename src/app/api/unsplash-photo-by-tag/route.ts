@@ -28,12 +28,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unsplash API key not configured." }, { status: 500 });
     }
 
-    // Build query parameters
+    // Build query parameters - fetch multiple images to get variety
     const params = new URLSearchParams({
       query: tag,
       client_id: ACCESS_KEY,
       orientation,
-      count: Math.min(count, 30).toString(), // Unsplash API limit
+      count: "10", // Fetch 10 images to get variety
     });
 
     const url = `${UNSPLASH_API_URL}?${params.toString()}`;
@@ -51,7 +51,10 @@ export async function POST(request: Request) {
       if (data.length === 0) {
         return NextResponse.json({ error: `No photos found for tag "${tag}"` }, { status: 404 });
       }
-      return NextResponse.json(data);
+      // Randomly select one image from the array for variety
+      const randomIndex = Math.floor(Math.random() * data.length);
+      const selectedImage = data[randomIndex];
+      return NextResponse.json([selectedImage]);
     } else {
       if (!data || !data.id) {
         return NextResponse.json({ error: `Invalid photo data for tag "${tag}"` }, { status: 404 });

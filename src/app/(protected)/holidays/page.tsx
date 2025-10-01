@@ -6,13 +6,15 @@ import { useHolidays } from "./hooks";
 import { useHolidayGraphics } from "./hooks/useHolidayGraphics";
 import { UrlInput, HolidaysList, ActionSection, ResultsSection, ExportSection, MockTemplateTest } from "./components";
 import { GeneratedPostsWithGraphics } from "./components/GeneratedPostsWithGraphics";
+import type { GeneratedImagePostImagesResult } from "@/services/generatedImagePostImagesService";
 
 // Main component
 export default function Holidays() {
   const [url, setUrl] = useState("https://www.kalbi.pl/kalendarz-swiat-nietypowych-pazdziernik");
+  const [postImagesResults, setPostImagesResults] = useState<GeneratedImagePostImagesResult[]>([]);
 
   const { state, aiLoading, fetchHolidays, extractHealthHolidays, generatePosts, clearError } = useHolidays();
-  const { state: graphicsState, generatePostsWithGraphics, refreshGraphics, clearError: clearGraphicsError, setTemplateConfig } = useHolidayGraphics();
+  const { state: graphicsState, generatePostsWithGraphics, refreshGraphics, clearError: clearGraphicsError, setTemplateConfig, updatePost, templateConfig } = useHolidayGraphics();
 
   // Handler functions
   const handleFetchHolidays = () => fetchHolidays(url);
@@ -22,6 +24,10 @@ export default function Holidays() {
   const handleRefreshGraphics = () => refreshGraphics();
   const handleTemplateConfigUpdate = (config: any) => {
     setTemplateConfig(config);
+  };
+
+  const handlePostUpdate = (updatedPost: any) => {
+    updatePost(updatedPost);
   };
 
   // Error handling
@@ -74,6 +80,9 @@ export default function Holidays() {
           loading={graphicsState.loading}
           error={graphicsState.error}
           onError={clearGraphicsError}
+          onPostImagesResultsChange={setPostImagesResults}
+          onPostUpdate={handlePostUpdate}
+          templateConfig={templateConfig}
         />
       </Box>
 
@@ -81,6 +90,8 @@ export default function Holidays() {
       <ExportSection
         posts={state.posts}
         holidays={state.separatedHolidaysFromOpenAi}
+        generatedPostsWithGraphics={graphicsState.posts}
+        postImagesResults={postImagesResults}
         onError={(error) => console.error("Export error:", error)}
       />
 

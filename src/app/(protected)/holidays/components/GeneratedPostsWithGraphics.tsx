@@ -16,7 +16,7 @@ import {
   Divider,
   Alert,
 } from "@mui/material";
-import { Close as CloseIcon, Download as DownloadIcon, Share as ShareIcon, FileDownload, CloudUpload } from "@mui/icons-material";
+import { Close as CloseIcon, Download as DownloadIcon, Share as ShareIcon, FileDownload, CloudUpload, Refresh } from "@mui/icons-material";
 import { LoadingSpinner } from "@/components/shared";
 import { exportPostsWithGraphicsToCSV, validatePostsWithGraphicsForExport } from "../utils/exportUtils";
 import { generatedImagePostImagesService, type GeneratedImagePostImagesResult } from "@/services/generatedImagePostImagesService";
@@ -40,6 +40,9 @@ interface GeneratedPostsWithGraphicsProps {
   loading: boolean;
   error: string | null;
   onError: (error: string) => void;
+  onPostImagesResultsChange?: (results: GeneratedImagePostImagesResult[]) => void;
+  onPostUpdate?: (updatedPost: GeneratedPostWithGraphics) => void;
+  templateConfig?: any;
 }
 
 export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProps> = ({
@@ -47,12 +50,23 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
   loading,
   error,
   onError,
+  onPostImagesResultsChange,
+  onPostUpdate,
+  templateConfig,
 }) => {
   const [selectedPost, setSelectedPost] = React.useState<GeneratedPostWithGraphics | null>(null);
   const [imageLoading, setImageLoading] = React.useState<Set<number>>(new Set());
   const [uploadingToPostImages, setUploadingToPostImages] = React.useState<Set<number>>(new Set());
   const [postImagesResults, setPostImagesResults] = React.useState<GeneratedImagePostImagesResult[]>([]);
   const [showPostImagesUrls, setShowPostImagesUrls] = React.useState(false);
+  const [regeneratingImage, setRegeneratingImage] = React.useState<Set<number>>(new Set());
+
+  // Notify parent when postImagesResults change
+  React.useEffect(() => {
+    if (onPostImagesResultsChange) {
+      onPostImagesResultsChange(postImagesResults);
+    }
+  }, [postImagesResults, onPostImagesResultsChange]);
 
   const handleImageLoad = (postId: number) => {
     setImageLoading(prev => {
@@ -88,13 +102,37 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
     }
   };
 
-  const handleExportToCSV = () => {
+  const handleExportToCSV = async () => {
     try {
       if (!validatePostsWithGraphicsForExport(posts)) {
         onError("Invalid posts data for CSV export");
         return;
       }
-      exportPostsWithGraphicsToCSV(posts);
+      
+      // Check if all posts have been uploaded to PostImages
+      const postsNotUploaded = posts.filter(post => 
+        !postImagesResults.some(result => result.originalPost.id === post.id)
+      );
+      
+      if (postsNotUploaded.length > 0) {
+        // Upload remaining posts to PostImages first
+        onError(`Please upload all posts to PostImages first. ${postsNotUploaded.length} posts still need to be uploaded.`);
+        return;
+      }
+      
+      // Create posts with PostImages URLs
+      const postsWithPostImagesUrls = posts.map(post => {
+        const postImagesResult = postImagesResults.find(result => result.originalPost.id === post.id);
+        return {
+          ...post,
+          // Use PostImages URL (should be available since we checked above)
+          imageUrl: postImagesResult?.postImagesResult?.url || post.generatedImageUrl,
+          // Keep original Unsplash URL for reference
+          originalImageUrl: post.imageUrl
+        };
+      });
+      
+      exportPostsWithGraphicsToCSV(postsWithPostImagesUrls);
     } catch (error) {
       onError(error instanceof Error ? error.message : "Failed to export CSV");
     }
@@ -162,6 +200,92 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
     }
   };
 
+  const handleUploadAllAndExport = async () => {
+    try {
+      // First upload all posts to PostImages
+      await handleUploadAllToPostImages();
+      
+      // Wait a moment for state to update
+      setTimeout(() => {
+        // Then export to CSV
+        handleExportToCSV();
+      }, 1000);
+    } catch (error) {
+      onError(error instanceof Error ? error.message : "Failed to upload and export");
+    }
+  };
+
+  const handleRegenerateImage = async (post: GeneratedPostWithGraphics) => {
+    console.log("Starting image regeneration for post:", post.id, post.title);
+    setRegeneratingImage(prev => new Set(prev).add(post.id));
+
+    try {
+      // Call the API to get a new Unsplash image for this post
+      // Add timestamp to query to get different images
+      const queryWithTimestamp = `${post.query} ${Date.now()}`;
+      console.log("Fetching new image for query:", queryWithTimestamp);
+      const response = await fetch("/api/unsplash-photo-by-tag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tag: queryWithTimestamp }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch new image");
+      }
+
+      const data = await response.json();
+      console.log("Unsplash API response:", data);
+      const newImageUrl = Array.isArray(data) && data.length > 0 ? data[0].urls?.regular : "";
+
+      if (!newImageUrl) {
+        throw new Error("No image URL received from Unsplash API");
+      }
+
+      console.log("New image URL:", newImageUrl);
+
+      // Regenerate the graphics with the new image using current template config
+      console.log("Regenerating graphics with template config:", templateConfig);
+      const { graphicsGenerator } = await import("@/utils/graphicsGenerator");
+      const newGeneratedImageUrl = await graphicsGenerator.generateHolidayPost({
+        title: post.title,
+        date: post.literalDate,
+        backgroundImageUrl: newImageUrl,
+        templateImageUrl: templateConfig?.templateImageUrl || "",
+        datePosition: templateConfig?.datePosition,
+        titlePosition: templateConfig?.titlePosition,
+        imagePlaceholder: templateConfig?.imagePlaceholder
+      });
+
+      console.log("New generated image URL:", newGeneratedImageUrl);
+
+      // Update the post in the parent component
+      const updatedPost = {
+        ...post,
+        imageUrl: newImageUrl,
+        generatedImageUrl: newGeneratedImageUrl
+      };
+
+      console.log("Updating post with:", updatedPost);
+      if (onPostUpdate) {
+        onPostUpdate(updatedPost);
+        console.log("Post update called successfully");
+      } else {
+        console.warn("onPostUpdate callback not provided");
+      }
+      
+    } catch (error) {
+      console.error("Error regenerating image:", error);
+      onError(error instanceof Error ? error.message : "Failed to regenerate image");
+    } finally {
+      setRegeneratingImage(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(post.id);
+        return newSet;
+      });
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
@@ -211,14 +335,6 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
               View PostImages URLs ({postImagesResults.length})
             </Button>
           )}
-          <Button
-            variant="outlined"
-            startIcon={<FileDownload />}
-            onClick={handleExportToCSV}
-            sx={{ px: 3, py: 1.5 }}
-          >
-            Export to CSV
-          </Button>
         </Box>
       </Box>
       
@@ -299,13 +415,13 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
                   </Box>
                 </Box>
                 
-                <Box sx={{ display: "flex", gap: 1, mt: "auto" }}>
+                <Box sx={{ display: "flex", gap: 1, mt: "auto", flexWrap: "wrap" }}>
                   <Button
                     variant="outlined"
                     size="small"
                     startIcon={<DownloadIcon />}
                     onClick={() => handleDownloadImage(post)}
-                    sx={{ flex: 1 }}
+                    sx={{ flex: 1, minWidth: "120px" }}
                   >
                     Pobierz
                   </Button>
@@ -315,16 +431,26 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
                     startIcon={<CloudUpload />}
                     onClick={() => handleUploadToPostImages(post)}
                     disabled={uploadingToPostImages.has(post.id)}
-                    sx={{ flex: 1 }}
+                    sx={{ flex: 1, minWidth: "120px" }}
                   >
                     {uploadingToPostImages.has(post.id) ? "Uploading..." : "Upload to PostImages"}
                   </Button>
                   <Button
                     variant="outlined"
                     size="small"
+                    startIcon={<Refresh />}
+                    onClick={() => handleRegenerateImage(post)}
+                    disabled={regeneratingImage.has(post.id)}
+                    sx={{ flex: 1, minWidth: "120px" }}
+                  >
+                    {regeneratingImage.has(post.id) ? "Regenerating..." : "New Image"}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
                     startIcon={<ShareIcon />}
                     onClick={() => handleSharePost(post)}
-                    sx={{ flex: 1 }}
+                    sx={{ flex: 1, minWidth: "120px" }}
                   >
                     Udostępnij
                   </Button>
@@ -389,6 +515,14 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
                   disabled={uploadingToPostImages.has(selectedPost.id)}
                 >
                   {uploadingToPostImages.has(selectedPost.id) ? "Uploading..." : "Upload to PostImages"}
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<Refresh />}
+                  onClick={() => handleRegenerateImage(selectedPost)}
+                  disabled={regeneratingImage.has(selectedPost.id)}
+                >
+                  {regeneratingImage.has(selectedPost.id) ? "Regenerating..." : "New Image"}
                 </Button>
                 <Button
                   variant="outlined"
