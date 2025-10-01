@@ -13,6 +13,7 @@ interface GeneratedPostWithGraphics {
   generatedImageUrl: string;
   tags: string;
   postingTime: string;
+  originalImageUrl?: string; // Optional field for original Unsplash URL
 }
 
 /**
@@ -60,13 +61,10 @@ export const exportPostsWithGraphicsToCSV = (posts: GeneratedPostWithGraphics[],
   try {
     const csvRows: string[][] = [];
 
-    // Header
+    // Header - matching health holidays format
     csvRows.push([
-      "Title", 
       "Text", 
-      "Date", 
-      "Original Image URL", 
-      "Generated Image URL", 
+      "Image URL", 
       "Tags", 
       "Posting Time"
     ]);
@@ -74,12 +72,9 @@ export const exportPostsWithGraphicsToCSV = (posts: GeneratedPostWithGraphics[],
     // Data rows
     for (const post of posts) {
       csvRows.push([
-        post.title,
         post.text, 
-        post.literalDate,
-        post.imageUrl, // Original Unsplash image
-        post.generatedImageUrl, // Generated image with template
-        post.tags, 
+        post.imageUrl, // PostImages URL (if available, otherwise generated)
+        "", // Empty tags column
         post.postingTime
       ]);
     }
