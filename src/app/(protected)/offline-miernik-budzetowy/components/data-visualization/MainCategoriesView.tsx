@@ -61,9 +61,15 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell><strong>Miesiąc</strong></TableCell>
-                    <TableCell align="right"><strong>Liczba osób</strong></TableCell>
-                    <TableCell align="right"><strong>Liczba działań</strong></TableCell>
+                    <TableCell>
+                      <strong>Miesiąc</strong>
+                    </TableCell>
+                    <TableCell align="right">
+                      <strong>Liczba osób</strong>
+                    </TableCell>
+                    <TableCell align="right">
+                      <strong>Liczba działań</strong>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -75,7 +81,9 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
                     </TableRow>
                   ))}
                   <TableRow sx={{ backgroundColor: "action.hover" }}>
-                    <TableCell><strong>SUMA</strong></TableCell>
+                    <TableCell>
+                      <strong>SUMA</strong>
+                    </TableCell>
                     <TableCell align="right">
                       <strong>{data.grandTotalPeople.toLocaleString("pl-PL")}</strong>
                     </TableCell>
@@ -126,9 +134,15 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
                       <Table size="small">
                         <TableHead>
                           <TableRow>
-                            <TableCell><strong>Miesiąc</strong></TableCell>
-                            <TableCell align="right"><strong>Liczba osób</strong></TableCell>
-                            <TableCell align="right"><strong>Liczba działań</strong></TableCell>
+                            <TableCell>
+                              <strong>Miesiąc</strong>
+                            </TableCell>
+                            <TableCell align="right">
+                              <strong>Liczba osób</strong>
+                            </TableCell>
+                            <TableCell align="right">
+                              <strong>Liczba działań</strong>
+                            </TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -140,7 +154,9 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
                             </TableRow>
                           ))}
                           <TableRow sx={{ backgroundColor: "action.hover" }}>
-                            <TableCell><strong>SUMA</strong></TableCell>
+                            <TableCell>
+                              <strong>SUMA</strong>
+                            </TableCell>
                             <TableCell align="right">
                               <strong>{category.totalPeople.toLocaleString("pl-PL")}</strong>
                             </TableCell>
@@ -219,9 +235,15 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
                           <Table size="small">
                             <TableHead>
                               <TableRow sx={{ backgroundColor: "action.hover" }}>
-                                <TableCell><strong>Miesiąc</strong></TableCell>
-                                <TableCell align="right"><strong>Osób</strong></TableCell>
-                                <TableCell align="right"><strong>Działań</strong></TableCell>
+                                <TableCell>
+                                  <strong>Miesiąc</strong>
+                                </TableCell>
+                                <TableCell align="right">
+                                  <strong>Osób</strong>
+                                </TableCell>
+                                <TableCell align="right">
+                                  <strong>Działań</strong>
+                                </TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>

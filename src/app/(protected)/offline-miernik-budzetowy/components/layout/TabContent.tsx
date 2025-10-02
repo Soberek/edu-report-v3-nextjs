@@ -22,7 +22,7 @@ interface TabContentProps {
 export const TabContent: React.FC<TabContentProps> = ({ activeTab, aggregatedData, selectedMonths, rawData }) => {
   // Calculate main category data with selected months
   const mainCategoryData = useMemo(() => {
-    const selectedMonthNumbers = selectedMonths.filter(m => m.selected).map(m => m.monthNumber);
+    const selectedMonthNumbers = selectedMonths.filter((m) => m.selected).map((m) => m.monthNumber);
     return aggregateByMainCategories(rawData, selectedMonthNumbers);
   }, [rawData, selectedMonths]);
 

@@ -72,8 +72,18 @@ export interface MainCategoryAggregatedData {
 }
 
 const MONTH_NAMES = [
-  "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
-  "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
+  "Styczeń",
+  "Luty",
+  "Marzec",
+  "Kwiecień",
+  "Maj",
+  "Czerwiec",
+  "Lipiec",
+  "Sierpień",
+  "Wrzesień",
+  "Październik",
+  "Listopad",
+  "Grudzień",
 ];
 
 /**
@@ -176,19 +186,19 @@ export function aggregateByMainCategories(rawData: ExcelRow[], selectedMonths?: 
     // Update monthly data for this program
     if (month > 0) {
       const monthlyMap = new Map<number, { people: number; actions: number }>();
-      itemData.monthlyBreakdown.forEach(m => monthlyMap.set(m.month, { people: m.people, actions: m.actions }));
-      
+      itemData.monthlyBreakdown.forEach((m) => monthlyMap.set(m.month, { people: m.people, actions: m.actions }));
+
       const monthData = monthlyMap.get(month) || { people: 0, actions: 0 };
       monthData.people += people;
       monthData.actions += actionNumber;
       monthlyMap.set(month, monthData);
-      
+
       itemData.monthlyBreakdown = Array.from(monthlyMap.entries())
         .map(([m, data]) => ({
           month: m,
           monthName: MONTH_NAMES[m - 1],
           people: data.people,
-          actions: data.actions
+          actions: data.actions,
         }))
         .sort((a, b) => a.month - b.month);
     }
@@ -256,7 +266,7 @@ export function aggregateByMainCategories(rawData: ExcelRow[], selectedMonths?: 
         month,
         monthName: MONTH_NAMES[month - 1],
         people: data.people,
-        actions: data.actions
+        actions: data.actions,
       }))
       .sort((a, b) => a.month - b.month);
 
@@ -309,7 +319,7 @@ export function aggregateByMainCategories(rawData: ExcelRow[], selectedMonths?: 
       month,
       monthName: MONTH_NAMES[month - 1],
       people: data.people,
-      actions: data.actions
+      actions: data.actions,
     }))
     .sort((a, b) => a.month - b.month);
 
