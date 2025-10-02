@@ -50,6 +50,54 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
         </Card>
       </Box>
 
+      {/* Grand Total Monthly Breakdown */}
+      {data.monthlyBreakdown && data.monthlyBreakdown.length > 0 && (
+        <Card sx={{ mb: 4 }}>
+          <CardContent>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              📅 Podział według miesięcy (wszystkie kategorie)
+            </Typography>
+            <TableContainer component={Paper} variant="outlined" sx={{ mt: 2 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Miesiąc</strong>
+                    </TableCell>
+                    <TableCell align="right">
+                      <strong>Liczba osób</strong>
+                    </TableCell>
+                    <TableCell align="right">
+                      <strong>Liczba działań</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.monthlyBreakdown.map((monthData) => (
+                    <TableRow key={monthData.month} hover>
+                      <TableCell>{monthData.monthName}</TableCell>
+                      <TableCell align="right">{monthData.people.toLocaleString("pl-PL")}</TableCell>
+                      <TableCell align="right">{monthData.actions.toLocaleString("pl-PL")}</TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow sx={{ backgroundColor: "action.hover" }}>
+                    <TableCell>
+                      <strong>SUMA</strong>
+                    </TableCell>
+                    <TableCell align="right">
+                      <strong>{data.grandTotalPeople.toLocaleString("pl-PL")}</strong>
+                    </TableCell>
+                    <TableCell align="right">
+                      <strong>{data.grandTotalActions.toLocaleString("pl-PL")}</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Categories */}
       <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
         Podział według kategorii głównych
@@ -75,6 +123,54 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
               </Box>
             </AccordionSummary>
             <AccordionDetails>
+              {/* Category Monthly Breakdown */}
+              {category.monthlyBreakdown && category.monthlyBreakdown.length > 0 && (
+                <Card sx={{ mb: 3, backgroundColor: "background.default" }}>
+                  <CardContent>
+                    <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                      📅 Podział według miesięcy dla kategorii: {category.category}
+                    </Typography>
+                    <TableContainer component={Paper} variant="outlined" sx={{ mt: 2 }}>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>
+                              <strong>Miesiąc</strong>
+                            </TableCell>
+                            <TableCell align="right">
+                              <strong>Liczba osób</strong>
+                            </TableCell>
+                            <TableCell align="right">
+                              <strong>Liczba działań</strong>
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {category.monthlyBreakdown.map((monthData) => (
+                            <TableRow key={monthData.month} hover>
+                              <TableCell>{monthData.monthName}</TableCell>
+                              <TableCell align="right">{monthData.people.toLocaleString("pl-PL")}</TableCell>
+                              <TableCell align="right">{monthData.actions.toLocaleString("pl-PL")}</TableCell>
+                            </TableRow>
+                          ))}
+                          <TableRow sx={{ backgroundColor: "action.hover" }}>
+                            <TableCell>
+                              <strong>SUMA</strong>
+                            </TableCell>
+                            <TableCell align="right">
+                              <strong>{category.totalPeople.toLocaleString("pl-PL")}</strong>
+                            </TableCell>
+                            <TableCell align="right">
+                              <strong>{category.totalActions.toLocaleString("pl-PL")}</strong>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </CardContent>
+                </Card>
+              )}
+
               {category.programs.map((program, pIndex) => (
                 <Card key={pIndex} sx={{ mb: 2, "&:last-child": { mb: 0 } }}>
                   <CardContent>
@@ -128,6 +224,41 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
                         />
                       </Box>
                     </Box>
+
+                    {/* Program Monthly Breakdown */}
+                    {program.monthlyBreakdown && program.monthlyBreakdown.length > 0 && (
+                      <Box sx={{ mb: 2, p: 2, backgroundColor: "background.default", borderRadius: 1 }}>
+                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                          📅 Miesięczny podział danych
+                        </Typography>
+                        <TableContainer component={Paper} variant="outlined" sx={{ mt: 1 }}>
+                          <Table size="small">
+                            <TableHead>
+                              <TableRow sx={{ backgroundColor: "action.hover" }}>
+                                <TableCell>
+                                  <strong>Miesiąc</strong>
+                                </TableCell>
+                                <TableCell align="right">
+                                  <strong>Osób</strong>
+                                </TableCell>
+                                <TableCell align="right">
+                                  <strong>Działań</strong>
+                                </TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {program.monthlyBreakdown.map((monthData) => (
+                                <TableRow key={monthData.month} hover>
+                                  <TableCell>{monthData.monthName}</TableCell>
+                                  <TableCell align="right">{monthData.people.toLocaleString("pl-PL")}</TableCell>
+                                  <TableCell align="right">{monthData.actions.toLocaleString("pl-PL")}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Box>
+                    )}
 
                     {/* Display actions */}
                     <TableContainer component={Paper} variant="outlined">

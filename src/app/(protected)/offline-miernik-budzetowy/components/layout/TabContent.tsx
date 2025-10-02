@@ -20,10 +20,11 @@ interface TabContentProps {
  * Encapsulates tab switching logic and prop passing
  */
 export const TabContent: React.FC<TabContentProps> = ({ activeTab, aggregatedData, selectedMonths, rawData }) => {
-  // Calculate main category data
+  // Calculate main category data with selected months
   const mainCategoryData = useMemo(() => {
-    return aggregateByMainCategories(rawData);
-  }, [rawData]);
+    const selectedMonthNumbers = selectedMonths.filter((m) => m.selected).map((m) => m.monthNumber);
+    return aggregateByMainCategories(rawData, selectedMonthNumbers);
+  }, [rawData, selectedMonths]);
 
   const renderTabContent = () => {
     switch (activeTab) {

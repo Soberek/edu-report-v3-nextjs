@@ -1,3 +1,4 @@
+import moment from "moment";
 import { ExcelRow } from "../types";
 import { getMainCategoryFromRow, MainCategory, getAllMainCategories } from "./mainCategoryMapping";
 
@@ -8,6 +9,16 @@ export interface ActionData {
   actionName: string;
   people: number;
   actionNumber: number;
+}
+
+/**
+ * Monthly breakdown data
+ */
+export interface MonthlyData {
+  month: number;
+  monthName: string;
+  people: number;
+  actions: number;
 }
 
 /**
@@ -36,6 +47,7 @@ export interface CategoryProgramData {
   examplePrograms: string[]; // Program names that belong to this sub-category (up to 3)
   totalProgramCount: number; // Total number of unique programs in this group
   actions: ActionData[];
+  monthlyBreakdown: MonthlyData[]; // Monthly breakdown of data
 }
 
 /**
@@ -46,6 +58,7 @@ export interface MainCategoryData {
   totalPeople: number;
   totalActions: number;
   programs: CategoryProgramData[];
+  monthlyBreakdown: MonthlyData[]; // Monthly breakdown for the entire category
 }
 
 /**
@@ -55,18 +68,42 @@ export interface MainCategoryAggregatedData {
   categories: MainCategoryData[];
   grandTotalPeople: number;
   grandTotalActions: number;
+  monthlyBreakdown: MonthlyData[]; // Grand total monthly breakdown
 }
+
+const MONTH_NAMES = [
+  "Styczeń",
+  "Luty",
+  "Marzec",
+  "Kwiecień",
+  "Maj",
+  "Czerwiec",
+  "Lipiec",
+  "Sierpień",
+  "Wrzesień",
+  "Październik",
+  "Listopad",
+  "Grudzień",
+];
 
 /**
  * Aggregates Excel data by main categories
  * Groups items by sub-category when present, showing example program names
+ * Now includes monthly breakdown for selected months
  */
-export function aggregateByMainCategories(rawData: ExcelRow[]): MainCategoryAggregatedData {
+export function aggregateByMainCategories(rawData: ExcelRow[], selectedMonths?: number[]): MainCategoryAggregatedData {
   console.log("🔄 Starting aggregation by main categories...");
   console.log(`📊 Total rows to process: ${rawData.length}`);
+  if (selectedMonths && selectedMonths.length > 0) {
+    console.log(`📅 Filtering by months: ${selectedMonths.join(", ")}`);
+  }
 
   // Initialize category map - now keyed by sub-category or program
   const categoryMap = new Map<MainCategory, Map<string, CategoryProgramData>>();
+
+  // Track monthly data at different levels
+  const grandMonthlyMap = new Map<number, { people: number; actions: number }>();
+  const categoryMonthlyMaps = new Map<MainCategory, Map<number, { people: number; actions: number }>>();
 
   let grandTotalPeople = 0;
   let grandTotalActions = 0;
@@ -76,6 +113,16 @@ export function aggregateByMainCategories(rawData: ExcelRow[]): MainCategoryAggr
 
   // Process each row
   rawData.forEach((row, index) => {
+    // Extract month from date
+    const dateStr = String(row["Data"] || "");
+    const date = moment(dateStr, "YYYY-MM-DD");
+    const month = date.isValid() ? date.month() + 1 : 0; // moment months are 0-indexed
+
+    // Filter by selected months if provided
+    if (selectedMonths && selectedMonths.length > 0 && month > 0 && !selectedMonths.includes(month)) {
+      return; // Skip this row
+    }
+
     const mainCategory = getMainCategoryFromRow(row);
     const programType = String(row["Typ programu"] || "");
     const programName = String(row["Nazwa programu"] || "");
@@ -130,10 +177,31 @@ export function aggregateByMainCategories(rawData: ExcelRow[]): MainCategoryAggr
         examplePrograms: [],
         totalProgramCount: 0,
         actions: [],
+        monthlyBreakdown: [],
       });
     }
 
     const itemData = itemsMap.get(itemKey)!;
+
+    // Update monthly data for this program
+    if (month > 0) {
+      const monthlyMap = new Map<number, { people: number; actions: number }>();
+      itemData.monthlyBreakdown.forEach((m) => monthlyMap.set(m.month, { people: m.people, actions: m.actions }));
+
+      const monthData = monthlyMap.get(month) || { people: 0, actions: 0 };
+      monthData.people += people;
+      monthData.actions += actionNumber;
+      monthlyMap.set(month, monthData);
+
+      itemData.monthlyBreakdown = Array.from(monthlyMap.entries())
+        .map(([m, data]) => ({
+          month: m,
+          monthName: MONTH_NAMES[m - 1],
+          people: data.people,
+          actions: data.actions,
+        }))
+        .sort((a, b) => a.month - b.month);
+    }
 
     // Track unique programs for sub-category groups
     if (isSubCategoryItem && !itemData.examplePrograms.includes(programName)) {
@@ -163,6 +231,24 @@ export function aggregateByMainCategories(rawData: ExcelRow[]): MainCategoryAggr
     itemData.totalActions += actionNumber;
     grandTotalPeople += people;
     grandTotalActions += actionNumber;
+
+    // Update grand monthly totals
+    if (month > 0) {
+      const grandMonthData = grandMonthlyMap.get(month) || { people: 0, actions: 0 };
+      grandMonthData.people += people;
+      grandMonthData.actions += actionNumber;
+      grandMonthlyMap.set(month, grandMonthData);
+
+      // Update category monthly totals
+      if (!categoryMonthlyMaps.has(mainCategory)) {
+        categoryMonthlyMaps.set(mainCategory, new Map());
+      }
+      const catMonthlyMap = categoryMonthlyMaps.get(mainCategory)!;
+      const catMonthData = catMonthlyMap.get(month) || { people: 0, actions: 0 };
+      catMonthData.people += people;
+      catMonthData.actions += actionNumber;
+      catMonthlyMap.set(month, catMonthData);
+    }
   });
 
   // Convert to array structure
@@ -173,11 +259,23 @@ export function aggregateByMainCategories(rawData: ExcelRow[]): MainCategoryAggr
     const totalPeople = programs.reduce((sum, p) => sum + p.totalPeople, 0);
     const totalActions = programs.reduce((sum, p) => sum + p.totalActions, 0);
 
+    // Get monthly breakdown for this category
+    const catMonthlyMap = categoryMonthlyMaps.get(category) || new Map();
+    const monthlyBreakdown: MonthlyData[] = Array.from(catMonthlyMap.entries())
+      .map(([month, data]) => ({
+        month,
+        monthName: MONTH_NAMES[month - 1],
+        people: data.people,
+        actions: data.actions,
+      }))
+      .sort((a, b) => a.month - b.month);
+
     return {
       category,
       totalPeople,
       totalActions,
       programs,
+      monthlyBreakdown,
     };
   });
 
@@ -215,9 +313,20 @@ export function aggregateByMainCategories(rawData: ExcelRow[]): MainCategoryAggr
   console.log(`🏷️  Total Categories: ${categories.filter((c) => c.programs.length > 0).length}`);
   console.log("=".repeat(60) + "\n");
 
+  // Create grand monthly breakdown
+  const monthlyBreakdown: MonthlyData[] = Array.from(grandMonthlyMap.entries())
+    .map(([month, data]) => ({
+      month,
+      monthName: MONTH_NAMES[month - 1],
+      people: data.people,
+      actions: data.actions,
+    }))
+    .sort((a, b) => a.month - b.month);
+
   return {
     categories,
     grandTotalPeople,
     grandTotalActions,
+    monthlyBreakdown,
   };
 }
