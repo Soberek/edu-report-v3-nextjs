@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Box, Typography, Chip, Button, Alert } from "@mui/material";
 import { Refresh, Warning } from "@mui/icons-material";
 import type { EducationalTask } from "@/types";
-import { Controller, Control, FieldValues, Path } from "react-hook-form";
+import { Controller, Control, FieldValues, Path, useWatch } from "react-hook-form";
 import { useTaskNumberManager } from "../hooks/useTaskNumberManager";
 
 interface TaskNumberFieldProps<T extends FieldValues = FieldValues> {
@@ -29,6 +29,14 @@ export const TaskNumberField = <T extends FieldValues = FieldValues>({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [currentValue, setCurrentValue] = useState("");
 
+  // Watch the field value
+  const fieldValue = useWatch({ control, name });
+
+  // Update current value when field value changes
+  useEffect(() => {
+    setCurrentValue(String(fieldValue || ""));
+  }, [fieldValue]);
+
   // Create manager with current field value
   const taskNumberManager = useTaskNumberManager({
     tasks,
@@ -41,10 +49,6 @@ export const TaskNumberField = <T extends FieldValues = FieldValues>({
       name={name}
       control={control}
       render={({ field, fieldState }) => {
-        // Update current value when field value changes
-        if (String(field.value || "") !== currentValue) {
-          setCurrentValue(String(field.value || ""));
-        }
         const handleQuickSuggestion = () => {
           const nextNumber = taskNumberManager.getNextSuggestion();
           field.onChange(String(nextNumber));
