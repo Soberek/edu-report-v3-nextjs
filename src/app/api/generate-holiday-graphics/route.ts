@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { fetchUnsplashPhotos } from "@/services/unsplashService";
 
 interface GenerateGraphicsRequest {
   holidays: Array<{
@@ -39,23 +40,21 @@ export async function POST(request: Request) {
     // Process each holiday
     for (const holiday of holidays) {
       try {
-        // Fetch Unsplash image
-        const unsplashResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/unsplash-photo-by-tag`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tag: holiday.query,
-            count: 1,
-            orientation: "landscape",
-            size: "regular",
-          }),
-        });
-
+        // Fetch Unsplash image directly via shared service (no internal HTTP roundtrip)
         let imageUrl = "";
-        if (unsplashResponse.ok) {
-          const unsplashData = await unsplashResponse.json();
-          if (Array.isArray(unsplashData) && unsplashData.length > 0) {
-            imageUrl = unsplashData[0].urls?.regular || "";
+        try {
+          const data = await fetchUnsplashPhotos(holiday.query, { count: 1, orientation: "landscape", timeoutMs: 5000 });
+          if (Array.isArray(data) && data.length > 0) {
+            imageUrl = data[0]?.urls?.regular || "";
+          } else if (data && (data as any).id) {
+            imageUrl = (data as any).urls?.regular || "";
+          }
+        } catch (err) {
+          const name = (err as any)?.name;
+          if (name === "AbortError") {
+            console.warn(`Unsplash fetch aborted after 5s for tag: ${holiday.query}`);
+          } else {
+            console.error(`Unsplash fetch error for tag ${holiday.query}:`, err);
           }
         }
 
