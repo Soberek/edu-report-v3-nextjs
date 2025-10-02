@@ -46,8 +46,11 @@ export function normalizeMainCategory(category: string | undefined | null): Main
  * Gets the main category from Excel row data
  * Reads the "Main Category" key from the row
  */
-export function getMainCategoryFromRow(row: Record<string, any>): MainCategory {
-  const categoryValue = row["Main Category"] || row["Kategoria główna"] || row["main category"];
+export function getMainCategoryFromRow(row: Record<string, unknown>): MainCategory {
+  const categoryValue =
+    (row as Record<string, string>)["Main Category"] ||
+    (row as Record<string, string>)["Kategoria główna"] ||
+    (row as Record<string, string>)["main category"];
   return normalizeMainCategory(categoryValue as string);
 }
 

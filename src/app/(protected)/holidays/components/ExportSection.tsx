@@ -1,34 +1,32 @@
 import React from "react";
 import { Box, Button, Typography, Paper, Grid } from "@mui/material";
 import { FileDownload, TableChart } from "@mui/icons-material";
-import { exportPostsToCSV, exportHolidaysToExcel, exportPostsWithGraphicsToCSV, validatePostsForExport, validateHolidaysForExport, validatePostsWithGraphicsForExport } from "../utils/exportUtils";
-import type { Post, EducationalHolidayWithQuery } from "../types";
+import {
+  exportPostsToCSV,
+  exportHolidaysToExcel,
+  exportPostsWithGraphicsToCSV,
+  validatePostsForExport,
+  validateHolidaysForExport,
+  validatePostsWithGraphicsForExport,
+} from "../utils/exportUtils";
+import type { Post, EducationalHolidayWithQuery, GeneratedPostWithGraphics } from "../types";
 import type { GeneratedImagePostImagesResult } from "@/services/generatedImagePostImagesService";
-
-interface GeneratedPostWithGraphics {
-  id: number;
-  title: string;
-  description: string;
-  query: string;
-  literalDate: string;
-  dateForThisYear: string;
-  text: string;
-  imageUrl: string;
-  generatedImageUrl: string;
-  tags: string;
-  postingTime: string;
-  originalImageUrl?: string;
-}
 
 interface ExportSectionProps {
   posts: Post[];
   holidays: EducationalHolidayWithQuery[];
   generatedPostsWithGraphics?: GeneratedPostWithGraphics[];
-  postImagesResults?: GeneratedImagePostImagesResult[];
+  postImagesResults?: GeneratedImagePostImagesResult<GeneratedPostWithGraphics>[];
   onError: (error: string) => void;
 }
 
-export const ExportSection: React.FC<ExportSectionProps> = ({ posts, holidays, generatedPostsWithGraphics, postImagesResults, onError }) => {
+export const ExportSection: React.FC<ExportSectionProps> = ({
+  posts,
+  holidays,
+  generatedPostsWithGraphics,
+  postImagesResults,
+  onError,
+}) => {
   const handleExportToCSV = () => {
     try {
       // Use generated posts with graphics if available, otherwise use regular posts
@@ -37,19 +35,19 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ posts, holidays, g
           onError("Invalid generated posts data for CSV export");
           return;
         }
-        
+
         // Create posts with PostImages URLs if available
-        const postsWithPostImagesUrls = generatedPostsWithGraphics.map(post => {
-          const postImagesResult = postImagesResults?.find(result => result.originalPost.id === post.id);
+        const postsWithPostImagesUrls = generatedPostsWithGraphics.map((post) => {
+          const postImagesResult = postImagesResults?.find((result) => result.originalPost.id === post.id);
           return {
             ...post,
             // Use PostImages URL if available, otherwise use generated image URL
             imageUrl: postImagesResult?.postImagesResult?.url || post.generatedImageUrl,
             // Keep original Unsplash URL for reference
-            originalImageUrl: post.imageUrl
+            originalImageUrl: post.imageUrl,
           };
         });
-        
+
         exportPostsWithGraphicsToCSV(postsWithPostImagesUrls);
       } else {
         if (!validatePostsForExport(posts)) {
@@ -108,10 +106,9 @@ export const ExportSection: React.FC<ExportSectionProps> = ({ posts, holidays, g
               Eksportuj posty do pliku CSV
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              {generatedPostsWithGraphics && generatedPostsWithGraphics.length > 0 
+              {generatedPostsWithGraphics && generatedPostsWithGraphics.length > 0
                 ? "Eksportuj wygenerowane posty z grafikami do pliku CSV (z Image URL)"
-                : "Eksportuj wygenerowane posty do pliku CSV"
-              }
+                : "Eksportuj wygenerowane posty do pliku CSV"}
             </Typography>
             <Button variant="contained" startIcon={<FileDownload />} onClick={handleExportToCSV} sx={{ px: 3, py: 1.5 }}>
               Eksportuj do CSV

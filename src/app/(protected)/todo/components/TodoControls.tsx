@@ -97,7 +97,9 @@ export const TodoControls = ({ state, dispatch, categories }: TodoControlsProps)
                 <InputLabel>Sortowanie</InputLabel>
                 <Select
                   value={state.sortBy}
-                  onChange={(e) => dispatch({ type: "SET_SORT_BY", payload: e.target.value as any })}
+                  onChange={(e) =>
+                    dispatch({ type: "SET_SORT_BY", payload: e.target.value as "dueDate" | "priority" | "createdAt" | "category" })
+                  }
                   label="Sortowanie"
                 >
                   <MenuItem value="dueDate">Po dacie</MenuItem>

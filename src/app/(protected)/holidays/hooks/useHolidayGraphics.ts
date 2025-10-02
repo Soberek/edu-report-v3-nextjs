@@ -1,21 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { graphicsGenerator } from "@/utils/graphicsGenerator";
 import { TEMPLATE_CONFIG } from "../config/templateConfig";
-import type { EducationalHolidayWithQuery } from "../types";
-
-interface GeneratedPostWithGraphics {
-  id: number;
-  title: string;
-  description: string;
-  query: string;
-  literalDate: string;
-  dateForThisYear: string;
-  text: string;
-  imageUrl: string;
-  generatedImageUrl: string;
-  tags: string;
-  postingTime: string;
-}
+import type { EducationalHolidayWithQuery, HolidayTemplateConfig, GeneratedPostWithGraphics, ApiGeneratedPost } from "../types";
 
 interface GraphicsState {
   posts: GeneratedPostWithGraphics[];
@@ -34,24 +20,24 @@ export const useHolidayGraphics = () => {
 
   // Load saved template configuration from localStorage
   useEffect(() => {
-    const savedConfig = localStorage.getItem('holidayTemplateConfig');
+    const savedConfig = localStorage.getItem("holidayTemplateConfig");
     if (savedConfig) {
       try {
         const parsedConfig = JSON.parse(savedConfig);
         setTemplateConfig(parsedConfig);
       } catch (error) {
-        console.warn('Failed to parse saved template config:', error);
+        console.warn("Failed to parse saved template config:", error);
       }
     }
   }, []);
 
   const generatePostsWithGraphics = useCallback(async (holidays: EducationalHolidayWithQuery[]) => {
     if (holidays.length === 0) {
-      setState(prev => ({ ...prev, error: "No holidays available to generate posts" }));
+      setState((prev) => ({ ...prev, error: "No holidays available to generate posts" }));
       return;
     }
 
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
       const response = await fetch("/api/generate-holiday-graphics", {
@@ -66,10 +52,10 @@ export const useHolidayGraphics = () => {
       }
 
       const data = await response.json();
-      
+
       // Generate graphics for each post on the client side
       const postsWithGraphics = await Promise.all(
-        data.posts.map(async (post: any) => {
+        data.posts.map(async (post: ApiGeneratedPost) => {
           try {
             const generatedImageUrl = await graphicsGenerator.generateHolidayPost({
               title: post.title,
@@ -78,24 +64,24 @@ export const useHolidayGraphics = () => {
               templateImageUrl: templateConfig.templateImageUrl,
               datePosition: templateConfig.datePosition,
               titlePosition: templateConfig.titlePosition,
-              imagePlaceholder: templateConfig.imagePlaceholder
+              imagePlaceholder: templateConfig.imagePlaceholder,
             });
-            
+
             return {
               ...post,
-              generatedImageUrl
+              generatedImageUrl,
             };
           } catch (error) {
             console.error(`Failed to generate graphics for ${post.title}:`, error);
             return {
               ...post,
-              generatedImageUrl: post.imageUrl // Fallback to original image
+              generatedImageUrl: post.imageUrl, // Fallback to original image
             };
           }
         })
       );
-      
-      setState(prev => ({
+
+      setState((prev) => ({
         ...prev,
         posts: postsWithGraphics,
         loading: false,
@@ -103,7 +89,7 @@ export const useHolidayGraphics = () => {
       }));
     } catch (error) {
       console.error("Error generating posts with graphics:", error);
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         loading: false,
         error: error instanceof Error ? error.message : "Unknown error occurred",
@@ -112,7 +98,7 @@ export const useHolidayGraphics = () => {
   }, []);
 
   const clearError = useCallback(() => {
-    setState(prev => ({ ...prev, error: null }));
+    setState((prev) => ({ ...prev, error: null }));
   }, []);
 
   const resetState = useCallback(() => {
@@ -125,11 +111,11 @@ export const useHolidayGraphics = () => {
 
   const refreshGraphics = useCallback(async () => {
     if (state.posts.length === 0) {
-      setState(prev => ({ ...prev, error: "No posts available to refresh" }));
+      setState((prev) => ({ ...prev, error: "No posts available to refresh" }));
       return;
     }
 
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
       // Regenerate graphics for existing posts using current template config
@@ -143,24 +129,24 @@ export const useHolidayGraphics = () => {
               templateImageUrl: templateConfig.templateImageUrl,
               datePosition: templateConfig.datePosition,
               titlePosition: templateConfig.titlePosition,
-              imagePlaceholder: templateConfig.imagePlaceholder
+              imagePlaceholder: templateConfig.imagePlaceholder,
             });
-            
+
             return {
               ...post,
-              generatedImageUrl
+              generatedImageUrl,
             };
           } catch (error) {
             console.error(`Failed to refresh graphics for ${post.title}:`, error);
             return {
               ...post,
-              generatedImageUrl: post.imageUrl // Fallback to original image
+              generatedImageUrl: post.imageUrl, // Fallback to original image
             };
           }
         })
       );
-      
-      setState(prev => ({
+
+      setState((prev) => ({
         ...prev,
         posts: refreshedPosts,
         loading: false,
@@ -168,7 +154,7 @@ export const useHolidayGraphics = () => {
       }));
     } catch (error) {
       console.error("Error refreshing graphics:", error);
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         loading: false,
         error: error instanceof Error ? error.message : "Unknown error occurred",
@@ -176,16 +162,14 @@ export const useHolidayGraphics = () => {
     }
   }, [state.posts, templateConfig]);
 
-  const updatePost = useCallback((updatedPost: any) => {
+  const updatePost = useCallback((updatedPost: GeneratedPostWithGraphics) => {
     console.log("updatePost called with:", updatedPost);
-    setState(prev => {
-      const newPosts = prev.posts.map(post => 
-        post.id === updatedPost.id ? updatedPost : post
-      );
+    setState((prev) => {
+      const newPosts = prev.posts.map((post) => (post.id === updatedPost.id ? updatedPost : post));
       console.log("Updated posts:", newPosts);
       return {
         ...prev,
-        posts: newPosts
+        posts: newPosts,
       };
     });
   }, []);

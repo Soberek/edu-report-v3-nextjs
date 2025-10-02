@@ -1,23 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  Alert,
-  CircularProgress,
-} from "@mui/material";
+import { Box, Paper, Typography, Button, Alert, CircularProgress } from "@mui/material";
 import { Visibility as VisibilityIcon } from "@mui/icons-material";
 import { graphicsGenerator } from "@/utils/graphicsGenerator";
+import type { HolidayTemplateConfig } from "../types";
 
 interface TemplatePreviewProps {
-  templateConfig: any;
+  templateConfig: HolidayTemplateConfig;
 }
 
-export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
-  templateConfig,
-}) => {
+export const TemplatePreview: React.FC<TemplatePreviewProps> = ({ templateConfig }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,16 +47,8 @@ export const TemplatePreview: React.FC<TemplatePreviewProps> = ({
   return (
     <Paper elevation={2} sx={{ p: 3 }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
-        <Typography variant="h6">
-          Template Preview
-        </Typography>
-        <Button
-          variant="outlined"
-          size="small"
-          startIcon={<VisibilityIcon />}
-          onClick={generatePreview}
-          disabled={loading}
-        >
+        <Typography variant="h6">Template Preview</Typography>
+        <Button variant="outlined" size="small" startIcon={<VisibilityIcon />} onClick={generatePreview} disabled={loading}>
           {loading ? "Generating..." : "Refresh Preview"}
         </Button>
       </Box>

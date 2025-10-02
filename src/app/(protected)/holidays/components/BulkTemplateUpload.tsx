@@ -18,14 +18,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import {
-  CloudUpload as CloudUploadIcon,
-  Delete as DeleteIcon,
-  Image as ImageIcon,
-  CheckCircle,
-  Error,
-  Upload,
-} from "@mui/icons-material";
+import { CloudUpload as CloudUploadIcon, Delete as DeleteIcon, Image as ImageIcon, CheckCircle, Error, Upload } from "@mui/icons-material";
 import { postImagesUploadService, type PostImagesUploadResult } from "@/services/postImagesUploadService";
 
 interface UploadedTemplate {
@@ -42,10 +35,7 @@ interface BulkTemplateUploadProps {
   onClose?: () => void;
 }
 
-export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
-  onTemplatesUploaded,
-  onClose,
-}) => {
+export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({ onTemplatesUploaded, onClose }) => {
   const [templates, setTemplates] = useState<UploadedTemplate[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,10 +46,10 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
     if (!files) return;
 
     const newTemplates: UploadedTemplate[] = [];
-    
+
     Array.from(files).forEach((file) => {
       // Validate file type
-      if (!file.type.startsWith('image/')) {
+      if (!file.type.startsWith("image/")) {
         setError(`File ${file.name} is not an image`);
         return;
       }
@@ -79,8 +69,8 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
           preview,
           uploading: false,
         };
-        
-        setTemplates(prev => [...prev, template]);
+
+        setTemplates((prev) => [...prev, template]);
       };
       reader.readAsDataURL(file);
     });
@@ -98,32 +88,23 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
   };
 
   const removeTemplate = (id: string) => {
-    setTemplates(prev => prev.filter(t => t.id !== id));
+    setTemplates((prev) => prev.filter((t) => t.id !== id));
   };
 
   const uploadTemplate = async (template: UploadedTemplate) => {
-    setTemplates(prev => prev.map(t => 
-      t.id === template.id ? { ...t, uploading: true, error: undefined } : t
-    ));
+    setTemplates((prev) => prev.map((t) => (t.id === template.id ? { ...t, uploading: true, error: undefined } : t)));
 
     try {
       const result = await postImagesUploadService.uploadImage(
         template.file,
-        template.file.name.split('.')[0],
+        template.file.name.split(".")[0],
         `Template: ${template.file.name}`
       );
 
-      setTemplates(prev => prev.map(t => 
-        t.id === template.id 
-          ? { ...t, postImagesResult: result, uploading: false }
-          : t
-      ));
-    } catch (error) {
-      setTemplates(prev => prev.map(t => 
-        t.id === template.id 
-          ? { ...t, error: error instanceof Error ? error.message : 'Upload failed', uploading: false }
-          : t
-      ));
+      setTemplates((prev) => prev.map((t) => (t.id === template.id ? { ...t, postImagesResult: result, uploading: false } : t)));
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? (error as Error).message : "Upload failed";
+      setTemplates((prev) => prev.map((t) => (t.id === template.id ? { ...t, error: errorMessage, uploading: false } : t)));
     }
   };
 
@@ -133,34 +114,32 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
 
     try {
       // Upload all templates in parallel
-      const uploadPromises = templates.map(template => uploadTemplate(template));
+      const uploadPromises = templates.map((template) => uploadTemplate(template));
       await Promise.all(uploadPromises);
 
-      const successfulUploads = templates
-        .filter(t => t.postImagesResult)
-        .map(t => t.postImagesResult!);
+      const successfulUploads = templates.filter((t) => t.postImagesResult).map((t) => t.postImagesResult!);
 
       if (successfulUploads.length > 0) {
         setShowResults(true);
         onTemplatesUploaded?.(successfulUploads);
       }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Bulk upload failed');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? (error as Error).message : "Bulk upload failed");
     } finally {
       setUploading(false);
     }
   };
 
-  const successfulUploads = templates.filter(t => t.postImagesResult);
-  const failedUploads = templates.filter(t => t.error);
-  const pendingUploads = templates.filter(t => !t.postImagesResult && !t.error && !t.uploading);
+  const successfulUploads = templates.filter((t) => t.postImagesResult);
+  const failedUploads = templates.filter((t) => t.error);
+  const pendingUploads = templates.filter((t) => !t.postImagesResult && !t.error && !t.uploading);
 
   return (
     <Box>
       <Typography variant="h5" gutterBottom>
         Bulk Template Upload
       </Typography>
-      
+
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         Upload multiple template images to PostImages at once. Drag and drop files or click to browse.
       </Typography>
@@ -215,9 +194,7 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
       {templates.length > 0 && (
         <Box sx={{ mt: 3 }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-            <Typography variant="h6">
-              Templates ({templates.length})
-            </Typography>
+            <Typography variant="h6">Templates ({templates.length})</Typography>
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
                 variant="contained"
@@ -227,27 +204,17 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
               >
                 {uploading ? "Uploading..." : `Upload All (${templates.length})`}
               </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setTemplates([])}
-                disabled={uploading}
-              >
+              <Button variant="outlined" onClick={() => setTemplates([])} disabled={uploading}>
                 Clear All
               </Button>
             </Box>
           </Box>
 
-          <Grid container spacing={2}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" }, gap: 2 }}>
             {templates.map((template) => (
-              <Grid item xs={12} sm={6} md={4} key={template.id}>
+              <Box key={template.id}>
                 <Card sx={{ height: "100%" }}>
-                  <CardMedia
-                    component="img"
-                    height="150"
-                    image={template.preview}
-                    alt={template.file.name}
-                    sx={{ objectFit: "cover" }}
-                  />
+                  <CardMedia component="img" height="150" image={template.preview} alt={template.file.name} sx={{ objectFit: "cover" }} />
                   <CardContent>
                     <Typography variant="subtitle2" noWrap>
                       {template.file.name}
@@ -259,35 +226,17 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
                     <Box sx={{ mt: 1, display: "flex", alignItems: "center", gap: 1 }}>
                       {template.uploading && (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          <LinearProgress size={20} />
+                          <LinearProgress sx={{ flex: 1, maxWidth: 100 }} />
                           <Typography variant="caption">Uploading...</Typography>
                         </Box>
                       )}
-                      
-                      {template.postImagesResult && (
-                        <Chip
-                          icon={<CheckCircle />}
-                          label="Uploaded"
-                          color="success"
-                          size="small"
-                        />
-                      )}
-                      
-                      {template.error && (
-                        <Chip
-                          icon={<Error />}
-                          label="Failed"
-                          color="error"
-                          size="small"
-                        />
-                      )}
-                      
+
+                      {template.postImagesResult && <Chip icon={<CheckCircle />} label="Uploaded" color="success" size="small" />}
+
+                      {template.error && <Chip icon={<Error />} label="Failed" color="error" size="small" />}
+
                       {!template.uploading && !template.postImagesResult && !template.error && (
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => uploadTemplate(template)}
-                        >
+                        <Button size="small" variant="outlined" onClick={() => uploadTemplate(template)}>
                           Upload
                         </Button>
                       )}
@@ -309,9 +258,9 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
                     </IconButton>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
 
           {/* Upload Summary */}
           {templates.length > 0 && (
@@ -320,25 +269,10 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
                 Upload Summary
               </Typography>
               <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                <Chip
-                  label={`Total: ${templates.length}`}
-                  variant="outlined"
-                />
-                <Chip
-                  label={`Successful: ${successfulUploads.length}`}
-                  color="success"
-                  variant="outlined"
-                />
-                <Chip
-                  label={`Failed: ${failedUploads.length}`}
-                  color="error"
-                  variant="outlined"
-                />
-                <Chip
-                  label={`Pending: ${pendingUploads.length}`}
-                  color="warning"
-                  variant="outlined"
-                />
+                <Chip label={`Total: ${templates.length}`} variant="outlined" />
+                <Chip label={`Successful: ${successfulUploads.length}`} color="success" variant="outlined" />
+                <Chip label={`Failed: ${failedUploads.length}`} color="error" variant="outlined" />
+                <Chip label={`Pending: ${pendingUploads.length}`} color="warning" variant="outlined" />
               </Box>
             </Box>
           )}
@@ -352,32 +286,29 @@ export const BulkTemplateUpload: React.FC<BulkTemplateUploadProps> = ({
       )}
 
       {/* Results Dialog */}
-      <Dialog
-        open={showResults}
-        onClose={() => setShowResults(false)}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={showResults} onClose={() => setShowResults(false)} maxWidth="md" fullWidth>
         <DialogTitle>Upload Results</DialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mb: 2 }}>
             Successfully uploaded {successfulUploads.length} out of {templates.length} templates.
           </Typography>
-          
+
           <Box sx={{ maxHeight: 400, overflow: "auto" }}>
             {successfulUploads.map((template, index) => (
               <Box key={template.id} sx={{ mb: 2, p: 2, border: "1px solid", borderColor: "grey.300", borderRadius: 1 }}>
                 <Typography variant="subtitle2" gutterBottom>
                   {template.file.name}
                 </Typography>
-                <Box sx={{
-                  backgroundColor: "grey.100",
-                  p: 1,
-                  borderRadius: 1,
-                  wordBreak: "break-all",
-                  fontFamily: "monospace",
-                  fontSize: "0.875rem"
-                }}>
+                <Box
+                  sx={{
+                    backgroundColor: "grey.100",
+                    p: 1,
+                    borderRadius: 1,
+                    wordBreak: "break-all",
+                    fontFamily: "monospace",
+                    fontSize: "0.875rem",
+                  }}
+                >
                   {template.postImagesResult?.url}
                 </Box>
               </Box>

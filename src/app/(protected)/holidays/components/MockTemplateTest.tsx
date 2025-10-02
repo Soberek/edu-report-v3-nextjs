@@ -18,15 +18,10 @@ import {
   DialogActions,
   IconButton,
 } from "@mui/material";
-import {
-  CloudUpload,
-  Download,
-  Close,
-  Image as ImageIcon,
-  AutoAwesome,
-} from "@mui/icons-material";
+import { CloudUpload, Download, Close, Image as ImageIcon, AutoAwesome } from "@mui/icons-material";
 import { generatedImagePostImagesService, type GeneratedImagePostImagesResult } from "@/services/generatedImagePostImagesService";
 import { type PostImagesUploadResult } from "@/services/postImagesUploadService";
+import { GeneratedPostWithGraphics } from "./GeneratedPostsWithGraphics";
 
 // Mock generated post data for testing
 const mockGeneratedPosts = [
@@ -72,16 +67,15 @@ const mockGeneratedPosts = [
 ];
 
 export const MockTemplateTest: React.FC = () => {
-  const [postImagesResults, setPostImagesResults] = useState<GeneratedImagePostImagesResult[]>([]);
+  const [postImagesResults, setPostImagesResults] = useState<GeneratedImagePostImagesResult<GeneratedPostWithGraphics>[]>([]);
   const [uploadingToPostImages, setUploadingToPostImages] = useState<Set<number>>(new Set());
   const [showPostImagesUrls, setShowPostImagesUrls] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generatingSinglePost, setGeneratingSinglePost] = useState(false);
-  const [singleGeneratedPost, setSingleGeneratedPost] = useState<any>(null);
+  const [singleGeneratedPost, setSingleGeneratedPost] = useState<GeneratedPostWithGraphics | null>(null);
 
-
-  const handleUploadToPostImages = async (post: typeof mockGeneratedPosts[0]) => {
-    setUploadingToPostImages(prev => new Set(prev).add(post.id));
+  const handleUploadToPostImages = async (post: (typeof mockGeneratedPosts)[0]) => {
+    setUploadingToPostImages((prev) => new Set(prev).add(post.id));
     setError(null);
 
     try {
@@ -92,12 +86,12 @@ export const MockTemplateTest: React.FC = () => {
       );
 
       if (postImagesResult) {
-        setPostImagesResults(prev => [...prev, { originalPost: post, postImagesResult }]);
+        setPostImagesResults((prev) => [...prev, { originalPost: post, postImagesResult }]);
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : "Failed to upload to PostImages");
     } finally {
-      setUploadingToPostImages(prev => {
+      setUploadingToPostImages((prev) => {
         const newSet = new Set(prev);
         newSet.delete(post.id);
         return newSet;
@@ -106,15 +100,13 @@ export const MockTemplateTest: React.FC = () => {
   };
 
   const handleUploadAllToPostImages = async () => {
-    setUploadingToPostImages(new Set(mockGeneratedPosts.map(p => p.id)));
+    setUploadingToPostImages(new Set(mockGeneratedPosts.map((p) => p.id)));
     setError(null);
 
     try {
-      const results = await generatedImagePostImagesService.uploadMultipleGeneratedImagesToPostImages(
-        mockGeneratedPosts
-      );
+      const results = await generatedImagePostImagesService.uploadMultipleGeneratedImagesToPostImages(mockGeneratedPosts);
 
-      setPostImagesResults(prev => [...prev, ...results]);
+      setPostImagesResults((prev) => [...prev, ...results]);
     } catch (error) {
       setError(error instanceof Error ? error.message : "Failed to upload to PostImages");
     } finally {
@@ -122,14 +114,14 @@ export const MockTemplateTest: React.FC = () => {
     }
   };
 
-  const handleDownloadImage = async (post: typeof mockGeneratedPosts[0]) => {
+  const handleDownloadImage = async (post: (typeof mockGeneratedPosts)[0]) => {
     try {
       const response = await fetch(post.generatedImageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `${post.title.replace(/[^a-zA-Z0-9]/g, '_')}_mock.png`;
+      link.download = `${post.title.replace(/[^a-zA-Z0-9]/g, "_")}_mock.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -145,29 +137,40 @@ export const MockTemplateTest: React.FC = () => {
 
     try {
       // Call the generate-holiday-graphics API to generate a single post
-      const response = await fetch('/api/generate-holiday-graphics', {
-        method: 'POST',
+      const response = await fetch("/api/generate-holiday-graphics", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          holidays: [{
-            id: 1,
-            title: "Światowy Dzień Zdrowia",
-            description: "Promocja zdrowia i profilaktyki",
-            query: "health wellness",
-            literalDate: "7 kwietnia 2024",
-            dateForThisYear: "2024-04-07"
-          }],
+          holidays: [
+            {
+              id: 1,
+              title: "Światowy Dzień Zdrowia",
+              description: "Promocja zdrowia i profilaktyki",
+              query: "health wellness",
+              literalDate: "7 kwietnia 2024",
+              dateForThisYear: "2024-04-07",
+            },
+          ],
           count: 1, // Generate only 1 post
           useTemplate: true,
           templateConfig: {
             templateImageUrl: "/templates/holiday-template.png",
             datePosition: { x: 50, y: 100, fontSize: 24, color: "#ffffff", fontFamily: "Arial", textAlign: "left" as const },
-            titlePosition: { x: 50, y: 150, fontSize: 32, color: "#ffffff", fontFamily: "Arial", textAlign: "left" as const, maxWidth: 400, lineHeight: 1.2 },
+            titlePosition: {
+              x: 50,
+              y: 150,
+              fontSize: 32,
+              color: "#ffffff",
+              fontFamily: "Arial",
+              textAlign: "left" as const,
+              maxWidth: 400,
+              lineHeight: 1.2,
+            },
             canvasSize: { width: 940, height: 788 },
-            imagePlaceholder: { x: 0, y: 0, width: 940, height: 788 }
-          }
+            imagePlaceholder: { x: 0, y: 0, width: 940, height: 788 },
+          },
         }),
       });
 
@@ -176,11 +179,11 @@ export const MockTemplateTest: React.FC = () => {
       }
 
       const result = await response.json();
-      
+
       if (result.success && result.posts && result.posts.length > 0) {
         setSingleGeneratedPost(result.posts[0]);
       } else {
-        throw new Error(result.error || 'Failed to generate post');
+        throw new Error(result.error || "Failed to generate post");
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : "Failed to generate single post");
@@ -194,10 +197,10 @@ export const MockTemplateTest: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Mock Template Upload Test
       </Typography>
-      
+
       <Typography variant="body1" sx={{ mb: 3 }}>
-        This is a test component with mock generated post templates. You can test the upload functionality
-        by uploading these mock images to Firebase Storage and getting URLs.
+        This is a test component with mock generated post templates. You can test the upload functionality by uploading these mock images to
+        Firebase Storage and getting URLs.
       </Typography>
 
       {error && (
@@ -225,10 +228,7 @@ export const MockTemplateTest: React.FC = () => {
           {uploadingToPostImages.size > 0 ? "Uploading..." : "Upload All to PostImages"}
         </Button>
         {postImagesResults.length > 0 && (
-          <Button
-            variant="outlined"
-            onClick={() => setShowPostImagesUrls(true)}
-          >
+          <Button variant="outlined" onClick={() => setShowPostImagesUrls(true)}>
             View PostImages URLs ({postImagesResults.length})
           </Button>
         )}
@@ -261,13 +261,16 @@ export const MockTemplateTest: React.FC = () => {
               <Typography variant="body2" sx={{ mb: 2 }}>
                 <strong>Treść posta:</strong>
               </Typography>
-              <Typography variant="body2" sx={{
-                backgroundColor: "grey.100",
-                p: 1,
-                borderRadius: 1,
-                fontStyle: "italic",
-                mb: 2
-              }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  backgroundColor: "grey.100",
+                  p: 1,
+                  borderRadius: 1,
+                  fontStyle: "italic",
+                  mb: 2,
+                }}
+              >
                 {singleGeneratedPost.text}
               </Typography>
               <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
@@ -305,13 +308,7 @@ export const MockTemplateTest: React.FC = () => {
         {mockGeneratedPosts.map((post) => (
           <Grid size={{ xs: 12, md: 6, lg: 4 }} key={post.id}>
             <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-              <CardMedia
-                component="img"
-                height="200"
-                image={post.generatedImageUrl}
-                alt={post.title}
-                sx={{ objectFit: "cover" }}
-              />
+              <CardMedia component="img" height="200" image={post.generatedImageUrl} alt={post.title} sx={{ objectFit: "cover" }} />
               <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
                 <Typography variant="h6" gutterBottom>
                   {post.title}
@@ -319,7 +316,7 @@ export const MockTemplateTest: React.FC = () => {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2, flexGrow: 1 }}>
                   {post.description}
                 </Typography>
-                
+
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     <strong>Data:</strong> {post.literalDate}
@@ -328,7 +325,7 @@ export const MockTemplateTest: React.FC = () => {
                     <strong>Czas publikacji:</strong> {post.postingTime}
                   </Typography>
                 </Box>
-                
+
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     <strong>Tagi:</strong>
@@ -339,7 +336,7 @@ export const MockTemplateTest: React.FC = () => {
                     ))}
                   </Box>
                 </Box>
-                
+
                 <Box sx={{ display: "flex", gap: 1, mt: "auto" }}>
                   <Button
                     variant="outlined"
@@ -367,14 +364,8 @@ export const MockTemplateTest: React.FC = () => {
         ))}
       </Grid>
 
-
       {/* Dialog for viewing PostImages URLs */}
-      <Dialog
-        open={showPostImagesUrls}
-        onClose={() => setShowPostImagesUrls(false)}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={showPostImagesUrls} onClose={() => setShowPostImagesUrls(false)} maxWidth="md" fullWidth>
         <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           PostImages URLs ({postImagesResults.length})
           <IconButton onClick={() => setShowPostImagesUrls(false)}>
@@ -398,15 +389,17 @@ export const MockTemplateTest: React.FC = () => {
                       <Typography variant="body2" sx={{ mb: 1 }}>
                         <strong>PostImages URL:</strong>
                       </Typography>
-                      <Box sx={{ 
-                        backgroundColor: "grey.100", 
-                        p: 1, 
-                        borderRadius: 1,
-                        mb: 1,
-                        wordBreak: "break-all",
-                        fontFamily: "monospace",
-                        fontSize: "0.875rem"
-                      }}>
+                      <Box
+                        sx={{
+                          backgroundColor: "grey.100",
+                          p: 1,
+                          borderRadius: 1,
+                          mb: 1,
+                          wordBreak: "break-all",
+                          fontFamily: "monospace",
+                          fontSize: "0.875rem",
+                        }}
+                      >
                         {result.postImagesResult.url}
                       </Box>
                       <Typography variant="caption" color="text.secondary">
@@ -427,7 +420,6 @@ export const MockTemplateTest: React.FC = () => {
           <Button onClick={() => setShowPostImagesUrls(false)}>Close</Button>
         </DialogActions>
       </Dialog>
-
     </Box>
   );
 };
