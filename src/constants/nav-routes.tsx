@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   FaHome,
   FaFileAlt,
@@ -27,8 +28,18 @@ import {
   FaDatabase,
   FaTools,
   FaShieldAlt,
-  icon?: React.JSX.Element;
-  description?: string;
+  FaQuestionCircle,
+} from "react-icons/fa";
+
+export type NavCategory = "main" | "education" | "database" | "tools" | "auth";
+
+export interface NavRoute {
+  title: string;
+  path: string;
+  category: NavCategory;
+  isPrivate: boolean;
+  icon: ReactNode;
+  description: string;
 }
 
 export const navRoutes: NavRoute[] = [
