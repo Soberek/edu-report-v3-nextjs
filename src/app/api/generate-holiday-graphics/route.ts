@@ -26,6 +26,18 @@ interface GeneratedPost {
   postingTime: string;
 }
 
+// Minimal Unsplash photo types used by our service
+interface UnsplashPhoto {
+  id: string;
+  urls?: {
+    raw?: string;
+    full?: string;
+    regular?: string;
+    small?: string;
+    thumb?: string;
+  };
+}
+
 // POST handler: generate graphics for holiday posts
 export async function POST(request: Request) {
   try {
@@ -43,15 +55,17 @@ export async function POST(request: Request) {
         // Fetch Unsplash image directly via shared service (no internal HTTP roundtrip)
         let imageUrl = "";
         try {
-          const data = await fetchUnsplashPhotos(holiday.query, { count: 1, orientation: "landscape", timeoutMs: 5000 });
+          const data = (await fetchUnsplashPhotos(holiday.query, { count: 1, orientation: "landscape", timeoutMs: 5000 })) as
+            | UnsplashPhoto
+            | UnsplashPhoto[];
           if (Array.isArray(data) && data.length > 0) {
-            imageUrl = data[0]?.urls?.regular || "";
-          } else if (data && (data as any).id) {
-            imageUrl = (data as any).urls?.regular || "";
+            imageUrl = data[0].urls?.regular || "";
+          } else if (data && (data as UnsplashPhoto).id) {
+            imageUrl = (data as UnsplashPhoto).urls?.regular || "";
           }
         } catch (err) {
-          const name = (err as any)?.name;
-          if (name === "AbortError") {
+          const e = err as Error & { name?: string };
+          if (e.name === "AbortError") {
             console.warn(`Unsplash fetch aborted after 5s for tag: ${holiday.query}`);
           } else {
             console.error(`Unsplash fetch error for tag ${holiday.query}:`, err);
