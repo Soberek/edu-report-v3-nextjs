@@ -9,7 +9,6 @@ const routeMap: { [key: string]: string } = {
   "/": "Strona główna",
   "/contacts": "Kontakty",
   "/schedule": "Harmonogram",
-  "/generator-postow": "Generator postów",
   "/wygeneruj-izrz": "Generator IZRZ",
   "/czerniak": "Czerniak",
   "/habit-tracker": "Śledzenie nawyków",

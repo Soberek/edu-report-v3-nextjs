@@ -162,7 +162,6 @@ edu-report-v3-nextjs/
 │   │   │   │   └── types/      # TypeScript interfaces
 │   │   │   ├── schedule/       # Task management system
 │   │   │   ├── wygeneruj-izrz/ # IZRZ report generator
-│   │   │   ├── generator-postow/ # AI post generator
 │   │   │   ├── czerniak/       # Melanoma education module
 │   │   │   ├── habit-tracker/  # Personal development tracker
 │   │   │   ├── contacts/       # Contact management

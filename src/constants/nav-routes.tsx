@@ -27,14 +27,6 @@ import {
   FaDatabase,
   FaTools,
   FaShieldAlt,
-  FaQuestionCircle,
-} from "react-icons/fa";
-
-export interface NavRoute {
-  title: string;
-  path: string;
-  category: "main" | "database" | "tools" | "auth" | "education";
-  isPrivate: boolean;
   icon?: React.JSX.Element;
   description?: string;
 }
