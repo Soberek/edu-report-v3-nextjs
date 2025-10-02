@@ -20,6 +20,7 @@ import { Close as CloseIcon, Download as DownloadIcon, Share as ShareIcon, FileD
 import { LoadingSpinner } from "@/components/shared";
 import { exportPostsWithGraphicsToCSV, validatePostsWithGraphicsForExport } from "../utils/exportUtils";
 import { generatedImagePostImagesService, type GeneratedImagePostImagesResult } from "@/services/generatedImagePostImagesService";
+import type { HolidayTemplateConfig } from "../types";
 
 interface GeneratedPostWithGraphics {
   id: number;
@@ -40,9 +41,9 @@ interface GeneratedPostsWithGraphicsProps {
   loading: boolean;
   error: string | null;
   onError: (error: string) => void;
-  onPostImagesResultsChange?: (results: GeneratedImagePostImagesResult[]) => void;
+  onPostImagesResultsChange?: (results: GeneratedImagePostImagesResult<GeneratedPostWithGraphics>[]) => void;
   onPostUpdate?: (updatedPost: GeneratedPostWithGraphics) => void;
-  templateConfig?: any;
+  templateConfig?: HolidayTemplateConfig;
 }
 
 export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProps> = ({
@@ -57,7 +58,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
   const [selectedPost, setSelectedPost] = React.useState<GeneratedPostWithGraphics | null>(null);
   const [imageLoading, setImageLoading] = React.useState<Set<number>>(new Set());
   const [uploadingToPostImages, setUploadingToPostImages] = React.useState<Set<number>>(new Set());
-  const [postImagesResults, setPostImagesResults] = React.useState<GeneratedImagePostImagesResult[]>([]);
+  const [postImagesResults, setPostImagesResults] = React.useState<GeneratedImagePostImagesResult<GeneratedPostWithGraphics>[]>([]);
   const [showPostImagesUrls, setShowPostImagesUrls] = React.useState(false);
   const [regeneratingImage, setRegeneratingImage] = React.useState<Set<number>>(new Set());
 
@@ -69,7 +70,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
   }, [postImagesResults, onPostImagesResultsChange]);
 
   const handleImageLoad = (postId: number) => {
-    setImageLoading(prev => {
+    setImageLoading((prev) => {
       const newSet = new Set(prev);
       newSet.delete(postId);
       return newSet;
@@ -77,7 +78,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
   };
 
   const handleImageError = (postId: number) => {
-    setImageLoading(prev => {
+    setImageLoading((prev) => {
       const newSet = new Set(prev);
       newSet.delete(postId);
       return newSet;
@@ -90,9 +91,9 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
       const response = await fetch(post.generatedImageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.download = `${post.title.replace(/[^a-zA-Z0-9]/g, '_')}_post.png`;
+      link.download = `${post.title.replace(/[^a-zA-Z0-9]/g, "_")}_post.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -108,30 +109,28 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
         onError("Invalid posts data for CSV export");
         return;
       }
-      
+
       // Check if all posts have been uploaded to PostImages
-      const postsNotUploaded = posts.filter(post => 
-        !postImagesResults.some(result => result.originalPost.id === post.id)
-      );
-      
+      const postsNotUploaded = posts.filter((post) => !postImagesResults.some((result) => result.originalPost.id === post.id));
+
       if (postsNotUploaded.length > 0) {
         // Upload remaining posts to PostImages first
         onError(`Please upload all posts to PostImages first. ${postsNotUploaded.length} posts still need to be uploaded.`);
         return;
       }
-      
+
       // Create posts with PostImages URLs
-      const postsWithPostImagesUrls = posts.map(post => {
-        const postImagesResult = postImagesResults.find(result => result.originalPost.id === post.id);
+      const postsWithPostImagesUrls = posts.map((post) => {
+        const postImagesResult = postImagesResults.find((result) => result.originalPost.id === post.id);
         return {
           ...post,
           // Use PostImages URL (should be available since we checked above)
           imageUrl: postImagesResult?.postImagesResult?.url || post.generatedImageUrl,
           // Keep original Unsplash URL for reference
-          originalImageUrl: post.imageUrl
+          originalImageUrl: post.imageUrl,
         };
       });
-      
+
       exportPostsWithGraphicsToCSV(postsWithPostImagesUrls);
     } catch (error) {
       onError(error instanceof Error ? error.message : "Failed to export CSV");
@@ -161,7 +160,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
   };
 
   const handleUploadToPostImages = async (post: GeneratedPostWithGraphics) => {
-    setUploadingToPostImages(prev => new Set(prev).add(post.id));
+    setUploadingToPostImages((prev) => new Set(prev).add(post.id));
 
     try {
       const postImagesResult = await generatedImagePostImagesService.uploadGeneratedImageToPostImages(
@@ -171,12 +170,12 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
       );
 
       if (postImagesResult) {
-        setPostImagesResults(prev => [...prev, { originalPost: post, postImagesResult }]);
+        setPostImagesResults((prev) => [...prev, { originalPost: post, postImagesResult }]);
       }
     } catch (error) {
       onError(error instanceof Error ? error.message : "Failed to upload to PostImages");
     } finally {
-      setUploadingToPostImages(prev => {
+      setUploadingToPostImages((prev) => {
         const newSet = new Set(prev);
         newSet.delete(post.id);
         return newSet;
@@ -185,14 +184,12 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
   };
 
   const handleUploadAllToPostImages = async () => {
-    setUploadingToPostImages(new Set(posts.map(p => p.id)));
+    setUploadingToPostImages(new Set(posts.map((p) => p.id)));
 
     try {
-      const results = await generatedImagePostImagesService.uploadMultipleGeneratedImagesToPostImages(
-        posts
-      );
+      const results = await generatedImagePostImagesService.uploadMultipleGeneratedImagesToPostImages(posts);
 
-      setPostImagesResults(prev => [...prev, ...results]);
+      setPostImagesResults((prev) => [...prev, ...results]);
     } catch (error) {
       onError(error instanceof Error ? error.message : "Failed to upload to PostImages");
     } finally {
@@ -204,7 +201,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
     try {
       // First upload all posts to PostImages
       await handleUploadAllToPostImages();
-      
+
       // Wait a moment for state to update
       setTimeout(() => {
         // Then export to CSV
@@ -217,7 +214,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
 
   const handleRegenerateImage = async (post: GeneratedPostWithGraphics) => {
     console.log("Starting image regeneration for post:", post.id, post.title);
-    setRegeneratingImage(prev => new Set(prev).add(post.id));
+    setRegeneratingImage((prev) => new Set(prev).add(post.id));
 
     try {
       // Call the API to get a new Unsplash image for this post
@@ -254,7 +251,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
         templateImageUrl: templateConfig?.templateImageUrl || "",
         datePosition: templateConfig?.datePosition,
         titlePosition: templateConfig?.titlePosition,
-        imagePlaceholder: templateConfig?.imagePlaceholder
+        imagePlaceholder: templateConfig?.imagePlaceholder,
       });
 
       console.log("New generated image URL:", newGeneratedImageUrl);
@@ -263,7 +260,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
       const updatedPost = {
         ...post,
         imageUrl: newImageUrl,
-        generatedImageUrl: newGeneratedImageUrl
+        generatedImageUrl: newGeneratedImageUrl,
       };
 
       console.log("Updating post with:", updatedPost);
@@ -273,12 +270,11 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
       } else {
         console.warn("onPostUpdate callback not provided");
       }
-      
     } catch (error) {
       console.error("Error regenerating image:", error);
       onError(error instanceof Error ? error.message : "Failed to regenerate image");
     } finally {
-      setRegeneratingImage(prev => {
+      setRegeneratingImage((prev) => {
         const newSet = new Set(prev);
         newSet.delete(post.id);
         return newSet;
@@ -327,20 +323,16 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
             {uploadingToPostImages.size > 0 ? "Uploading..." : "Upload All to PostImages"}
           </Button>
           {postImagesResults.length > 0 && (
-            <Button
-              variant="outlined"
-              onClick={() => setShowPostImagesUrls(true)}
-              sx={{ px: 3, py: 1.5 }}
-            >
+            <Button variant="outlined" onClick={() => setShowPostImagesUrls(true)} sx={{ px: 3, py: 1.5 }}>
               View PostImages URLs ({postImagesResults.length})
             </Button>
           )}
         </Box>
       </Box>
-      
+
       <Grid container spacing={3}>
         {posts.map((post) => (
-          <Grid size={{ xs: 12, md: 6, lg: 4 }}  key={post.id}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }} key={post.id}>
             <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
               <Box sx={{ position: "relative" }}>
                 {imageLoading.has(post.id) && (
@@ -371,16 +363,16 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
                   sx={{ objectFit: "cover" }}
                 />
               </Box>
-              
+
               <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
                 <Typography variant="h6" component="h3" gutterBottom>
                   {post.title}
                 </Typography>
-                
+
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2, flexGrow: 1 }}>
                   {post.description}
                 </Typography>
-                
+
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     <strong>Data:</strong> {post.literalDate}
@@ -389,21 +381,24 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
                     <strong>Czas publikacji:</strong> {post.postingTime}
                   </Typography>
                 </Box>
-                
+
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     <strong>Treść posta:</strong>
                   </Typography>
-                  <Typography variant="body2" sx={{ 
-                    backgroundColor: "grey.100", 
-                    p: 1, 
-                    borderRadius: 1,
-                    fontStyle: "italic"
-                  }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      backgroundColor: "grey.100",
+                      p: 1,
+                      borderRadius: 1,
+                      fontStyle: "italic",
+                    }}
+                  >
                     {post.text}
                   </Typography>
                 </Box>
-                
+
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     <strong>Tagi:</strong>
@@ -414,7 +409,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
                     ))}
                   </Box>
                 </Box>
-                
+
                 <Box sx={{ display: "flex", gap: 1, mt: "auto", flexWrap: "wrap" }}>
                   <Button
                     variant="outlined"
@@ -462,12 +457,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
       </Grid>
 
       {/* Dialog for viewing full-size image */}
-      <Dialog
-        open={!!selectedPost}
-        onClose={() => setSelectedPost(null)}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={!!selectedPost} onClose={() => setSelectedPost(null)} maxWidth="md" fullWidth>
         <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           {selectedPost?.title}
           <IconButton onClick={() => setSelectedPost(null)}>
@@ -484,28 +474,27 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
                   style={{ width: "100%", height: "auto", borderRadius: "8px" }}
                 />
               </Box>
-              
+
               <Divider sx={{ my: 2 }} />
-              
+
               <Typography variant="body1" sx={{ mb: 2 }}>
                 <strong>Treść posta:</strong>
               </Typography>
-              <Typography variant="body2" sx={{ 
-                backgroundColor: "grey.100", 
-                p: 2, 
-                borderRadius: 1,
-                fontStyle: "italic",
-                mb: 2
-              }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  backgroundColor: "grey.100",
+                  p: 2,
+                  borderRadius: 1,
+                  fontStyle: "italic",
+                  mb: 2,
+                }}
+              >
                 {selectedPost.text}
               </Typography>
-              
+
               <Box sx={{ display: "flex", gap: 1 }}>
-                <Button
-                  variant="contained"
-                  startIcon={<DownloadIcon />}
-                  onClick={() => handleDownloadImage(selectedPost)}
-                >
+                <Button variant="contained" startIcon={<DownloadIcon />} onClick={() => handleDownloadImage(selectedPost)}>
                   Pobierz Obraz
                 </Button>
                 <Button
@@ -524,11 +513,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
                 >
                   {regeneratingImage.has(selectedPost.id) ? "Regenerating..." : "New Image"}
                 </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<ShareIcon />}
-                  onClick={() => handleSharePost(selectedPost)}
-                >
+                <Button variant="outlined" startIcon={<ShareIcon />} onClick={() => handleSharePost(selectedPost)}>
                   Udostępnij Post
                 </Button>
               </Box>
@@ -538,12 +523,7 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
       </Dialog>
 
       {/* Dialog for viewing PostImages URLs */}
-      <Dialog
-        open={showPostImagesUrls}
-        onClose={() => setShowPostImagesUrls(false)}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={showPostImagesUrls} onClose={() => setShowPostImagesUrls(false)} maxWidth="md" fullWidth>
         <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           PostImages URLs ({postImagesResults.length})
           <IconButton onClick={() => setShowPostImagesUrls(false)}>
@@ -567,15 +547,17 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
                       <Typography variant="body2" sx={{ mb: 1 }}>
                         <strong>PostImages URL:</strong>
                       </Typography>
-                      <Box sx={{ 
-                        backgroundColor: "grey.100", 
-                        p: 1, 
-                        borderRadius: 1,
-                        mb: 1,
-                        wordBreak: "break-all",
-                        fontFamily: "monospace",
-                        fontSize: "0.875rem"
-                      }}>
+                      <Box
+                        sx={{
+                          backgroundColor: "grey.100",
+                          p: 1,
+                          borderRadius: 1,
+                          mb: 1,
+                          wordBreak: "break-all",
+                          fontFamily: "monospace",
+                          fontSize: "0.875rem",
+                        }}
+                      >
                         {result.postImagesResult.url}
                       </Box>
                       <Typography variant="caption" color="text.secondary">
@@ -596,3 +578,5 @@ export const GeneratedPostsWithGraphics: React.FC<GeneratedPostsWithGraphicsProp
     </Box>
   );
 };
+
+export type { GeneratedPostWithGraphics };

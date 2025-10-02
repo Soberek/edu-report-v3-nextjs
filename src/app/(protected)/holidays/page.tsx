@@ -7,14 +7,23 @@ import { useHolidayGraphics } from "./hooks/useHolidayGraphics";
 import { UrlInput, HolidaysList, ActionSection, ResultsSection, ExportSection, MockTemplateTest } from "./components";
 import { GeneratedPostsWithGraphics } from "./components/GeneratedPostsWithGraphics";
 import type { GeneratedImagePostImagesResult } from "@/services/generatedImagePostImagesService";
+import type { HolidayTemplateConfig, GeneratedPostWithGraphics } from "./types";
 
 // Main component
 export default function Holidays() {
   const [url, setUrl] = useState("https://www.kalbi.pl/kalendarz-swiat-nietypowych-pazdziernik");
-  const [postImagesResults, setPostImagesResults] = useState<GeneratedImagePostImagesResult[]>([]);
+  const [postImagesResults, setPostImagesResults] = useState<GeneratedImagePostImagesResult<GeneratedPostWithGraphics>[]>([]);
 
   const { state, aiLoading, fetchHolidays, extractHealthHolidays, generatePosts, clearError } = useHolidays();
-  const { state: graphicsState, generatePostsWithGraphics, refreshGraphics, clearError: clearGraphicsError, setTemplateConfig, updatePost, templateConfig } = useHolidayGraphics();
+  const {
+    state: graphicsState,
+    generatePostsWithGraphics,
+    refreshGraphics,
+    clearError: clearGraphicsError,
+    setTemplateConfig,
+    updatePost,
+    templateConfig,
+  } = useHolidayGraphics();
 
   // Handler functions
   const handleFetchHolidays = () => fetchHolidays(url);
@@ -22,11 +31,11 @@ export default function Holidays() {
   const handleGeneratePosts = () => generatePosts();
   const handleGeneratePostsWithGraphics = () => generatePostsWithGraphics(state.separatedHolidaysFromOpenAi);
   const handleRefreshGraphics = () => refreshGraphics();
-  const handleTemplateConfigUpdate = (config: any) => {
+  const handleTemplateConfigUpdate = (config: HolidayTemplateConfig) => {
     setTemplateConfig(config);
   };
 
-  const handlePostUpdate = (updatedPost: any) => {
+  const handlePostUpdate = (updatedPost: GeneratedPostWithGraphics) => {
     updatePost(updatedPost);
   };
 

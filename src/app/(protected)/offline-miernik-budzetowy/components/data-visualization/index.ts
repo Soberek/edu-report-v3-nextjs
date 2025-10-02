@@ -6,3 +6,4 @@
 export { DataTable } from "./DataTable";
 export { AdvancedStats } from "./AdvancedStats";
 export { BarCharts } from "./BarCharts";
+export { MainCategoriesView } from "./MainCategoriesView";

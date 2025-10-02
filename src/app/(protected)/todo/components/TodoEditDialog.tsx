@@ -226,7 +226,9 @@ export const TodoEditDialog = ({ open, onClose, todo, onSave, mode = "edit" }: T
               <InputLabel>Powtarzanie</InputLabel>
               <Select
                 value={formData.recurringType}
-                onChange={(e) => setFormData((prev) => ({ ...prev, recurringType: e.target.value as any }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, recurringType: e.target.value as "daily" | "weekly" | "monthly" | "yearly" | "none" }))
+                }
                 label="Powtarzanie"
               >
                 <MenuItem value="none">Bez powtórzeń</MenuItem>

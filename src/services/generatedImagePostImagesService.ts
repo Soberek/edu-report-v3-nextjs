@@ -1,7 +1,7 @@
 import { postImagesUploadService, type PostImagesUploadResult } from "./postImagesUploadService";
 
-export interface GeneratedImagePostImagesResult {
-  originalPost: any;
+export interface GeneratedImagePostImagesResult<T = unknown> {
+  originalPost: T;
   postImagesResult: PostImagesUploadResult | null;
   error?: string;
 }
@@ -34,7 +34,7 @@ export class GeneratedImagePostImagesService {
       }
 
       const blob = await response.blob();
-      
+
       // Upload to PostImages
       const postImagesResult = await postImagesUploadService.uploadImage(
         blob,
@@ -44,26 +44,22 @@ export class GeneratedImagePostImagesService {
 
       return postImagesResult;
     } catch (error) {
-      console.error('Error uploading generated image to PostImages:', error);
-      throw new Error(`Failed to upload generated image to PostImages: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Error uploading generated image to PostImages:", error);
+      throw new Error(`Failed to upload generated image to PostImages: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
   /**
    * Upload multiple generated images to PostImages
    */
-  public async uploadMultipleGeneratedImagesToPostImages(
-    posts: Array<{ generatedImageUrl: string; title: string; description?: string; [key: string]: any }>
-  ): Promise<GeneratedImagePostImagesResult[]> {
-    const results: GeneratedImagePostImagesResult[] = [];
+  public async uploadMultipleGeneratedImagesToPostImages<T extends { generatedImageUrl: string; title: string; description?: string }>(
+    posts: T[]
+  ): Promise<GeneratedImagePostImagesResult<T>[]> {
+    const results: GeneratedImagePostImagesResult<T>[] = [];
 
     for (const post of posts) {
       try {
-        const postImagesResult = await this.uploadGeneratedImageToPostImages(
-          post.generatedImageUrl,
-          post.title,
-          post.description
-        );
+        const postImagesResult = await this.uploadGeneratedImageToPostImages(post.generatedImageUrl, post.title, post.description);
 
         results.push({
           originalPost: post,
@@ -73,7 +69,7 @@ export class GeneratedImagePostImagesService {
         results.push({
           originalPost: post,
           postImagesResult: null,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : "Unknown error",
         });
       }
     }
@@ -88,7 +84,7 @@ export class GeneratedImagePostImagesService {
     try {
       return await postImagesUploadService.deleteImage(deleteUrl);
     } catch (error) {
-      console.error('Error deleting image from PostImages:', error);
+      console.error("Error deleting image from PostImages:", error);
       return false;
     }
   }
@@ -100,8 +96,8 @@ export class GeneratedImagePostImagesService {
     try {
       return await postImagesUploadService.getImageInfo(imageId);
     } catch (error) {
-      console.error('Error getting image info from PostImages:', error);
-      throw new Error(`Failed to get image info from PostImages: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Error getting image info from PostImages:", error);
+      throw new Error(`Failed to get image info from PostImages: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 }

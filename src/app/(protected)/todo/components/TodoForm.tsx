@@ -77,7 +77,9 @@ export const TodoForm = ({ formState, formDispatch, onSubmit, onCancel }: TodoFo
           <div className="flex gap-2">
             <select
               value={formState.recurringType}
-              onChange={(e) => formDispatch({ type: "SET_RECURRING_TYPE", payload: e.target.value as any })}
+              onChange={(e) =>
+                formDispatch({ type: "SET_RECURRING_TYPE", payload: e.target.value as "daily" | "weekly" | "monthly" | "yearly" | "none" })
+              }
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="none">Bez powtórzeń</option>

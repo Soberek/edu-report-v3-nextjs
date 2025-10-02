@@ -4,6 +4,7 @@ import { CloudDownload, Psychology, PostAdd, Image, Settings, Refresh, CloudUplo
 import { TemplateConfigDialog } from "./TemplateConfigDialog";
 import { UploadedImagesList } from "./UploadedImagesList";
 import { type PostImagesUploadResult } from "@/services/postImagesUploadService";
+import type { HolidayTemplateConfig } from "../types";
 
 interface ActionSectionProps {
   onFetchHolidays: () => void;
@@ -11,7 +12,7 @@ interface ActionSectionProps {
   onGeneratePosts: () => void;
   onGeneratePostsWithGraphics: () => void;
   onRefreshGraphics: () => void;
-  onTemplateConfigUpdate?: (config: any) => void;
+  onTemplateConfigUpdate?: (config: HolidayTemplateConfig) => void;
   loading: boolean;
   aiLoading: boolean;
   graphicsLoading: boolean;
@@ -45,11 +46,11 @@ export const ActionSection: React.FC<ActionSectionProps> = ({
   const [templateConfigOpen, setTemplateConfigOpen] = useState(false);
   const [showUploadedImages, setShowUploadedImages] = useState(false);
 
-  const handleTemplateConfigSave = (config: any) => {
+  const handleTemplateConfigSave = (config: HolidayTemplateConfig) => {
     // Save the config to localStorage
-    localStorage.setItem('holidayTemplateConfig', JSON.stringify(config));
-    console.log('Template configuration saved:', config);
-    
+    localStorage.setItem("holidayTemplateConfig", JSON.stringify(config));
+    console.log("Template configuration saved:", config);
+
     // Notify parent component if callback provided
     if (onTemplateConfigUpdate) {
       onTemplateConfigUpdate(config);
@@ -143,12 +144,7 @@ export const ActionSection: React.FC<ActionSectionProps> = ({
 
       {/* Template Configuration and Refresh Buttons */}
       <Box sx={{ mt: 3, textAlign: "center", display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
-        <Button
-          variant="outlined"
-          startIcon={<Settings />}
-          onClick={() => setTemplateConfigOpen(true)}
-          sx={{ px: 3, py: 1.5 }}
-        >
+        <Button variant="outlined" startIcon={<Settings />} onClick={() => setTemplateConfigOpen(true)} sx={{ px: 3, py: 1.5 }}>
           Configure Template
         </Button>
         <Button
@@ -160,12 +156,7 @@ export const ActionSection: React.FC<ActionSectionProps> = ({
         >
           {graphicsLoading ? "Refreshing..." : "Refresh Graphics"}
         </Button>
-        <Button
-          variant="outlined"
-          startIcon={<List />}
-          onClick={() => setShowUploadedImages(true)}
-          sx={{ px: 3, py: 1.5 }}
-        >
+        <Button variant="outlined" startIcon={<List />} onClick={() => setShowUploadedImages(true)} sx={{ px: 3, py: 1.5 }}>
           View Uploaded Images ({uploadedImages.length})
         </Button>
       </Box>
@@ -175,17 +166,13 @@ export const ActionSection: React.FC<ActionSectionProps> = ({
         <Box sx={{ mt: 3 }}>
           <Alert severity="info" sx={{ mb: 2 }}>
             <Typography variant="body2">
-              <strong>{uploadedImages.length}</strong> images uploaded to PostImages. 
-              <Button 
-                size="small" 
-                onClick={() => setShowUploadedImages(true)}
-                sx={{ ml: 1 }}
-              >
+              <strong>{uploadedImages.length}</strong> images uploaded to PostImages.
+              <Button size="small" onClick={() => setShowUploadedImages(true)} sx={{ ml: 1 }}>
                 View All
               </Button>
             </Typography>
           </Alert>
-          
+
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
             {uploadedImages.slice(0, 5).map((image, index) => (
               <Chip
@@ -210,19 +197,10 @@ export const ActionSection: React.FC<ActionSectionProps> = ({
       )}
 
       {/* Template Configuration Dialog */}
-      <TemplateConfigDialog
-        open={templateConfigOpen}
-        onClose={() => setTemplateConfigOpen(false)}
-        onSave={handleTemplateConfigSave}
-      />
+      <TemplateConfigDialog open={templateConfigOpen} onClose={() => setTemplateConfigOpen(false)} onSave={handleTemplateConfigSave} />
 
       {/* Uploaded Images Dialog */}
-      <Dialog
-        open={showUploadedImages}
-        onClose={() => setShowUploadedImages(false)}
-        maxWidth="lg"
-        fullWidth
-      >
+      <Dialog open={showUploadedImages} onClose={() => setShowUploadedImages(false)} maxWidth="lg" fullWidth>
         <DialogTitle>Uploaded Images</DialogTitle>
         <DialogContent>
           <UploadedImagesList
@@ -235,7 +213,7 @@ export const ActionSection: React.FC<ActionSectionProps> = ({
               width: image.width,
               height: image.height,
               uploadedAt: new Date().toISOString(),
-              description: `Uploaded to PostImages`
+              description: `Uploaded to PostImages`,
             }))}
             onDelete={onDeleteImage}
             onRefresh={onRefreshImages}

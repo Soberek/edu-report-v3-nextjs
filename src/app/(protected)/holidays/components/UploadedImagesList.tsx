@@ -17,14 +17,7 @@ import {
   TextField,
   InputAdornment,
 } from "@mui/material";
-import {
-  ContentCopy,
-  Delete,
-  Visibility,
-  Search,
-  CloudUpload,
-  Refresh,
-} from "@mui/icons-material";
+import { ContentCopy, Delete, Visibility, Search, CloudUpload, Refresh } from "@mui/icons-material";
 import { type PostImagesUploadResult } from "@/services/postImagesUploadService";
 
 interface UploadedImage {
@@ -47,21 +40,15 @@ interface UploadedImagesListProps {
   loading?: boolean;
 }
 
-export const UploadedImagesList: React.FC<UploadedImagesListProps> = ({
-  images,
-  onDelete,
-  onRefresh,
-  onBulkUpload,
-  loading = false,
-}) => {
+export const UploadedImagesList: React.FC<UploadedImagesListProps> = ({ images, onDelete, onRefresh, onBulkUpload, loading = false }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedImage, setSelectedImage] = useState<UploadedImage | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
-  const filteredImages = images.filter(image =>
-    image.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    image.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredImages = images.filter(
+    (image) =>
+      image.title.toLowerCase().includes(searchTerm.toLowerCase()) || image.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleCopyUrl = async (url: string) => {
@@ -95,29 +82,13 @@ export const UploadedImagesList: React.FC<UploadedImagesListProps> = ({
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           {onBulkUpload && (
-            <Button
-              variant="outlined"
-              startIcon={<CloudUpload />}
-              component="label"
-              disabled={loading}
-            >
+            <Button variant="outlined" startIcon={<CloudUpload />} component="label" disabled={loading}>
               Bulk Upload
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                hidden
-                onChange={handleBulkUpload}
-              />
+              <input type="file" multiple accept="image/*" hidden onChange={handleBulkUpload} />
             </Button>
           )}
           {onRefresh && (
-            <Button
-              variant="outlined"
-              startIcon={<Refresh />}
-              onClick={onRefresh}
-              disabled={loading}
-            >
+            <Button variant="outlined" startIcon={<Refresh />} onClick={onRefresh} disabled={loading}>
               Refresh
             </Button>
           )}
@@ -142,13 +113,11 @@ export const UploadedImagesList: React.FC<UploadedImagesListProps> = ({
 
       {/* Images Grid */}
       {filteredImages.length === 0 ? (
-        <Alert severity="info">
-          {searchTerm ? "No images match your search." : "No images uploaded yet."}
-        </Alert>
+        <Alert severity="info">{searchTerm ? "No images match your search." : "No images uploaded yet."}</Alert>
       ) : (
-        <Grid container spacing={2}>
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" }, gap: 2 }}>
           {filteredImages.map((image) => (
-            <Grid item xs={12} sm={6} md={4} key={image.id}>
+            <Box key={image.id}>
               <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
@@ -156,11 +125,7 @@ export const UploadedImagesList: React.FC<UploadedImagesListProps> = ({
                       {image.title}
                     </Typography>
                     <Box sx={{ display: "flex", gap: 0.5 }}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handlePreview(image)}
-                        title="Preview"
-                      >
+                      <IconButton size="small" onClick={() => handlePreview(image)} title="Preview">
                         <Visibility />
                       </IconButton>
                       <IconButton
@@ -172,12 +137,7 @@ export const UploadedImagesList: React.FC<UploadedImagesListProps> = ({
                         <ContentCopy />
                       </IconButton>
                       {onDelete && (
-                        <IconButton
-                          size="small"
-                          onClick={() => onDelete(image.id)}
-                          title="Delete"
-                          color="error"
-                        >
+                        <IconButton size="small" onClick={() => onDelete(image.id)} title="Delete" color="error">
                           <Delete />
                         </IconButton>
                       )}
@@ -195,15 +155,17 @@ export const UploadedImagesList: React.FC<UploadedImagesListProps> = ({
                     <Chip label={image.size} size="small" variant="outlined" />
                   </Box>
 
-                  <Box sx={{
-                    backgroundColor: "grey.100",
-                    p: 1,
-                    borderRadius: 1,
-                    wordBreak: "break-all",
-                    fontFamily: "monospace",
-                    fontSize: "0.75rem",
-                    mb: 1
-                  }}>
+                  <Box
+                    sx={{
+                      backgroundColor: "grey.100",
+                      p: 1,
+                      borderRadius: 1,
+                      wordBreak: "break-all",
+                      fontFamily: "monospace",
+                      fontSize: "0.75rem",
+                      mb: 1,
+                    }}
+                  >
                     {image.url}
                   </Box>
 
@@ -212,18 +174,13 @@ export const UploadedImagesList: React.FC<UploadedImagesListProps> = ({
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       )}
 
       {/* Preview Dialog */}
-      <Dialog
-        open={showPreview}
-        onClose={() => setShowPreview(false)}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={showPreview} onClose={() => setShowPreview(false)} maxWidth="md" fullWidth>
         <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           {selectedImage?.title}
           <Box sx={{ display: "flex", gap: 1 }}>
@@ -279,14 +236,16 @@ export const UploadedImagesList: React.FC<UploadedImagesListProps> = ({
                 <Chip label={new Date(selectedImage.uploadedAt).toLocaleDateString()} />
               </Box>
 
-              <Box sx={{
-                backgroundColor: "grey.100",
-                p: 2,
-                borderRadius: 1,
-                wordBreak: "break-all",
-                fontFamily: "monospace",
-                fontSize: "0.875rem"
-              }}>
+              <Box
+                sx={{
+                  backgroundColor: "grey.100",
+                  p: 2,
+                  borderRadius: 1,
+                  wordBreak: "break-all",
+                  fontFamily: "monospace",
+                  fontSize: "0.875rem",
+                }}
+              >
                 {selectedImage.url}
               </Box>
             </Box>

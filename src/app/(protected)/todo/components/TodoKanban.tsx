@@ -149,7 +149,12 @@ export const TodoKanban = ({
                   <Typography variant="h6" fontWeight="bold">
                     {column.title}
                   </Typography>
-                  <Chip label={column.todos.length} size="small" color={column.color as any} variant="filled" />
+                  <Chip
+                    label={column.todos.length}
+                    size="small"
+                    color={column.color as "primary" | "warning" | "success"}
+                    variant="filled"
+                  />
                 </Stack>
                 <Divider />
               </Box>

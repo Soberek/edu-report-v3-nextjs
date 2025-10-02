@@ -240,7 +240,7 @@ export const TodoItem = ({
                   icon={<Flag />}
                   label={getPriorityLabel(todo.priority)}
                   size="small"
-                  color={getPriorityColorValue(todo.priority) as any}
+                  color={getPriorityColorValue(todo.priority) as "error" | "warning" | "success" | "default"}
                   variant="filled"
                   sx={{
                     borderRadius: 1.5,

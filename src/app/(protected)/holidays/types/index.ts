@@ -68,3 +68,60 @@ export interface ExportOptions {
   filename?: string;
   format: "csv" | "xlsx";
 }
+
+export type TemplateTextAlign = "left" | "center" | "right";
+
+export interface TemplateTextPosition {
+  x: number;
+  y: number;
+  fontSize: number;
+  color: string;
+  fontFamily: string;
+  textAlign: TemplateTextAlign;
+  maxWidth?: number;
+  lineHeight?: number;
+}
+
+export interface TemplateImagePlaceholder {
+  x: number;
+  y: number;
+  radius: number;
+}
+
+export interface TemplateCanvasSize {
+  width: number;
+  height: number;
+}
+
+export interface HolidayTemplateConfig {
+  templateImageUrl: string;
+  datePosition: TemplateTextPosition;
+  titlePosition: TemplateTextPosition & { maxWidth: number; lineHeight: number };
+  canvasSize: TemplateCanvasSize;
+  imagePlaceholder: TemplateImagePlaceholder;
+  postImagesUrl?: string;
+}
+
+export type TemplatePresetKey = "default" | "centered" | "rightAligned";
+
+export interface ApiGeneratedPost {
+  id: number;
+  title: string;
+  description: string;
+  query: string;
+  literalDate: string;
+  dateForThisYear: string;
+  text: string;
+  imageUrl: string;
+  generatedImageUrl: string;
+  tags: string;
+  postingTime: string;
+}
+
+export interface GeneratedPostWithGraphics extends EducationalHolidayWithQuery {
+  text: string;
+  imageUrl: string;
+  generatedImageUrl: string;
+  tags: string;
+  postingTime: string;
+}

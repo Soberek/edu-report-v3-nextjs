@@ -298,7 +298,7 @@ export class GraphicsGenerator {
   private wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, fontSize: number, lineHeightMultiplier: number = 1.2): void {
     const words = text.split(' ');
     let line = '';
-    let lineHeight = fontSize * lineHeightMultiplier;
+    const lineHeight = fontSize * lineHeightMultiplier;
     let currentY = y;
 
     for (let i = 0; i < words.length; i++) {
