@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   FaHome,
   FaFileAlt,
@@ -30,13 +31,15 @@ import {
   FaQuestionCircle,
 } from "react-icons/fa";
 
+export type NavCategory = "main" | "education" | "database" | "tools" | "auth";
+
 export interface NavRoute {
   title: string;
   path: string;
-  category: "main" | "database" | "tools" | "auth" | "education";
+  category: NavCategory;
   isPrivate: boolean;
-  icon?: React.JSX.Element;
-  description?: string;
+  icon: ReactNode;
+  description: string;
 }
 
 export const navRoutes: NavRoute[] = [
