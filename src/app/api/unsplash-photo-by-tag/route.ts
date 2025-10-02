@@ -14,6 +14,17 @@ interface UnsplashRequest {
   size?: "small" | "regular" | "full" | "raw";
 }
 
+interface UnsplashPhoto {
+  id: string;
+  urls?: {
+    raw?: string;
+    full?: string;
+    regular?: string;
+    small?: string;
+    thumb?: string;
+  };
+}
+
 // GET handler: simple health check
 export function GET() {
   return NextResponse.json({ message: "Unsplash API route is working." });
@@ -74,9 +85,9 @@ export async function POST(request: Request) {
       await fetchUnsplashPhotos("health", { count: 1, timeoutMs: 1500 });
       console.timeEnd(checkLabel);
       console.debug(`[${requestId}] Unsplash connectivity check OK`);
-    } catch (err) {
-      const name = (err as any)?.name;
-      if (name === "AbortError") {
+    } catch (err: unknown) {
+      const e = err as Error & { name?: string };
+      if (e.name === "AbortError") {
         console.warn(`[${requestId}] Unsplash connectivity check aborted after ${1500}ms`);
         return NextResponse.json({ error: "Unsplash connectivity timeout" }, { status: 504 });
       }
@@ -85,18 +96,20 @@ export async function POST(request: Request) {
     }
 
     // Use shared service to fetch photos (same timeout behavior)
-    let data: any = null;
+    let data: UnsplashPhoto | UnsplashPhoto[] | null = null;
     try {
-      data = await fetchUnsplashPhotos(cleanedTag, { count: finalCount, orientation: finalOrientation, timeoutMs: 5000 });
+      data = (await fetchUnsplashPhotos(cleanedTag, { count: finalCount, orientation: finalOrientation, timeoutMs: 5000 })) as
+        | UnsplashPhoto
+        | UnsplashPhoto[];
       console.debug(`[${requestId}] fetchUnsplashPhotos returned type: ${Array.isArray(data) ? "array" : "object"}`);
-    } catch (err) {
-      const status = (err as any)?.status;
-      if ((err as any)?.name === "AbortError") {
+    } catch (err: unknown) {
+      const e = err as Error & { status?: number; name?: string };
+      if (e.name === "AbortError") {
         console.warn(`[${requestId}] Unsplash fetch aborted after 5000ms for tag: ${cleanedTag}`);
         return NextResponse.json({ error: "Unsplash fetch timeout" }, { status: 504 });
       }
       console.error(`[${requestId}] fetchUnsplashPhotos error:`, err);
-      return NextResponse.json({ error: "Failed to fetch from Unsplash" }, { status: status || 502 });
+      return NextResponse.json({ error: "Failed to fetch from Unsplash" }, { status: e.status || 502 });
     }
 
     // Handle both single photo and array of photos
@@ -118,7 +131,7 @@ export async function POST(request: Request) {
       console.debug(`[${requestId}] Returning single image id=${data.id}`);
       return NextResponse.json([data]);
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Unsplash API error:", error);
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
