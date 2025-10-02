@@ -138,10 +138,10 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
                               <strong>Działanie</strong>
                             </TableCell>
                             <TableCell align="right">
-                              <strong>Liczba osób</strong>
+                              <strong>Liczba działań</strong>
                             </TableCell>
                             <TableCell align="right">
-                              <strong>Liczba działań</strong>
+                              <strong>Liczba osób</strong>
                             </TableCell>
                           </TableRow>
                         </TableHead>
@@ -149,8 +149,8 @@ export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) 
                           {program.actions.map((action, aIndex) => (
                             <TableRow key={aIndex} hover>
                               <TableCell>{action.actionName}</TableCell>
-                              <TableCell align="right">{action.people.toLocaleString("pl-PL")}</TableCell>
                               <TableCell align="right">{action.actionNumber.toLocaleString("pl-PL")}</TableCell>
+                              <TableCell align="right">{action.people.toLocaleString("pl-PL")}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
