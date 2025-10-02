@@ -32,9 +32,8 @@ export async function fetchUnsplashPhotos(tag: string, opts: FetchPhotosOptions 
 
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      const err = new Error(`Unsplash fetch failed: ${res.status} ${text}`);
-      // @ts-ignore
-      (err as any).status = res.status;
+      const err = new Error(`Unsplash fetch failed: ${res.status} ${text}`) as Error & { status?: number };
+      err.status = res.status;
       throw err;
     }
 
