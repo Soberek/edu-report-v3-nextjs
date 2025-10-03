@@ -18,7 +18,8 @@ export type MainCategory = (typeof MAIN_CATEGORIES)[keyof typeof MAIN_CATEGORIES
  * Handles different variations and typos
  */
 export function normalizeMainCategory(category: string | undefined | null): MainCategory {
-  if (!category) {
+  // Handle null, undefined, or non-string values
+  if (!category || typeof category !== "string") {
     return MAIN_CATEGORIES.INNE;
   }
 
