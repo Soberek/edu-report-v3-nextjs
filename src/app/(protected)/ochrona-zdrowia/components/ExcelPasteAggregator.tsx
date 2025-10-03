@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { Button, Box, Typography } from "@mui/material";
 import { aggregateHealthData } from "../utils/fileProcessing";
+import { HealthInspectionRow } from "../types";
 
 const ExcelPasteAggregator: React.FC = () => {
   const [fileName, setFileName] = useState<string>("");
@@ -20,7 +21,7 @@ const ExcelPasteAggregator: React.FC = () => {
       // Parse data for aggregation
       const data = XLSX.utils.sheet_to_json(worksheet, { raw: false, range: 4 });
       // Aggregate only rows 7-16
-      const aggregated = aggregateHealthData([{ fileName: file.name, data: data as any, worksheet }]);
+      const aggregated = aggregateHealthData([{ fileName: file.name, data: data as HealthInspectionRow[], worksheet }]);
       // Paste results back to same cells (C7–C16, D7–D16, E7–E16)
       const types = Object.keys(aggregated);
       types.forEach((type, i) => {
