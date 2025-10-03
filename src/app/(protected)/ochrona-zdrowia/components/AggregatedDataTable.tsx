@@ -3,6 +3,7 @@
 import React, { useMemo } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from "@mui/material";
 import { type AggregatedHealthData, FACILITY_TYPES } from "../types";
+import ExcelPasteButton from "./ExcelPasteButton";
 
 interface AggregatedDataTableProps {
   data: AggregatedHealthData;
@@ -26,7 +27,6 @@ const AggregatedDataTable: React.FC<AggregatedDataTableProps> = ({ data }) => {
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         Łączne dane z {Object.keys(data).length} kategorii obiektów:
       </Typography>
-
       <TableContainer component={Paper} variant="outlined">
         <Table size="small">
           <TableHead>
