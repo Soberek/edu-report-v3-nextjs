@@ -1,8 +1,9 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import * as XLSX from "xlsx";
 import { useHealthInspectionAggregator } from "./useHealthInspectionAggregator";
 import * as fileProcessing from "../utils/fileProcessing";
-import { ERROR_MESSAGES, MAX_FILES } from "../types";
+import { ERROR_MESSAGES, MAX_FILES, type HealthInspectionRow } from "../types";
 
 // Mock the file processing utilities
 vi.mock("../utils/fileProcessing", () => ({
@@ -82,7 +83,7 @@ describe("useHealthInspectionAggregator", () => {
       const mockFileList = createMockFileList([mockFile]);
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
 
       const { result } = renderHook(() => useHealthInspectionAggregator());
@@ -98,10 +99,10 @@ describe("useHealthInspectionAggregator", () => {
     it("should successfully process a valid file", async () => {
       const mockFile = createMockFile("test.xlsx");
       const mockFileList = createMockFileList([mockFile]);
-      const mockData = [{ "RODZAJ OBIEKTU": "Test", "LICZBA SKONTROLOWANYCH OBIEKTÓW": 5 }] as any[];
+      const mockData: HealthInspectionRow[] = [{ "RODZAJ OBIEKTU": "Test", "LICZBA SKONTROLOWANYCH OBIEKTÓW": 5 }];
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: mockData, worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: mockData, worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
 
       const { result } = renderHook(() => useHealthInspectionAggregator());
@@ -143,7 +144,7 @@ describe("useHealthInspectionAggregator", () => {
       const mockFileList = createMockFileList([mockFile]);
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({
         isValid: false,
         error: "No data found",
@@ -179,13 +180,13 @@ describe("useHealthInspectionAggregator", () => {
       const mockFile1 = createMockFile("test1.xlsx");
       const mockFile2 = createMockFile("test2.xlsx");
       const mockFileList = createMockFileList([mockFile1, mockFile2]);
-      const mockData1 = [{ "RODZAJ OBIEKTU": "Test1", "LICZBA SKONTROLOWANYCH OBIEKTÓW": 1 }] as any[];
-      const mockData2 = [{ "RODZAJ OBIEKTU": "Test2", "LICZBA SKONTROLOWANYCH OBIEKTÓW": 2 }] as any[];
+      const mockData1: HealthInspectionRow[] = [{ "RODZAJ OBIEKTU": "Test1", "LICZBA SKONTROLOWANYCH OBIEKTÓW": 1 }];
+      const mockData2: HealthInspectionRow[] = [{ "RODZAJ OBIEKTU": "Test2", "LICZBA SKONTROLOWANYCH OBIEKTÓW": 2 }];
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
       vi.mocked(fileProcessing.readExcelFile)
-        .mockResolvedValueOnce({ fileName: "test1.xlsx", data: mockData1, worksheet: {} as any })
-        .mockResolvedValueOnce({ fileName: "test2.xlsx", data: mockData2, worksheet: {} as any });
+        .mockResolvedValueOnce({ fileName: "test1.xlsx", data: mockData1, worksheet: {} as XLSX.WorkSheet })
+        .mockResolvedValueOnce({ fileName: "test2.xlsx", data: mockData2, worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
 
       const { result } = renderHook(() => useHealthInspectionAggregator());
@@ -227,7 +228,7 @@ describe("useHealthInspectionAggregator", () => {
       const mockFileList = createMockFileList([mockFile1, mockFile2]);
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
 
       const { result } = renderHook(() => useHealthInspectionAggregator());
@@ -251,7 +252,7 @@ describe("useHealthInspectionAggregator", () => {
       const mockFileList = createMockFileList([mockFile]);
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
       vi.mocked(fileProcessing.aggregateHealthData).mockReturnValue({});
 
@@ -281,7 +282,7 @@ describe("useHealthInspectionAggregator", () => {
       const mockFileList = createMockFileList([mockFile]);
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
 
       const { result } = renderHook(() => useHealthInspectionAggregator());
@@ -306,11 +307,11 @@ describe("useHealthInspectionAggregator", () => {
     it("should aggregate data from successful files", async () => {
       const mockFile = createMockFile("test.xlsx");
       const mockFileList = createMockFileList([mockFile]);
-      const mockData = [{ "RODZAJ OBIEKTU": "Test", "LICZBA SKONTROLOWANYCH OBIEKTÓW": 1 }] as any[];
+      const mockData: HealthInspectionRow[] = [{ "RODZAJ OBIEKTU": "Test", "LICZBA SKONTROLOWANYCH OBIEKTÓW": 1 }];
       const mockAggregated = { Test: { skontrolowane: 5, realizowane: 3, zWykorzystaniemPalarni: 1 } };
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: mockData, worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: mockData, worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
       vi.mocked(fileProcessing.aggregateHealthData).mockReturnValue(mockAggregated);
 
@@ -344,7 +345,7 @@ describe("useHealthInspectionAggregator", () => {
       const mockFileList = createMockFileList([mockFile]);
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
       vi.mocked(fileProcessing.aggregateHealthData).mockImplementation(() => {
         throw new Error("Aggregation failed");
@@ -372,7 +373,7 @@ describe("useHealthInspectionAggregator", () => {
       const mockAggregated = { Test: { skontrolowane: 5, realizowane: 3, zWykorzystaniemPalarni: 1 } };
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
       vi.mocked(fileProcessing.aggregateHealthData).mockReturnValue(mockAggregated);
       vi.mocked(fileProcessing.exportToExcel).mockResolvedValue(true);
@@ -415,7 +416,7 @@ describe("useHealthInspectionAggregator", () => {
       const mockAggregated = { Test: { skontrolowane: 5, realizowane: 3, zWykorzystaniemPalarni: 1 } };
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
       vi.mocked(fileProcessing.aggregateHealthData).mockReturnValue(mockAggregated);
       vi.mocked(fileProcessing.exportToExcel).mockRejectedValue(new Error("Export failed"));
@@ -446,7 +447,7 @@ describe("useHealthInspectionAggregator", () => {
       const mockAggregated = { Test: { skontrolowane: 5, realizowane: 3, zWykorzystaniemPalarni: 1 } };
 
       vi.mocked(fileProcessing.validateExcelFile).mockReturnValue({ isValid: true });
-      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as any });
+      vi.mocked(fileProcessing.readExcelFile).mockResolvedValue({ fileName: "test.xlsx", data: [], worksheet: {} as XLSX.WorkSheet });
       vi.mocked(fileProcessing.validateExcelData).mockReturnValue({ isValid: true });
       vi.mocked(fileProcessing.aggregateHealthData).mockReturnValue(mockAggregated);
       vi.mocked(fileProcessing.exportToExcel).mockResolvedValue(false);
