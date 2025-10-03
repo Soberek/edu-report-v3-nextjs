@@ -143,9 +143,7 @@ const toNumber = (value: number | string | undefined): number => {
 /**
  * Aggregates data from multiple Excel files
  */
-export function aggregateHealthData(
-  filesData: Array<{ fileName: string; data: HealthInspectionRow[] }>
-): AggregatedHealthData {
+export function aggregateHealthData(filesData: Array<{ fileName: string; data: HealthInspectionRow[] }>): AggregatedHealthData {
   console.log("aggregateHealthData called with filesData:", filesData);
 
   // Initialize all facility types with zeros
@@ -168,13 +166,9 @@ export function aggregateHealthData(
 
       const facilityType = row["RODZAJ OBIEKTU"];
       if (facilityType && result[facilityType]) {
-        const skontrolowane = toNumber(
-          row["LICZBA SKONTROLOWANYCH OBIEKTÓW"]
-        );
+        const skontrolowane = toNumber(row["LICZBA SKONTROLOWANYCH OBIEKTÓW"]);
         const realizowane = toNumber(row["OGÓŁEM"]);
-        const zWykorzystaniemPalarni = toNumber(
-          row["W TYM Z WYKORZYSTANIEM PALARNI"]
-        );
+        const zWykorzystaniemPalarni = toNumber(row["W TYM Z WYKORZYSTANIEM PALARNI"]);
 
         result[facilityType].skontrolowane += skontrolowane;
         result[facilityType].realizowane += realizowane;

@@ -21,7 +21,7 @@ const ExcelPasteAggregator: React.FC = () => {
       // Parse data for aggregation
       const data = XLSX.utils.sheet_to_json(worksheet, { raw: false, range: 4 });
       // Aggregate only rows 7-16
-      const aggregated = aggregateHealthData([{ fileName: file.name, data: data as HealthInspectionRow[], worksheet }]);
+      const aggregated = aggregateHealthData([{ fileName: file.name, data: data as HealthInspectionRow[] }]);
       // Paste results back to same cells (C7–C16, D7–D16, E7–E16)
       const types = Object.keys(aggregated);
       types.forEach((type, i) => {
