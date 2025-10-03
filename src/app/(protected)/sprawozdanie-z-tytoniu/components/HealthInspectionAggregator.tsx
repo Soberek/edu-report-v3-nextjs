@@ -2,15 +2,7 @@
 
 import React, { useRef } from "react";
 import { Box, Typography, Button, Paper, Alert, LinearProgress, Chip, IconButton, Divider } from "@mui/material";
-import {
-  CloudUpload,
-  Delete,
-  DeleteSweep,
-  Calculate,
-  CheckCircle,
-  Error as ErrorIcon,
-  HourglassEmpty,
-} from "@mui/icons-material";
+import { CloudUpload, Delete, DeleteSweep, Calculate, CheckCircle, Error as ErrorIcon, HourglassEmpty } from "@mui/icons-material";
 import { useHealthInspectionAggregator } from "../hooks/useHealthInspectionAggregator";
 import { MAX_FILES } from "../types";
 import AggregatedDataTable from "./AggregatedDataTable";
