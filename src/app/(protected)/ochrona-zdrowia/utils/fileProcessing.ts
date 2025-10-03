@@ -82,7 +82,13 @@ export const readExcelFile = async (file: File): Promise<{ fileName: string; dat
       reject(new Error(ERROR_MESSAGES.PROCESSING_ERROR));
     };
 
-    reader.readAsArrayBuffer(file);
+    const aggregatedData: {
+      [key: string]: {
+        skontrolowane: number;
+        realizowane: number;
+        zWykorzystaniemPalarni: number;
+      };
+    } = {};
   });
 };
 
@@ -155,10 +161,11 @@ export const aggregateHealthData = (
   filesData.forEach(({ data }) => {
     // Only aggregate rows with __rowNum__ 6–15 (Excel rows 7–16)
     data.forEach((row) => {
-      const r = row as Record<string, any>;
+      const r = row as HealthInspectionRow & { __rowNum__?: number; [key: string]: string | number | undefined };
       const rowNumber = r.__rowNum__;
       if (rowNumber !== undefined && rowNumber >= 6 && rowNumber <= 15) {
-        const facilityType = normalizeFacilityType(r["RODZAJ OBIEKTU"]);
+        const rawType = r["RODZAJ OBIEKTU"];
+        const facilityType = typeof rawType === "string" ? normalizeFacilityType(rawType) : "";
         if (!aggregated[facilityType]) {
           aggregated[facilityType] = {
             skontrolowane: 0,
