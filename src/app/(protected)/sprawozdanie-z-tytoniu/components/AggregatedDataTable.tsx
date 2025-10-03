@@ -3,7 +3,6 @@
 import React, { useMemo } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box } from "@mui/material";
 import { type AggregatedHealthData, FACILITY_TYPES } from "../types";
-import ExcelPasteButton from "./ExcelPasteButton";
 
 interface AggregatedDataTableProps {
   data: AggregatedHealthData;
