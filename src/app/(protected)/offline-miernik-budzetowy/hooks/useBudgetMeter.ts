@@ -8,49 +8,46 @@ export const useBudgetMeter = () => {
   const [state, dispatch] = useReducer(budgetMeterReducer, initialBudgetMeterState);
 
   // File handling
-  const handleFileUpload = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = event.target.files;
-      if (!files || files.length === 0) {
-        dispatch({ type: "SET_FILE_ERROR", payload: ERROR_MESSAGES.NO_FILE_SELECTED });
+  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) {
+      dispatch({ type: "SET_FILE_ERROR", payload: ERROR_MESSAGES.NO_FILE_SELECTED });
+      return;
+    }
+
+    const file = files[0];
+
+    // Validate file
+    const validation = validateExcelFile(file);
+    if (!validation.isValid) {
+      dispatch({ type: "SET_FILE_ERROR", payload: validation.error || ERROR_MESSAGES.INVALID_FILE_TYPE });
+      return;
+    }
+
+    try {
+      dispatch({ type: "SET_LOADING", payload: true });
+
+      const { fileName, data } = await readExcelFile(file);
+
+      // Validate data
+      const dataValidation = validateExcelData(data);
+      if (!dataValidation.isValid) {
+        dispatch({ type: "SET_FILE_ERROR", payload: dataValidation.error || ERROR_MESSAGES.INVALID_DATA_FORMAT });
         return;
       }
 
-      const file = files[0];
+      dispatch({ type: "SET_FILE_DATA", payload: { fileName, rawData: data } });
 
-      // Validate file
-      const validation = validateExcelFile(file);
-      if (!validation.isValid) {
-        dispatch({ type: "SET_FILE_ERROR", payload: validation.error || ERROR_MESSAGES.INVALID_FILE_TYPE });
-        return;
-      }
-
-      try {
-        dispatch({ type: "SET_LOADING", payload: true });
-
-        const { fileName, data } = await readExcelFile(file);
-
-        // Validate data
-        const dataValidation = validateExcelData(data);
-        if (!dataValidation.isValid) {
-          dispatch({ type: "SET_FILE_ERROR", payload: dataValidation.error || ERROR_MESSAGES.INVALID_DATA_FORMAT });
-          return;
-        }
-
-        dispatch({ type: "SET_FILE_DATA", payload: { fileName, rawData: data } });
-
-        // Auto-select all months when file is uploaded
-        const allMonthsSelected = state.selectedMonths.map((month) => ({ ...month, selected: true }));
-        dispatch({ type: "SET_SELECTED_MONTHS", payload: allMonthsSelected });
-      } catch (error) {
-        dispatch({
-          type: "SET_FILE_ERROR",
-          payload: error instanceof Error ? error.message : ERROR_MESSAGES.FILE_READ_ERROR,
-        });
-      }
-    },
-    [state.selectedMonths]
-  );
+      // Auto-select all months when file is uploaded
+      const allMonthsSelected = state.selectedMonths.map((month) => ({ ...month, selected: true }));
+      dispatch({ type: "SET_SELECTED_MONTHS", payload: allMonthsSelected });
+    } catch (error) {
+      dispatch({
+        type: "SET_FILE_ERROR",
+        payload: error instanceof Error ? error.message : ERROR_MESSAGES.FILE_READ_ERROR,
+      });
+    }
+  }, []);
 
   // Month selection
   const handleMonthToggle = useCallback(
