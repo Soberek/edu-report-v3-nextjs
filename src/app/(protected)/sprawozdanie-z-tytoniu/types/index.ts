@@ -23,10 +23,15 @@ export type FacilityType = (typeof FACILITY_TYPES)[number];
  */
 export interface HealthInspectionRow {
   lp?: number | string;
+  "Lp."?: number | string;
   "RODZAJ OBIEKTU": string;
   "LICZBA SKONTROLOWANYCH OBIEKTÓW": number | string;
+  // Old format (for tests)
   OGÓŁEM?: number | string;
   "W TYM Z WYKORZYSTANIEM PALARNI"?: number | string;
+  // Real Excel format
+  "LICZBA OBIEKTÓW, W KTÓRYCH USTAWA JEST REALIZOWANA"?: number | string;
+  __EMPTY?: number | string;
 }
 
 /**
