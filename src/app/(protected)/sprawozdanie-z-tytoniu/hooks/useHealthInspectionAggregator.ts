@@ -16,10 +16,13 @@ export const useHealthInspectionAggregator = () => {
       if (!uploadedFiles || uploadedFiles.length === 0) return;
 
       setGlobalError(null);
+      setIsProcessing(true);
 
       // Check max files limit
-      if (files.length + uploadedFiles.length > MAX_FILES) {
+      const currentFilesCount = files.length;
+      if (currentFilesCount + uploadedFiles.length > MAX_FILES) {
         setGlobalError(ERROR_MESSAGES.TOO_MANY_FILES);
+        setIsProcessing(false);
         return;
       }
 
@@ -30,12 +33,15 @@ export const useHealthInspectionAggregator = () => {
         status: "pending" as const,
       }));
 
+      // Get the starting index before adding new files
+      const startingIndex = currentFilesCount;
+
       setFiles((prev) => [...prev, ...newFiles]);
 
       // Process files
       for (let i = 0; i < newFiles.length; i++) {
         const fileState = newFiles[i];
-        const fileIndex = files.length + i;
+        const fileIndex = startingIndex + i;
 
         // Update status to processing
         setFiles((prev) => prev.map((f, idx) => (idx === fileIndex ? { ...f, status: "processing" as const } : f)));
@@ -59,6 +65,7 @@ export const useHealthInspectionAggregator = () => {
           // Update with success
           setFiles((prev) => prev.map((f, idx) => (idx === fileIndex ? { ...f, data, status: "success" as const } : f)));
         } catch (error) {
+          console.error(`Error processing file ${fileState.fileName}:`, error);
           // Update with error
           setFiles((prev) =>
             prev.map((f, idx) =>
@@ -73,6 +80,8 @@ export const useHealthInspectionAggregator = () => {
           );
         }
       }
+
+      setIsProcessing(false);
     },
     [files.length]
   );

@@ -49,30 +49,7 @@ export const navRoutes: NavRoute[] = [
   },
 
   // Education & Programs
-  {
-    title: "Programy edukacyjne",
-    path: "programy-edukacyjne",
-    category: "education",
-    isPrivate: true,
-    icon: <FaBook />,
-    description: "Zarządzaj programami edukacyjnymi",
-  },
-  {
-    title: "Zadania edukacyjne",
-    path: "zadania-edukacyjne",
-    category: "education",
-    isPrivate: true,
-    icon: <FaTasks />,
-    description: "Zarządzaj zadaniami i aktywnościami",
-  },
-  {
-    title: "Harmonogram zadań edukacyjnych",
-    path: "schedule",
-    category: "education",
-    isPrivate: true,
-    icon: <FaCalendarAlt />,
-    description: "Planowanie i harmonogram zadań",
-  },
+
   {
     title: "Czerniak",
     path: "czerniak",
@@ -123,8 +100,32 @@ export const navRoutes: NavRoute[] = [
     icon: <FaListAlt />,
     description: "Archiwum spraw i dokumentów",
   },
+  {
+    title: "Programy edukacyjne",
+    path: "programy-edukacyjne",
+    category: "database",
+    isPrivate: true,
+    icon: <FaBook />,
+    description: "Zarządzaj programami edukacyjnymi",
+  },
 
   // Tools & Utilities
+  {
+    title: "Harmonogram zadań edukacyjnych",
+    path: "schedule",
+    category: "tools",
+    isPrivate: true,
+    icon: <FaCalendarAlt />,
+    description: "Planowanie i harmonogram zadań",
+  },
+  {
+    title: "Zadania edukacyjne",
+    path: "zadania-edukacyjne",
+    category: "tools",
+    isPrivate: true,
+    icon: <FaTasks />,
+    description: "Zarządzaj zadaniami i aktywnościami",
+  },
   {
     title: "Generuj Informacje z realizacji zadania",
     path: "wygeneruj-izrz",
@@ -142,8 +143,8 @@ export const navRoutes: NavRoute[] = [
     description: "Analiza budżetu offline",
   },
   {
-    title: "Ochrona zdrowia - agregacja",
-    path: "ochrona-zdrowia",
+    title: "Sprawozdanie z tytoniu",
+    path: "sprawozdanie-z-tytoniu",
     category: "tools",
     isPrivate: true,
     icon: <FaHeartbeat />,
@@ -173,46 +174,6 @@ export const navRoutes: NavRoute[] = [
     icon: <FaCheckSquare />,
     description: "Lista zadań do wykonania",
   },
-  {
-    title: "Analiza danych",
-    path: "analiza-danych",
-    category: "tools",
-    isPrivate: true,
-    icon: <FaChartBar />,
-    description: "Narzędzia do analizy i wizualizacji danych",
-  },
-  {
-    title: "Eksport raportów",
-    path: "eksport-raportow",
-    category: "tools",
-    isPrivate: true,
-    icon: <FaFileExport />,
-    description: "Eksportowanie danych i raportów",
-  },
-  {
-    title: "Zarządzanie użytkownikami",
-    path: "uzytkownicy",
-    category: "tools",
-    isPrivate: true,
-    icon: <FaUsers />,
-    description: "Administracja użytkownikami systemu",
-  },
-  {
-    title: "Ustawienia systemu",
-    path: "ustawienia",
-    category: "tools",
-    isPrivate: true,
-    icon: <FaCog />,
-    description: "Konfiguracja i ustawienia aplikacji",
-  },
-  {
-    title: "Pomoc i wsparcie",
-    path: "pomoc",
-    category: "tools",
-    isPrivate: true,
-    icon: <FaQuestionCircle />,
-    description: "Centrum pomocy i dokumentacja",
-  },
 
   // Authentication
   {
@@ -230,14 +191,6 @@ export const navRoutes: NavRoute[] = [
     isPrivate: false,
     icon: <FaUserPlus />,
     description: "Rejestracja nowego użytkownika",
-  },
-  {
-    title: "Profil użytkownika",
-    path: "profil",
-    category: "auth",
-    isPrivate: true,
-    icon: <FaUserMd />,
-    description: "Zarządzanie profilem użytkownika",
   },
   {
     title: "Wyloguj się",
@@ -263,5 +216,5 @@ export const getPublicRoutes = (): NavRoute[] => {
 };
 
 export const getMainNavigation = (): NavRoute[] => {
-  return navRoutes.filter((route) => route.isPrivate && ["main", "education", "database", "tools"].includes(route.category));
+  return navRoutes.filter((route) => route.isPrivate && ["tools", "main", "education", "database"].includes(route.category));
 };
