@@ -82,13 +82,7 @@ export const readExcelFile = async (file: File): Promise<{ fileName: string; dat
       reject(new Error(ERROR_MESSAGES.PROCESSING_ERROR));
     };
 
-    const aggregatedData: {
-      [key: string]: {
-        skontrolowane: number;
-        realizowane: number;
-        zWykorzystaniemPalarni: number;
-      };
-    } = {};
+
   });
 };
 
@@ -118,17 +112,7 @@ export const validateExcelData = (data: HealthInspectionRow[]): { isValid: boole
   }
 };
 
-/**
- * Normalizes facility type name to match predefined types
- */
-const normalizeFacilityType = (type: string): string => {
-  const normalized = type.trim().toLowerCase();
 
-  // Find matching facility type
-  const match = FACILITY_TYPES.find((ft) => ft.toLowerCase() === normalized);
-
-  return match || type.trim();
-};
 
 /**
  * Converts string or number to number
@@ -157,7 +141,7 @@ export function aggregateHealthData(filesData: Array<{ fileName: string; data: H
   });
 
   filesData.forEach((fileData) => {
-    fileData.data.forEach((row: any) => {
+    fileData.data.forEach((row: HealthInspectionRow & { __rowNum__?: number }) => {
       // Skip rows that are not within the data range (rows 6-15 in Excel)
       // Only apply row filtering if __rowNum__ is present (from actual Excel files)
       if (row.__rowNum__ !== undefined && (row.__rowNum__ < 6 || row.__rowNum__ > 15)) {
