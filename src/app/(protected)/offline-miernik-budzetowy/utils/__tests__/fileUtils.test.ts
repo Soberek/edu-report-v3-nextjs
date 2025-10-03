@@ -263,19 +263,54 @@ describe("fileUtils", () => {
       // Mock FileReader
       const originalFileReader = global.FileReader;
       const mockFileReader = {
-        readAsArrayBuffer: vi.fn(function (this: any) {
+        readAsArrayBuffer: vi.fn(function (this: FileReader) {
           // Simulate successful read
-          setTimeout(() => {
-            this.onload({
-              target: { result: new ArrayBuffer(8) },
+          if (this.onload) {
+            const event = new ProgressEvent("load", {
+              lengthComputable: true,
+              loaded: 8,
+              total: 8,
             });
-          }, 0);
+            Object.defineProperty(event, "target", {
+              value: { result: new ArrayBuffer(8) },
+            });
+            this.onload(event as ProgressEvent<FileReader>);
+          }
         }),
-        onload: null as any,
-        onerror: null as any,
+        onerror: null,
+        onload: null,
       };
 
-      global.FileReader = vi.fn(() => mockFileReader) as any;
+      global.FileReader = vi.fn(() => {
+        const instance = Object.create(mockFileReader);
+        instance.onerror = function () {
+          if (instance.onerror) {
+            const errorEvent = new ProgressEvent("error", {
+              lengthComputable: false,
+              loaded: 0,
+              total: 0,
+            });
+            Object.defineProperty(errorEvent, "target", {
+              value: this,
+            });
+            this.onerror(errorEvent as ProgressEvent<FileReader>);
+          }
+        };
+        instance.onload = function () {
+          if (instance.onload) {
+            const loadEvent = new ProgressEvent("load", {
+              lengthComputable: true,
+              loaded: 8,
+              total: 8,
+            });
+            Object.defineProperty(loadEvent, "target", {
+              value: { result: new ArrayBuffer(8) },
+            });
+            instance.onload(loadEvent as ProgressEvent<FileReader>);
+          }
+        };
+        return instance;
+      }) as unknown as typeof FileReader;
 
       const promise = readExcelFile(file);
 
@@ -297,16 +332,25 @@ describe("fileUtils", () => {
       // Mock FileReader to fail
       const originalFileReader = global.FileReader;
       const mockFileReader = {
-        readAsArrayBuffer: vi.fn(function (this: any) {
+        readAsArrayBuffer: vi.fn(function (this: FileReader) {
           setTimeout(() => {
-            this.onerror(new Error("Read error"));
+            const errorEvent = new ProgressEvent("error", {
+              lengthComputable: false,
+              loaded: 0,
+              total: 0,
+            });
+            console.error("Mock FileReader error event", errorEvent);
+            Object.defineProperty(errorEvent, "target", {
+              value: this,
+            });
+            this.onerror?.(errorEvent as ProgressEvent<FileReader>);
           }, 0);
         }),
-        onload: null as any,
-        onerror: null as any,
+        onload: null as FileReader["onload"],
+        onerror: null as FileReader["onerror"],
       };
 
-      global.FileReader = vi.fn(() => mockFileReader) as any;
+      global.FileReader = vi.fn(() => mockFileReader) as unknown as typeof FileReader;
 
       await expect(readExcelFile(file)).rejects.toThrow(ERROR_MESSAGES.FILE_READ_ERROR);
 
@@ -320,16 +364,16 @@ describe("fileUtils", () => {
 
       const originalFileReader = global.FileReader;
       const mockFileReader = {
-        readAsArrayBuffer: vi.fn(function (this: any) {
+        readAsArrayBuffer: vi.fn(function (this: FileReader) {
           setTimeout(() => {
-            this.onload({ target: { result: null } });
+            this.onload?.({ target: { result: null } } as ProgressEvent<FileReader>);
           }, 0);
         }),
-        onload: null as any,
-        onerror: null as any,
+        onload: null as FileReader["onload"],
+        onerror: null as FileReader["onerror"],
       };
 
-      global.FileReader = vi.fn(() => mockFileReader) as any;
+      global.FileReader = vi.fn(() => mockFileReader) as unknown as typeof FileReader;
 
       await expect(readExcelFile(file)).rejects.toThrow(ERROR_MESSAGES.FILE_READ_ERROR);
 
@@ -357,16 +401,55 @@ describe("fileUtils", () => {
 
       const originalFileReader = global.FileReader;
       const mockFileReader = {
-        readAsArrayBuffer: vi.fn(function (this: any) {
+        readAsArrayBuffer: vi.fn(function (this: FileReader) {
           setTimeout(() => {
-            this.onload({ target: { result: new ArrayBuffer(8) } });
+            if (this.onload) {
+              const loadEvent = new ProgressEvent("load", {
+                lengthComputable: true,
+                loaded: 8,
+                total: 8,
+              });
+              Object.defineProperty(loadEvent, "target", {
+                value: { result: new ArrayBuffer(8) },
+              });
+              this.onload(loadEvent as ProgressEvent<FileReader>);
+            }
           }, 0);
         }),
-        onload: null as any,
-        onerror: null as any,
+        onerror: null,
+        onload: null,
       };
 
-      global.FileReader = vi.fn(() => mockFileReader) as any;
+      global.FileReader = vi.fn(() => {
+        const instance = Object.create(mockFileReader);
+        instance.onerror = function () {
+          if (instance.onerror) {
+            const errorEvent = new ProgressEvent("error", {
+              lengthComputable: false,
+              loaded: 0,
+              total: 0,
+            });
+            Object.defineProperty(errorEvent, "target", {
+              value: this,
+            });
+            this.onerror(errorEvent as ProgressEvent<FileReader>);
+          }
+        };
+        instance.onload = function () {
+          if (instance.onload) {
+            const loadEvent = new ProgressEvent("load", {
+              lengthComputable: true,
+              loaded: 8,
+              total: 8,
+            });
+            Object.defineProperty(loadEvent, "target", {
+              value: { result: new ArrayBuffer(8) },
+            });
+            instance.onload(loadEvent as ProgressEvent<FileReader>);
+          }
+        };
+        return instance;
+      }) as unknown as typeof FileReader;
 
       const result = await readExcelFile(file);
 
