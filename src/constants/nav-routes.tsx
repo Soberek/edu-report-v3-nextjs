@@ -155,6 +155,14 @@ export const navRoutes: NavRoute[] = [
     description: "Analiza budżetu offline",
   },
   {
+    title: "Ochrona zdrowia - agregacja",
+    path: "ochrona-zdrowia",
+    category: "tools",
+    isPrivate: true,
+    icon: <FaHeartbeat />,
+    description: "Agregacja danych kontroli ochrony zdrowia",
+  },
+  {
     title: "Nietypowe święta",
     path: "holidays",
     category: "tools",
