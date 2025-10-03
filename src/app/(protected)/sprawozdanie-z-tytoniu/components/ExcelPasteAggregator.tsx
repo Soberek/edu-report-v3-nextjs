@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
-import { Button, Box, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { aggregateHealthData } from "../utils/fileProcessing";
 import { HealthInspectionRow } from "../types";
 
@@ -31,7 +31,7 @@ const ExcelPasteAggregator: React.FC = () => {
       });
       XLSX.writeFile(workbook, `agregacja_${file.name}`);
       setStatus("Success! File updated and downloaded.");
-    } catch (err) {
+    } catch {
       setStatus("Error processing file.");
     }
   };
