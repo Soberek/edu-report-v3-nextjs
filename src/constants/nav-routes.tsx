@@ -22,12 +22,7 @@ import {
   FaFileExport,
   FaCog,
   FaUsers,
-  FaGraduationCap,
-  FaLightbulb,
   FaChartBar,
-  FaDatabase,
-  FaTools,
-  FaShieldAlt,
   FaQuestionCircle,
 } from "react-icons/fa";
 
@@ -93,14 +88,6 @@ export const navRoutes: NavRoute[] = [
     isPrivate: true,
     icon: <FaVirus />,
     description: "Edukacja na temat grypy i przeziębień",
-  },
-  {
-    title: "Śledzenie nawyków",
-    path: "habit-tracker",
-    category: "education",
-    isPrivate: true,
-    icon: <FaChartLine />,
-    description: "Monitorowanie i śledzenie nawyków zdrowotnych",
   },
 
   // Database Management
