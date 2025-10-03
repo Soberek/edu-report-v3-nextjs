@@ -37,7 +37,7 @@ export const validateExcelFile = (file: File): { isValid: boolean; error?: strin
 /**
  * Reads Excel file and returns parsed data
  */
-export const readExcelFile = async (file: File): Promise<{ fileName: string; data: HealthInspectionRow[] }> => {
+export const readExcelFile = async (file: File): Promise<{ fileName: string; data: HealthInspectionRow[]; worksheet: XLSX.WorkSheet }> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -71,6 +71,7 @@ export const readExcelFile = async (file: File): Promise<{ fileName: string; dat
         resolve({
           fileName: file.name,
           data: filteredData,
+          worksheet,
         });
       } catch (error) {
         reject(new Error(error instanceof Error ? error.message : ERROR_MESSAGES.PROCESSING_ERROR));
@@ -136,7 +137,10 @@ const toNumber = (value: number | string | undefined): number => {
 /**
  * Aggregates data from multiple Excel files
  */
-export const aggregateHealthData = (filesData: Array<{ fileName: string; data: HealthInspectionRow[] }>): AggregatedHealthData => {
+export const aggregateHealthData = (
+  filesData: Array<{ fileName: string; data: HealthInspectionRow[]; worksheet?: XLSX.WorkSheet }>
+): AggregatedHealthData => {
+  console.log("aggregateHealthData called with filesData:", filesData);
   const aggregated: AggregatedHealthData = {};
 
   // Initialize all facility types with zeros
@@ -148,23 +152,29 @@ export const aggregateHealthData = (filesData: Array<{ fileName: string; data: H
     };
   });
 
-  // Aggregate data from all files
   filesData.forEach(({ data }) => {
+    // Only aggregate rows with __rowNum__ 6–15 (Excel rows 7–16)
     data.forEach((row) => {
-      const facilityType = normalizeFacilityType(row["RODZAJ OBIEKTU"]);
-
-      if (!aggregated[facilityType]) {
-        aggregated[facilityType] = {
-          skontrolowane: 0,
-          realizowane: 0,
-          zWykorzystaniemPalarni: 0,
-        };
+      const r = row as Record<string, any>;
+      const rowNumber = r.__rowNum__;
+      if (rowNumber !== undefined && rowNumber >= 6 && rowNumber <= 15) {
+        const facilityType = normalizeFacilityType(r["RODZAJ OBIEKTU"]);
+        if (!aggregated[facilityType]) {
+          aggregated[facilityType] = {
+            skontrolowane: 0,
+            realizowane: 0,
+            zWykorzystaniemPalarni: 0,
+          };
+        }
+        aggregated[facilityType].skontrolowane += toNumber(r["LICZBA SKONTROLOWANYCH OBIEKTÓW"]);
+        aggregated[facilityType].realizowane += toNumber(r["LICZBA OBIEKTÓW, W KTÓRYCH USTAWA JEST REALIZOWANA"]);
+        aggregated[facilityType].zWykorzystaniemPalarni += toNumber(r["__EMPTY"]);
+        console.log(
+          `Row ${rowNumber} [${facilityType}]: SKONTROLOWANE=${r["LICZBA SKONTROLOWANYCH OBIEKTÓW"]}, REALIZOWANE=${r["LICZBA OBIEKTÓW, W KTÓRYCH USTAWA JEST REALIZOWANA"]}, PALARNIA=${r["__EMPTY"]}`
+        );
       }
-
-      aggregated[facilityType].skontrolowane += toNumber(row["LICZBA SKONTROLOWANYCH OBIEKTÓW"]);
-      aggregated[facilityType].realizowane += toNumber(row.OGÓŁEM);
-      aggregated[facilityType].zWykorzystaniemPalarni += toNumber(row["W TYM Z WYKORZYSTANIEM PALARNI"]);
     });
+    console.log("Aggregated result:", JSON.stringify(aggregated, null, 2));
   });
 
   return aggregated;
