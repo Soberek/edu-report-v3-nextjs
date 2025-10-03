@@ -2,8 +2,16 @@ import React, { useRef, useState } from "react";
 import ExcelJS from "exceljs";
 import { Button, CircularProgress } from "@mui/material";
 
+interface AggregatedDataType {
+  [key: string]: {
+    skontrolowane: number;
+    realizowane: number;
+    zWykorzystaniemPalarni: number;
+  };
+}
+
 interface ExcelPasteButtonProps {
-  aggregatedData: any;
+  aggregatedData: AggregatedDataType;
 }
 
 const ExcelPasteButton: React.FC<ExcelPasteButtonProps> = ({ aggregatedData }) => {
