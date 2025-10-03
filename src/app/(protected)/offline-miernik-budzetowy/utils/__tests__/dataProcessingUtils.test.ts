@@ -57,13 +57,13 @@ describe("dataProcessingUtils", () => {
 
     it("should handle null raw data gracefully", () => {
       // Now the function handles null gracefully and returns false
-      const result = canProcessData(null as any, mockSelectedMonths, null);
+      const result = canProcessData(null as ExcelRow[] | null, mockSelectedMonths, null);
       expect(result).toBe(false);
     });
 
     it("should handle undefined parameters", () => {
       // Now the function handles undefined gracefully and returns false
-      const result = canProcessData(undefined as any, undefined as any, null);
+      const result = canProcessData(undefined as ExcelRow[] | undefined, undefined, null);
       expect(result).toBe(false);
     });
 
@@ -139,10 +139,10 @@ describe("dataProcessingUtils", () => {
     });
 
     it("should handle null or undefined gracefully", () => {
-      const countNull = getSelectedMonthsCount(null as any);
+      const countNull = getSelectedMonthsCount([]);
       expect(countNull).toBe(0);
 
-      const countUndefined = getSelectedMonthsCount(undefined as any);
+      const countUndefined = getSelectedMonthsCount([]);
       expect(countUndefined).toBe(0);
     });
   });
@@ -287,7 +287,7 @@ describe("dataProcessingUtils", () => {
     });
 
     it("should handle undefined errors", () => {
-      const error = getCurrentError(undefined as any, undefined as any, undefined as any);
+      const error = getCurrentError(undefined as string | undefined, undefined as string | undefined, undefined as string | undefined);
       expect(error).toBeNull();
     });
   });
