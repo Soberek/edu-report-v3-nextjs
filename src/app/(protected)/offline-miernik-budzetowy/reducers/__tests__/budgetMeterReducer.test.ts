@@ -416,7 +416,7 @@ describe("budgetMeterReducer", () => {
 
   describe("Edge cases", () => {
     it("should handle unknown action type gracefully", () => {
-      const unknownAction = { type: "UNKNOWN_ACTION" } as any;
+      const unknownAction = { type: "UNKNOWN_ACTION", payload: null } as unknown as BudgetMeterAction;
       const newState = budgetMeterReducer(initialBudgetMeterState, unknownAction);
 
       expect(newState).toBe(initialBudgetMeterState);
