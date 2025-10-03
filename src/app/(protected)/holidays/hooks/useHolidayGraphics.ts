@@ -100,7 +100,7 @@ export const useHolidayGraphics = () => {
           setState((prev) => ({ ...prev, posts: [...prev.posts, ...batchResults] }));
 
           // yield to event loop briefly to keep UI responsive
-          // eslint-disable-next-line no-await-in-loop
+           
           await new Promise((r) => setTimeout(r, 30));
 
           idx += concurrency;
