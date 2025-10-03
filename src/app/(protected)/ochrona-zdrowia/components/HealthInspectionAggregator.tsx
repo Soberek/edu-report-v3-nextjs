@@ -15,6 +15,7 @@ import {
 import { useHealthInspectionAggregator } from "../hooks/useHealthInspectionAggregator";
 import { MAX_FILES } from "../types";
 import AggregatedDataTable from "./AggregatedDataTable";
+import ExcelPasteButton from "./ExcelPasteButton";
 
 const HealthInspectionAggregator: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -195,35 +196,15 @@ const HealthInspectionAggregator: React.FC = () => {
 
           <Divider sx={{ my: 3 }} />
 
-          {/* Export Section */}
+          {/* Export Section - Step 4 */}
           <Box>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
               4. Eksportuj Raport
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Podaj miesiąc, za który raport jest tworzony:
+              Wgraj szablon pliku Excel i wyeksportuj raport z danymi agregacji. Możesz ustawić tytuł oraz miesiąc.
             </Typography>
-
-            <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start", flexWrap: "wrap" }}>
-              <TextField
-                label="Miesiąc i rok"
-                value={month}
-                onChange={(e) => setMonth(e.target.value)}
-                placeholder="np. sierpień 2025"
-                sx={{ minWidth: 250 }}
-              />
-
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<Download />}
-                onClick={handleExport}
-                disabled={!canExport}
-                size="large"
-              >
-                Pobierz Raport Excel
-              </Button>
-            </Box>
+            <ExcelPasteButton aggregatedData={aggregatedData} />
           </Box>
         </Paper>
       )}
