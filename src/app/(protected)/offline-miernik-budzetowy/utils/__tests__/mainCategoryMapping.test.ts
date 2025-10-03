@@ -178,22 +178,22 @@ describe("mainCategoryMapping", () => {
     });
 
     it("should handle row with null values", () => {
-      const row = {
+      const row: Record<string, unknown> = {
         "Main Category": null,
         "Other Key": "Value",
       };
 
-      const result = getMainCategoryFromRow(row as any);
+      const result = getMainCategoryFromRow(row);
       expect(result).toBe(MAIN_CATEGORIES.INNE);
     });
 
     it("should handle row with undefined category", () => {
-      const row = {
+      const row: Record<string, unknown> = {
         "Main Category": undefined,
         "Other Key": "Value",
       };
 
-      const result = getMainCategoryFromRow(row as any);
+      const result = getMainCategoryFromRow(row);
       expect(result).toBe(MAIN_CATEGORIES.INNE);
     });
 
@@ -203,39 +203,38 @@ describe("mainCategoryMapping", () => {
     });
 
     it("should handle row with numeric category value", () => {
-      const row = {
+      const row: Record<string, unknown> = {
         "Main Category": 123,
       };
 
-      // Now the function handles non-string types gracefully
-      const result = getMainCategoryFromRow(row as any);
+      const result = getMainCategoryFromRow(row);
       expect(result).toBe(MAIN_CATEGORIES.INNE);
     });
 
     it("should handle row with boolean category value", () => {
-      const row = {
+      const row: Record<string, unknown> = {
         "Main Category": true,
       };
 
-      const result = getMainCategoryFromRow(row as any);
+      const result = getMainCategoryFromRow(row);
       expect(result).toBe(MAIN_CATEGORIES.INNE);
     });
 
     it("should handle row with array category value", () => {
-      const row = {
+      const row: Record<string, unknown> = {
         "Main Category": ["Szczepienia"],
       };
 
-      const result = getMainCategoryFromRow(row as any);
+      const result = getMainCategoryFromRow(row);
       expect(result).toBe(MAIN_CATEGORIES.INNE);
     });
 
     it("should handle row with object category value", () => {
-      const row = {
+      const row: Record<string, unknown> = {
         "Main Category": { value: "Szczepienia" },
       };
 
-      const result = getMainCategoryFromRow(row as any);
+      const result = getMainCategoryFromRow(row);
       expect(result).toBe(MAIN_CATEGORIES.INNE);
     });
   });
