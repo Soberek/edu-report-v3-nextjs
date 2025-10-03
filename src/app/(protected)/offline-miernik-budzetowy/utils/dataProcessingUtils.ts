@@ -8,7 +8,11 @@ import type { ExcelRow, Month, AggregatedData } from "../types";
 /**
  * Checks if data processing conditions are met
  */
-export const canProcessData = (rawData: ExcelRow[], selectedMonths: Month[], existingData: AggregatedData | null): boolean => {
+export const canProcessData = (
+  rawData: ExcelRow[] | null | undefined,
+  selectedMonths: Month[] | null | undefined,
+  existingData: AggregatedData | null
+): boolean => {
   // Handle null/undefined inputs
   if (!rawData || !Array.isArray(rawData)) {
     return false;
