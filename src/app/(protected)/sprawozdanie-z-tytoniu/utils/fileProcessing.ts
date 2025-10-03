@@ -81,8 +81,6 @@ export const readExcelFile = async (file: File): Promise<{ fileName: string; dat
     reader.onerror = () => {
       reject(new Error(ERROR_MESSAGES.PROCESSING_ERROR));
     };
-
-
   });
 };
 
@@ -111,8 +109,6 @@ export const validateExcelData = (data: HealthInspectionRow[]): { isValid: boole
     };
   }
 };
-
-
 
 /**
  * Converts string or number to number
