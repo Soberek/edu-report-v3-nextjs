@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { Box, Typography, Button, Paper, Alert, LinearProgress, Chip, IconButton, TextField, Divider } from "@mui/material";
+import React, { useRef } from "react";
+import { Box, Typography, Button, Paper, Alert, LinearProgress, Chip, IconButton, Divider } from "@mui/material";
 import {
   CloudUpload,
   Delete,
   DeleteSweep,
   Calculate,
-  Download,
   CheckCircle,
   Error as ErrorIcon,
   HourglassEmpty,
@@ -19,9 +18,8 @@ import ExcelPasteButton from "./ExcelPasteButton";
 
 const HealthInspectionAggregator: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [month, setMonth] = useState("sierpień 2025");
 
-  const { files, isProcessing, aggregatedData, globalError, handleFilesUpload, removeFile, clearAll, aggregateData, exportData } =
+  const { files, isProcessing, aggregatedData, globalError, handleFilesUpload, removeFile, clearAll, aggregateData } =
     useHealthInspectionAggregator();
 
   const handleFileSelect = () => {
@@ -34,13 +32,8 @@ const HealthInspectionAggregator: React.FC = () => {
     e.target.value = "";
   };
 
-  const handleExport = async () => {
-    await exportData(month);
-  };
-
   const successfulFilesCount = files.filter((f) => f.status === "success").length;
   const canAggregate = successfulFilesCount > 0 && !isProcessing;
-  const canExport = aggregatedData !== null && !isProcessing;
 
   return (
     <Box>
