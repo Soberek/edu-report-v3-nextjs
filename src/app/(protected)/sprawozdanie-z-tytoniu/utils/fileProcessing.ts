@@ -41,7 +41,14 @@ export const readExcelFile = async (file: File): Promise<{ fileName: string; dat
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
+    // Add timeout to prevent infinite hanging
+    const timeout = setTimeout(() => {
+      reader.abort();
+      reject(new Error("File reading timeout - file may be corrupted or too large"));
+    }, 30000); // 30 second timeout
+
     reader.onload = (event) => {
+      clearTimeout(timeout);
       try {
         const arrayBuffer = event.target?.result;
         if (!arrayBuffer) {
@@ -53,16 +60,25 @@ export const readExcelFile = async (file: File): Promise<{ fileName: string; dat
         const worksheet = workbook.Sheets[firstSheetName];
 
         // Read data starting from row 5 (skip header rows)
-        const data = XLSX.utils.sheet_to_json<HealthInspectionRow>(worksheet, {
+        const rawData = XLSX.utils.sheet_to_json<HealthInspectionRow>(worksheet, {
           raw: false,
           range: 4, // Start from row 5 (0-indexed, so 4)
         });
 
-        // Filter out empty rows and RAZEM row
-        const filteredData = data.filter((row) => {
-          const facilityType = row["RODZAJ OBIEKTU"];
-          return facilityType && facilityType.trim() !== "" && !facilityType.toLowerCase().includes("razem");
-        });
+        // Add row numbers and filter out empty rows and RAZEM row
+        const filteredData = rawData
+          .map((row, index) => {
+            // Add __rowNum__ starting from row 5 (index 0 -> row 5, index 1 -> row 6, etc.)
+            // Data rows in Excel are typically rows 6-15, so we'll filter these in aggregation
+            const rowWithNumber = { ...row, __rowNum__: index + 5 } as HealthInspectionRow & { __rowNum__: number };
+            return rowWithNumber;
+          })
+          .filter((row) => {
+            const facilityType = row["RODZAJ OBIEKTU"];
+            const isValidRow = facilityType && facilityType.trim() !== "" && !facilityType.toLowerCase().includes("razem");
+
+            return isValidRow;
+          });
 
         if (filteredData.length === 0) {
           throw new Error(ERROR_MESSAGES.NO_DATA);
@@ -79,8 +95,16 @@ export const readExcelFile = async (file: File): Promise<{ fileName: string; dat
     };
 
     reader.onerror = () => {
+      clearTimeout(timeout);
       reject(new Error(ERROR_MESSAGES.PROCESSING_ERROR));
     };
+
+    reader.onabort = () => {
+      clearTimeout(timeout);
+      reject(new Error("File reading was aborted"));
+    };
+
+    reader.readAsArrayBuffer(file);
   });
 };
 
@@ -124,8 +148,6 @@ const toNumber = (value: number | string | undefined): number => {
  * Aggregates data from multiple Excel files
  */
 export function aggregateHealthData(filesData: Array<{ fileName: string; data: HealthInspectionRow[] }>): AggregatedHealthData {
-  console.log("aggregateHealthData called with filesData:", filesData);
-
   // Initialize all facility types with zeros
   const result: AggregatedHealthData = {};
   FACILITY_TYPES.forEach((type) => {
@@ -140,24 +162,29 @@ export function aggregateHealthData(filesData: Array<{ fileName: string; data: H
     fileData.data.forEach((row: HealthInspectionRow & { __rowNum__?: number }) => {
       // Skip rows that are not within the data range (rows 6-15 in Excel)
       // Only apply row filtering if __rowNum__ is present (from actual Excel files)
+      // Since we start reading from row 5 with range:4, data rows should be 6-15
       if (row.__rowNum__ !== undefined && (row.__rowNum__ < 6 || row.__rowNum__ > 15)) {
         return;
       }
 
       const facilityType = row["RODZAJ OBIEKTU"];
+
       if (facilityType && result[facilityType]) {
         const skontrolowane = toNumber(row["LICZBA SKONTROLOWANYCH OBIEKTÓW"]);
-        const realizowane = toNumber(row["OGÓŁEM"]);
-        const zWykorzystaniemPalarni = toNumber(row["W TYM Z WYKORZYSTANIEM PALARNI"]);
+        // Support both old test format (OGÓŁEM) and real Excel format (LICZBA OBIEKTÓW...)
+        const realizowane = toNumber(row["LICZBA OBIEKTÓW, W KTÓRYCH USTAWA JEST REALIZOWANA"] ?? row["OGÓŁEM"]);
+        // Support both old test format (W TYM Z WYKORZYSTANIEM PALARNI) and real Excel format (__EMPTY)
+        const zWykorzystaniemPalarni = toNumber(row["__EMPTY"] ?? row["W TYM Z WYKORZYSTANIEM PALARNI"]);
 
         result[facilityType].skontrolowane += skontrolowane;
         result[facilityType].realizowane += realizowane;
         result[facilityType].zWykorzystaniemPalarni += zWykorzystaniemPalarni;
+      } else if (facilityType) {
+        console.log(`Facility type "${facilityType}" not found in predefined types`);
       }
     });
   });
 
-  console.log("Aggregated result:", result);
   return result;
 }
 
