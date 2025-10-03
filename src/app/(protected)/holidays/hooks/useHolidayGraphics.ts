@@ -31,71 +31,94 @@ export const useHolidayGraphics = () => {
     }
   }, []);
 
-  const generatePostsWithGraphics = useCallback(async (holidays: EducationalHolidayWithQuery[]) => {
-    if (holidays.length === 0) {
-      setState((prev) => ({ ...prev, error: "No holidays available to generate posts" }));
-      return;
-    }
-
-    setState((prev) => ({ ...prev, loading: true, error: null }));
-
-    try {
-      const response = await fetch("/api/generate-holiday-graphics", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ holidays }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to generate graphics");
+  const generatePostsWithGraphics = useCallback(
+    async (holidays: EducationalHolidayWithQuery[]) => {
+      if (holidays.length === 0) {
+        setState((prev) => ({ ...prev, error: "No holidays available to generate posts" }));
+        return;
       }
 
-      const data = await response.json();
+      setState((prev) => ({ ...prev, loading: true, error: null, posts: [] }));
 
-      // Generate graphics for each post on the client side
-      const postsWithGraphics = await Promise.all(
-        data.posts.map(async (post: ApiGeneratedPost) => {
-          try {
-            const generatedImageUrl = await graphicsGenerator.generateHolidayPost({
-              title: post.title,
-              date: post.literalDate,
-              backgroundImageUrl: templateConfig.templateImageUrl ? post.imageUrl : post.imageUrl, // Always use Unsplash for image placeholder
-              templateImageUrl: templateConfig.templateImageUrl,
-              datePosition: templateConfig.datePosition,
-              titlePosition: templateConfig.titlePosition,
-              imagePlaceholder: templateConfig.imagePlaceholder,
-            });
+      try {
+        console.time("generatePostsWithGraphics");
+        const response = await fetch("/api/generate-holiday-graphics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ holidays }),
+        });
 
-            return {
-              ...post,
-              generatedImageUrl,
-            };
-          } catch (error) {
-            console.error(`Failed to generate graphics for ${post.title}:`, error);
-            return {
-              ...post,
-              generatedImageUrl: post.imageUrl, // Fallback to original image
-            };
-          }
-        })
-      );
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to generate graphics");
+        }
 
-      setState((prev) => ({
-        ...prev,
-        posts: postsWithGraphics,
-        loading: false,
-        error: null,
-      }));
-    } catch (error) {
-      console.error("Error generating posts with graphics:", error);
-      setState((prev) => ({
-        ...prev,
-        loading: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
-      }));
-    }
-  }, []);
+        const data = await response.json();
+        const posts: ApiGeneratedPost[] = Array.isArray(data.posts) ? data.posts : [];
+
+        // Process in small concurrent batches to avoid blocking the main thread
+        const concurrency = 2; // keep low to avoid UI freeze; adjust if needed
+        let idx = 0;
+
+        while (idx < posts.length) {
+          const batch = posts.slice(idx, idx + concurrency);
+
+          const batchResults = await Promise.all(
+            batch.map(async (post: ApiGeneratedPost) => {
+              // include a short, sanitized version of the tag/query in the timing label
+              const rawTag = String(post.query ?? "").trim();
+              const tagPart =
+                rawTag
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")
+                  .replace(/[^a-z0-9-_]/g, "")
+                  .slice(0, 24) || "no-tag";
+              const label = `generate-post-${post.id}-${tagPart}`;
+              console.time(label);
+              try {
+                const generatedImageUrl = await graphicsGenerator.generateHolidayPost({
+                  title: post.title,
+                  date: post.literalDate,
+                  backgroundImageUrl: post.imageUrl,
+                  templateImageUrl: templateConfig.templateImageUrl,
+                  datePosition: templateConfig.datePosition,
+                  titlePosition: templateConfig.titlePosition,
+                  imagePlaceholder: templateConfig.imagePlaceholder,
+                });
+
+                console.timeEnd(label);
+                return { ...post, generatedImageUrl };
+              } catch (error) {
+                console.timeEnd(label);
+                console.error(`Failed to generate graphics for ${post.title}:`, error);
+                return { ...post, generatedImageUrl: post.imageUrl };
+              }
+            })
+          );
+
+          // Append batch results to state so UI sees progress incrementally
+          setState((prev) => ({ ...prev, posts: [...prev.posts, ...batchResults] }));
+
+          // yield to event loop briefly to keep UI responsive
+           
+          await new Promise((r) => setTimeout(r, 30));
+
+          idx += concurrency;
+        }
+
+        setState((prev) => ({ ...prev, loading: false, error: null }));
+        console.timeEnd("generatePostsWithGraphics");
+      } catch (error) {
+        console.error("Error generating posts with graphics:", error);
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: error instanceof Error ? error.message : "Unknown error occurred",
+        }));
+      }
+    },
+    [templateConfig]
+  );
 
   const clearError = useCallback(() => {
     setState((prev) => ({ ...prev, error: null }));

@@ -23,7 +23,6 @@ export const initialBudgetMeterState: BudgetMeterState = {
 };
 
 export const budgetMeterReducer = (state: BudgetMeterState, action: BudgetMeterAction): BudgetMeterState => {
-  console.log("action", action);
   switch (action.type) {
     case "RESET_STATE":
       return initialBudgetMeterState;
