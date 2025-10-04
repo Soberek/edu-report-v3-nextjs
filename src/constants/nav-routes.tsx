@@ -180,17 +180,10 @@ export const navRoutes: NavRoute[] = [
     description: "Generator treści na święta",
   },
   {
-    title: "Generator postów",
-    path: "generator-postow",
-    category: "tools",
-    isPrivate: true,
-    icon: <FaPenFancy />,
-    description: "Tworzenie postów i treści",
-  },
-  {
     title: "TODO",
     path: "todo",
     category: "tools",
+    isAdminOnly: true,
     isPrivate: true,
     icon: <FaCheckSquare />,
     description: "Lista zadań do wykonania",
