@@ -182,7 +182,7 @@ const SideDrawer: React.FC = () => {
                   {/* Category Routes */}
                   <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      {routes.map(({ title, path, icon, description }) => {
+                      {routes.map(({ title, path, icon, description, isAdminOnly }) => {
                         // Enhanced active path detection
                         const isActive = (() => {
                           // Handle root path
@@ -262,7 +262,31 @@ const SideDrawer: React.FC = () => {
                                 {icon}
                               </ListItemIcon>
                               <ListItemText
-                                primary={title}
+                                primary={
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <span>{title}</span>
+                                    {isAdmin && isUserLoggedIn && typeof isAdmin === 'boolean' && isAdmin && (null)}
+                                    {typeof isAdminOnly !== 'undefined' && isAdminOnly && (
+                                      <Chip
+                                        label="admin"
+                                        size="small"
+                                        sx={{
+                                          height: 18,
+                                          fontSize: "0.65rem",
+                                          backgroundColor: theme.palette.error.main,
+                                          color: "white",
+                                          fontWeight: 700,
+                                          ml: 0.5,
+                                          letterSpacing: 0.5,
+                                          textTransform: 'uppercase',
+                                          "& .MuiChip-label": {
+                                            px: 0.8,
+                                          },
+                                        }}
+                                      />
+                                    )}
+                                  </Box>
+                                }
                                 secondary={description}
                                 primaryTypographyProps={{
                                   fontSize: "0.9rem",
