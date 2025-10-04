@@ -44,7 +44,7 @@ export default function ProfilePage() {
         countryCode,
       });
       setSuccess(true);
-    } catch (err: any) {
+  } catch (err: unknown) {
       setError("Nie udało się zaktualizować danych użytkownika.");
     } finally {
       setSaving(false);
