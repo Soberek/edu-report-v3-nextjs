@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import type { UserData } from "@/types/user";
 
 import { IconButton, Tooltip } from "@mui/material";
