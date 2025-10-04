@@ -10,6 +10,8 @@ import { programs } from "@/constants/programs";
 import type { School } from "@/types";
 import { TemplateSelector } from "./components/TemplateSelector";
 import { FormField } from "./components/FormField";
+import { TaskDescriptionTemplateSelector } from "./components/ViewerDescriptionTemplateSelector";
+import { AudienceGroupBuilder } from "./components/AudienceGroupBuilder";
 import { PAGE_CONSTANTS, FIELD_LABELS, FIELD_PLACEHOLDERS, BUTTON_CONSTANTS, STYLE_CONSTANTS } from "./constants";
 
 export default function IzrzForm() {
@@ -155,6 +157,12 @@ export default function IzrzForm() {
         placeholder={FIELD_PLACEHOLDERS.VIEWER_COUNT}
         required
       />
+
+      <AudienceGroupBuilder
+        onDescriptionChange={(desc) => setValue("viewerCountDescription", desc)}
+        onTotalCountChange={(count) => setValue("viewerCount", count)}
+      />
+
       <FormField
         type="textarea"
         name="viewerCountDescription"
@@ -168,6 +176,8 @@ export default function IzrzForm() {
       />
 
       {/* Task Description */}
+      <TaskDescriptionTemplateSelector onSelect={(desc) => setValue("taskDescription", desc)} />
+
       <FormField
         type="textarea"
         name="taskDescription"

@@ -75,8 +75,8 @@ class IzrzRepository {
       opis_zadania: data.taskDescription,
       dodatkowe_informacje: data.additionalInfo,
       data: formatDate(data.dateInput),
-      lista_obecnosci: data.attendanceList === "on" ? `${++index}. Potwierdzenie spotkania zał. F/PT/PZ/01/02` : "",
-      rozdzielnik: data.rozdzielnik === "on" ? `${++index}. Rozdzielnik materiałów zał. F/PT/PZ/01/01` : "",
+      lista_obecnosci: data.attendanceList === "true" ? `${++index}. Potwierdzenie spotkania zał. F/PT/PZ/01/02` : "",
+      rozdzielnik: data.rozdzielnik === "true" ? `${++index}. Rozdzielnik materiałów zał. F/PT/PZ/01/01` : "",
     });
 
     try {
@@ -138,6 +138,10 @@ export async function POST(request: NextRequest) {
       attendanceList: String(formData.get("attendanceList") ?? ""),
       rozdzielnik: String(formData.get("rozdzielnik") ?? ""),
     };
+
+    // Log boolean values for debugging
+    console.log("attendanceList:", data.attendanceList);
+    console.log("rozdzielnik:", data.rozdzielnik);
 
     const validation = createIzrzDocumentCreateSchema.safeParse(data);
     if (!validation.success) {

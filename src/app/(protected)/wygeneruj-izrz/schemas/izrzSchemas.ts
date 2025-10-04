@@ -1,4 +1,11 @@
+// Export viewer description templates as an array for UI selection
+export const viewerDescriptionTemplates = Object.entries(OPISY_ZADAN).map(([key, value]) => ({
+  key,
+  label: `${value.icon} ${key.trim()}`,
+  description: value.opis,
+}));
 import { z } from "zod";
+import { OPISY_ZADAN } from "../constants/opisy-zadan";
 
 // Validation constants
 const VALIDATION_LIMITS = {
@@ -175,14 +182,8 @@ export const defaultFormValues: IzrzFormData = {
   address: "",
   dateInput: new Date().toISOString().split("T")[0],
   viewerCount: 0,
-  viewerCountDescription: `Grupa I:
-Szkoła Podstawowa (klasy 1-3): ... osób
-Opiekunowie: ... osób
-Szkoła Podstawowa (klasy 4-8): ... osób
-
-Grupa II:
-Szkoła Ponadpodstawowa (klasy 1-3): ... osób
-Dorośli (studenci, nauczyciele, inni dorośli): ... osób`,
+  // Default simple viewer description - will be populated by AudienceGroupBuilder
+  viewerCountDescription: "Grupa I:\nUczniowie: 0 osób",
   taskDescription: "",
   additionalInfo: "",
   attendanceList: false,
