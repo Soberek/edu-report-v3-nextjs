@@ -1,4 +1,4 @@
-// ...existing code...
+import { z } from "zod";
 import { baseAuthFormSchema, validateAuthForm, BaseAuthFormData } from "@/components/auth";
 
 /**
