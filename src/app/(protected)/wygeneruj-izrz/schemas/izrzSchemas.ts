@@ -182,8 +182,8 @@ export const defaultFormValues: IzrzFormData = {
   address: "",
   dateInput: new Date().toISOString().split("T")[0],
   viewerCount: 0,
-  // Default to the first available description from OPISY_ZADAN
-  viewerCountDescription: (OPISY_ZADAN as Record<string, { icon: string; opis: string }>)[Object.keys(OPISY_ZADAN)[0]].opis,
+  // Default simple viewer description - will be populated by AudienceGroupBuilder
+  viewerCountDescription: "Grupa I:\nUczniowie: 0 osób",
   taskDescription: "",
   additionalInfo: "",
   attendanceList: false,
