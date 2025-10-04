@@ -263,10 +263,10 @@ const SideDrawer: React.FC = () => {
                               </ListItemIcon>
                               <ListItemText
                                 primary={
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                     <span>{title}</span>
-                                    {isAdmin && isUserLoggedIn && typeof isAdmin === 'boolean' && isAdmin && (null)}
-                                    {typeof isAdminOnly !== 'undefined' && isAdminOnly && (
+                                    {isAdmin && isUserLoggedIn && typeof isAdmin === "boolean" && isAdmin && null}
+                                    {typeof isAdminOnly !== "undefined" && isAdminOnly && (
                                       <Chip
                                         label="admin"
                                         size="small"
@@ -278,7 +278,7 @@ const SideDrawer: React.FC = () => {
                                           fontWeight: 700,
                                           ml: 0.5,
                                           letterSpacing: 0.5,
-                                          textTransform: 'uppercase',
+                                          textTransform: "uppercase",
                                           "& .MuiChip-label": {
                                             px: 0.8,
                                           },
