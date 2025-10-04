@@ -23,14 +23,31 @@ export const AudienceGroupBuilder: React.FC<Props> = ({ onDescriptionChange, onT
     {
       id: "1",
       groupName: "Grupa I",
-      subGroups: [{ name: "Szkoła Podstawowa (klasy 1-3)", count: 0 }],
+      subGroups: [
+        { name: "Szkoła Podstawowa (klasy 1-8)", count: 0 },
+        {
+          name: "Opiekunowie",
+          count: 0,
+        },
+      ],
+    },
+    {
+      id: "2",
+      groupName: "Grupa II",
+      subGroups: [
+        { name: "Szkoła Ponadpodstawowa (klasy 1-4)", count: 0 },
+        {
+          name: "Opiekunowie",
+          count: 0,
+        },
+      ],
     },
   ]);
 
   const generateDescription = (currentGroups: AudienceGroup[]): string => {
     return currentGroups
       .map((group) => {
-        const subGroupsText = group.subGroups.map((sg) => `${sg.name}: ${sg.count} osób`).join("\n");
+        const subGroupsText = group.subGroups.map((sg) => `${sg.name}: ${sg.count} osób; `).join("\n");
         return `${group.groupName}:\n${subGroupsText}`;
       })
       .join("\n\n");
