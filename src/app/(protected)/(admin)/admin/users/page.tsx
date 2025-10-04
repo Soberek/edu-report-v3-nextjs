@@ -34,7 +34,21 @@ const initialState: State = {
   generatedPassword: null,
 };
 
-function reducer(state: State, action: any): State {
+type Action =
+  | { type: "SET_USERS"; users: UserData[] }
+  | { type: "SET_LOADING"; loading: boolean }
+  | { type: "EDIT_USER"; user: UserData }
+  | { type: "CLOSE_EDIT" }
+  | { type: "SET_EDIT_LOADING"; loading: boolean }
+  | { type: "DELETE_USER"; user: UserData }
+  | { type: "CLOSE_DELETE" }
+  | { type: "SET_DELETE_LOADING"; loading: boolean }
+  | { type: "OPEN_PASSWORD_DIALOG"; user: UserData }
+  | { type: "CLOSE_PASSWORD_DIALOG" }
+  | { type: "SET_PASSWORD_LOADING"; loading: boolean }
+  | { type: "SET_GENERATED_PASSWORD"; password: string };
+
+function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "SET_USERS":
       return { ...state, users: action.users };
