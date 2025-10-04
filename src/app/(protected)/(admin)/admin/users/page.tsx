@@ -88,7 +88,7 @@ export default function AdminUsersPage() {
     setEditDialogOpen(false);
   };
 
-  const handleUpdateUser = async (uid: string, updates: any) => {
+  const handleUpdateUser = async (uid: string, updates: Partial<AdminUser>): Promise<void> => {
     try {
       await updateUser(uid, updates);
       await fetchUsers();
