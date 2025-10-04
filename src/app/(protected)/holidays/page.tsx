@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { AdminOnly } from "@/components/auth";
 import { Container, Box } from "@mui/material";
 import { PageHeader, ErrorDisplay } from "@/components/shared";
 import { useHolidays } from "./hooks";
@@ -11,6 +12,14 @@ import type { HolidayTemplateConfig, GeneratedPostWithGraphics } from "./types";
 
 // Main component
 export default function Holidays() {
+  return (
+    <AdminOnly>
+      <HolidaysContent />
+    </AdminOnly>
+  );
+}
+
+function HolidaysContent() {
   const [url, setUrl] = useState("https://www.kalbi.pl/kalendarz-swiat-nietypowych-pazdziernik");
   const [postImagesResults, setPostImagesResults] = useState<GeneratedImagePostImagesResult<GeneratedPostWithGraphics>[]>([]);
 
