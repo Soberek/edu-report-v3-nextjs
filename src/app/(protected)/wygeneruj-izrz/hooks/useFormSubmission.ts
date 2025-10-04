@@ -20,6 +20,10 @@ export const useFormSubmission = ({ onSuccess, onError }: UseFormSubmissionProps
       }
     });
 
+    formData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
+
     return formData;
   }, []);
 
