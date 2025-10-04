@@ -26,7 +26,7 @@ import {
   FaQuestionCircle,
 } from "react-icons/fa";
 
-export type NavCategory = "main" | "education" | "database" | "tools" | "auth";
+export type NavCategory = "main" | "education" | "database" | "tools" | "auth" | "admin";
 
 export interface NavRoute {
   title: string;
@@ -35,9 +35,29 @@ export interface NavRoute {
   isPrivate: boolean;
   icon: ReactNode;
   description: string;
+  isAdminOnly?: boolean;
 }
 
 export const navRoutes: NavRoute[] = [
+  // Admin-only routes
+  {
+    title: "Panel administratora",
+    path: "/admin",
+    category: "admin",
+    isPrivate: true,
+    isAdminOnly: true,
+    icon: <FaCog />,
+    description: "Panel zarządzania dla administratorów",
+  },
+  {
+    title: "Zarządzaj użytkownikami",
+    path: "/admin/users",
+    category: "admin",
+    isPrivate: true,
+    isAdminOnly: true,
+    icon: <FaUsers />,
+    description: "Lista i zarządzanie użytkownikami",
+  },
   // Main Dashboard
   {
     title: "Strona Główna",
@@ -215,6 +235,10 @@ export const getPublicRoutes = (): NavRoute[] => {
   return navRoutes.filter((route) => !route.isPrivate);
 };
 
-export const getMainNavigation = (): NavRoute[] => {
-  return navRoutes.filter((route) => route.isPrivate && ["tools", "main", "education", "database"].includes(route.category));
+export const getMainNavigation = (isAdmin = false): NavRoute[] => {
+  return navRoutes.filter((route) => {
+    if (!route.isPrivate) return false;
+    if (route.isAdminOnly && !isAdmin) return false;
+    return ["tools", "main", "education", "database", "admin"].includes(route.category);
+  });
 };
