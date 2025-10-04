@@ -29,11 +29,13 @@ const SideDrawer: React.FC = () => {
   const theme = useTheme();
   const pathname = usePathname();
   const navContext = useNavContext();
-  const isUserLoggedIn = useUser().user?.uid ? true : false;
-  const [expandedCategories, setExpandedCategories] = React.useState<Set<string>>(new Set(["education", "database", "tools"]));
+  const userContext = useUser();
+  const isUserLoggedIn = userContext.user?.uid ? true : false;
+  const isAdmin = userContext.isAdmin;
+  const [expandedCategories, setExpandedCategories] = React.useState<Set<string>>(new Set(["education", "database", "tools", "admin"]));
 
-  // Get main navigation routes (private routes only)
-  const mainNavRoutes = getMainNavigation();
+  // Get main navigation routes (private routes only, admin routes only for admins)
+  const mainNavRoutes = getMainNavigation(isAdmin);
 
   // Group routes by category
   const routesByCategory = React.useMemo(() => {
@@ -44,8 +46,12 @@ const SideDrawer: React.FC = () => {
       }
       grouped[route.category].push(route);
     });
+    // Only show 'admin' category if user is admin
+    if (!isAdmin) {
+      delete grouped["admin"];
+    }
     return grouped;
-  }, [mainNavRoutes]);
+  }, [mainNavRoutes, isAdmin]);
 
   // Category labels and icons
   const categoryConfig = {
@@ -53,6 +59,7 @@ const SideDrawer: React.FC = () => {
     education: { label: "Edukacja", icon: "📚" },
     database: { label: "Baza danych", icon: "🗄️" },
     tools: { label: "Narzędzia", icon: "🔧" },
+    admin: { label: "Administrator", icon: "🛡️" },
   };
 
   const toggleCategory = (category: string) => {
