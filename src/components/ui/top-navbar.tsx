@@ -1,4 +1,5 @@
 "use client";
+
 import {
   AppBar,
   Toolbar,
@@ -13,8 +14,10 @@ import {
   InputAdornment,
   Divider,
   Chip,
-  Badge,
 } from "@mui/material";
+import { useWeatherLocation } from "@/hooks/useWeatherLocation";
+
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
@@ -26,23 +29,47 @@ import { useUser } from "@/hooks/useUser";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/config";
 import { useSearch } from "../../hooks/useSearch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/navigation";
 import { useNavContext } from "@/providers/NavProvider";
 
 const Navbar: React.FC = () => {
+  const { userData } = useUser();
+  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const { weather, location } = useWeatherLocation(userData, coords);
+
   const theme = useTheme();
   const authContext = useUser();
   const searchContext = useSearch();
   const router = useRouter();
   const navContext = useNavContext();
   const { handleDrawerOpen } = navContext;
+  const isAdmin = authContext.isAdmin;
 
   // Determine if menu button should be shown (only for authenticated users)
   const showMenuButton = Boolean(authContext.user);
 
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const [currentTime, setCurrentTime] = useState<string>("");
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(
+        now.toLocaleTimeString("pl-PL", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setUserMenuAnchor(event.currentTarget);
@@ -63,7 +90,8 @@ const Navbar: React.FC = () => {
     }
   };
 
-  const userInitial = authContext.user?.email?.charAt(0).toUpperCase() ?? "U";
+  const displayName = authContext.userData?.displayName || authContext.user?.email || "Użytkownik";
+  const userInitial = displayName.charAt(0).toUpperCase();
 
   return (
     <AppBar
@@ -160,10 +188,43 @@ const Navbar: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Right Section - User Menu */}
+        {/* Right Section - User Menu & Time */}
         <Box display="flex" alignItems="center" gap={2}>
+          {/* Tailwind styled time and weather display */}
+          <span className="flex items-center gap-2 rounded-full bg-white/80 border border-slate-200 shadow px-4 py-1 font-mono text-lg text-slate-800 font-semibold tracking-wide select-none transition hover:bg-white hover:shadow-lg">
+            <span className="text-base font-medium text-slate-500 mr-2">{location}</span>
+            {weather && (
+              <span className="flex items-center gap-1">
+                <img
+                  src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+                  alt="weather"
+                  className="w-6 h-6 -my-1"
+                  loading="lazy"
+                />
+                <span className="text-base font-medium text-slate-600">{weather.temp}°C</span>
+              </span>
+            )}
+            {currentTime}
+          </span>
+
           {authContext.user ? (
             <>
+              {isAdmin && (
+                <Chip
+                  label="Administrator"
+                  color="error"
+                  size="small"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    ml: 1,
+                    background: `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
+                    color: "white",
+                    boxShadow: `0 2px 8px ${theme.palette.error.main}30`,
+                  }}
+                  icon={<PersonIcon />}
+                />
+              )}
               <IconButton
                 onClick={handleUserMenuOpen}
                 sx={{
@@ -225,7 +286,7 @@ const Navbar: React.FC = () => {
               >
                 <Box sx={{ px: 3, py: 2 }}>
                   <Typography variant="subtitle1" fontWeight={600}>
-                    {authContext.user.email}
+                    {displayName}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     🎉 Miło Cię widzieć ponownie!
