@@ -1,379 +1,203 @@
-# Shared Authentication Components
+# Role-Based Authentication
 
-A comprehensive, reusable authentication system built with TypeScript, React, and Firebase Auth. This module provides shared components, hooks, and utilities used across login and registration modules.
+This directory contains components and utilities for role-based authentication using Firebase.
 
-## 📁 Architecture
+## User Roles
 
-```
-src/components/auth/
-├── components/          # Reusable UI components
-│   ├── ErrorAlert.tsx  # Error display with accessibility
-│   ├── AuthForm.tsx    # Generic authentication form
-│   ├── AuthLayout.tsx  # Shared layout for auth pages
-│   └── index.ts        # Barrel exports
-├── constants/          # Shared constants
-│   └── index.ts        # Common validation, UI text, styling
-├── hooks/             # Shared React hooks
-│   ├── useAuthRedirect.ts # Authentication redirects
-│   ├── useAuthForm.ts     # Generic form logic
-│   └── index.ts           # Barrel exports
-├── types/             # TypeScript interfaces
-│   └── index.ts       # All shared type definitions
-├── utils/             # Pure utility functions
-│   ├── authUtils.ts   # Firebase error handling
-│   ├── validationUtils.ts # Zod schemas and validation
-│   └── index.ts       # Barrel exports
-├── index.ts           # Module barrel export
-└── README.md          # This file
-```
+- **ADMIN**: Full access to all features
+- **USER**: Standard user access
 
-## 🎯 Purpose
+## Components
 
-This shared module eliminates code duplication between login and register modules by providing:
+### `RoleProtected`
+Protects routes based on user role. Redirects unauthorized users.
 
-- **Consistent UI components** across all authentication flows
-- **Unified error handling** for Firebase authentication
-- **Shared validation logic** with Zod schemas
-- **Common styling and theming** for authentication pages
-- **Reusable hooks** for authentication operations
-
-## 🧩 Components
-
-### `ErrorAlert`
-
-**Purpose**: Consistent error display with accessibility features
-**Features**: 
-- Collapsible animations
-- ARIA live regions for screen readers
-- Customizable titles
-- Dismissible with close callback
-
-**Usage**:
 ```tsx
-import { ErrorAlert } from "@/components/auth";
+import { RoleProtected } from "@/components/auth";
+import { UserRole } from "@/types/user";
 
-<ErrorAlert 
-  error={errorMessage} 
-  onClose={clearError}
-  title="Login Error"
-/>
-```
-
-### `AuthForm`
-
-**Purpose**: Generic form component for authentication
-**Features**:
-- Configurable with Zod schemas
-- Consistent styling and behavior
-- Loading states and validation
-- Email and password fields
-
-**Usage**:
-```tsx
-import { AuthForm } from "@/components/auth";
-
-<AuthForm
-  onSubmit={handleSubmit}
-  isLoading={isLoading}
-  schema={loginFormSchema}
-  constants={LOGIN_CONSTANTS}
-  submitButtonText="Log In"
-  loadingText="Logging in..."
-/>
-```
-
-### `AuthLayout`
-
-**Purpose**: Shared layout wrapper for authentication pages
-**Features**:
-- Responsive design
-- Consistent spacing and styling
-- Configurable background and sizing
-- Mobile-optimized
-
-**Usage**:
-```tsx
-import { AuthLayout } from "@/components/auth";
-
-<AuthLayout title="Login">
-  <ErrorAlert error={error} />
-  <AuthForm onSubmit={handleSubmit} />
-  <NavigationPrompt />
-</AuthLayout>
-```
-
-## 🪝 Hooks
-
-### `useAuthRedirect`
-
-**Purpose**: Handles authentication-based redirects
-**Parameters**: 
-- `redirectTo?: string` - Custom redirect path
-- `defaultRedirect: string` - Default redirect if no custom path
-
-**Returns**: `{ shouldRedirect: boolean, redirectPath: string }`
-
-**Usage**:
-```tsx
-import { useAuthRedirect } from "@/components/auth";
-
-const { shouldRedirect } = useAuthRedirect("/dashboard", "/");
-
-if (shouldRedirect) {
-  return null; // User is authenticated, redirect will happen
+export default function AdminPage() {
+  return (
+    <RoleProtected requiredRole={UserRole.ADMIN} redirectTo="/">
+      <div>Admin-only content</div>
+    </RoleProtected>
+  );
 }
 ```
 
-### `useAuthForm`
+### `AdminOnly`
+Conditionally renders content for admin users only.
 
-**Purpose**: Generic authentication form logic
-**Parameters**:
-- `authFunction: (data: T) => Promise<any>` - Firebase auth function
-- `successRedirect: string` - Where to redirect on success
-- `errorContext: string` - Context for error logging
-
-**Returns**: `{ submit, isLoading, error, clearError }`
-
-**Usage**:
 ```tsx
-import { useAuthForm } from "@/components/auth";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { AdminOnly } from "@/components/auth";
 
-const { submit, isLoading, error, clearError } = useAuthForm(
-  (data) => signInWithEmailAndPassword(auth, data.email, data.password),
-  "/dashboard",
-  "Login error"
-);
+export default function Page() {
+  return (
+    <div>
+      <h1>Public content</h1>
+      <AdminOnly>
+        <button>Admin-only button</button>
+      </AdminOnly>
+    </div>
+  );
+}
 ```
 
-## 🛠️ Utilities
+## Hooks
 
-### `validationUtils.ts`
+### `useUser()`
+Access user authentication state and role data.
 
-**Features**:
-- Base Zod schema for email/password forms
-- Generic validation function
-- Email and password validation helpers
-- Type-safe form data interfaces
-
-**Key Functions**:
 ```tsx
-import { baseAuthFormSchema, validateAuthForm } from "@/components/auth";
+import { useUser } from "@/hooks/useUser";
 
-// Use base schema
-const loginSchema = baseAuthFormSchema;
-
-// Validate form data
-const { isValid, errors } = validateAuthForm(data, schema);
-```
-
-### `authUtils.ts`
-
-**Features**:
-- Comprehensive Firebase error mapping
-- User-friendly error messages in Polish
-- Error classification (retryable, requires user action)
-- Development logging utilities
-
-**Key Functions**:
-```tsx
-import { getAuthErrorMessage, isRetryableError } from "@/components/auth";
-
-// Convert Firebase error to user message
-const message = getAuthErrorMessage(error);
-
-// Check if error can be retried
-const canRetry = isRetryableError(parsedError);
-```
-
-## 📊 Error Handling Matrix
-
-| Firebase Error Code | User Message | Classification |
-|---------------------|--------------|----------------|
-| `auth/user-not-found` | "Nie znaleziono użytkownika..." | User action required |
-| `auth/wrong-password` | "Nieprawidłowe hasło" | User action required |
-| `auth/email-already-in-use` | "Ten adres email jest już używany" | User action required |
-| `auth/weak-password` | "Hasło jest zbyt słabe" | User action required |
-| `auth/too-many-requests` | "Zbyt wiele prób..." | Temporary restriction |
-| `auth/network-request-failed` | "Błąd połączenia..." | Retryable |
-| `auth/invalid-credential` | "Nieprawidłowe dane logowania" | User action required |
-| `auth/user-disabled` | "Konto zostało zablokowane" | Contact support |
-
-## 📝 Constants Structure
-
-### `SHARED_AUTH_CONSTANTS`
-
-```typescript
-export const SHARED_AUTH_CONSTANTS = {
-  VALIDATION: {
-    EMAIL_REQUIRED: "Email jest wymagany",
-    EMAIL_INVALID: "Nieprawidłowy format email",
-    PASSWORD_REQUIRED: "Hasło jest wymagane",
-    PASSWORD_MIN_LENGTH: 6,
-    PASSWORD_MIN_LENGTH_MESSAGE: "Hasło musi mieć co najmniej 6 znaków",
-  },
+export default function Component() {
+  const { user, userData, loading, isAdmin } = useUser();
   
-  TEXT: {
-    UNKNOWN_ERROR: "Wystąpił nieznany błąd",
-    ERROR_PREFIX: "Wystąpił błąd:",
-    DEFAULT_ERROR_TITLE: "Błąd",
-  },
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <div>Not logged in</div>;
   
-  FIELDS: {
-    EMAIL: { LABEL: "Email", TYPE: "email", AUTOCOMPLETE: "email" },
-    PASSWORD: { LABEL: "Hasło", TYPE: "password" },
-  },
+  return (
+    <div>
+      <p>Email: {user.email}</p>
+      <p>Role: {userData?.role}</p>
+      {isAdmin && <p>You are an admin!</p>}
+    </div>
+  );
+}
+```
+
+### `useIsAdmin()`
+Quick check if current user is admin.
+
+```tsx
+import { useIsAdmin } from "@/hooks/useUser";
+
+export default function Component() {
+  const isAdmin = useIsAdmin();
   
-  ROUTES: {
-    HOME: "/",
-    LOGIN: "/login", 
-    REGISTER: "/register",
-  },
+  return isAdmin ? <AdminPanel /> : <UserPanel />;
+}
+```
+
+### `useHasRole(role)`
+Check if user has a specific role.
+
+```tsx
+import { useHasRole } from "@/hooks/useUser";
+import { UserRole } from "@/types/user";
+
+export default function Component() {
+  const isAdmin = useHasRole(UserRole.ADMIN);
   
-  STYLES: {
-    BACKGROUND_GRADIENT: "linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)",
-    PRIMARY_COLOR: "#7b1fa2",
-    PAPER_ELEVATION: 6,
-    BORDER_RADIUS: 3,
-    MIN_WIDTH: 320,
-    MAX_WIDTH: 400,
-    BUTTON_PADDING_Y: 1.5,
-    FORM_GAP: 2,
-    COMPONENT_GAP: 3,
-  },
-} as const;
+  return isAdmin ? <div>Admin view</div> : <div>User view</div>;
+}
 ```
 
-## 🔄 Integration Guide
+## Services
 
-### Extending for New Auth Pages
+### `userService.ts`
+Functions for managing user data in Firestore.
 
-1. **Import shared constants**:
 ```tsx
-import { SHARED_AUTH_CONSTANTS } from "@/components/auth";
+import { 
+  getUserData, 
+  createUserData, 
+  updateUserRole, 
+  isUserAdmin 
+} from "@/services/userService";
+import { UserRole } from "@/types/user";
 
-export const NEW_AUTH_CONSTANTS = {
-  ...SHARED_AUTH_CONSTANTS,
-  TEXT: {
-    ...SHARED_AUTH_CONSTANTS.TEXT,
-    TITLE: "Custom Title",
-    SUBMIT_BUTTON: "Custom Action",
-  },
-};
+// Get user data
+const userData = await getUserData(uid);
+
+// Create new user (automatically done on first login)
+await createUserData(uid, email, UserRole.USER);
+
+// Update user role (admin only)
+await updateUserRole(uid, UserRole.ADMIN);
+
+// Check if user is admin
+const isAdmin = await isUserAdmin(uid);
 ```
 
-2. **Use shared components**:
-```tsx
-import { AuthLayout, AuthForm, ErrorAlert } from "@/components/auth";
+## Firestore Structure
 
-export const NewAuthPage = () => (
-  <AuthLayout title="Custom Auth">
-    <ErrorAlert error={error} />
-    <AuthForm 
-      schema={customSchema}
-      onSubmit={handleSubmit}
-      submitButtonText="Custom Action"
-    />
-  </AuthLayout>
-);
+Users collection structure:
+```json
+{
+  "users": {
+    "userId123": {
+      "uid": "userId123",
+      "email": "user@example.com",
+      "role": "user",
+      "displayName": "John Doe",
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    }
+  }
+}
 ```
 
-3. **Leverage shared hooks**:
-```tsx
-import { useAuthForm, useAuthRedirect } from "@/components/auth";
+## Making Your First Admin User
 
-const { submit, isLoading, error } = useAuthForm(
-  customAuthFunction,
-  "/success-redirect",
-  "Custom error context"
-);
+Since new users default to `USER` role, you'll need to manually promote your first admin:
+
+1. Register a new user through your app
+2. Go to Firebase Console > Firestore
+3. Find the user document in the `users` collection
+4. Change the `role` field from `"user"` to `"admin"`
+5. Save the changes
+
+Alternatively, use Firebase Admin SDK or Cloud Functions to automate this.
+
+## Example: Admin Page
+
+```tsx
+// app/(protected)/admin/page.tsx
+import { RoleProtected } from "@/components/auth";
+import { UserRole } from "@/types/user";
+
+export default function AdminDashboard() {
+  return (
+    <RoleProtected requiredRole={UserRole.ADMIN}>
+      <div>
+        <h1>Admin Dashboard</h1>
+        <p>Only admins can see this page</p>
+      </div>
+    </RoleProtected>
+  );
+}
 ```
 
-## 🧪 Testing Strategy
+## Example: Mixed Content Page
 
-### Unit Tests
-- **Utils**: Test pure functions with various inputs
-- **Hooks**: Test with React Testing Library
-- **Components**: Test rendering and interactions
-
-### Integration Tests
-- **Form flows**: Test complete submission cycles
-- **Error handling**: Test various Firebase errors
-- **Redirects**: Test authentication state changes
-
-### Example Test
 ```tsx
-import { render, screen } from "@testing-library/react";
-import { ErrorAlert } from "@/components/auth";
+import { AdminOnly } from "@/components/auth";
+import { useUser } from "@/hooks/useUser";
 
-test("displays error message with accessibility", () => {
-  render(<ErrorAlert error="Test error" />);
+export default function MixedPage() {
+  const { user, userData } = useUser();
   
-  const alert = screen.getByRole("alert");
-  expect(alert).toHaveAttribute("aria-live", "assertive");
-  expect(alert).toHaveTextContent("Test error");
-});
+  return (
+    <div>
+      <h1>Welcome, {userData?.displayName}</h1>
+      
+      {/* Everyone can see this */}
+      <section>
+        <h2>Public Section</h2>
+        <p>All users see this content</p>
+      </section>
+      
+      {/* Only admins can see this */}
+      <AdminOnly>
+        <section>
+          <h2>Admin Controls</h2>
+          <button>Manage Users</button>
+          <button>System Settings</button>
+        </section>
+      </AdminOnly>
+    </div>
+  );
+}
 ```
-
-## 🎨 Customization
-
-### Theming
-All components use Material-UI theming and can be customized through the theme provider:
-
-```tsx
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#your-color",
-    },
-  },
-});
-```
-
-### Styling Override
-Individual components accept `sx` props for custom styling:
-
-```tsx
-<AuthLayout 
-  title="Custom"
-  backgroundGradient="linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
-/>
-```
-
-## 📱 Accessibility Features
-
-- **ARIA labels**: Proper labeling for screen readers
-- **Live regions**: Error announcements
-- **Keyboard navigation**: Full keyboard support
-- **Focus management**: Logical tab order
-- **High contrast**: System preference support
-
-## 🚀 Performance Benefits
-
-- **Code reuse**: Eliminates duplication between auth modules
-- **Bundle optimization**: Shared components reduce bundle size
-- **Tree shaking**: Only used components are included
-- **Memoization ready**: Components optimized for React.memo
-
-## 🔒 Security Features
-
-- **Input validation**: Client-side validation with Zod
-- **XSS protection**: Proper escaping and sanitization
-- **Error sanitization**: No sensitive data in error messages
-- **Development logging**: Conditional debug information
-
-## 🤝 Contributing
-
-1. **Add new auth methods**: Extend the shared hooks and utilities
-2. **Update validation**: Modify shared Zod schemas
-3. **Enhance error handling**: Add new Firebase error codes
-4. **Improve accessibility**: Follow WCAG guidelines
-5. **Document changes**: Update this README
-
-## 📚 Related Documentation
-
-- [Login Module](../../app/login/README.md)
-- [Register Module](../../app/register/README.md)
-- [Firebase Auth Documentation](https://firebase.google.com/docs/auth)
-- [Zod Schema Validation](https://zod.dev/)
-- [Material-UI Components](https://mui.com/)

@@ -1,3 +1,6 @@
+// Re-export user types
+export * from "./user";
+
 export type ArchiveCategories = "A" | "B5" | "B10" | "BE" | "BE5" | "BE10";
 
 export interface Akt {
