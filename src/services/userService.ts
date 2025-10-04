@@ -1,8 +1,49 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { deleteDoc } from "firebase/firestore";
+/**
+ * Update user data (admin only)
+ */
+export async function updateUser(uid: string, data: Partial<UserData>): Promise<void> {
+  try {
+    await updateDoc(doc(db, USERS_COLLECTION, uid), {
+      ...data,
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    throw error;
+  }
+}
+
+/**
+ * Delete user (admin only)
+ */
+export async function deleteUser(uid: string): Promise<void> {
+  try {
+    await deleteDoc(doc(db, USERS_COLLECTION, uid));
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
+}
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { UserRole, type UserData } from "@/types/user";
 
 const USERS_COLLECTION = "users";
+
+/**
+ * Get all users (admin only)
+ */
+export async function getAllUsers(): Promise<UserData[]> {
+  try {
+    const usersCol = collection(db, USERS_COLLECTION);
+    const usersSnapshot = await getDocs(usersCol);
+    return usersSnapshot.docs.map((doc) => doc.data() as UserData);
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    return [];
+  }
+}
 
 /**
  * Get user data from Firestore
@@ -10,11 +51,11 @@ const USERS_COLLECTION = "users";
 export async function getUserData(uid: string): Promise<UserData | null> {
   try {
     const userDoc = await getDoc(doc(db, USERS_COLLECTION, uid));
-    
+
     if (!userDoc.exists()) {
       return null;
     }
-    
+
     return userDoc.data() as UserData;
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -25,12 +66,7 @@ export async function getUserData(uid: string): Promise<UserData | null> {
 /**
  * Create a new user document in Firestore
  */
-export async function createUserData(
-  uid: string,
-  email: string,
-  role: UserRole = UserRole.USER,
-  displayName?: string
-): Promise<void> {
+export async function createUserData(uid: string, email: string, role: UserRole = UserRole.USER, displayName?: string): Promise<void> {
   try {
     const userData: UserData = {
       uid,
@@ -40,7 +76,7 @@ export async function createUserData(
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    
+
     await setDoc(doc(db, USERS_COLLECTION, uid), userData);
   } catch (error) {
     console.error("Error creating user data:", error);
