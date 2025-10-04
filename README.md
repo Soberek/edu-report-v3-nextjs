@@ -83,6 +83,7 @@ Edu Report V3 is a comprehensive educational management system built with Next.j
 ### Data & State Management
 
 - **[Firebase 12.2.1](https://firebase.google.com/)** - Backend services (Firestore, Auth)
+- **[Firebase Admin SDK 13.5.0](https://firebase.google.com/docs/admin/setup)** - Server-side Firebase operations
 - **[React Hook Form 7.62.0](https://react-hook-form.com/)** - Form state management
 - **[Zod 4.1.9](https://zod.dev/)** - Schema validation
 - **[React Context API](https://react.dev/reference/react/Context)** - Global state management
@@ -167,6 +168,10 @@ edu-report-v3-nextjs/
 │   │   │   ├── contacts/       # Contact management
 │   │   │   └── ...             # Other modules
 │   │   ├── api/                # API routes
+│   │   │   ├── auth/           # Authentication endpoints
+│   │   │   │   ├── verify/     # Token verification
+│   │   │   │   └── set-role/   # Role management
+│   │   │   ├── users/          # User management CRUD
 │   │   │   ├── generate-izrz/  # IZRZ generation endpoint
 │   │   │   ├── openai/         # OpenAI integration
 │   │   │   └── unsplash-photo-by-tag/ # Image fetching
@@ -181,9 +186,14 @@ edu-report-v3-nextjs/
 │   ├── constants/              # Application constants
 │   ├── providers/              # Context providers
 │   ├── firebase/               # Firebase configuration
+│   │   ├── config.ts           # Client-side Firebase
+│   │   ├── admin.ts            # Firebase Admin SDK
+│   │   └── ProtectedPage.tsx  # Auth guard component
 │   ├── models/                 # Data models and schemas
 │   ├── services/               # Business logic services
 │   └── utils/                  # Utility functions
+│       ├── auth.ts             # Server-side auth utilities
+│       └── firestore-admin.ts  # Firestore admin helpers
 ├── public/                     # Static assets
 │   ├── generate-templates/     # Word document templates
 │   └── ...                     # Images, icons, etc.
@@ -198,7 +208,7 @@ edu-report-v3-nextjs/
 Create a `.env.local` file in the root directory with the following variables:
 
 ```env
-# Firebase Configuration
+# Firebase Configuration (Client-side)
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
@@ -206,12 +216,26 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
+# Firebase Admin SDK (Server-side)
+FIREBASE_ADMIN_TYPE=service_account
+FIREBASE_ADMIN_PROJECT_ID=your_project_id
+FIREBASE_ADMIN_PRIVATE_KEY_ID=your_private_key_id
+FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+FIREBASE_ADMIN_CLIENT_EMAIL=firebase-adminsdk@your-project.iam.gserviceaccount.com
+FIREBASE_ADMIN_CLIENT_ID=your_client_id
+FIREBASE_ADMIN_AUTH_URI=https://accounts.google.com/o/oauth2/auth
+FIREBASE_ADMIN_TOKEN_URI=https://oauth2.googleapis.com/token
+FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL=https://www.googleapis.com/oauth2/v1/certs
+FIREBASE_ADMIN_CLIENT_X509_CERT_URL=https://www.googleapis.com/robot/v1/metadata/x509/...
+
 # OpenAI Configuration
 OPENAI_API_KEY=your_openai_api_key
 
 # Unsplash API
 UNSPLASH_ACCESS_KEY=your_unsplash_access_key
 ```
+
+For detailed Firebase Admin SDK setup, see [FIREBASE_ADMIN_API.md](FIREBASE_ADMIN_API.md).
 
 ## 🌐 Deployment
 

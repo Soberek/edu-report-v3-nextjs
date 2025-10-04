@@ -40,5 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Firebase admin service account
+*.json
+
 
 contacts.ts

@@ -182,19 +182,19 @@ const SideDrawer: React.FC = () => {
                   {/* Category Routes */}
                   <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                      {routes.map(({ title, path, icon, description }) => {
+                      {routes.map(({ title, path, icon, description, isAdminOnly }) => {
                         // Enhanced active path detection
                         const isActive = (() => {
                           // Handle root path
                           if (pathname === "/" && path === "/") return true;
 
                           // Handle exact match
-                          if (pathname === `/${path}`) return true;
+                          if (pathname === path) return true;
 
                           // Handle nested routes - check if current path starts with the nav path
-                          if (path !== "/" && pathname.startsWith(`/${path}`)) {
+                          if (path !== "/" && pathname.startsWith(path)) {
                             // Make sure it's not a partial match (e.g., /schedule vs /schedule-edit)
-                            const nextChar = pathname[`/${path}`.length];
+                            const nextChar = pathname[path.length];
                             return !nextChar || nextChar === "/";
                           }
 
@@ -262,7 +262,31 @@ const SideDrawer: React.FC = () => {
                                 {icon}
                               </ListItemIcon>
                               <ListItemText
-                                primary={title}
+                                primary={
+                                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <span>{title}</span>
+                                    {isAdmin && isUserLoggedIn && typeof isAdmin === "boolean" && isAdmin && null}
+                                    {typeof isAdminOnly !== "undefined" && isAdminOnly && (
+                                      <Chip
+                                        label="admin"
+                                        size="small"
+                                        sx={{
+                                          height: 18,
+                                          fontSize: "0.65rem",
+                                          backgroundColor: theme.palette.error.main,
+                                          color: "white",
+                                          fontWeight: 700,
+                                          ml: 0.5,
+                                          letterSpacing: 0.5,
+                                          textTransform: "uppercase",
+                                          "& .MuiChip-label": {
+                                            px: 0.8,
+                                          },
+                                        }}
+                                      />
+                                    )}
+                                  </Box>
+                                }
                                 secondary={description}
                                 primaryTypographyProps={{
                                   fontSize: "0.9rem",
