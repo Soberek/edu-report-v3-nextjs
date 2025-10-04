@@ -7,7 +7,7 @@ import { getAuth } from "firebase/auth";
  * Hook to interact with Firebase Admin API endpoints
  */
 export function useFirebaseAdmin() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   /**
@@ -17,7 +17,7 @@ export function useFirebaseAdmin() {
     try {
       const auth = getAuth();
       const user = auth.currentUser;
-      
+
       if (!user) {
         throw new Error("User not authenticated");
       }
@@ -32,16 +32,13 @@ export function useFirebaseAdmin() {
   /**
    * Make authenticated API request
    */
-  const apiRequest = async <T,>(
-    endpoint: string,
-    options?: RequestInit
-  ): Promise<T> => {
+  const apiRequest = async <T,>(endpoint: string, options?: RequestInit): Promise<T> => {
     setLoading(true);
     setError(null);
 
     try {
       const token = await getAuthToken();
-      
+
       if (!token) {
         throw new Error("Failed to get authentication token");
       }
@@ -75,26 +72,21 @@ export function useFirebaseAdmin() {
    * List all users (admin only)
    */
   const listUsers = async () => {
-    return apiRequest<{ users: any[] }>("/api/users");
+    return apiRequest<{ users: unknown[] }>("/api/users");
   };
 
   /**
    * Get a specific user
    */
   const getUser = async (uid: string) => {
-    return apiRequest<{ user: any }>(`/api/users/${uid}`);
+    return apiRequest<{ user: unknown }>(`/api/users/${uid}`);
   };
 
   /**
    * Create a new user (admin only)
    */
-  const createUser = async (userData: {
-    email: string;
-    password: string;
-    displayName?: string;
-    role?: string;
-  }) => {
-    return apiRequest<{ user: any }>("/api/users", {
+  const createUser = async (userData: { email: string; password: string; displayName?: string; role?: string }) => {
+    return apiRequest<{ user: unknown }>("/api/users", {
       method: "POST",
       body: JSON.stringify(userData),
     });
@@ -103,8 +95,18 @@ export function useFirebaseAdmin() {
   /**
    * Update a user
    */
-  const updateUser = async (uid: string, updates: any) => {
-    return apiRequest<{ user: any }>(`/api/users/${uid}`, {
+  type UpdateUserPayload = {
+    displayName?: string;
+    photoURL?: string;
+    email?: string;
+    emailVerified?: boolean;
+    disabled?: boolean;
+    password?: string;
+    role?: string;
+  };
+
+  const updateUser = async (uid: string, updates: UpdateUserPayload) => {
+    return apiRequest<{ user: unknown }>(`/api/users/${uid}`, {
       method: "PATCH",
       body: JSON.stringify(updates),
     });
@@ -123,7 +125,7 @@ export function useFirebaseAdmin() {
    * Verify current token
    */
   const verifyToken = async () => {
-    return apiRequest<{ valid: boolean; user: any }>("/api/auth/verify", {
+    return apiRequest<{ valid: boolean; user: unknown }>("/api/auth/verify", {
       method: "POST",
     });
   };
@@ -132,13 +134,10 @@ export function useFirebaseAdmin() {
    * Set role for a user (admin only)
    */
   const setRole = async (uid: string, role: string) => {
-    return apiRequest<{ message: string; uid: string; role: string }>(
-      "/api/auth/set-role",
-      {
-        method: "POST",
-        body: JSON.stringify({ uid, role }),
-      }
-    );
+    return apiRequest<{ message: string; uid: string; role: string }>("/api/auth/set-role", {
+      method: "POST",
+      body: JSON.stringify({ uid, role }),
+    });
   };
 
   return {
