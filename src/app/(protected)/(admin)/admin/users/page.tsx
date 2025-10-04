@@ -1,132 +1,140 @@
 "use client";
-import { useEffect, useReducer } from "react";
-import { getAllUsers, updateUser, deleteUser } from "@/services/userService";
+
+import { useEffect, useState } from "react";
+import { Container, Typography, CircularProgress, Box, Button, Alert, Snackbar } from "@mui/material";
+import { Add as AddIcon } from "@mui/icons-material";
 import { useUser } from "@/hooks/useUser";
-import type { UserData } from "@/types/user";
-import { Container, Typography, CircularProgress, Box, Button, TextField, MenuItem } from "@mui/material";
-import { UserTable } from "@/components/shared/UserTable";
-import { EditDialog } from "@/components/shared/EditDialog";
+import { useAdminUsers, type AdminUser } from "@/hooks/useAdminUsers";
+import { EnhancedUserTable } from "./components/EnhancedUserTable";
+import { CreateUserDialog } from "./components/CreateUserDialog";
+import { EditUserDialog } from "./components/EditUserDialog";
+import { ResetPasswordDialog } from "./components/ResetPasswordDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 
-type State = {
-  users: UserData[];
-  loading: boolean;
-  editUser: UserData | null;
-  editLoading: boolean;
-  deleteUserObj: UserData | null;
-  deleteLoading: boolean;
-  passwordDialogOpen: boolean;
-  passwordUser: UserData | null;
-  passwordLoading: boolean;
-  generatedPassword: string | null;
-};
-
-const initialState: State = {
-  users: [],
-  loading: true,
-  editUser: null,
-  editLoading: false,
-  deleteUserObj: null,
-  deleteLoading: false,
-  passwordDialogOpen: false,
-  passwordUser: null,
-  passwordLoading: false,
-  generatedPassword: null,
-};
-
-type Action =
-  | { type: "SET_USERS"; users: UserData[] }
-  | { type: "SET_LOADING"; loading: boolean }
-  | { type: "EDIT_USER"; user: UserData }
-  | { type: "CLOSE_EDIT" }
-  | { type: "SET_EDIT_LOADING"; loading: boolean }
-  | { type: "DELETE_USER"; user: UserData }
-  | { type: "CLOSE_DELETE" }
-  | { type: "SET_DELETE_LOADING"; loading: boolean }
-  | { type: "OPEN_PASSWORD_DIALOG"; user: UserData }
-  | { type: "CLOSE_PASSWORD_DIALOG" }
-  | { type: "SET_PASSWORD_LOADING"; loading: boolean }
-  | { type: "SET_GENERATED_PASSWORD"; password: string };
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case "SET_USERS":
-      return { ...state, users: action.users };
-    case "SET_LOADING":
-      return { ...state, loading: action.loading };
-    case "EDIT_USER":
-      return { ...state, editUser: action.user };
-    case "CLOSE_EDIT":
-      return { ...state, editUser: null, editLoading: false };
-    case "SET_EDIT_LOADING":
-      return { ...state, editLoading: action.loading };
-    case "DELETE_USER":
-      return { ...state, deleteUserObj: action.user };
-    case "CLOSE_DELETE":
-      return { ...state, deleteUserObj: null, deleteLoading: false };
-    case "SET_DELETE_LOADING":
-      return { ...state, deleteLoading: action.loading };
-    case "OPEN_PASSWORD_DIALOG":
-      return { ...state, passwordDialogOpen: true, passwordUser: action.user, passwordLoading: false, generatedPassword: null };
-    case "CLOSE_PASSWORD_DIALOG":
-      return { ...state, passwordDialogOpen: false, passwordUser: null, passwordLoading: false, generatedPassword: null };
-    case "SET_PASSWORD_LOADING":
-      return { ...state, passwordLoading: action.loading };
-    case "SET_GENERATED_PASSWORD":
-      return { ...state, generatedPassword: action.password, passwordLoading: false };
-    default:
-      return state;
-  }
-}
-
-export default function UsersPage() {
+export default function AdminUsersPage() {
   const { userData, loading: userLoading } = useUser();
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const { listUsers, createUser, updateUser, deleteUser, generatePassword, resetPassword, loading: apiLoading } = useAdminUsers();
+
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+
+  // Dialog states
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Selected user states
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+
+  // Snackbar states
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info";
+  }>({ open: false, message: "", severity: "success" });
 
   useEffect(() => {
-    async function fetchUsers() {
-      dispatch({ type: "SET_LOADING", loading: true });
-      const users = await getAllUsers();
-      dispatch({ type: "SET_USERS", users });
-      dispatch({ type: "SET_LOADING", loading: false });
-    }
     fetchUsers();
   }, []);
 
-  const handleEdit = (user: UserData) => dispatch({ type: "EDIT_USER", user });
-  const handleDelete = (user: UserData) => dispatch({ type: "DELETE_USER", user });
-  const handleGeneratePassword = (user: UserData) => dispatch({ type: "OPEN_PASSWORD_DIALOG", user });
-
-  const handleEditSave = async (data: { displayName: string; role: UserData["role"] }) => {
-    if (!state.editUser) return;
-    dispatch({ type: "SET_EDIT_LOADING", loading: true });
-    await updateUser(state.editUser.uid, data);
-    dispatch({ type: "CLOSE_EDIT" });
-    dispatch({ type: "SET_LOADING", loading: true });
-    const users = await getAllUsers();
-    dispatch({ type: "SET_USERS", users });
-    dispatch({ type: "SET_LOADING", loading: false });
+  const fetchUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const fetchedUsers = await listUsers();
+      setUsers(fetchedUsers);
+    } catch (error) {
+      showSnackbar("Nie udało się pobrać listy użytkowników", "error");
+    } finally {
+      setLoadingUsers(false);
+    }
   };
 
-  const handleDeleteConfirm = async () => {
-    if (!state.deleteUserObj) return;
-    dispatch({ type: "SET_DELETE_LOADING", loading: true });
-    await deleteUser(state.deleteUserObj.uid);
-    dispatch({ type: "CLOSE_DELETE" });
-    dispatch({ type: "SET_LOADING", loading: true });
-    const users = await getAllUsers();
-    dispatch({ type: "SET_USERS", users });
-    dispatch({ type: "SET_LOADING", loading: false });
+  const showSnackbar = (message: string, severity: "success" | "error" | "info") => {
+    setSnackbar({ open: true, message, severity });
   };
 
-  const handleGeneratePasswordConfirm = async () => {
-    if (!state.passwordUser) return;
-    dispatch({ type: "SET_PASSWORD_LOADING", loading: true });
-    // Simulate password generation
-    await new Promise((r) => setTimeout(r, 1200));
-    const newPassword = Math.random().toString(36).slice(-10);
-    // TODO: Integrate with backend to actually set password
-    dispatch({ type: "SET_GENERATED_PASSWORD", password: newPassword });
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Create user handlers
+  const handleOpenCreateDialog = () => {
+    setCreateDialogOpen(true);
+  };
+
+  const handleCloseCreateDialog = () => {
+    setCreateDialogOpen(false);
+  };
+
+  const handleCreateUser = async (data: { email: string; password: string; displayName: string; role: string }) => {
+    try {
+      await createUser(data);
+      await fetchUsers();
+      showSnackbar("Użytkownik utworzony pomyślnie", "success");
+    } catch (error) {
+      throw error; // Let dialog handle the error
+    }
+  };
+
+  // Edit user handlers
+  const handleOpenEditDialog = (user: AdminUser) => {
+    setSelectedUser(user);
+    setEditDialogOpen(true);
+  };
+
+  const handleCloseEditDialog = () => {
+    setSelectedUser(null);
+    setEditDialogOpen(false);
+  };
+
+  const handleUpdateUser = async (uid: string, updates: any) => {
+    try {
+      await updateUser(uid, updates);
+      await fetchUsers();
+      showSnackbar("Użytkownik zaktualizowany pomyślnie", "success");
+    } catch (error) {
+      throw error; // Let dialog handle the error
+    }
+  };
+
+  // Reset password handlers
+  const handleOpenResetPasswordDialog = (user: AdminUser) => {
+    setSelectedUser(user);
+    setResetPasswordDialogOpen(true);
+  };
+
+  const handleCloseResetPasswordDialog = () => {
+    setSelectedUser(null);
+    setResetPasswordDialogOpen(false);
+  };
+
+  const handleResetPassword = async (uid: string, password: string) => {
+    return await resetPassword(uid, password);
+  };
+
+  // Delete user handlers
+  const handleOpenDeleteDialog = (user: AdminUser) => {
+    setSelectedUser(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setSelectedUser(null);
+    setDeleteDialogOpen(false);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+
+    try {
+      await deleteUser(selectedUser.uid);
+      await fetchUsers();
+      handleCloseDeleteDialog();
+      showSnackbar("Użytkownik usunięty pomyślnie", "success");
+    } catch (error) {
+      showSnackbar("Nie udało się usunąć użytkownika", "error");
+    }
   };
 
   if (userLoading) {
@@ -138,140 +146,105 @@ export default function UsersPage() {
       </Container>
     );
   }
+
   if (!userData || userData.role !== "admin") {
     return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Typography variant="h6" color="error" align="center">
-          Access denied. Admins only.
-        </Typography>
+        <Alert severity="error">Brak dostępu. Ta strona jest dostępna tylko dla administratorów.</Alert>
       </Container>
     );
   }
 
   return (
     <>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom align="center">
-          Lista użytkowników
-        </Typography>
-        {state.loading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-            <CircularProgress />
+      <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+        <Box sx={{ mb: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box>
+            <Typography variant="h4" gutterBottom>
+              Zarządzanie użytkownikami
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Pełna kontrola nad użytkownikami systemu z wykorzystaniem Firebase Admin SDK
+            </Typography>
+          </Box>
+          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleOpenCreateDialog} size="large">
+            Dodaj użytkownika
+          </Button>
+        </Box>
+
+        {loadingUsers ? (
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+            <CircularProgress size={48} />
           </Box>
         ) : (
-          <UserTable users={state.users} onEdit={handleEdit} onDelete={handleDelete} onGeneratePassword={handleGeneratePassword} />
+          <>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Znaleziono {users.length} użytkowników
+            </Typography>
+            <EnhancedUserTable
+              users={users}
+              onEdit={handleOpenEditDialog}
+              onDelete={handleOpenDeleteDialog}
+              onResetPassword={handleOpenResetPasswordDialog}
+            />
+          </>
         )}
       </Container>
 
-      {/* Edit Dialog */}
-      <EditDialog
-        open={!!state.editUser}
-        onClose={() => dispatch({ type: "CLOSE_EDIT" })}
-        title={state.editUser ? `Edytuj użytkownika: ${state.editUser.displayName || state.editUser.email}` : ""}
-        loading={state.editLoading}
-        onSave={() => {}}
-        showActions={false}
-      >
-        {state.editUser && (
-          <Box
-            component="form"
-            sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 2, minWidth: 350 }}
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const form = e.target as typeof e.target & {
-                displayName: { value: string };
-                role: { value: string };
-              };
-              await handleEditSave({
-                displayName: form.displayName.value,
-                role: form.role.value as UserData["role"],
-              });
-            }}
-          >
-            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-              UID: {state.editUser.uid}
-            </Typography>
-            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
-              Email: {state.editUser.email}
-            </Typography>
-            <TextField
-              name="displayName"
-              label="Display Name"
-              defaultValue={state.editUser.displayName || ""}
-              fullWidth
-              variant="outlined"
-              size="small"
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              name="role"
-              label="Role"
-              select
-              defaultValue={state.editUser.role}
-              fullWidth
-              variant="outlined"
-              size="small"
-              sx={{ mb: 2 }}
-            >
-              <MenuItem value="admin">admin</MenuItem>
-              <MenuItem value="user">user</MenuItem>
-            </TextField>
-            <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
-              <Button onClick={() => dispatch({ type: "CLOSE_EDIT" })} disabled={state.editLoading}>
-                Anuluj
-              </Button>
-              <Button type="submit" variant="contained" color="primary" disabled={state.editLoading}>
-                Zapisz
-              </Button>
-            </Box>
-          </Box>
-        )}
-      </EditDialog>
+      {/* Create User Dialog */}
+      <CreateUserDialog
+        open={createDialogOpen}
+        onClose={handleCloseCreateDialog}
+        onCreate={handleCreateUser}
+        onGeneratePassword={generatePassword}
+        loading={apiLoading}
+      />
 
-      {/* Delete Dialog */}
+      {/* Edit User Dialog */}
+      <EditUserDialog
+        open={editDialogOpen}
+        user={selectedUser}
+        onClose={handleCloseEditDialog}
+        onSave={handleUpdateUser}
+        loading={apiLoading}
+      />
+
+      {/* Reset Password Dialog */}
+      <ResetPasswordDialog
+        open={resetPasswordDialogOpen}
+        user={selectedUser}
+        onClose={handleCloseResetPasswordDialog}
+        onReset={handleResetPassword}
+        onGeneratePassword={generatePassword}
+        loading={apiLoading}
+      />
+
+      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
-        open={!!state.deleteUserObj}
-        onClose={() => dispatch({ type: "CLOSE_DELETE" })}
-        onConfirm={handleDeleteConfirm}
+        open={deleteDialogOpen}
+        onClose={handleCloseDeleteDialog}
+        onConfirm={handleDeleteUser}
         title="Usuń użytkownika"
         message={
-          state.deleteUserObj
-            ? `Czy na pewno chcesz usunąć użytkownika ${state.deleteUserObj.displayName || state.deleteUserObj.email}?`
+          selectedUser
+            ? `Czy na pewno chcesz usunąć użytkownika ${selectedUser.displayName || selectedUser.email}? Ta operacja jest nieodwracalna.`
             : ""
         }
         type="delete"
-        loading={state.deleteLoading}
+        loading={apiLoading}
       />
 
-      {/* Password Dialog */}
-      <EditDialog
-        open={state.passwordDialogOpen}
-        onClose={() => dispatch({ type: "CLOSE_PASSWORD_DIALOG" })}
-        title={state.passwordUser ? `Nowe hasło dla: ${state.passwordUser.displayName || state.passwordUser.email}` : "Generuj nowe hasło"}
-        loading={state.passwordLoading}
-        showActions={true}
-        onSave={handleGeneratePasswordConfirm}
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Box sx={{ py: 2, minWidth: 320 }}>
-          {state.passwordLoading ? (
-            <Typography variant="body1">Generowanie hasła...</Typography>
-          ) : state.generatedPassword ? (
-            <>
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                <strong>Nowe hasło:</strong>
-              </Typography>
-              <TextField value={state.generatedPassword} fullWidth InputProps={{ readOnly: true }} />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 2 }}>
-                Przekaż użytkownikowi nowe hasło. Po zalogowaniu może je zmienić w swoim profilu.
-              </Typography>
-            </>
-          ) : (
-            <Button variant="contained" color="primary" onClick={handleGeneratePasswordConfirm} disabled={state.passwordLoading}>
-              Wygeneruj hasło
-            </Button>
-          )}
-        </Box>
-      </EditDialog>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
