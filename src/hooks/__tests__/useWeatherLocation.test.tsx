@@ -4,7 +4,7 @@ import { UserRole } from "@/types/user";
 
 // Mock global fetch
 // Helper to mock sequential fetch responses
-const mockFetchSequence = (responses: any[]) => {
+const mockFetchSequence = (responses: unknown[]) => {
   let call = 0;
   global.fetch = vi.fn().mockImplementation(() =>
     Promise.resolve({
