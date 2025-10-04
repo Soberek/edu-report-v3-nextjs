@@ -72,7 +72,7 @@ export const navRoutes: NavRoute[] = [
 
   {
     title: "Czerniak",
-    path: "czerniak",
+    path: "/czerniak",
     category: "education",
     isPrivate: true,
     icon: <FaUserMd />,
@@ -80,7 +80,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Grypa i przeziębienia",
-    path: "grypa-i-przeziebienia",
+    path: "/grypa-i-przeziebienia",
     category: "education",
     isPrivate: true,
     icon: <FaVirus />,
@@ -90,7 +90,7 @@ export const navRoutes: NavRoute[] = [
   // Database Management
   {
     title: "Szkoły",
-    path: "schools",
+    path: "/schools",
     category: "database",
     isPrivate: true,
     icon: <FaSchool />,
@@ -98,7 +98,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Szkoły w programie",
-    path: "szkoly-w-programie",
+    path: "/szkoly-w-programie",
     category: "database",
     isPrivate: true,
     icon: <FaSchool />,
@@ -106,7 +106,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Baza kontaktów",
-    path: "contacts",
+    path: "/contacts",
     category: "database",
     isPrivate: true,
     icon: <FaAddressBook />,
@@ -114,7 +114,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Spisy spraw",
-    path: "spisy-spraw",
+    path: "/spisy-spraw",
     category: "database",
     isPrivate: true,
     icon: <FaListAlt />,
@@ -122,7 +122,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Programy edukacyjne",
-    path: "programy-edukacyjne",
+    path: "/programy-edukacyjne",
     category: "database",
     isPrivate: true,
     icon: <FaBook />,
@@ -132,7 +132,7 @@ export const navRoutes: NavRoute[] = [
   // Tools & Utilities
   {
     title: "Harmonogram zadań edukacyjnych",
-    path: "schedule",
+    path: "/schedule",
     category: "tools",
     isPrivate: true,
     icon: <FaCalendarAlt />,
@@ -140,7 +140,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Zadania edukacyjne",
-    path: "zadania-edukacyjne",
+    path: "/zadania-edukacyjne",
     category: "tools",
     isPrivate: true,
     icon: <FaTasks />,
@@ -148,7 +148,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Generuj Informacje z realizacji zadania",
-    path: "wygeneruj-izrz",
+    path: "/wygeneruj-izrz",
     category: "tools",
     isPrivate: true,
     icon: <FaFileAlt />,
@@ -156,7 +156,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Offline miernik budżetowy",
-    path: "offline-miernik-budzetowy",
+    path: "/offline-miernik-budzetowy",
     category: "tools",
     isPrivate: true,
     icon: <FaMoneyBillAlt />,
@@ -164,7 +164,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Sprawozdanie z tytoniu",
-    path: "sprawozdanie-z-tytoniu",
+    path: "/sprawozdanie-z-tytoniu",
     category: "tools",
     isPrivate: true,
     icon: <FaHeartbeat />,
@@ -172,7 +172,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Nietypowe święta",
-    path: "holidays",
+    path: "/holidays",
     category: "tools",
     isPrivate: true,
     isAdminOnly: true,
@@ -181,7 +181,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "TODO",
-    path: "todo",
+    path: "/todo",
     category: "tools",
     isAdminOnly: true,
     isPrivate: true,
@@ -192,7 +192,7 @@ export const navRoutes: NavRoute[] = [
   // Authentication
   {
     title: "Zaloguj się",
-    path: "login",
+    path: "/login",
     category: "auth",
     isPrivate: false,
     icon: <FaSignInAlt />,
@@ -200,7 +200,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Zarejestruj się",
-    path: "register",
+    path: "/register",
     category: "auth",
     isPrivate: false,
     icon: <FaUserPlus />,
@@ -208,7 +208,7 @@ export const navRoutes: NavRoute[] = [
   },
   {
     title: "Wyloguj się",
-    path: "logout",
+    path: "/logout",
     category: "auth",
     isPrivate: true,
     icon: <FaSignInAlt />,
