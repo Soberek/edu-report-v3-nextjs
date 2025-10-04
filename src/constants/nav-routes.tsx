@@ -175,6 +175,7 @@ export const navRoutes: NavRoute[] = [
     path: "holidays",
     category: "tools",
     isPrivate: true,
+    isAdminOnly: true,
     icon: <FaGift />,
     description: "Generator treści na święta",
   },
