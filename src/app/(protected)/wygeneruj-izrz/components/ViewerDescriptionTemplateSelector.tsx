@@ -6,7 +6,7 @@ interface Props {
   onSelect: (description: string) => void;
 }
 
-export const ViewerDescriptionTemplateSelector: React.FC<Props> = ({ onSelect }) => (
+export const TaskDescriptionTemplateSelector: React.FC<Props> = ({ onSelect }) => (
   <Box sx={{ mb: 2 }}>
     <Typography variant="subtitle2" sx={{ mb: 1 }}>
       Wstaw opis zadania z szablonu:
