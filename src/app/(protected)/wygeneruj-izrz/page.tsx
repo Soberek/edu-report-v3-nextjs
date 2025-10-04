@@ -10,6 +10,7 @@ import { programs } from "@/constants/programs";
 import type { School } from "@/types";
 import { TemplateSelector } from "./components/TemplateSelector";
 import { FormField } from "./components/FormField";
+import { ViewerDescriptionTemplateSelector } from "./components/ViewerDescriptionTemplateSelector";
 import { PAGE_CONSTANTS, FIELD_LABELS, FIELD_PLACEHOLDERS, BUTTON_CONSTANTS, STYLE_CONSTANTS } from "./constants";
 
 export default function IzrzForm() {
@@ -155,6 +156,9 @@ export default function IzrzForm() {
         placeholder={FIELD_PLACEHOLDERS.VIEWER_COUNT}
         required
       />
+
+      <ViewerDescriptionTemplateSelector onSelect={(desc) => setValue("viewerCountDescription", desc)} />
+
       <FormField
         type="textarea"
         name="viewerCountDescription"
