@@ -14,6 +14,9 @@ export interface UserData {
   createdAt: string;
   updatedAt: string;
   displayName?: string;
+  city?: string;
+  postalCode?: string;
+  countryCode?: string; // ISO 3166, e.g. 'PL'
 }
 
 // User context type
