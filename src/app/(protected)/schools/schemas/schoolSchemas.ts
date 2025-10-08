@@ -39,7 +39,7 @@ export const editSchoolSchema = schoolBaseSchema;
 // Filter schema
 export const schoolFilterSchema = z.object({
   search: z.string(),
-  type: z.string(),
+  type: z.array(z.string()),
   city: z.string(),
 });
 
@@ -61,6 +61,6 @@ export const defaultSchoolFormValues: CreateSchoolFormData = {
 
 export const defaultFilterValues: SchoolFilterFormData = {
   search: "",
-  type: "",
+  type: [],
   city: "",
 };

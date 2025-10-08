@@ -1,21 +1,9 @@
 import React from "react";
-import {
-  Box,
-  TextField,
-  Autocomplete,
-  Paper,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, TextField, Autocomplete, Paper, Typography, useTheme } from "@mui/material";
 import { Search, FilterList } from "@mui/icons-material";
 import type { SchoolFilterProps } from "../types";
 
-export const SchoolFilter: React.FC<SchoolFilterProps> = ({
-  filter,
-  onFilterChange,
-  uniqueTypes,
-  uniqueCities,
-}) => {
+export const SchoolFilter: React.FC<SchoolFilterProps> = ({ filter, onFilterChange, uniqueTypes, uniqueCities }) => {
   const theme = useTheme();
 
   return (
@@ -63,8 +51,9 @@ export const SchoolFilter: React.FC<SchoolFilterProps> = ({
 
         {/* Type Filter */}
         <Autocomplete
+          multiple
           value={filter.type}
-          onChange={(_, newValue) => onFilterChange({ type: newValue || "" })}
+          onChange={(_, newValue) => onFilterChange({ type: newValue })}
           options={uniqueTypes}
           renderInput={(params) => (
             <TextField
