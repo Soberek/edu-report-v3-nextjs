@@ -9,8 +9,9 @@ export const schoolProgramParticipationSchema = z.object({
   previousCoordinatorId: z.string().optional(), // ID koordynatora z poprzedniego roku
   //
   schoolYear: z.enum(["2024/2025", "2025/2026", "2026/2027", "2027/2028"] as const),
-  studentCount: z.number().int().nonnegative(),
+  studentCount: z.coerce.number().int().nonnegative(),
   createdAt: z.string(),
+  updatedAt: z.string().optional(),
   notes: z.string().optional(),
   userId: z.string(),
   // Czy przesłał sprawozdanie z realizacji programu?
