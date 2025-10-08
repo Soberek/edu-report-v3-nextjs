@@ -8,7 +8,8 @@ import { AutocompleteField, FormField, ActionButton } from "@/components/shared"
 import { transformSchoolsToOptions, transformContactsToOptions, transformProgramsToOptions, transformSchoolYearsToOptions } from "../utils";
 import { SCHOOL_YEAR_OPTIONS, FIELD_LABELS, HELPER_TEXT, BUTTON_LABELS, STYLE_CONSTANTS, PAGE_CONSTANTS, UI_CONSTANTS } from "../constants";
 import type { ParticipationFormProps } from "../types";
-import { Control } from "react-hook-form";
+import type { SelectOption } from "../types/shared";
+import type { Control } from "react-hook-form";
 
 // Custom Paper Form Section Component
 const CustomFormSection: React.FC<{
@@ -56,15 +57,137 @@ const CustomFormSection: React.FC<{
   </Paper>
 );
 
+// Form Fields Component
+const ParticipationFormFields: React.FC<{
+  control: Control<SchoolProgramParticipationDTO>;
+  schoolsOptions: SelectOption[];
+  contactsOptions: SelectOption[];
+  programsOptions: SelectOption[];
+  schoolYearsOptions: SelectOption[];
+}> = ({ control, schoolsOptions, contactsOptions, programsOptions, schoolYearsOptions }) => (
+  <Box sx={{ display: "flex", flexDirection: "column", gap: STYLE_CONSTANTS.SPACING.MEDIUM }}>
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: UI_CONSTANTS.FORM_GRID_COLUMNS.TABLET,
+        gap: STYLE_CONSTANTS.SPACING.MEDIUM,
+      }}
+    >
+      {/* School Selection */}
+      <AutocompleteField
+        name="schoolId"
+        control={control}
+        label={FIELD_LABELS.SCHOOL}
+        options={schoolsOptions}
+        required
+        startAdornment={<School />}
+      />
+
+      {/* Program Selection */}
+      <AutocompleteField
+        name="programId"
+        control={control}
+        label={FIELD_LABELS.PROGRAM}
+        options={programsOptions}
+        required
+        startAdornment={<Group />}
+        getOptionLabel={(option) => `${option.code || "Brak kodu"} - ${option.name}`}
+      />
+
+      {/* Coordinator Selection */}
+      <AutocompleteField
+        name="coordinatorId"
+        control={control}
+        label={FIELD_LABELS.COORDINATOR}
+        options={contactsOptions}
+        required
+        startAdornment={<Person />}
+      />
+
+      {/* School Year Selection */}
+      <AutocompleteField
+        name="schoolYear"
+        control={control}
+        label={FIELD_LABELS.SCHOOL_YEAR}
+        options={schoolYearsOptions}
+        required
+        startAdornment={<CalendarToday />}
+      />
+
+      {/* Student Count */}
+      <FormField
+        name="studentCount"
+        control={control}
+        label={FIELD_LABELS.STUDENT_COUNT}
+        type="number"
+        required
+        helperText={HELPER_TEXT.STUDENT_COUNT}
+      />
+
+      {/* Previous Coordinator */}
+      <AutocompleteField
+        name="previousCoordinatorId"
+        control={control}
+        label={FIELD_LABELS.PREVIOUS_COORDINATOR}
+        options={contactsOptions}
+        startAdornment={<Person />}
+      />
+    </Box>
+
+    {/* Notes */}
+    <Box sx={{ gridColumn: "1 / -1" }}>
+      <FormField name="notes" control={control} label={FIELD_LABELS.NOTES} type="textarea" rows={4} helperText={HELPER_TEXT.NOTES} />
+    </Box>
+  </Box>
+);
+
+// Submit Button Component
+const ParticipationFormSubmitButton: React.FC<{
+  loading: boolean;
+  isDirty: boolean;
+}> = ({ loading, isDirty }) => (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "flex-end",
+      mt: STYLE_CONSTANTS.SPACING.MEDIUM,
+      pt: STYLE_CONSTANTS.SPACING.MEDIUM,
+      borderTop: "1px solid rgba(0,0,0,0.1)",
+    }}
+  >
+    <ActionButton
+      type="submit"
+      disabled={loading || !isDirty}
+      variant="contained"
+      startIcon={<Save />}
+      loading={loading}
+      sx={{
+        borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.LARGE,
+        textTransform: "none",
+        fontWeight: "bold",
+        px: STYLE_CONSTANTS.SPACING.LARGE,
+        py: STYLE_CONSTANTS.SPACING.SMALL,
+        background: STYLE_CONSTANTS.GRADIENTS.PRIMARY,
+        boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
+        "&:hover": {
+          background: STYLE_CONSTANTS.GRADIENTS.PRIMARY_HOVER,
+          boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
+          transform: "translateY(-1px)",
+        },
+        "&:disabled": {
+          background: "rgba(0,0,0,0.12)",
+          color: "rgba(0,0,0,0.26)",
+        },
+      }}
+    >
+      {BUTTON_LABELS.SAVE_PARTICIPATION}
+    </ActionButton>
+  </Box>
+);
+
 export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, contacts, programs, loading, onSubmit, formMethods }) => {
-  const { control, handleSubmit, reset, isDirty } = formMethods as {
-    control: Control<SchoolProgramParticipationDTO>;
-    handleSubmit: (
-      onValid: (data: SchoolProgramParticipationDTO) => void | Promise<void>
-    ) => (e?: React.BaseSyntheticEvent) => Promise<void>;
-    reset: () => void;
-    isDirty: boolean;
-  };
+  const { control, handleSubmit, reset, formState } = formMethods;
+  const { isDirty } = formState;
 
   // Transform data to options using utility functions
   const schoolsOptions = useMemo(() => transformSchoolsToOptions(schools), [schools]);
@@ -77,127 +200,11 @@ export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, c
       await onSubmit(data);
       reset();
     } catch (error) {
-      console.error("Form submission error:", error);
+      // Error is already handled in the parent hook
+      // Just re-throw to maintain the error flow
       throw error;
     }
   };
-
-  const renderFormFields = () => (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: STYLE_CONSTANTS.SPACING.MEDIUM }}>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: UI_CONSTANTS.FORM_GRID_COLUMNS.TABLET,
-          gap: STYLE_CONSTANTS.SPACING.MEDIUM,
-        }}
-      >
-        {/* School Selection */}
-        <AutocompleteField
-          name="schoolId"
-          control={control}
-          label={FIELD_LABELS.SCHOOL}
-          options={schoolsOptions}
-          required
-          startAdornment={<School />}
-        />
-
-        {/* Program Selection */}
-        <AutocompleteField
-          name="programId"
-          control={control}
-          label={FIELD_LABELS.PROGRAM}
-          options={programsOptions}
-          required
-          startAdornment={<Group />}
-          getOptionLabel={(option) => `${option.code || "Brak kodu"} - ${option.name}`}
-        />
-
-        {/* Coordinator Selection */}
-        <AutocompleteField
-          name="coordinatorId"
-          control={control}
-          label={FIELD_LABELS.COORDINATOR}
-          options={contactsOptions}
-          required
-          startAdornment={<Person />}
-        />
-
-        {/* School Year Selection */}
-        <AutocompleteField
-          name="schoolYear"
-          control={control}
-          label={FIELD_LABELS.SCHOOL_YEAR}
-          options={schoolYearsOptions}
-          required
-          startAdornment={<CalendarToday />}
-        />
-
-        {/* Student Count */}
-        <FormField
-          name="studentCount"
-          control={control}
-          label={FIELD_LABELS.STUDENT_COUNT}
-          type="number"
-          required
-          helperText={HELPER_TEXT.STUDENT_COUNT}
-        />
-
-        {/* Previous Coordinator */}
-        <AutocompleteField
-          name="previousCoordinatorId"
-          control={control}
-          label={FIELD_LABELS.PREVIOUS_COORDINATOR}
-          options={contactsOptions}
-          startAdornment={<Person />}
-        />
-      </Box>
-
-      {/* Notes */}
-      <Box sx={{ gridColumn: "1 / -1" }}>
-        <FormField name="notes" control={control} label={FIELD_LABELS.NOTES} type="textarea" rows={4} helperText={HELPER_TEXT.NOTES} />
-      </Box>
-    </Box>
-  );
-
-  const renderSubmitButton = () => (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "flex-end",
-        mt: STYLE_CONSTANTS.SPACING.MEDIUM,
-        pt: STYLE_CONSTANTS.SPACING.MEDIUM,
-        borderTop: "1px solid rgba(0,0,0,0.1)",
-      }}
-    >
-      <ActionButton
-        type="submit"
-        disabled={loading || !isDirty}
-        variant="contained"
-        startIcon={<Save />}
-        loading={loading}
-        sx={{
-          borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.LARGE,
-          textTransform: "none",
-          fontWeight: "bold",
-          px: STYLE_CONSTANTS.SPACING.LARGE,
-          py: STYLE_CONSTANTS.SPACING.SMALL,
-          background: STYLE_CONSTANTS.GRADIENTS.PRIMARY,
-          boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
-          "&:hover": {
-            background: STYLE_CONSTANTS.GRADIENTS.PRIMARY_HOVER,
-            boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
-            transform: "translateY(-1px)",
-          },
-          "&:disabled": {
-            background: "rgba(0,0,0,0.12)",
-            color: "rgba(0,0,0,0.26)",
-          },
-        }}
-      >
-        {BUTTON_LABELS.SAVE_PARTICIPATION}
-      </ActionButton>
-    </Box>
-  );
 
   return (
     <CustomFormSection title={PAGE_CONSTANTS.FORM_TITLE}>
@@ -210,8 +217,14 @@ export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, c
           gap: STYLE_CONSTANTS.SPACING.MEDIUM,
         }}
       >
-        {renderFormFields()}
-        {renderSubmitButton()}
+        <ParticipationFormFields
+          control={control}
+          schoolsOptions={schoolsOptions}
+          contactsOptions={contactsOptions}
+          programsOptions={programsOptions}
+          schoolYearsOptions={schoolYearsOptions}
+        />
+        <ParticipationFormSubmitButton loading={loading} isDirty={isDirty} />
       </Box>
     </CustomFormSection>
   );
