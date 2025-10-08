@@ -122,7 +122,7 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
   }, [snackbar.open, snackbar]);
 
   // Loading state
-  const isLoading = schoolsLoading || contactsLoading || programsLoading;
+  const isLoading = userContext.loading || schoolsLoading || contactsLoading || programsLoading;
 
   // Error state - exclude schoolProgramParticipationError since it's handled locally in operations
   const error = schoolsError || contactsError;

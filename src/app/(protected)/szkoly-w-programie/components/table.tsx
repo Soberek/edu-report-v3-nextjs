@@ -227,7 +227,6 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
       open={addDialogOpen}
       onClose={handleCloseAddDialog}
       title="Dodaj uczestnictwo szkoły"
-      onSave={handleSaveParticipation}
       loading={dialogLoading}
       maxWidth={UI_CONSTANTS.DIALOG_MAX_WIDTH}
     >
