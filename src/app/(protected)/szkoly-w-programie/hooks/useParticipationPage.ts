@@ -4,6 +4,8 @@ import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { usePrograms } from "@/hooks/useProgram";
 import type { Contact, Program, School as SchoolType } from "@/types";
 import type { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
+import { schoolProgramParticipationDTOSchema, schoolProgramParticiapationUpdateDTOSchema } from "@/models/SchoolProgramParticipation";
+import { ZodError } from "zod";
 import { createLookupMaps, mapParticipationsForDisplay } from "../utils";
 import { UI_CONSTANTS, MESSAGES } from "../constants";
 import type { UseParticipationPageProps, SnackbarMessage, MappedParticipation } from "../types";
@@ -17,6 +19,23 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
     type: "success",
     message: "",
   });
+
+  // Helper functions for snackbar messages
+  const showSuccessMessage = useCallback((message: string) => {
+    setSnackbar({
+      open: true,
+      type: "success",
+      message,
+    });
+  }, []);
+
+  const showErrorMessage = useCallback((message: string) => {
+    setSnackbar({
+      open: true,
+      type: "error",
+      message,
+    });
+  }, []);
 
   // Firebase data hooks
   const { data: schools, loading: schoolsLoading, error: schoolsError } = useFirebaseData<SchoolType>("schools", userContext.user?.uid);
@@ -48,18 +67,21 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
   const handleSubmit = useCallback(
     async (data: SchoolProgramParticipationDTO) => {
       try {
-        await createSchoolProgramParticipation(data);
-        setSnackbar({
-          open: true,
-          type: "success",
-          message: MESSAGES.SUCCESS.PARTICIPATION_ADDED,
-        });
+        const userId = userContext.user?.uid;
+        const validatedData = schoolProgramParticipationDTOSchema.parse(data);
+
+        // Parse and validate data using Zod schema
+
+        await createSchoolProgramParticipation(validatedData);
+        showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_ADDED);
       } catch (error) {
-        setSnackbar({
-          open: true,
-          type: "error",
-          message: MESSAGES.ERROR.SAVE_FAILED,
-        });
+        if (error instanceof ZodError) {
+          // Extract validation error messages
+          const errorMessages = error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join(", ");
+          showErrorMessage(`Validation error: ${errorMessages}`);
+        } else {
+          showErrorMessage(MESSAGES.ERROR.SAVE_FAILED);
+        }
         throw error;
       }
     },
@@ -70,19 +92,21 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
   const handleUpdateParticipation = useCallback(
     async (id: string, data: Partial<SchoolProgramParticipation>) => {
       try {
-        await updateSchoolProgramParticipation(id, data);
-        setSnackbar({
-          open: true,
-          type: "success",
-          message: MESSAGES.SUCCESS.PARTICIPATION_UPDATED,
-        });
+        // Validate the update data using Zod schema
+        const updateData = { id, ...data };
+        const validatedData = schoolProgramParticiapationUpdateDTOSchema.parse(updateData);
+
+        await updateSchoolProgramParticipation(id, validatedData);
+        showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_UPDATED);
         onUpdate?.(id, data);
       } catch (error) {
-        setSnackbar({
-          open: true,
-          type: "error",
-          message: MESSAGES.ERROR.UPDATE_FAILED,
-        });
+        if (error instanceof ZodError) {
+          // Extract validation error messages
+          const errorMessages = error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join(", ");
+          showErrorMessage(`Validation error: ${errorMessages}`);
+        } else {
+          showErrorMessage(MESSAGES.ERROR.UPDATE_FAILED);
+        }
         throw error;
       }
     },
@@ -94,18 +118,10 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
     async (id: string) => {
       try {
         await deleteSchoolProgramParticipation(id);
-        setSnackbar({
-          open: true,
-          type: "success",
-          message: MESSAGES.SUCCESS.PARTICIPATION_DELETED,
-        });
+        showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_DELETED);
         onDelete?.(id);
       } catch (error) {
-        setSnackbar({
-          open: true,
-          type: "error",
-          message: MESSAGES.ERROR.DELETE_FAILED,
-        });
+        showErrorMessage(MESSAGES.ERROR.DELETE_FAILED);
         throw error;
       }
     },
@@ -129,10 +145,10 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
   }, [snackbar.open, snackbar]);
 
   // Loading state
-  const isLoading = schoolsLoading || contactsLoading || programsLoading;
+  const isLoading = userContext.loading || schoolsLoading || contactsLoading || programsLoading;
 
-  // Error state
-  const error = schoolsError || contactsError || schoolProgramParticipationError;
+  // Error state - exclude schoolProgramParticipationError since it's handled locally in operations
+  const error = schoolsError || contactsError;
 
   return {
     // Data

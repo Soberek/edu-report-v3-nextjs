@@ -1,15 +1,4 @@
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  doc,
-  deleteDoc,
-  updateDoc,
-  QueryConstraint,
-  getDoc,
-} from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, doc, deleteDoc, updateDoc, QueryConstraint, getDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 
 interface Creatable<T> {
@@ -66,39 +55,66 @@ export class FirebaseService<R> implements Creatable<R>, Readable<R>, Updatable<
 
   async createDocument(userId: string, data: Omit<R, "id" | "createdAt" | "updatedAt" | "userId">): Promise<string> {
     try {
+      // Validate userId
+      if (!userId || typeof userId !== "string" || userId.trim() === "") {
+        throw new Error("Invalid userId: userId must be a non-empty string");
+      }
+
+      // Validate and parse date if needed
+      const createdAt = new Date().toISOString();
+      if (!createdAt || isNaN(new Date(createdAt).getTime())) {
+        throw new Error("Invalid createdAt date");
+      }
+
       const collectionRef = collection(db, this.collectionName);
       const docRef = await addDoc(collectionRef, {
-        userId,
+        userId: userId.trim(),
         ...data,
-        createdAt: new Date().toISOString(), // Automatically add timestamp
+        createdAt,
       });
       return docRef.id;
     } catch (error) {
       console.error(`Error adding document to ${this.collectionName}:`, error);
-      throw new Error(`Failed to add document to ${this.collectionName}`);
+      throw new Error(`Failed to add document to ${this.collectionName}: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
   async deleteDocument(documentId: string): Promise<void> {
     try {
+      // Validate documentId
+      if (!documentId || typeof documentId !== "string" || documentId.trim() === "") {
+        throw new Error("Invalid documentId: documentId must be a non-empty string");
+      }
+
       const docRef = doc(db, this.collectionName, documentId);
       await deleteDoc(docRef);
     } catch (error) {
       console.error(`Error deleting document from ${this.collectionName}:`, error);
-      throw new Error(`Failed to delete document from ${this.collectionName}`);
+      throw new Error(`Failed to delete document from ${this.collectionName}: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
   async updateDocument(documentId: string, data: Partial<R>): Promise<void> {
     try {
+      // Validate documentId
+      if (!documentId || typeof documentId !== "string" || documentId.trim() === "") {
+        throw new Error("Invalid documentId: documentId must be a non-empty string");
+      }
+
+      // Validate and parse date if needed
+      const updatedAt = new Date().toISOString();
+      if (!updatedAt || isNaN(new Date(updatedAt).getTime())) {
+        throw new Error("Invalid updatedAt date");
+      }
+
       const docRef = doc(db, this.collectionName, documentId);
       await updateDoc(docRef, {
         ...data,
-        updatedAt: new Date().toISOString(), // Automatically add timestamp
+        updatedAt,
       });
     } catch (error) {
       console.error(`Error updating document in ${this.collectionName}:`, error);
-      throw new Error(`Failed to update document in ${this.collectionName}`);
+      throw new Error(`Failed to update document in ${this.collectionName}: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 

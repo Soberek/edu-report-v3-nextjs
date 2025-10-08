@@ -1,6 +1,7 @@
 import type { Contact, Program, School as SchoolType } from "@/types";
 import type { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import type { SelectOption } from "./shared";
+import type { UseFormReturn } from "react-hook-form";
 
 // Message types
 export interface SnackbarMessage {
@@ -29,6 +30,8 @@ export interface MappedParticipation extends SchoolProgramParticipation {
   readonly schoolName: string;
   readonly programName: string;
   readonly coordinatorName: string;
+  readonly coordinatorEmail?: string;
+  readonly coordinatorPhone?: string;
 }
 
 // Component props types
@@ -38,7 +41,7 @@ export interface ParticipationFormProps {
   readonly programs: readonly Program[];
   readonly loading: boolean;
   readonly onSubmit: (data: SchoolProgramParticipationDTO) => Promise<void>;
-  readonly formMethods: unknown; // Will be properly typed with react-hook-form
+  readonly formMethods: UseFormReturn<SchoolProgramParticipationDTO>;
 }
 
 export interface TableProps {
@@ -53,6 +56,7 @@ export interface TableProps {
   readonly programs: readonly Program[];
   readonly onUpdate: (id: string, data: Partial<SchoolProgramParticipation>) => Promise<void>;
   readonly onDelete: (id: string) => Promise<void>;
+  readonly onAdd: (data: SchoolProgramParticipationDTO) => Promise<void>;
 }
 
 export interface EditParticipationFormProps {

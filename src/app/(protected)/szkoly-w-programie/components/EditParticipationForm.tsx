@@ -65,11 +65,7 @@ export const EditParticipationForm = forwardRef<EditParticipationFormRef, EditPa
       [contacts]
     );
 
-    const programsOptions: AutocompleteOption[] = React.useMemo(
-      () => programs.map((p) => ({ id: p.id, name: p.code ? `${p.code} - ${p.name}` : p.name })),
-      [programs]
-    );
-
+    const programsOptions: AutocompleteOption[] = React.useMemo(() => programs.map((p) => ({ id: p.id, name: p.name })), [programs]);
     const schoolYearsOptions: AutocompleteOption[] = React.useMemo(() => schoolYears.map((year) => ({ id: year, name: year })), []);
 
     // Update form when participation changes

@@ -1,6 +1,6 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { Typography } from "@mui/material";
-import { CalendarToday, Group } from "@mui/icons-material";
+import { CalendarToday, Group, Email, Phone } from "@mui/icons-material";
 import { AvatarWithText, Tag, InfoBadge, NotesCell, DateCell } from "@/components/shared";
 
 export interface TableColumnConfig {
@@ -13,13 +13,15 @@ export interface TableColumnConfig {
 }
 
 export const TABLE_COLUMNS: TableColumnConfig[] = [
-  { field: "schoolName", headerName: "Szkoła", flex: 1.5, minWidth: 200, align: "center", headerAlign: "center" },
-  { field: "programName", headerName: "Program", flex: 1, minWidth: 150, align: "center", headerAlign: "center" },
-  { field: "coordinatorName", headerName: "Koordynator", flex: 1.2, minWidth: 180, align: "center", headerAlign: "center" },
-  { field: "schoolYear", headerName: "Rok", flex: 0.8, minWidth: 100, align: "center", headerAlign: "center" },
-  { field: "studentCount", headerName: "Uczniowie", flex: 0.8, minWidth: 100, align: "center", headerAlign: "center" },
-  { field: "notes", headerName: "Notatki", flex: 1.5, minWidth: 150, align: "center", headerAlign: "center" },
-  { field: "createdAt", headerName: "Data", flex: 0.8, minWidth: 100, align: "center", headerAlign: "center" },
+  { field: "schoolName", headerName: "Szkoła", flex: 2.25, minWidth: 200, align: "center", headerAlign: "center" },
+  { field: "programName", headerName: "Program", flex: 1.5, minWidth: 150, align: "center", headerAlign: "center" },
+  { field: "coordinatorName", headerName: "Koordynator", flex: 1.8, minWidth: 180, align: "center", headerAlign: "center" },
+  { field: "coordinatorEmail", headerName: "Email", flex: 1.8, minWidth: 180, align: "center", headerAlign: "center" },
+  { field: "coordinatorPhone", headerName: "Telefon", flex: 1.2, minWidth: 120, align: "center", headerAlign: "center" },
+  { field: "schoolYear", headerName: "Rok", flex: 1.2, minWidth: 100, align: "center", headerAlign: "center" },
+  { field: "studentCount", headerName: "Uczniowie", flex: 1.2, minWidth: 100, align: "center", headerAlign: "center" },
+  { field: "notes", headerName: "Notatki", flex: 2.25, minWidth: 150, align: "center", headerAlign: "center" },
+  { field: "createdAt", headerName: "Data", flex: 1.2, minWidth: 100, align: "center", headerAlign: "center" },
 ];
 
 export const CUSTOM_STYLES = {
@@ -95,6 +97,36 @@ const renderCellContent = (field: string, value: unknown) => {
       return <Tag label={value as string} />;
     case "coordinatorName":
       return <AvatarWithText text={value as string} avatarSize={28} fontSize="0.7rem" fontWeight="500" />;
+    case "coordinatorEmail":
+      return value ? (
+        <InfoBadge
+          icon={<Email />}
+          text={value as string}
+          backgroundColor="linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)"
+          borderColor="#2196f3"
+          iconColor="#1976d2"
+          textColor="#0d47a1"
+        />
+      ) : (
+        <Typography variant="body2" color="text.secondary">
+          -
+        </Typography>
+      );
+    case "coordinatorPhone":
+      return value ? (
+        <InfoBadge
+          icon={<Phone />}
+          text={value as string}
+          backgroundColor="linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%)"
+          borderColor="#9c27b0"
+          iconColor="#7b1fa2"
+          textColor="#4a148c"
+        />
+      ) : (
+        <Typography variant="body2" color="text.secondary">
+          -
+        </Typography>
+      );
     case "schoolYear":
       return <InfoBadge icon={<CalendarToday />} text={value as string} />;
     case "studentCount":
