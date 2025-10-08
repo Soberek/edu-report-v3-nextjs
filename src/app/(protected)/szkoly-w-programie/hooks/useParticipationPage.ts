@@ -4,6 +4,7 @@ import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { usePrograms } from "@/hooks/useProgram";
 import type { Contact, Program, School as SchoolType } from "@/types";
 import type { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
+import { schoolProgramParticipationDTOSchema, schoolProgramParticiapationUpdateDTOSchema } from "@/models/SchoolProgramParticipation";
 import { createLookupMaps, mapParticipationsForDisplay } from "../utils";
 import { UI_CONSTANTS, MESSAGES } from "../constants";
 import type { UseParticipationPageProps, SnackbarMessage, MappedParticipation } from "../types";
@@ -65,10 +66,21 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
   const handleSubmit = useCallback(
     async (data: SchoolProgramParticipationDTO) => {
       try {
-        await createSchoolProgramParticipation(data);
+        const userId = userContext.user?.uid;
+        const validatedData = schoolProgramParticipationDTOSchema.parse(data);
+
+        // Parse and validate data using Zod schema
+
+        await createSchoolProgramParticipation(validatedData);
         showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_ADDED);
       } catch (error) {
-        showErrorMessage(MESSAGES.ERROR.SAVE_FAILED);
+        if (error instanceof Error && error.name === "ZodError") {
+          // Extract validation error messages
+          const errorMessages = (error as any).issues.map((issue: any) => `${issue.path.join(".")}: ${issue.message}`).join(", ");
+          showErrorMessage(`Validation error: ${errorMessages}`);
+        } else {
+          showErrorMessage(MESSAGES.ERROR.SAVE_FAILED);
+        }
         throw error;
       }
     },
@@ -79,11 +91,21 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
   const handleUpdateParticipation = useCallback(
     async (id: string, data: Partial<SchoolProgramParticipation>) => {
       try {
-        await updateSchoolProgramParticipation(id, data);
+        // Validate the update data using Zod schema
+        const updateData = { id, ...data };
+        const validatedData = schoolProgramParticiapationUpdateDTOSchema.parse(updateData);
+
+        await updateSchoolProgramParticipation(id, validatedData);
         showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_UPDATED);
         onUpdate?.(id, data);
       } catch (error) {
-        showErrorMessage(MESSAGES.ERROR.UPDATE_FAILED);
+        if (error instanceof Error && error.name === "ZodError") {
+          // Extract validation error messages
+          const errorMessages = (error as any).issues.map((issue: any) => `${issue.path.join(".")}: ${issue.message}`).join(", ");
+          showErrorMessage(`Validation error: ${errorMessages}`);
+        } else {
+          showErrorMessage(MESSAGES.ERROR.UPDATE_FAILED);
+        }
         throw error;
       }
     },
