@@ -37,15 +37,18 @@ export interface Program {
 export type SchoolTypes =
   | "Żłobek"
   | "Przedszkole"
+  | "Przedszkole specjalne"
   | "Oddział przedszkolny"
   | "Szkoła podstawowa"
+  | "Szkoła podstawowa specjalna"
   | "Technikum"
   | "Liceum"
   | "Szkoła branżowa"
   | "Szkoła policealna"
   | "Szkoła specjalna"
   | "Młodzieżowy ośrodek socjoterapii"
-  | "Specjalny ośrodek szkolno-wychowawczy";
+  | "Specjalny ośrodek szkolno-wychowawczy"
+  | "Klub dziecięcy niepubliczny";
 
 export interface School {
   id: string;

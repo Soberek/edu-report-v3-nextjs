@@ -6,8 +6,10 @@ export const schoolYears: SchoolYear[] = ["2024/2025", "2025/2026", "2026/2027",
 export const schoolTypes: Record<string, SchoolTypes> = {
   ZLOBEK: "Żłobek",
   PRZEDSZKOLE: "Przedszkole",
+  PRZEDSZKOLE_SPECJALNE: "Przedszkole specjalne",
   ODDZIAL_PRZEDSZKOLNY: "Oddział przedszkolny",
   SZKOLA_PODSTAWOWA: "Szkoła podstawowa",
+  SZKOLA_PODSTAWOWA_SPECJALNA: "Szkoła podstawowa specjalna",
   TECHNIKUM: "Technikum",
   LICEUM: "Liceum",
   SZKOLA_BRANZOWA: "Szkoła branżowa",
@@ -15,6 +17,7 @@ export const schoolTypes: Record<string, SchoolTypes> = {
   SZKOLA_SPECJALNA: "Szkoła specjalna",
   MLODZIEZOWY_OSRODEK_SOCJOTERAPII: "Młodzieżowy ośrodek socjoterapii",
   SPECJALNY_OSRODEK_SZKOLNO_WYCHOWAWCZY: "Specjalny ośrodek szkolno-wychowawczy",
+  KLUB_DZIECIECY_NIEPUBLICZNY: "Klub dziecięcy niepubliczny",
 } as const;
 
 // dostępne klasy
