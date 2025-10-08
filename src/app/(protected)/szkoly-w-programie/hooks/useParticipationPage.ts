@@ -18,6 +18,23 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
     message: "",
   });
 
+  // Helper functions for snackbar messages
+  const showSuccessMessage = useCallback((message: string) => {
+    setSnackbar({
+      open: true,
+      type: "success",
+      message,
+    });
+  }, []);
+
+  const showErrorMessage = useCallback((message: string) => {
+    setSnackbar({
+      open: true,
+      type: "error",
+      message,
+    });
+  }, []);
+
   // Firebase data hooks
   const { data: schools, loading: schoolsLoading, error: schoolsError } = useFirebaseData<SchoolType>("schools", userContext.user?.uid);
 
@@ -49,17 +66,9 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
     async (data: SchoolProgramParticipationDTO) => {
       try {
         await createSchoolProgramParticipation(data);
-        setSnackbar({
-          open: true,
-          type: "success",
-          message: MESSAGES.SUCCESS.PARTICIPATION_ADDED,
-        });
+        showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_ADDED);
       } catch (error) {
-        setSnackbar({
-          open: true,
-          type: "error",
-          message: MESSAGES.ERROR.SAVE_FAILED,
-        });
+        showErrorMessage(MESSAGES.ERROR.SAVE_FAILED);
         throw error;
       }
     },
@@ -71,18 +80,10 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
     async (id: string, data: Partial<SchoolProgramParticipation>) => {
       try {
         await updateSchoolProgramParticipation(id, data);
-        setSnackbar({
-          open: true,
-          type: "success",
-          message: MESSAGES.SUCCESS.PARTICIPATION_UPDATED,
-        });
+        showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_UPDATED);
         onUpdate?.(id, data);
       } catch (error) {
-        setSnackbar({
-          open: true,
-          type: "error",
-          message: MESSAGES.ERROR.UPDATE_FAILED,
-        });
+        showErrorMessage(MESSAGES.ERROR.UPDATE_FAILED);
         throw error;
       }
     },
@@ -94,18 +95,10 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
     async (id: string) => {
       try {
         await deleteSchoolProgramParticipation(id);
-        setSnackbar({
-          open: true,
-          type: "success",
-          message: MESSAGES.SUCCESS.PARTICIPATION_DELETED,
-        });
+        showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_DELETED);
         onDelete?.(id);
       } catch (error) {
-        setSnackbar({
-          open: true,
-          type: "error",
-          message: MESSAGES.ERROR.DELETE_FAILED,
-        });
+        showErrorMessage(MESSAGES.ERROR.DELETE_FAILED);
         throw error;
       }
     },
