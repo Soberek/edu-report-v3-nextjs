@@ -126,7 +126,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   );
 
   const renderTableContent = () => (
-    <Box sx={{ p: STYLE_CONSTANTS.SPACING.MEDIUM, background: "transparent" }}>
+    <Box sx={{ px: 2, py: STYLE_CONSTANTS.SPACING.MEDIUM, background: "transparent" }}>
       {mappedParticipations.length === 0 ? (
         <EmptyState title={MESSAGES.EMPTY.NO_DATA} description={MESSAGES.EMPTY.NO_DATA_DESCRIPTION} />
       ) : (
@@ -181,6 +181,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
       <Paper
         elevation={0}
         sx={{
+          width: '100%',
           borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.EXTRA_LARGE,
           background: STYLE_CONSTANTS.COLORS.BACKGROUND_GRADIENT,
           overflow: "hidden",
