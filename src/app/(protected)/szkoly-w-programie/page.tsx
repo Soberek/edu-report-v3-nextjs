@@ -1,6 +1,6 @@
 "use client";
 import React, { useMemo } from "react";
-import { Container, Alert, Snackbar } from "@mui/material";
+import { Alert, Snackbar, Box } from "@mui/material";
 // import { usePrograms } from "@/hooks/useProgram";
 import { useForm } from "react-hook-form";
 // import type { Contact, Program, School as SchoolType } from "@/types";
@@ -62,9 +62,9 @@ export default function SchoolsProgramParticipation() {
   );
 
   const renderLoadingState = () => (
-    <Container maxWidth={PAGE_CONSTANTS.CONTAINER_MAX_WIDTH} sx={{ py: 4 }}>
+    <Box sx={{ py: 4, px: 2 }}>
       <LoadingSpinner size={48} message={MESSAGES.LOADING.LOADING_DATA} sx={{ minHeight: 400 }} />
-    </Container>
+    </Box>
   );
 
   const renderErrorAlert = () =>
@@ -121,12 +121,12 @@ export default function SchoolsProgramParticipation() {
   }
 
   return (
-    <Container maxWidth={PAGE_CONSTANTS.CONTAINER_MAX_WIDTH} sx={{ py: 4 }}>
+    <Box sx={{ py: 4, px: 2 }}>
       {renderHeader()}
       {renderErrorAlert()}
       {renderFormSection()}
       {renderTableSection()}
       {renderSnackbar()}
-    </Container>
+    </Box>
   );
 }
