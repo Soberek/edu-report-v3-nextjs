@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { fetchUnsplashPhotos } from "@/services/unsplashService";
+import { checkRateLimit } from "@/lib/rate-limit-helpers";
 
 // Secret/API key expected in request header 'x-api-key'
 // IMPORTANT: use a dedicated UNSPLASH_API_SECRET for this route. Do NOT fall back to
@@ -30,8 +31,17 @@ export function GET() {
   return NextResponse.json({ message: "Unsplash API route is working." });
 }
 
-// POST handler: fetch Unsplash photo(s) by tag
+/**
+ * POST /api/unsplash-photo-by-tag - Fetch Unsplash photos by tag
+ * Rate limited to 30 requests per minute per IP
+ */
 export async function POST(request: Request) {
+  // Apply rate limiting
+  const rateLimitResult = checkRateLimit(request as NextRequest, "STANDARD");
+  if (!rateLimitResult.success && rateLimitResult.response) {
+    return rateLimitResult.response;
+  }
+
   try {
     // Create a request-scoped id for easier tracing in logs
     const requestId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;

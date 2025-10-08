@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { checkRateLimit } from "@/lib/rate-limit-helpers";
+import { NextRequest } from "next/server";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,10 +15,17 @@ const openai = new OpenAI({
  * - Sends the prompt to OpenAI's GPT-4o model and returns the generated response.
  * - The response format can be specified via the `format` parameter (defaults to "text").
  *
+ * Rate limited to 10 requests per minute per IP/user.
+ *
  * @param request - The incoming HTTP request containing the prompt and format.
  * @returns A JSON response with the generated content or an error message.
  */
 export async function POST(request: Request) {
+  // Apply rate limiting for AI operations (10 requests per minute)
+  const rateLimitResult = checkRateLimit(request as NextRequest, "AI_OPERATIONS");
+  if (!rateLimitResult.success && rateLimitResult.response) {
+    return rateLimitResult.response;
+  }
   try {
     const { prompt, format } = await request.json();
 

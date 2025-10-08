@@ -25,8 +25,10 @@ export const useSchoolFilters = ({ schools, filter }: UseSchoolFiltersProps) => 
     }
 
     // Apply type filter
-    if (filter.type) {
-      filtered = filtered.filter((school) => school.type && school.type.includes(filter.type as SchoolTypes));
+    if (filter.type && filter.type.length > 0) {
+      filtered = filtered.filter(
+        (school) => school.type && filter.type.some((selectedType) => school.type.includes(selectedType as SchoolTypes))
+      );
     }
 
     // Apply city filter

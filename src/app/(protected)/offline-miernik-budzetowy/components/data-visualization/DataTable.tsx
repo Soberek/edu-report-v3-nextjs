@@ -33,8 +33,10 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: theme.palette.grey[50] }}>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>Typ programu</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>Nazwa programu</TableCell>
+              <TableCell sx={{ fontWeight: "bold", fontSize: "0.9rem" }} colSpan={2}>
+                Typ programu - Nazwa programu
+              </TableCell>
+              {/* <TableCell sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>Nazwa programu</TableCell> */}
               <TableCell sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>Działanie</TableCell>
               <TableCell align="right" sx={{ fontWeight: "bold", fontSize: "0.9rem" }}>
                 Liczba działań
@@ -49,7 +51,7 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
               <React.Fragment key={programType}>
                 {/* Program Type Header */}
                 <TableRow sx={{ backgroundColor: `${getProgramTypeColor(typeIndex)}10` }}>
-                  <TableCell colSpan={5} sx={{ fontWeight: "bold", fontSize: "1rem", py: 2 }}>
+                  <TableCell colSpan={5} sx={{ fontWeight: "bold", fontSize: "1rem", py: 1 }}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Chip
                         label={programType}
@@ -69,14 +71,19 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
                   <React.Fragment key={programName}>
                     {/* Program Name Row */}
                     <TableRow sx={{ backgroundColor: "#252525" }}>
-                      <TableCell sx={{ pl: 4, fontWeight: 600, color: "text.secondary" }}>{programName}</TableCell>
+                      <TableCell sx={{ pl: 1, fontWeight: 600, color: "white" }}>{programName}</TableCell>
                       <TableCell colSpan={4} />
                     </TableRow>
 
                     {/* Actions */}
                     {Object.entries(actions).map(([actionName, stats]) => (
-                      <TableRow key={actionName} hover>
-                        <TableCell sx={{ pl: 6, color: "text.secondary" }} />
+                      <TableRow
+                        key={actionName}
+                        hover
+                        sx={{ textAlign: "center" }}
+                        className="[&>td]:outline outline-1 outline-transparent hover:[&>td]:outline-gray-300 "
+                      >
+                        <TableCell sx={{ pl: 4, color: "text.secondary" }} />
                         <TableCell sx={{ pl: 2, color: "text.secondary" }} />
                         <TableCell sx={{ fontWeight: 500 }}>{actionName}</TableCell>
                         <TableCell align="right" sx={{ fontWeight: 600, color: theme.palette.primary.main }}>
