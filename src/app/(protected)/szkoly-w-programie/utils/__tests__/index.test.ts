@@ -10,8 +10,10 @@ import {
   isValidSchoolYear,
   formatParticipationForSubmission,
   createDefaultFormValues,
+  mapParticipationsForDisplay,
 } from "../index";
 import type { School, Contact, Program } from "@/types";
+import type { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
 
 describe("transformSchoolsToOptions", () => {
   it("should transform schools to select options", () => {
@@ -253,5 +255,95 @@ describe("createDefaultFormValues", () => {
       reportSubmitted: false,
     });
     expect(["2024/2025", "2025/2026", "2026/2027", "2027/2028"]).toContain(result.schoolYear);
+  });
+});
+
+describe("mapParticipationsForDisplay", () => {
+  it("should map participations for display with coordinator contact info", () => {
+    const participations: SchoolProgramParticipation[] = [
+      {
+        id: "1",
+        schoolId: "school1",
+        programId: "program1",
+        coordinatorId: "coord1",
+        schoolYear: "2024/2025",
+        studentCount: 100,
+        notes: "Test notes",
+        createdAt: "2024-01-01",
+        userId: "user1",
+        reportSubmitted: false,
+      },
+    ];
+
+    const schoolsMap = {
+      school1: { id: "school1", name: "Test School" } as School,
+    };
+
+    const programsMap = {
+      program1: { id: "program1", name: "Test Program" } as Program,
+    };
+
+    const contactsMap = {
+      coord1: {
+        id: "coord1",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john@example.com",
+        phone: "123-456-789",
+      } as Contact,
+    };
+
+    const result = mapParticipationsForDisplay(participations, schoolsMap, contactsMap, programsMap);
+
+    expect(result).toEqual([
+      {
+        ...participations[0],
+        schoolName: "Test School",
+        programName: "Test Program",
+        coordinatorName: "John Doe",
+        coordinatorEmail: "john@example.com",
+        coordinatorPhone: "123-456-789",
+      },
+    ]);
+  });
+
+  it("should handle missing coordinator data", () => {
+    const participations: SchoolProgramParticipation[] = [
+      {
+        id: "1",
+        schoolId: "school1",
+        programId: "program1",
+        coordinatorId: "coord1",
+        schoolYear: "2024/2025",
+        studentCount: 100,
+        notes: "Test notes",
+        createdAt: "2024-01-01",
+        userId: "user1",
+        reportSubmitted: false,
+      },
+    ];
+
+    const schoolsMap = {
+      school1: { id: "school1", name: "Test School" } as School,
+    };
+
+    const programsMap = {
+      program1: { id: "program1", name: "Test Program" } as Program,
+    };
+
+    const contactsMap = {}; // Empty contacts map
+
+    const result = mapParticipationsForDisplay(participations, schoolsMap, contactsMap, programsMap);
+
+    expect(result).toEqual([
+      {
+        ...participations[0],
+        schoolName: "Test School",
+        programName: "Test Program",
+        coordinatorName: "N/A",
+        coordinatorEmail: undefined,
+        coordinatorPhone: undefined,
+      },
+    ]);
   });
 });

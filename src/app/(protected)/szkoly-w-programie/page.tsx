@@ -91,6 +91,7 @@ export default function SchoolsProgramParticipation() {
       programs={programs}
       onUpdate={handleUpdateParticipation}
       onDelete={handleDeleteParticipation}
+      onAdd={handleSubmit}
     />
   );
 
@@ -124,7 +125,6 @@ export default function SchoolsProgramParticipation() {
     <Box sx={{ py: 4, px: 2 }}>
       {renderHeader()}
       {renderErrorAlert()}
-      {renderFormSection()}
       {renderTableSection()}
       {renderSnackbar()}
     </Box>

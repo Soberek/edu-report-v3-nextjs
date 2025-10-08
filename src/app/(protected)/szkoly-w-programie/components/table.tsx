@@ -1,12 +1,14 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import { School as SchoolIcon } from "@mui/icons-material";
+import { useForm } from "react-hook-form";
 // import type { Contact, Program, School } from "@/types";
-import { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
+import { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { createColumns } from "./TableConfig";
-import { LoadingSpinner, EmptyState, DataTable, defaultActions, EditDialog } from "@/components/shared";
+import { LoadingSpinner, EmptyState, DataTable, defaultActions, EditDialog, ActionButton } from "@/components/shared";
 import { EditParticipationForm } from "./EditParticipationForm";
-import { mapParticipationsForDisplay } from "../utils";
+import { ParticipationForm } from "./ParticipationForm";
+import { mapParticipationsForDisplay, createDefaultFormValues } from "../utils";
 import { STYLE_CONSTANTS, PAGE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
 import type { TableProps, MappedParticipation } from "../types";
 import { Contact, Program, School } from "@/types";
@@ -23,11 +25,18 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   programs,
   onUpdate,
   onDelete,
+  onAdd,
 }) => {
   const [editingParticipation, setEditingParticipation] = useState<SchoolProgramParticipation | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
   const formRef = useRef<{ submit: () => void; isDirty: boolean } | null>(null);
+
+  // Form for adding new participations
+  const addFormMethods = useForm<SchoolProgramParticipationDTO>({
+    defaultValues: createDefaultFormValues(),
+  });
 
   // Map participations for display using utility function
   const mappedParticipations: MappedParticipation[] = useMemo(
@@ -38,6 +47,10 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   const handleEditParticipation = useCallback((participation: SchoolProgramParticipation) => {
     setEditingParticipation(participation);
     setEditDialogOpen(true);
+  }, []);
+
+  const handleAddParticipation = useCallback(() => {
+    setAddDialogOpen(true);
   }, []);
 
   const handleSaveParticipation = useCallback(async () => {
@@ -66,10 +79,29 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
     [editingParticipation, onUpdate]
   );
 
+  const handleAddFormSubmit = useCallback(
+    async (data: SchoolProgramParticipationDTO) => {
+      setDialogLoading(true);
+      try {
+        await onAdd(data);
+        setAddDialogOpen(false);
+        addFormMethods.reset();
+      } finally {
+        setDialogLoading(false);
+      }
+    },
+    [onAdd, addFormMethods]
+  );
+
   const handleCloseEditDialog = useCallback(() => {
     setEditDialogOpen(false);
     setEditingParticipation(null);
   }, []);
+
+  const handleCloseAddDialog = useCallback(() => {
+    setAddDialogOpen(false);
+    addFormMethods.reset();
+  }, [addFormMethods]);
 
   const handleDeleteParticipation = useCallback(
     async (id: string) => {
@@ -107,6 +139,9 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
         backdropFilter: "blur(10px)",
         p: STYLE_CONSTANTS.SPACING.MEDIUM,
         borderBottom: "1px solid rgba(255,255,255,0.2)",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
       }}
     >
       <Typography
@@ -122,6 +157,25 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
         <SchoolIcon sx={{ color: STYLE_CONSTANTS.COLORS.PRIMARY }} />
         {PAGE_CONSTANTS.TABLE_TITLE} ({mappedParticipations.length})
       </Typography>
+      <ActionButton
+        onClick={handleAddParticipation}
+        variant="contained"
+        size="small"
+        sx={{
+          borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.MEDIUM,
+          textTransform: "none",
+          fontWeight: "bold",
+          background: STYLE_CONSTANTS.GRADIENTS.PRIMARY,
+          boxShadow: "0 2px 8px rgba(25, 118, 210, 0.3)",
+          "&:hover": {
+            background: STYLE_CONSTANTS.GRADIENTS.PRIMARY_HOVER,
+            boxShadow: "0 4px 12px rgba(25, 118, 210, 0.4)",
+            transform: "translateY(-1px)",
+          },
+        }}
+      >
+        Dodaj uczestnictwo
+      </ActionButton>
     </Box>
   );
 
@@ -168,6 +222,26 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
     </EditDialog>
   );
 
+  const renderAddDialog = () => (
+    <EditDialog
+      open={addDialogOpen}
+      onClose={handleCloseAddDialog}
+      title="Dodaj uczestnictwo szkoły"
+      onSave={handleSaveParticipation}
+      loading={dialogLoading}
+      maxWidth={UI_CONSTANTS.DIALOG_MAX_WIDTH}
+    >
+      <ParticipationForm
+        schools={schools as School[]}
+        contacts={contacts as Contact[]}
+        programs={programs as Program[]}
+        loading={dialogLoading}
+        onSubmit={handleAddFormSubmit}
+        formMethods={addFormMethods}
+      />
+    </EditDialog>
+  );
+
   if (errorMessage) {
     return renderErrorState();
   }
@@ -181,7 +255,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
       <Paper
         elevation={0}
         sx={{
-          width: '100%',
+          width: "100%",
           borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.EXTRA_LARGE,
           background: STYLE_CONSTANTS.COLORS.BACKGROUND_GRADIENT,
           overflow: "hidden",
@@ -191,6 +265,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
         {renderTableContent()}
       </Paper>
       {renderEditDialog()}
+      {renderAddDialog()}
     </>
   );
 };

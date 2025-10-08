@@ -30,6 +30,8 @@ export interface MappedParticipation extends SchoolProgramParticipation {
   readonly schoolName: string;
   readonly programName: string;
   readonly coordinatorName: string;
+  readonly coordinatorEmail?: string;
+  readonly coordinatorPhone?: string;
 }
 
 // Component props types
@@ -54,6 +56,7 @@ export interface TableProps {
   readonly programs: readonly Program[];
   readonly onUpdate: (id: string, data: Partial<SchoolProgramParticipation>) => Promise<void>;
   readonly onDelete: (id: string) => Promise<void>;
+  readonly onAdd: (data: SchoolProgramParticipationDTO) => Promise<void>;
 }
 
 export interface EditParticipationFormProps {

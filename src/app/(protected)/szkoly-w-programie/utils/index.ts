@@ -75,6 +75,8 @@ export const mapParticipationsForDisplay = (
       schoolName: school?.name || "N/A",
       programName: program?.name || "N/A",
       coordinatorName: coordinator ? `${coordinator.firstName} ${coordinator.lastName}` : "N/A",
+      coordinatorEmail: coordinator?.email,
+      coordinatorPhone: coordinator?.phone,
     };
   });
 };
