@@ -5,6 +5,7 @@ import { usePrograms } from "@/hooks/useProgram";
 import type { Contact, Program, School as SchoolType } from "@/types";
 import type { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { schoolProgramParticipationDTOSchema, schoolProgramParticiapationUpdateDTOSchema } from "@/models/SchoolProgramParticipation";
+import { ZodError } from "zod";
 import { createLookupMaps, mapParticipationsForDisplay } from "../utils";
 import { UI_CONSTANTS, MESSAGES } from "../constants";
 import type { UseParticipationPageProps, SnackbarMessage, MappedParticipation } from "../types";
@@ -74,9 +75,9 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
         await createSchoolProgramParticipation(validatedData);
         showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_ADDED);
       } catch (error) {
-        if (error instanceof Error && error.name === "ZodError") {
+        if (error instanceof ZodError) {
           // Extract validation error messages
-          const errorMessages = (error as any).issues.map((issue: any) => `${issue.path.join(".")}: ${issue.message}`).join(", ");
+          const errorMessages = error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join(", ");
           showErrorMessage(`Validation error: ${errorMessages}`);
         } else {
           showErrorMessage(MESSAGES.ERROR.SAVE_FAILED);
@@ -99,9 +100,9 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
         showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_UPDATED);
         onUpdate?.(id, data);
       } catch (error) {
-        if (error instanceof Error && error.name === "ZodError") {
+        if (error instanceof ZodError) {
           // Extract validation error messages
-          const errorMessages = (error as any).issues.map((issue: any) => `${issue.path.join(".")}: ${issue.message}`).join(", ");
+          const errorMessages = error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join(", ");
           showErrorMessage(`Validation error: ${errorMessages}`);
         } else {
           showErrorMessage(MESSAGES.ERROR.UPDATE_FAILED);
