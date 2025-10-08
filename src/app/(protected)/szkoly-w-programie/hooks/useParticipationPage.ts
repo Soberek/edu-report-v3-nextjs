@@ -124,8 +124,8 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
   // Loading state
   const isLoading = schoolsLoading || contactsLoading || programsLoading;
 
-  // Error state
-  const error = schoolsError || contactsError || schoolProgramParticipationError;
+  // Error state - exclude schoolProgramParticipationError since it's handled locally in operations
+  const error = schoolsError || contactsError;
 
   return {
     // Data
