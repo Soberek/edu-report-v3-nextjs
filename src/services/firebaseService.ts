@@ -66,15 +66,37 @@ export class FirebaseService<R> implements Creatable<R>, Readable<R>, Updatable<
 
   async createDocument(userId: string, data: Omit<R, "id" | "createdAt" | "updatedAt" | "userId">): Promise<string> {
     try {
+      console.log(`Creating document in ${this.collectionName} for userId:`, userId);
+      console.log('Current auth state - checking if user is authenticated...');
+
+      // Check if we're authenticated
+      const { getAuth } = await import('firebase/auth');
+      const auth = getAuth();
+      console.log('Auth currentUser:', auth.currentUser);
+      console.log('Auth currentUser UID:', auth.currentUser?.uid);
+
+      console.log('Data to be saved:', data);
+
       const collectionRef = collection(db, this.collectionName);
-      const docRef = await addDoc(collectionRef, {
+      const docData = {
         userId,
         ...data,
         createdAt: new Date().toISOString(), // Automatically add timestamp
-      });
+      };
+
+      console.log('Full document data:', docData);
+
+      const docRef = await addDoc(collectionRef, docData);
+      console.log('Document created successfully with ID:', docRef.id);
       return docRef.id;
     } catch (error) {
       console.error(`Error adding document to ${this.collectionName}:`, error);
+      console.error('Error details:', {
+        userId,
+        data,
+        collectionName: this.collectionName,
+        error
+      });
       throw new Error(`Failed to add document to ${this.collectionName}`);
     }
   }
