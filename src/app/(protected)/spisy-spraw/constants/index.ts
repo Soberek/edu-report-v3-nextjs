@@ -27,7 +27,11 @@ export const INITIAL_STATE = {
   selectedCode: INITIAL_SELECTED_CODE,
   editingCaseRecord: null,
   editDialogOpen: false,
+  createDialogOpen: false,
+  deleteDialogOpen: false,
   dialogLoading: false,
+  createLoading: false,
+  recordToDelete: null,
   snackbar: {
     open: false,
     type: "success" as const,

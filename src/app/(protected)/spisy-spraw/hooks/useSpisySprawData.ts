@@ -91,6 +91,8 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
         return;
       }
 
+      dispatch(actions.setCreateLoading(true));
+
       try {
         const parsedData = ActCreateDTO.parse(data);
         await actService.create(parsedData);
@@ -104,6 +106,8 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
         reset();
       } catch (error) {
         handleValidationError(error, dispatch, MESSAGES.ADD_ERROR);
+      } finally {
+        dispatch(actions.setCreateLoading(false));
       }
     },
     [userId, actService, dispatch, reset]
@@ -179,6 +183,21 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
   // --------------------------------------------------------------------------
 
   /**
+   * Opens create dialog
+   */
+  const handleOpenCreateDialog = useCallback(() => {
+    dispatch(actions.openCreateDialog());
+  }, [dispatch]);
+
+  /**
+   * Closes create dialog
+   */
+  const handleCloseCreateDialog = useCallback(() => {
+    dispatch(actions.closeCreateDialog());
+    reset();
+  }, [dispatch, reset]);
+
+  /**
    * Opens edit dialog for a case record
    */
   const handleEditCaseRecord = useCallback(
@@ -187,6 +206,33 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
     },
     [dispatch]
   );
+
+  /**
+   * Opens delete confirmation dialog
+   */
+  const handleOpenDeleteDialog = useCallback(
+    (id: string) => {
+      dispatch(actions.openDeleteDialog(id));
+    },
+    [dispatch]
+  );
+
+  /**
+   * Closes delete dialog
+   */
+  const handleCloseDeleteDialog = useCallback(() => {
+    dispatch(actions.closeDeleteDialog());
+  }, [dispatch]);
+
+  /**
+   * Confirms deletion
+   */
+  const handleConfirmDelete = useCallback(async () => {
+    if (!state.recordToDelete) return;
+    
+    await handleDeleteActRecord(state.recordToDelete);
+    dispatch(actions.closeDeleteDialog());
+  }, [state.recordToDelete, handleDeleteActRecord, dispatch]);
 
   /**
    * Triggers form submission via ref
@@ -242,6 +288,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
     // Loading states
     isLoading: actRecordsLoading,
     hasError: !!actRecordsError,
+    createLoading: state.createLoading,
 
     // CRUD operations
     addActRecord: handleAddActRecord,
@@ -249,7 +296,12 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
     deleteActRecord: handleDeleteActRecord,
 
     // UI actions
+    openCreateDialog: handleOpenCreateDialog,
+    closeCreateDialog: handleCloseCreateDialog,
     editCaseRecord: handleEditCaseRecord,
+    openDeleteDialog: handleOpenDeleteDialog,
+    closeDeleteDialog: handleCloseDeleteDialog,
+    confirmDelete: handleConfirmDelete,
     saveCaseRecord: handleSaveActRecord,
     closeEditDialog: handleCloseEditDialog,
     closeSnackbar: handleCloseSnackbar,

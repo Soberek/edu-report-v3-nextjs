@@ -99,6 +99,7 @@ export const EditActForm = forwardRef<EditActFormRef, EditActFormProps>(({ caseR
   // Update form when caseRecord changes
   useEffect(() => {
     if (caseRecord) {
+      // Edit mode - populate with existing data
       reset({
         code: caseRecord.code,
         referenceNumber: caseRecord.referenceNumber,
@@ -109,6 +110,20 @@ export const EditActForm = forwardRef<EditActFormRef, EditActFormProps>(({ caseR
         sender: caseRecord.sender,
         comments: caseRecord.comments,
         notes: caseRecord.notes,
+      });
+    } else {
+      // Create mode - reset to default values
+      const today = new Date().toISOString().split("T")[0];
+      reset({
+        code: "",
+        referenceNumber: "OZiPZ.966",
+        date: today,
+        title: "",
+        startDate: today,
+        endDate: today,
+        sender: "-",
+        comments: "OZ",
+        notes: "",
       });
     }
   }, [caseRecord, reset]);

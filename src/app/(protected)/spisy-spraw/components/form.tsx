@@ -11,6 +11,7 @@ interface ActFormProps {
   onSubmit: (data: CaseRecord) => void;
   errors: FieldErrors<CaseRecord>;
   actsOptions: string[];
+  loading?: boolean;
 }
 
 const CustomSelectField: React.FC<{
@@ -53,7 +54,7 @@ const CustomSelectField: React.FC<{
   );
 };
 
-export const ActForm: React.FC<ActFormProps> = ({ control, errors, handleSubmit, onSubmit, actsOptions }) => {
+export const ActForm: React.FC<ActFormProps> = ({ control, errors, handleSubmit, onSubmit, actsOptions, loading = false }) => {
   return (
     <FormSection
       title="Dodaj nowy akt sprawy"
@@ -123,6 +124,8 @@ export const ActForm: React.FC<ActFormProps> = ({ control, errors, handleSubmit,
             type="submit"
             variant="contained"
             startIcon={<Save />}
+            loading={loading}
+            disabled={loading}
             sx={{
               borderRadius: 3,
               textTransform: "none",

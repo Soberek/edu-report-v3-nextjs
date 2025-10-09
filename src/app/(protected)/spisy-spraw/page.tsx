@@ -1,10 +1,11 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Container, Alert, Snackbar } from "@mui/material";
+import { Container, Alert, Snackbar, Box, Button } from "@mui/material";
 import { useReducer, useRef } from "react";
+import { Add } from "@mui/icons-material";
 
-import { ActForm, ActCaseRecordsTable, FilterSection, EditActForm, PageHeader, LoadingSpinner, EditDialog } from "./components";
+import { ActCaseRecordsTable, FilterSection, EditActForm, PageHeader, LoadingSpinner, EditDialog, ConfirmDialog } from "./components";
 import { DEFAULT_FORM_VALUES, INITIAL_STATE, UI_CONFIG, MESSAGES } from "./constants";
 import { spisySprawReducer } from "./reducers/spisySprawReducer";
 import { useSpisySpraw } from "./hooks";
@@ -33,10 +34,16 @@ export default function Acts() {
     sortedCaseRecords,
     errorMessages,
     isLoading,
+    createLoading,
     addActRecord,
     updateActRecord,
     deleteActRecord,
+    openCreateDialog,
+    closeCreateDialog,
     editCaseRecord,
+    openDeleteDialog,
+    closeDeleteDialog,
+    confirmDelete,
     saveCaseRecord,
     closeEditDialog,
     closeSnackbar,
@@ -69,8 +76,23 @@ export default function Acts() {
         </Alert>
       ))}
 
-      {/* Add New Act Section */}
-      <ActForm control={control} handleSubmit={handleSubmit} onSubmit={addActRecord} errors={errors} actsOptions={actsOptionsCodes} />
+      {/* Add New Act Button */}
+      <Box sx={{ mb: 3, display: "flex", justifyContent: "flex-end" }}>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={openCreateDialog}
+          sx={{
+            borderRadius: 2,
+            px: 3,
+            py: 1.5,
+            fontWeight: "bold",
+            textTransform: "none",
+          }}
+        >
+          Dodaj nowy akt sprawy
+        </Button>
+      </Box>
 
       {/* Filter and Export Section */}
       <FilterSection
@@ -84,7 +106,7 @@ export default function Acts() {
       <ActCaseRecordsTable
         caseRecords={sortedCaseRecords}
         loading={isLoading}
-        deleteCaseRecord={deleteActRecord}
+        deleteCaseRecord={openDeleteDialog}
         editCaseRecord={editCaseRecord}
       />
 
@@ -100,6 +122,18 @@ export default function Acts() {
         </Alert>
       </Snackbar>
 
+      {/* Create Dialog */}
+      <EditDialog
+        open={state.createDialogOpen}
+        onClose={closeCreateDialog}
+        title="Dodaj nowy akt sprawy"
+        onSave={handleSubmit(addActRecord)}
+        loading={state.createLoading}
+        maxWidth={UI_CONFIG.EDIT_DIALOG_MAX_WIDTH}
+      >
+        <EditActForm ref={formRef} caseRecord={null} actsOptions={actsOptionsCodes} onSubmit={addActRecord} />
+      </EditDialog>
+
       {/* Edit Dialog */}
       <EditDialog
         open={state.editDialogOpen}
@@ -111,6 +145,17 @@ export default function Acts() {
       >
         <EditActForm ref={formRef} caseRecord={state.editingCaseRecord} actsOptions={actsOptionsCodes} onSubmit={updateActRecord} />
       </EditDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={state.deleteDialogOpen}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDelete}
+        title="Usuń akt sprawy"
+        message="Czy na pewno chcesz usunąć ten akt sprawy? Ta operacja jest nieodwracalna."
+        confirmText="Usuń"
+        type="delete"
+      />
     </Container>
   );
 }
