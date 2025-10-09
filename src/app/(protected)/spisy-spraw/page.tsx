@@ -3,9 +3,9 @@
 import { useForm } from "react-hook-form";
 import { Container, Alert, Snackbar, Box, Button } from "@mui/material";
 import { useReducer, useRef } from "react";
-import { Add } from "@mui/icons-material";
+import { Add, Description, Category, FilterList } from "@mui/icons-material";
 
-import { ActCaseRecordsTable, FilterSection, EditActForm, PageHeader, LoadingSpinner, EditDialog, ConfirmDialog } from "./components";
+import { ActCaseRecordsTable, FilterSection, EditActForm, PageHeader, LoadingSpinner, EditDialog, ConfirmDialog, StatsCard } from "./components";
 import { DEFAULT_FORM_VALUES, INITIAL_STATE, UI_CONFIG, MESSAGES } from "./constants";
 import { spisySprawReducer } from "./reducers/spisySprawReducer";
 import { useSpisySpraw } from "./hooks";
@@ -33,6 +33,7 @@ export default function Acts() {
     actsOptionsCodes,
     sortedCaseRecords,
     errorMessages,
+    stats,
     isLoading,
     createLoading,
     addActRecord,
@@ -75,6 +76,53 @@ export default function Acts() {
           {error}
         </Alert>
       ))}
+
+      {/* Statistics Cards */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(4, 1fr)",
+          },
+          gap: 3,
+          mb: 3,
+        }}
+      >
+        <StatsCard
+          title="Wszystkie akta"
+          value={stats.total}
+          subtitle="Łączna liczba akt spraw"
+          icon={<Description />}
+          color="primary"
+          loading={isLoading}
+        />
+        <StatsCard
+          title="Filtrowane wyniki"
+          value={stats.filtered}
+          subtitle={state.selectedCode.title}
+          icon={<FilterList />}
+          color="info"
+          loading={isLoading}
+        />
+        <StatsCard
+          title="Unikalne kody"
+          value={Object.keys(stats.byCode).length}
+          subtitle="Różne typy akt"
+          icon={<Category />}
+          color="success"
+          loading={isLoading}
+        />
+        <StatsCard
+          title="Najpopularniejszy"
+          value={stats.mostUsedCode?.code || "-"}
+          subtitle={stats.mostUsedCode ? `${stats.mostUsedCode.count} rekordów` : "Brak danych"}
+          icon={<Description />}
+          color="warning"
+          loading={isLoading}
+        />
+      </Box>
 
       {/* Add New Act Button */}
       <Box sx={{ mb: 3, display: "flex", justifyContent: "flex-end" }}>

@@ -72,6 +72,25 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
 
   const errorMessages = useMemo(() => formatErrorMessages(actRecordsError), [actRecordsError]);
 
+  // Statistics
+  const stats = useMemo(() => {
+    const total = actRecords.length;
+    const byCode = actRecords.reduce((acc, record) => {
+      acc[record.code] = (acc[record.code] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const filtered = sortedCaseRecords.length;
+    const mostUsedCode = Object.entries(byCode).sort((a, b) => b[1] - a[1])[0];
+
+    return {
+      total,
+      filtered,
+      byCode,
+      mostUsedCode: mostUsedCode ? { code: mostUsedCode[0], count: mostUsedCode[1] } : null,
+    };
+  }, [actRecords, sortedCaseRecords]);
+
   // --------------------------------------------------------------------------
   // CRUD Operations
   // --------------------------------------------------------------------------
@@ -284,6 +303,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
     actsOptionsCodes,
     sortedCaseRecords,
     errorMessages,
+    stats,
 
     // Loading states
     isLoading: actRecordsLoading,
