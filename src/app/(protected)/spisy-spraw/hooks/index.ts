@@ -1,3 +1,9 @@
-export { useSpisySprawActions } from "./useSpisySprawActions";
-export { useSpisySprawData } from "./useSpisySprawData";
-export type { UseSpisySprawActionsProps } from "./useSpisySprawActions";
+/**
+ * Spisy Spraw Hooks
+ *
+ * Centralized hook for managing case records (Spisy Spraw).
+ * Provides data fetching, CRUD operations, and UI state management.
+ */
+
+export { useSpisySpraw } from "./useSpisySprawData";
+export type { UseSpisySprawProps } from "./useSpisySprawData";

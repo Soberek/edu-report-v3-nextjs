@@ -16,6 +16,8 @@ export {
   FormSection,
   ActionButton,
   EditDialog,
+  ConfirmDialog,
+  StatsCard,
 } from "@/components/shared";
 
 // Re-export local modules for easy access

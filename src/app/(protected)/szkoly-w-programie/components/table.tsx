@@ -180,7 +180,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   );
 
   const renderTableContent = () => (
-    <Box sx={{ px: 2, py: STYLE_CONSTANTS.SPACING.MEDIUM, background: "transparent" }}>
+    <Box sx={{ px: 2, py: STYLE_CONSTANTS.SPACING.MEDIUM, background: "transparent", height: "auto" }}>
       {mappedParticipations.length === 0 ? (
         <EmptyState title={MESSAGES.EMPTY.NO_DATA} description={MESSAGES.EMPTY.NO_DATA_DESCRIPTION} />
       ) : (
@@ -189,7 +189,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
           columns={columns}
           actions={actions}
           loading={loading}
-          height={UI_CONSTANTS.TABLE_HEIGHT}
+          height={mappedParticipations.length * 80 + 100} // Dynamic height based on rows
           pageSizeOptions={[...UI_CONSTANTS.PAGE_SIZE_OPTIONS]}
           getRowId={(row) => (row as unknown as MappedParticipation).id}
           sx={{

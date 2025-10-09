@@ -17,10 +17,10 @@ export const TABLE_COLUMNS: TableColumnConfig[] = [
   { field: "programName", headerName: "Program", flex: 1.5, minWidth: 150, align: "center", headerAlign: "center" },
   { field: "coordinatorName", headerName: "Koordynator", flex: 1.8, minWidth: 180, align: "center", headerAlign: "center" },
   { field: "coordinatorEmail", headerName: "Email", flex: 1.8, minWidth: 180, align: "center", headerAlign: "center" },
-  { field: "coordinatorPhone", headerName: "Telefon", flex: 1.2, minWidth: 120, align: "center", headerAlign: "center" },
-  { field: "schoolYear", headerName: "Rok", flex: 1.2, minWidth: 100, align: "center", headerAlign: "center" },
+  { field: "coordinatorPhone", headerName: "Telefon", flex: 1.4, minWidth: 140, align: "center", headerAlign: "center" },
+  { field: "schoolYear", headerName: "Rok", flex: 1.4, minWidth: 120, align: "center", headerAlign: "center" },
   { field: "studentCount", headerName: "Uczniowie", flex: 1.2, minWidth: 100, align: "center", headerAlign: "center" },
-  { field: "notes", headerName: "Notatki", flex: 2.25, minWidth: 150, align: "center", headerAlign: "center" },
+  { field: "notes", headerName: "Notatki", flex: 2, minWidth: 150, align: "center", headerAlign: "center" },
   { field: "createdAt", headerName: "Data", flex: 1.2, minWidth: 100, align: "center", headerAlign: "center" },
 ];
 

@@ -6,6 +6,9 @@ import { useForm } from "react-hook-form";
 // import type { Contact, Program, School as SchoolType } from "@/types";
 import { SchoolProgramParticipationTable } from "./components/table";
 import { ParticipationForm } from "./components/ParticipationForm";
+import { ProgramStatistics } from "./components/ProgramStatistics";
+import { SchoolYearSelector } from "./components/SchoolYearSelector";
+import { ProgramSelector } from "./components/ProgramSelector";
 // import { useFirebaseData } from "@/hooks/useFirebaseData";
 // import { useUser } from "@/hooks/useUser";
 import { PageHeader, LoadingSpinner } from "@/components/shared";
@@ -26,6 +29,13 @@ export default function SchoolsProgramParticipation() {
     programs,
     participations,
     mappedParticipations,
+    allParticipations,
+    selectedSchoolYear,
+    setSelectedSchoolYear,
+    availableSchoolYears,
+    selectedProgram,
+    setSelectedProgram,
+    availablePrograms,
     isLoading,
     schoolProgramParticipationLoading,
     error,
@@ -78,6 +88,16 @@ export default function SchoolsProgramParticipation() {
 
   const renderFormSection = () => <ParticipationForm {...formProps} />;
 
+  const renderStatisticsSection = () => <ProgramStatistics participations={participations} programs={programs} />;
+
+  const renderSchoolYearSelector = () => (
+    <SchoolYearSelector selectedYear={selectedSchoolYear} onYearChange={setSelectedSchoolYear} availableYears={availableSchoolYears} />
+  );
+
+  const renderProgramSelector = () => (
+    <ProgramSelector selectedProgram={selectedProgram} onProgramChange={setSelectedProgram} availablePrograms={availablePrograms} />
+  );
+
   const renderTableSection = () => (
     <SchoolProgramParticipationTable
       participations={participations}
@@ -125,6 +145,11 @@ export default function SchoolsProgramParticipation() {
     <Box sx={{ py: 4, px: 2 }}>
       {renderHeader()}
       {renderErrorAlert()}
+      {renderStatisticsSection()}
+      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
+        {renderSchoolYearSelector()}
+        {renderProgramSelector()}
+      </Box>
       {renderTableSection()}
       {renderSnackbar()}
     </Box>

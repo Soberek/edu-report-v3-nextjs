@@ -10,11 +10,23 @@ export function spisySprawReducer(state: SpisySprawState, action: SpisySprawActi
         selectedCode: action.payload,
       };
 
+    case "SET_SEARCH_QUERY":
+      return {
+        ...state,
+        searchQuery: action.payload,
+      };
+
     case "START_EDIT":
       return {
         ...state,
         editingCaseRecord: action.payload,
         editDialogOpen: true,
+      };
+
+    case "OPEN_CREATE_DIALOG":
+      return {
+        ...state,
+        createDialogOpen: true,
       };
 
     case "CLOSE_EDIT_DIALOG":
@@ -25,10 +37,37 @@ export function spisySprawReducer(state: SpisySprawState, action: SpisySprawActi
         dialogLoading: false,
       };
 
+    case "CLOSE_CREATE_DIALOG":
+      return {
+        ...state,
+        createDialogOpen: false,
+        createLoading: false,
+      };
+
+    case "OPEN_DELETE_DIALOG":
+      return {
+        ...state,
+        deleteDialogOpen: true,
+        recordToDelete: action.payload,
+      };
+
+    case "CLOSE_DELETE_DIALOG":
+      return {
+        ...state,
+        deleteDialogOpen: false,
+        recordToDelete: null,
+      };
+
     case "SET_DIALOG_LOADING":
       return {
         ...state,
         dialogLoading: action.payload,
+      };
+
+    case "SET_CREATE_LOADING":
+      return {
+        ...state,
+        createLoading: action.payload,
       };
 
     case "SHOW_SNACKBAR":
@@ -70,17 +109,44 @@ export const actions = {
     payload,
   }),
 
+  setSearchQuery: (payload: string) => ({
+    type: "SET_SEARCH_QUERY" as const,
+    payload,
+  }),
+
   startEdit: (payload: CaseRecord) => ({
     type: "START_EDIT" as const,
     payload,
+  }),
+
+  openCreateDialog: () => ({
+    type: "OPEN_CREATE_DIALOG" as const,
   }),
 
   closeEditDialog: () => ({
     type: "CLOSE_EDIT_DIALOG" as const,
   }),
 
+  closeCreateDialog: () => ({
+    type: "CLOSE_CREATE_DIALOG" as const,
+  }),
+
+  openDeleteDialog: (payload: string) => ({
+    type: "OPEN_DELETE_DIALOG" as const,
+    payload,
+  }),
+
+  closeDeleteDialog: () => ({
+    type: "CLOSE_DELETE_DIALOG" as const,
+  }),
+
   setDialogLoading: (payload: boolean) => ({
     type: "SET_DIALOG_LOADING" as const,
+    payload,
+  }),
+
+  setCreateLoading: (payload: boolean) => ({
+    type: "SET_CREATE_LOADING" as const,
     payload,
   }),
 

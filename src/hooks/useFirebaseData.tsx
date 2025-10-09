@@ -84,7 +84,10 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
           updatedAt: new Date().toISOString(),
           userId: userId,
         } as unknown as T;
-        dispatch({ type: "ADD_ITEM", payload: newItem });
+
+        // Refetch żeby mieć świeże dane z bazy
+        await fetchData();
+
         return newItem;
       } catch (err) {
         dispatch({
@@ -94,14 +97,15 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
         return null;
       }
     },
-    [userId, service]
+    [userId, service, fetchData]
   );
 
   const updateItem = useCallback(
     async (id: string, updates: Partial<T>) => {
       try {
         await service.updateDocument(id, updates);
-        dispatch({ type: "UPDATE_ITEM", payload: { id, updates } });
+        // Refetch żeby mieć świeże dane z bazy
+        await fetchData();
         return true;
       } catch (err) {
         dispatch({
@@ -111,14 +115,15 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
         return false;
       }
     },
-    [service]
+    [service, fetchData]
   );
 
   const deleteItem = useCallback(
     async (id: string) => {
       try {
         await service.deleteDocument(id);
-        dispatch({ type: "DELETE_ITEM", payload: id });
+        // Refetch żeby mieć świeże dane z bazy
+        await fetchData();
         return true;
       } catch (err) {
         dispatch({
@@ -128,7 +133,7 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
         return false;
       }
     },
-    [service]
+    [service, fetchData]
   );
 
   useEffect(() => {

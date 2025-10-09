@@ -114,6 +114,7 @@ export const ActCaseRecordsTable: React.FC<ActCaseRecordsTableProps> = ({
           height={600}
           pageSizeOptions={[5, 10, 25, 50]}
           getRowId={(row) => row.id as string}
+          sortingModel={[{ field: "date", sort: "desc" }]}
           sx={{
             background: "white",
             borderRadius: 2,

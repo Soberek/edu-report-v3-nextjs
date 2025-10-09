@@ -32,10 +32,10 @@ export const useParticipationForm = ({ onSubmit, initialData }: UseParticipation
   const handleFormSubmit = useCallback(
     async (data: SchoolProgramParticipationDTO) => {
       try {
-        // Ensure studentCount is a number
+        // Ensure studentCount is a number (handle string inputs from form)
         const processedData = {
           ...data,
-          studentCount: typeof data.studentCount === "string" ? parseInt(data.studentCount, 10) || 0 : data.studentCount,
+          studentCount: typeof data.studentCount === "string" ? parseInt(data.studentCount, 10) || 0 : Number(data.studentCount) || 0,
         };
         await onSubmit(processedData);
         reset();
