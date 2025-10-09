@@ -108,6 +108,7 @@ export interface DataTableProps<T = unknown> {
   actions?: DataTableAction[];
   onRowClick?: (params: GridRowParams) => void;
   getRowId?: (row: T) => string;
+  sortingModel?: { field: string; sort: "asc" | "desc" }[];
   sx?: object;
 }
 
@@ -120,6 +121,7 @@ export const DataTable = <T extends Record<string, unknown>>({
   actions = [],
   onRowClick,
   getRowId,
+  sortingModel,
   sx = {},
 }: DataTableProps<T>) => {
   const theme = useTheme();
@@ -159,6 +161,9 @@ export const DataTable = <T extends Record<string, unknown>>({
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 25 },
+          },
+          sorting: {
+            sortModel: sortingModel || [],
           },
         }}
         onRowClick={onRowClick}

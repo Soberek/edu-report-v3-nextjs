@@ -78,7 +78,7 @@ export default function Acts() {
 
       {/* Cases Table */}
       <ActCaseRecordsTable
-        caseRecords={actRecords}
+        caseRecords={sortedCaseRecords}
         loading={actRecordsLoading}
         deleteCaseRecord={handleDeleteCaseRecord}
         editCaseRecord={handleEditCaseRecord}
