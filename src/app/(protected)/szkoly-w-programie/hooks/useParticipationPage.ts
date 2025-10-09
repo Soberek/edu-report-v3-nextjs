@@ -110,14 +110,14 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
 
   // Get available programs from data with participation counts
   const availableProgramsWithCounts = useMemo(() => {
-    if (!schoolProgramParticipation || !programs) return [];
-    const programCounts = schoolProgramParticipation.reduce((acc, p) => {
+    if (!filteredParticipations || !programs) return [];
+    const programCounts = filteredParticipations.reduce((acc, p) => {
       acc[p.programId] = (acc[p.programId] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
     return programs.filter((p) => programCounts[p.id]).map((p) => ({ ...p, participationCount: programCounts[p.id] }));
-  }, [schoolProgramParticipation, programs]);
+  }, [filteredParticipations, programs]);
 
   // Handle form submission
   const handleSubmit = useCallback(
