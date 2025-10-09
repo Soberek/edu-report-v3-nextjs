@@ -104,6 +104,8 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
     async (id: string, updates: Partial<T>) => {
       try {
         await service.updateDocument(id, updates);
+        // Refetch żeby mieć świeże dane z bazy
+        await fetchData();
         return true;
       } catch (err) {
         dispatch({
@@ -113,13 +115,15 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
         return false;
       }
     },
-    [service]
+    [service, fetchData]
   );
 
   const deleteItem = useCallback(
     async (id: string) => {
       try {
         await service.deleteDocument(id);
+        // Refetch żeby mieć świeże dane z bazy
+        await fetchData();
         return true;
       } catch (err) {
         dispatch({
@@ -129,7 +133,7 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
         return false;
       }
     },
-    [service]
+    [service, fetchData]
   );
 
   useEffect(() => {
