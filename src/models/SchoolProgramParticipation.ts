@@ -19,11 +19,15 @@ export const schoolProgramParticipationSchema = z.object({
   reportSubmitted: z.boolean().optional(),
 });
 
-export const schoolProgramParticipationDTOSchema = schoolProgramParticipationSchema.omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  userId: true,
+export const schoolProgramParticipationDTOSchema = z.object({
+  schoolId: z.string(),
+  programId: z.string(),
+  coordinatorId: z.string(),
+  previousCoordinatorId: z.string().optional(),
+  schoolYear: z.enum(["2024/2025", "2025/2026", "2026/2027", "2027/2028"] as const),
+  studentCount: z.number().int().nonnegative(),
+  notes: z.string().optional(),
+  reportSubmitted: z.boolean().optional(),
 });
 
 export const schoolProgramParticiapationUpdateDTOSchema = schoolProgramParticipationSchema.partial().extend({

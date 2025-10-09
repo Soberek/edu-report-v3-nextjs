@@ -32,7 +32,12 @@ export const useParticipationForm = ({ onSubmit, initialData }: UseParticipation
   const handleFormSubmit = useCallback(
     async (data: SchoolProgramParticipationDTO) => {
       try {
-        await onSubmit(data);
+        // Ensure studentCount is a number
+        const processedData = {
+          ...data,
+          studentCount: typeof data.studentCount === "string" ? parseInt(data.studentCount, 10) || 0 : data.studentCount,
+        };
+        await onSubmit(processedData);
         reset();
       } catch (error) {
         console.error("Form submission error:", error);
