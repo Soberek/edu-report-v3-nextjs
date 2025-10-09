@@ -154,7 +154,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
    * Updates an existing act record
    */
   const handleUpdateActRecord = useCallback(
-    async (data: CaseRecord) => {
+    async (data: CaseRecord | Omit<CaseRecord, "id" | "createdAt" | "userId">) => {
       if (!state.editingCaseRecord) return;
 
       if (!userId) {
@@ -170,7 +170,13 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
       dispatch(actions.setDialogLoading(true));
 
       try {
-        const parsedData = ActUpdateDTO.parse(data);
+        // Merge partial data with existing record data
+        const fullData: CaseRecord = {
+          ...state.editingCaseRecord,
+          ...data,
+        };
+
+        const parsedData = ActUpdateDTO.parse(fullData);
         await actService.update(parsedData);
 
         dispatch(
