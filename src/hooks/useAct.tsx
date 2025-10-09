@@ -38,6 +38,7 @@ export const useAct = () => {
     createItem: createActRecord,
     updateItem: updateActItem,
     deleteItem: deleteActRecord,
+    refetch: refetchActRecords,
   } = useFirebaseData<Act>("case-records", userId);
 
   const addActRecord = async (data: Omit<ActCreate, "userId">) => {
@@ -52,9 +53,7 @@ export const useAct = () => {
     } catch (error) {
       if (error instanceof z.ZodError) {
         throw new Error(
-          `Validation failed at addActRecord: ${error.issues
-            .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
-            .join(", ")}`,
+          `Validation failed at addActRecord: ${error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join(", ")}`
         );
       }
       throw error;
@@ -71,9 +70,7 @@ export const useAct = () => {
       return await updateActItem(parsedData.id, parsedData);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new Error(
-          `Validation failed: ${error.issues.map((e) => e.message).join(", ")}`,
-        );
+        throw new Error(`Validation failed: ${error.issues.map((e) => e.message).join(", ")}`);
       }
       throw error;
     }
@@ -94,5 +91,6 @@ export const useAct = () => {
     actRecordsLoading,
     updateActRecord,
     removeActRecord,
+    refetchActRecords,
   };
 };
