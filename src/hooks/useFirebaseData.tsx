@@ -84,7 +84,6 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
           updatedAt: new Date().toISOString(),
           userId: userId,
         } as unknown as T;
-        dispatch({ type: "ADD_ITEM", payload: newItem });
         return newItem;
       } catch (err) {
         dispatch({
@@ -101,7 +100,6 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
     async (id: string, updates: Partial<T>) => {
       try {
         await service.updateDocument(id, updates);
-        dispatch({ type: "UPDATE_ITEM", payload: { id, updates } });
         return true;
       } catch (err) {
         dispatch({
@@ -118,7 +116,6 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
     async (id: string) => {
       try {
         await service.deleteDocument(id);
-        dispatch({ type: "DELETE_ITEM", payload: id });
         return true;
       } catch (err) {
         dispatch({
