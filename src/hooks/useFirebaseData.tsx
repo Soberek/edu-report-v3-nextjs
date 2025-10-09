@@ -84,6 +84,10 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
           updatedAt: new Date().toISOString(),
           userId: userId,
         } as unknown as T;
+
+        // Refetch żeby mieć świeże dane z bazy
+        await fetchData();
+
         return newItem;
       } catch (err) {
         dispatch({
@@ -93,7 +97,7 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
         return null;
       }
     },
-    [userId, service]
+    [userId, service, fetchData]
   );
 
   const updateItem = useCallback(
