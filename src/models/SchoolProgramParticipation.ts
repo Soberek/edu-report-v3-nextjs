@@ -25,7 +25,7 @@ export const schoolProgramParticipationDTOSchema = z.object({
   coordinatorId: z.string(),
   previousCoordinatorId: z.string().optional(),
   schoolYear: z.enum(["2024/2025", "2025/2026", "2026/2027", "2027/2028"] as const),
-  studentCount: z.number().int().nonnegative(),
+  studentCount: z.coerce.number().int().nonnegative(),
   notes: z.string().optional(),
   reportSubmitted: z.boolean().optional(),
 });
