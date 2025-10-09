@@ -1,34 +1,235 @@
-import { useMemo } from "react";
-import { useAct } from "@/hooks/useAct";
-import { createActsOptions } from "../constants";
-import type { SpisySprawState } from "../types";
+import { useMemo, useCallback } from "react";
+import { useFirebaseData } from "@/hooks/useFirebaseData";
+import { useUser } from "@/hooks/useUser";
+import type { CaseRecord } from "@/types";
 
-export const useSpisySprawData = (state: SpisySprawState) => {
-  const { actRecords, actRecordsError, actRecordsLoading, refetchActRecords } = useAct();
+// Local imports - organized by domain
+import { ActCreateDTO, ActUpdateDTO, type ActCreate } from "../schemas";
+import { filterRecordsByCode, sortRecordsByDate, handleValidationError, formatErrorMessages } from "../utils";
+import { ActService } from "../lib";
+import { createActsOptions, MESSAGES } from "../constants";
+import { actions } from "../reducers/spisySprawReducer";
+import type { SpisySprawState, SpisySprawAction } from "../types";
+
+// ============================================================================
+// HOOK INTERFACE
+// ============================================================================
+
+export interface UseSpisySprawProps {
+  state: SpisySprawState;
+  dispatch: React.Dispatch<SpisySprawAction>;
+  formRef: React.RefObject<{ submit: () => void; isDirty: boolean } | null>;
+  reset: () => void;
+}
+
+// ============================================================================
+// MAIN HOOK
+// ============================================================================
+
+export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySprawProps) => {
+  // --------------------------------------------------------------------------
+  // Core Dependencies
+  // --------------------------------------------------------------------------
+
+  const user = useUser();
+  const userId = user.user?.uid;
+
+  const {
+    data: actRecords,
+    error: actRecordsError,
+    loading: actRecordsLoading,
+    createItem,
+    updateItem,
+    deleteItem,
+    refetch,
+  } = useFirebaseData<CaseRecord>("case-records", userId);
+
+  // Business logic service
+  const actService = useMemo(
+    () =>
+      new ActService({
+        userId,
+        createItem,
+        updateItem,
+        deleteItem,
+        refetch,
+      }),
+    [userId, createItem, updateItem, deleteItem, refetch]
+  );
+
+  // --------------------------------------------------------------------------
+  // Computed Data
+  // --------------------------------------------------------------------------
 
   const actsOptions = useMemo(() => createActsOptions(), []);
 
   const actsOptionsCodes = useMemo(() => actsOptions.map((option) => option.code), [actsOptions]);
 
   const sortedCaseRecords = useMemo(() => {
-    let filtered;
-    if (state.selectedCode.code === "966") {
-      filtered = actRecords.filter((record) => record.referenceNumber.startsWith("OZiPZ.966"));
-    } else if (state.selectedCode.code) {
-      filtered = actRecords.filter((record) => record.code === state.selectedCode.code);
-    } else {
-      filtered = actRecords;
-    }
-    const sorted = [...filtered].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    return sorted;
+    const filtered = filterRecordsByCode(actRecords, state.selectedCode.code);
+    return sortRecordsByDate(filtered);
   }, [actRecords, state.selectedCode.code]);
 
-  const getErrorMessages = () => {
-    if (!actRecordsError) return [];
+  const errorMessages = useMemo(() => formatErrorMessages(actRecordsError), [actRecordsError]);
 
-    const errors = Array.isArray(actRecordsError) ? actRecordsError : [actRecordsError];
-    return errors;
-  };
+  // --------------------------------------------------------------------------
+  // CRUD Operations
+  // --------------------------------------------------------------------------
+
+  /**
+   * Creates a new act record
+   */
+  const handleAddActRecord = useCallback(
+    async (data: CaseRecord) => {
+      if (!userId) {
+        dispatch(
+          actions.showSnackbar({
+            type: "error",
+            message: "User not authenticated",
+          })
+        );
+        return;
+      }
+
+      try {
+        const parsedData = ActCreateDTO.parse(data);
+        await actService.create(parsedData);
+
+        dispatch(
+          actions.showSnackbar({
+            type: "success",
+            message: MESSAGES.ADD_SUCCESS,
+          })
+        );
+        reset();
+      } catch (error) {
+        handleValidationError(error, dispatch, MESSAGES.ADD_ERROR);
+      }
+    },
+    [userId, actService, dispatch, reset]
+  );
+
+  /**
+   * Updates an existing act record
+   */
+  const handleUpdateActRecord = useCallback(
+    async (data: CaseRecord) => {
+      if (!state.editingCaseRecord) return;
+
+      if (!userId) {
+        dispatch(
+          actions.showSnackbar({
+            type: "error",
+            message: "User not authenticated",
+          })
+        );
+        return;
+      }
+
+      dispatch(actions.setDialogLoading(true));
+
+      try {
+        const parsedData = ActUpdateDTO.parse(data);
+        await actService.update(parsedData);
+
+        dispatch(
+          actions.showSnackbar({
+            type: "success",
+            message: MESSAGES.UPDATE_SUCCESS,
+          })
+        );
+        dispatch(actions.closeEditDialog());
+      } catch (error) {
+        handleValidationError(error, dispatch, MESSAGES.UPDATE_ERROR);
+      } finally {
+        dispatch(actions.setDialogLoading(false));
+      }
+    },
+    [state.editingCaseRecord, userId, actService, dispatch]
+  );
+
+  /**
+   * Deletes an act record
+   */
+  const handleDeleteActRecord = useCallback(
+    async (caseId: string) => {
+      try {
+        await actService.delete(caseId);
+
+        dispatch(
+          actions.showSnackbar({
+            type: "success",
+            message: MESSAGES.DELETE_SUCCESS,
+          })
+        );
+      } catch {
+        dispatch(
+          actions.showSnackbar({
+            type: "error",
+            message: MESSAGES.DELETE_ERROR,
+          })
+        );
+      }
+    },
+    [actService, dispatch]
+  );
+
+  // --------------------------------------------------------------------------
+  // UI Actions
+  // --------------------------------------------------------------------------
+
+  /**
+   * Opens edit dialog for a case record
+   */
+  const handleEditCaseRecord = useCallback(
+    (caseRecord: CaseRecord) => {
+      dispatch(actions.startEdit(caseRecord));
+    },
+    [dispatch]
+  );
+
+  /**
+   * Triggers form submission via ref
+   */
+  const handleSaveActRecord = useCallback(async () => {
+    if (formRef.current?.submit) {
+      await formRef.current.submit();
+    }
+  }, [formRef]);
+
+  /**
+   * Closes the edit dialog
+   */
+  const handleCloseEditDialog = useCallback(() => {
+    dispatch(actions.closeEditDialog());
+  }, [dispatch]);
+
+  /**
+   * Closes the snackbar notification
+   */
+  const handleCloseSnackbar = useCallback(() => {
+    dispatch(actions.closeSnackbar());
+  }, [dispatch]);
+
+  /**
+   * Handles code filter change
+   */
+  const handleCodeChange = useCallback(
+    (code: string) => {
+      const option = actsOptions.find((opt) => opt.code === code);
+      dispatch(
+        actions.setSelectedCode({
+          code,
+          title: option?.name || "Wszystkie",
+        })
+      );
+    },
+    [actsOptions, dispatch]
+  );
+
+  // --------------------------------------------------------------------------
+  // Return Interface
+  // --------------------------------------------------------------------------
 
   return {
     // Data
@@ -36,12 +237,22 @@ export const useSpisySprawData = (state: SpisySprawState) => {
     actsOptions,
     actsOptionsCodes,
     sortedCaseRecords,
+    errorMessages,
 
     // Loading states
-    actRecordsLoading,
+    isLoading: actRecordsLoading,
+    hasError: !!actRecordsError,
 
-    // Error handling
-    actRecordsError,
-    getErrorMessages,
+    // CRUD operations
+    addActRecord: handleAddActRecord,
+    updateActRecord: handleUpdateActRecord,
+    deleteActRecord: handleDeleteActRecord,
+
+    // UI actions
+    editCaseRecord: handleEditCaseRecord,
+    saveCaseRecord: handleSaveActRecord,
+    closeEditDialog: handleCloseEditDialog,
+    closeSnackbar: handleCloseSnackbar,
+    changeCode: handleCodeChange,
   };
 };
