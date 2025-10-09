@@ -18,8 +18,8 @@ export const DEFAULT_FORM_VALUES: Omit<CaseRecord, "id" | "createdAt" | "userId"
 
 // Initial selected code
 export const INITIAL_SELECTED_CODE = {
-  code: "0442",
-  title: "Sprawozdawczość statystyczna",
+  code: "",
+  title: "Wszystkie",
 };
 
 // Initial state
