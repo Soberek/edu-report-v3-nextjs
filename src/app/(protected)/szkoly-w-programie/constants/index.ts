@@ -2,7 +2,7 @@
 export const UI_CONSTANTS = {
   SNACKBAR_DURATION: 4000, // 4 seconds
   DIALOG_MAX_WIDTH: "lg" as const,
-  TABLE_HEIGHT: 600,
+  // TABLE_HEIGHT: 1000,
   FORM_GRID_COLUMNS: {
     MOBILE: "1fr",
     TABLET: "repeat(auto-fit, minmax(300px, 1fr))",
