@@ -124,9 +124,14 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
     async (data: SchoolProgramParticipationDTO) => {
       try {
         const userId = userContext.user?.uid;
-        const validatedData = schoolProgramParticipationDTOSchema.parse(data);
 
-        // Parse and validate data using Zod schema
+        // Coerce studentCount from string to number if needed
+        const processedData = {
+          ...data,
+          studentCount: typeof data.studentCount === "string" ? parseInt(data.studentCount, 10) || 0 : Number(data.studentCount) || 0,
+        };
+
+        const validatedData = schoolProgramParticipationDTOSchema.parse(processedData);
 
         await createSchoolProgramParticipation(validatedData);
         showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_ADDED);
@@ -148,8 +153,16 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
   const handleUpdateParticipation = useCallback(
     async (id: string, data: Partial<SchoolProgramParticipation>) => {
       try {
+        // Coerce studentCount from string to number if needed
+        const processedData = {
+          ...data,
+          ...(data.studentCount !== undefined && {
+            studentCount: typeof data.studentCount === "string" ? parseInt(data.studentCount, 10) || 0 : Number(data.studentCount) || 0,
+          }),
+        };
+
         // Validate the update data using Zod schema
-        const updateData = { id, ...data };
+        const updateData = { id, ...processedData };
         const validatedData = schoolProgramParticiapationUpdateDTOSchema.parse(updateData);
 
         await updateSchoolProgramParticipation(id, validatedData);
