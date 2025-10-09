@@ -113,7 +113,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
    * Creates a new act record
    */
   const handleAddActRecord = useCallback(
-    async (data: CaseRecord) => {
+    async (data: CaseRecord | Omit<CaseRecord, "id" | "userId" | "createdAt">) => {
       if (!userId) {
         dispatch(
           actions.showSnackbar({
