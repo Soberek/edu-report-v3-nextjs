@@ -57,11 +57,7 @@ export const ProgramStatistics: React.FC<ProgramStatisticsProps> = ({ participat
   if (programStats.length === 0) {
     return (
       <Accordion expanded={expanded} onChange={handleChange} sx={{ mb: 3 }}>
-        <AccordionSummary
-          expandIcon={<ExpandMore />}
-          aria-controls="program-statistics-content"
-          id="program-statistics-header"
-        >
+        <AccordionSummary expandIcon={<ExpandMore />} aria-controls="program-statistics-content" id="program-statistics-header">
           <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <TrendingUp color="primary" />
             Statystyki programów edukacyjnych
@@ -83,19 +79,18 @@ export const ProgramStatistics: React.FC<ProgramStatisticsProps> = ({ participat
         aria-controls="program-statistics-content"
         id="program-statistics-header"
         sx={{
-          '& .MuiAccordionSummary-content': {
-            alignItems: 'center',
+          "& .MuiAccordionSummary-content": {
+            alignItems: "center",
             gap: 2,
-          }
+          },
         }}
       >
         <TrendingUp color="primary" />
         <Box>
-          <Typography variant="h6">
-            Statystyki programów edukacyjnych
-          </Typography>
+          <Typography variant="h6">Statystyki programów edukacyjnych</Typography>
           <Typography variant="body2" color="text.secondary">
-            {programStats.length} programów • {programStats.reduce((sum, stat) => sum + stat.schoolCount, 0)} szkół • {programStats.reduce((sum, stat) => sum + stat.totalStudents, 0).toLocaleString()} uczniów
+            {programStats.length} programów • {programStats.reduce((sum, stat) => sum + stat.schoolCount, 0)} szkół •{" "}
+            {programStats.reduce((sum, stat) => sum + stat.totalStudents, 0).toLocaleString()} uczniów
           </Typography>
         </Box>
       </AccordionSummary>
@@ -107,7 +102,7 @@ export const ProgramStatistics: React.FC<ProgramStatisticsProps> = ({ participat
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           {programStats.map((stat) => (
             <Card variant="outlined" key={stat.programId} sx={{ mb: 1 }}>
-              <CardContent sx={{ pb: '16px !important' }}>
+              <CardContent sx={{ pb: "16px !important" }}>
                 <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                   <Avatar sx={{ bgcolor: "primary.main", mr: 2, width: 32, height: 32 }}>
                     <School fontSize="small" />
