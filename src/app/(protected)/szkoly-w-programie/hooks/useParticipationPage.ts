@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { usePrograms } from "@/hooks/useProgram";
-import type { Contact, Program, School as SchoolType } from "@/types";
+import type { Contact, Program, School as SchoolType, SchoolYear } from "@/types";
 import type { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { schoolProgramParticipationDTOSchema, schoolProgramParticiapationUpdateDTOSchema } from "@/models/SchoolProgramParticipation";
 import { ZodError } from "zod";
@@ -19,6 +19,12 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
     type: "success",
     message: "",
   });
+
+  // School year filter state
+  const [selectedSchoolYear, setSelectedSchoolYear] = useState<SchoolYear | "all">("2025/2026");
+
+  // Program filter state
+  const [selectedProgram, setSelectedProgram] = useState<string | "all">("all");
 
   // Helper functions for snackbar messages
   const showSuccessMessage = useCallback((message: string) => {
@@ -62,6 +68,56 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
       mapParticipationsForDisplay(schoolProgramParticipation || [], lookupMaps.schoolsMap, lookupMaps.contactsMap, lookupMaps.programsMap),
     [schoolProgramParticipation, lookupMaps]
   );
+
+  // Filter participations by selected school year and program
+  const filteredParticipations = useMemo(() => {
+    if (!schoolProgramParticipation) return [];
+
+    let filtered = schoolProgramParticipation;
+
+    if (selectedSchoolYear !== "all") {
+      filtered = filtered.filter((participation) => participation.schoolYear === selectedSchoolYear);
+    }
+
+    if (selectedProgram !== "all") {
+      filtered = filtered.filter((participation) => participation.programId === selectedProgram);
+    }
+
+    return filtered;
+  }, [schoolProgramParticipation, selectedSchoolYear, selectedProgram]);
+
+  // Filter mapped participations by selected school year and program
+  const filteredMappedParticipations = useMemo(() => {
+    let filtered = mappedParticipations;
+
+    if (selectedSchoolYear !== "all") {
+      filtered = filtered.filter((participation) => participation.schoolYear === selectedSchoolYear);
+    }
+
+    if (selectedProgram !== "all") {
+      filtered = filtered.filter((participation) => participation.programId === selectedProgram);
+    }
+
+    return filtered;
+  }, [mappedParticipations, selectedSchoolYear, selectedProgram]);
+
+  // Get available school years from data
+  const availableSchoolYears = useMemo(() => {
+    if (!schoolProgramParticipation) return [];
+    const years = [...new Set(schoolProgramParticipation.map((p) => p.schoolYear))];
+    return years.sort();
+  }, [schoolProgramParticipation]);
+
+  // Get available programs from data with participation counts
+  const availableProgramsWithCounts = useMemo(() => {
+    if (!schoolProgramParticipation || !programs) return [];
+    const programCounts = schoolProgramParticipation.reduce((acc, p) => {
+      acc[p.programId] = (acc[p.programId] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return programs.filter((p) => programCounts[p.id]).map((p) => ({ ...p, participationCount: programCounts[p.id] }));
+  }, [schoolProgramParticipation, programs]);
 
   // Handle form submission
   const handleSubmit = useCallback(
@@ -155,8 +211,19 @@ export const useParticipationPage = ({ onUpdate, onDelete }: UseParticipationPag
     schools: schools || [],
     contacts: contacts || [],
     programs: programs || [],
-    participations: schoolProgramParticipation || [],
-    mappedParticipations,
+    participations: filteredParticipations,
+    mappedParticipations: filteredMappedParticipations,
+    allParticipations: schoolProgramParticipation || [], // Keep original for statistics
+
+    // School year filtering
+    selectedSchoolYear,
+    setSelectedSchoolYear,
+    availableSchoolYears,
+
+    // Program filtering
+    selectedProgram,
+    setSelectedProgram,
+    availablePrograms: availableProgramsWithCounts,
 
     // Loading states
     isLoading,
