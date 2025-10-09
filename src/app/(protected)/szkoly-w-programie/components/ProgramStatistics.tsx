@@ -100,7 +100,7 @@ export const ProgramStatistics: React.FC<ProgramStatisticsProps> = ({ participat
           <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
             Statystyki programów edukacyjnych
           </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>
+          <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2, fontSize: "0.8rem" }}>
             {programStats.length} programów • {programStats.reduce((sum, stat) => sum + stat.schoolCount, 0)} szkół •{" "}
             {programStats.reduce((sum, stat) => sum + stat.totalStudents, 0).toLocaleString()} uczniów
           </Typography>
@@ -125,13 +125,13 @@ export const ProgramStatistics: React.FC<ProgramStatisticsProps> = ({ participat
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 0.5 }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     <School sx={{ fontSize: 16, color: "text.secondary" }} />
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, fontSize: "1rem" }}>
                       {stat.schoolCount}
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     <People sx={{ fontSize: 16, color: "text.secondary" }} />
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, fontSize: "1rem" }}>
                       {stat.totalStudents.toLocaleString()}
                     </Typography>
                   </Box>
