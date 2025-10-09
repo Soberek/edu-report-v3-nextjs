@@ -57,13 +57,21 @@ export const ProgramStatistics: React.FC<ProgramStatisticsProps> = ({ participat
   if (programStats.length === 0) {
     return (
       <Accordion expanded={expanded} onChange={handleChange} sx={{ mb: 3 }}>
-        <AccordionSummary expandIcon={<ExpandMore />} aria-controls="program-statistics-content" id="program-statistics-header">
-          <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <TrendingUp color="primary" />
+        <AccordionSummary
+          expandIcon={<ExpandMore />}
+          aria-controls="program-statistics-content"
+          id="program-statistics-header"
+          sx={{
+            minHeight: "48px !important",
+            py: 1,
+          }}
+        >
+          <Typography variant="subtitle1" sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: 600 }}>
+            <TrendingUp color="primary" sx={{ fontSize: 20 }} />
             Statystyki programów edukacyjnych
           </Typography>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails sx={{ pt: 1, pb: 2 }}>
           <Typography variant="body2" color="text.secondary">
             Brak danych do wyświetlenia. Dodaj pierwsze szkoły do programów, aby zobaczyć statystyki.
           </Typography>
@@ -81,63 +89,62 @@ export const ProgramStatistics: React.FC<ProgramStatisticsProps> = ({ participat
         sx={{
           "& .MuiAccordionSummary-content": {
             alignItems: "center",
-            gap: 2,
+            gap: 1.5,
           },
+          minHeight: "48px !important",
+          py: 1,
         }}
       >
-        <TrendingUp color="primary" />
-        <Box>
-          <Typography variant="h6">Statystyki programów edukacyjnych</Typography>
-          <Typography variant="body2" color="text.secondary">
+        <TrendingUp color="primary" sx={{ fontSize: 20 }} />
+        <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
+            Statystyki programów edukacyjnych
+          </Typography>
+          <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>
             {programStats.length} programów • {programStats.reduce((sum, stat) => sum + stat.schoolCount, 0)} szkół •{" "}
             {programStats.reduce((sum, stat) => sum + stat.totalStudents, 0).toLocaleString()} uczniów
           </Typography>
         </Box>
       </AccordionSummary>
-      <AccordionDetails>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Podsumowanie programów z udziałem szkół
-        </Typography>
-
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+      <AccordionDetails sx={{ pt: 1, pb: 2 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
           {programStats.map((stat) => (
-            <Card variant="outlined" key={stat.programId} sx={{ mb: 1 }}>
-              <CardContent sx={{ pb: "16px !important" }}>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <Avatar sx={{ bgcolor: "primary.main", mr: 2, width: 32, height: 32 }}>
-                    <School fontSize="small" />
+            <Card variant="outlined" key={stat.programId} sx={{ flex: "1 1 280px", maxWidth: "320px", minWidth: "260px" }}>
+              <CardContent sx={{ py: 1.5, px: 2, pb: "12px !important", "&:last-child": { pb: "12px" } }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                  <Avatar sx={{ bgcolor: "primary.main", mr: 1.5, width: 28, height: 28 }}>
+                    <School sx={{ fontSize: 16 }} />
                   </Avatar>
                   <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
                       {stat.programName}
                     </Typography>
                   </Box>
                 </Box>
 
-                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                  <School fontSize="small" sx={{ mr: 1, color: "text.secondary" }} />
-                  <Typography variant="body2" color="text.secondary">
-                    Szkoły:
-                  </Typography>
-                  <Chip label={stat.schoolCount} size="small" color="primary" sx={{ ml: 1 }} />
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 0.5 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <School sx={{ fontSize: 16, color: "text.secondary" }} />
+                    <Typography variant="caption" color="text.secondary">
+                      {stat.schoolCount}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    <People sx={{ fontSize: 16, color: "text.secondary" }} />
+                    <Typography variant="caption" color="text.secondary">
+                      {stat.totalStudents.toLocaleString()}
+                    </Typography>
+                  </Box>
                 </Box>
 
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <People fontSize="small" sx={{ mr: 1, color: "text.secondary" }} />
-                  <Typography variant="body2" color="text.secondary">
-                    Uczniowie:
-                  </Typography>
-                  <Chip label={stat.totalStudents.toLocaleString()} size="small" color="secondary" sx={{ ml: 1 }} />
-                </Box>
+                <Divider sx={{ my: 0.5 }} />
 
-                <Divider sx={{ my: 1 }} />
-
-                <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
                   Lata szkolne:
                 </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.25 }}>
                   {stat.schoolYears.map((year) => (
-                    <Chip key={year} label={year} size="small" variant="outlined" sx={{ fontSize: "0.7rem", height: "20px" }} />
+                    <Chip key={year} label={year} size="small" variant="outlined" sx={{ fontSize: "0.65rem", height: "18px", px: 0.5 }} />
                   ))}
                 </Box>
               </CardContent>
