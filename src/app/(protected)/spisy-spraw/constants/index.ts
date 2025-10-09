@@ -25,6 +25,7 @@ export const INITIAL_SELECTED_CODE = {
 // Initial state
 export const INITIAL_STATE = {
   selectedCode: INITIAL_SELECTED_CODE,
+  searchQuery: "",
   editingCaseRecord: null,
   editDialogOpen: false,
   createDialogOpen: false,

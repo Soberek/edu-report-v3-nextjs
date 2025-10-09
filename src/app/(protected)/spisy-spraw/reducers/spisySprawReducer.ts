@@ -10,6 +10,12 @@ export function spisySprawReducer(state: SpisySprawState, action: SpisySprawActi
         selectedCode: action.payload,
       };
 
+    case "SET_SEARCH_QUERY":
+      return {
+        ...state,
+        searchQuery: action.payload,
+      };
+
     case "START_EDIT":
       return {
         ...state,
@@ -100,6 +106,11 @@ export function spisySprawReducer(state: SpisySprawState, action: SpisySprawActi
 export const actions = {
   setSelectedCode: (payload: { code: string; title: string }) => ({
     type: "SET_SELECTED_CODE" as const,
+    payload,
+  }),
+
+  setSearchQuery: (payload: string) => ({
+    type: "SET_SEARCH_QUERY" as const,
     payload,
   }),
 

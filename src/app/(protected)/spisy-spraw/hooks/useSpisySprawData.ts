@@ -5,7 +5,14 @@ import type { CaseRecord } from "@/types";
 
 // Local imports - organized by domain
 import { ActCreateDTO, ActUpdateDTO, type ActCreate } from "../schemas";
-import { filterRecordsByCode, sortRecordsByDate, handleValidationError, formatErrorMessages } from "../utils";
+import {
+  filterRecordsByCode,
+  sortRecordsByDate,
+  searchRecords,
+  suggestNextReferenceNumber,
+  handleValidationError,
+  formatErrorMessages,
+} from "../utils";
 import { ActService } from "../lib";
 import { createActsOptions, MESSAGES } from "../constants";
 import { actions } from "../reducers/spisySprawReducer";
@@ -66,9 +73,13 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
   const actsOptionsCodes = useMemo(() => actsOptions.map((option) => option.code), [actsOptions]);
 
   const sortedCaseRecords = useMemo(() => {
+    // First filter by code
     const filtered = filterRecordsByCode(actRecords, state.selectedCode.code);
-    return sortRecordsByDate(filtered);
-  }, [actRecords, state.selectedCode.code]);
+    // Then apply search
+    const searched = searchRecords(filtered, state.searchQuery);
+    // Finally sort by date
+    return sortRecordsByDate(searched);
+  }, [actRecords, state.selectedCode.code, state.searchQuery]);
 
   const errorMessages = useMemo(() => formatErrorMessages(actRecordsError), [actRecordsError]);
 
@@ -79,7 +90,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
       acc[record.code] = (acc[record.code] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-    
+
     const filtered = sortedCaseRecords.length;
     const mostUsedCode = Object.entries(byCode).sort((a, b) => b[1] - a[1])[0];
 
@@ -91,7 +102,10 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
     };
   }, [actRecords, sortedCaseRecords]);
 
-  // --------------------------------------------------------------------------
+  // Suggested next reference number
+  const suggestedReferenceNumber = useMemo(() => {
+    return suggestNextReferenceNumber(actRecords);
+  }, [actRecords]); // --------------------------------------------------------------------------
   // CRUD Operations
   // --------------------------------------------------------------------------
 
@@ -113,7 +127,9 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
       dispatch(actions.setCreateLoading(true));
 
       try {
+        console.log("🔍 Raw form data:", data);
         const parsedData = ActCreateDTO.parse(data);
+        console.log("✅ Parsed data:", parsedData);
         await actService.create(parsedData);
 
         dispatch(
@@ -123,7 +139,9 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
           })
         );
         reset();
+        dispatch(actions.closeCreateDialog());
       } catch (error) {
+        console.error("❌ Error creating record:", error);
         handleValidationError(error, dispatch, MESSAGES.ADD_ERROR);
       } finally {
         dispatch(actions.setCreateLoading(false));
@@ -248,7 +266,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
    */
   const handleConfirmDelete = useCallback(async () => {
     if (!state.recordToDelete) return;
-    
+
     await handleDeleteActRecord(state.recordToDelete);
     dispatch(actions.closeDeleteDialog());
   }, [state.recordToDelete, handleDeleteActRecord, dispatch]);
@@ -268,6 +286,16 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
   const handleCloseEditDialog = useCallback(() => {
     dispatch(actions.closeEditDialog());
   }, [dispatch]);
+
+  /**
+   * Handles search query changes
+   */
+  const handleSearchChange = useCallback(
+    (query: string) => {
+      dispatch(actions.setSearchQuery(query));
+    },
+    [dispatch]
+  );
 
   /**
    * Closes the snackbar notification
@@ -304,6 +332,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
     sortedCaseRecords,
     errorMessages,
     stats,
+    suggestedReferenceNumber,
 
     // Loading states
     isLoading: actRecordsLoading,
@@ -319,6 +348,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
     openCreateDialog: handleOpenCreateDialog,
     closeCreateDialog: handleCloseCreateDialog,
     editCaseRecord: handleEditCaseRecord,
+    searchChange: handleSearchChange,
     openDeleteDialog: handleOpenDeleteDialog,
     closeDeleteDialog: handleCloseDeleteDialog,
     confirmDelete: handleConfirmDelete,

@@ -1,11 +1,20 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Container, Alert, Snackbar, Box, Button } from "@mui/material";
+import { Container, Alert, Snackbar, Box, Button, TextField, InputAdornment } from "@mui/material";
 import { useReducer, useRef } from "react";
-import { Add, Description, Category, FilterList } from "@mui/icons-material";
+import { Add, Description, Category, FilterList, Search } from "@mui/icons-material";
 
-import { ActCaseRecordsTable, FilterSection, EditActForm, PageHeader, LoadingSpinner, EditDialog, ConfirmDialog, StatsCard } from "./components";
+import {
+  ActCaseRecordsTable,
+  FilterSection,
+  EditActForm,
+  PageHeader,
+  LoadingSpinner,
+  EditDialog,
+  ConfirmDialog,
+  StatsCard,
+} from "./components";
 import { DEFAULT_FORM_VALUES, INITIAL_STATE, UI_CONFIG, MESSAGES } from "./constants";
 import { spisySprawReducer } from "./reducers/spisySprawReducer";
 import { useSpisySpraw } from "./hooks";
@@ -34,6 +43,7 @@ export default function Acts() {
     sortedCaseRecords,
     errorMessages,
     stats,
+    suggestedReferenceNumber,
     isLoading,
     createLoading,
     addActRecord,
@@ -49,6 +59,7 @@ export default function Acts() {
     closeEditDialog,
     closeSnackbar,
     changeCode,
+    searchChange,
   } = useSpisySpraw({
     state,
     dispatch,
@@ -142,6 +153,28 @@ export default function Acts() {
         </Button>
       </Box>
 
+      {/* Search Field */}
+      <Box sx={{ mb: 3 }}>
+        <TextField
+          fullWidth
+          placeholder="Szukaj po kodzie, numerze, tytule, nadawcy, uwagach lub notatkach..."
+          value={state.searchQuery}
+          onChange={(e) => searchChange(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 2,
+            },
+          }}
+        />
+      </Box>
+
       {/* Filter and Export Section */}
       <FilterSection
         selectedCode={state.selectedCode}
@@ -175,11 +208,17 @@ export default function Acts() {
         open={state.createDialogOpen}
         onClose={closeCreateDialog}
         title="Dodaj nowy akt sprawy"
-        onSave={handleSubmit(addActRecord)}
+        onSave={saveCaseRecord}
         loading={state.createLoading}
         maxWidth={UI_CONFIG.EDIT_DIALOG_MAX_WIDTH}
       >
-        <EditActForm ref={formRef} caseRecord={null} actsOptions={actsOptionsCodes} onSubmit={addActRecord} />
+        <EditActForm
+          ref={formRef}
+          caseRecord={null}
+          actsOptions={actsOptionsCodes}
+          suggestedReferenceNumber={suggestedReferenceNumber}
+          onSubmit={addActRecord}
+        />
       </EditDialog>
 
       {/* Edit Dialog */}

@@ -3,6 +3,7 @@ import type { CaseRecord } from "@/types";
 // State management types
 export interface SpisySprawState {
   selectedCode: { code: string; title: string };
+  searchQuery: string;
   editingCaseRecord: CaseRecord | null;
   editDialogOpen: boolean;
   createDialogOpen: boolean;
@@ -19,6 +20,7 @@ export interface SpisySprawState {
 
 export type SpisySprawAction =
   | { type: "SET_SELECTED_CODE"; payload: { code: string; title: string } }
+  | { type: "SET_SEARCH_QUERY"; payload: string }
   | { type: "START_EDIT"; payload: CaseRecord }
   | { type: "OPEN_CREATE_DIALOG" }
   | { type: "CLOSE_EDIT_DIALOG" }
