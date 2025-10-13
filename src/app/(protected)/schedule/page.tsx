@@ -9,7 +9,7 @@ import { StatisticsCards } from "./components/StatisticsCards";
 import { FilterSection } from "./components/FilterSection";
 import { TaskListSection } from "./components/TaskListSection";
 import { useScheduleFilters } from "./hooks/useScheduleFilters";
-import { calculateCompletionPercentage, localizeMonth, getMonths } from "./utils/scheduleUtils";
+import { calculateCompletionPercentage, localizeMonth, getMonths, getYears } from "./utils/scheduleUtils";
 
 function Schedule(): JSX.Element {
   const [openScheduleTaskForm, setOpenScheduleTaskForm] = useState(false);
@@ -19,15 +19,17 @@ function Schedule(): JSX.Element {
     month: "",
     status: "",
     search: "",
+    year: "",
   });
 
   const { user } = useUser();
   const { tasks, handleScheduledTaskCreation, handleScheduledTaskUpdate, handleScheduledTaskDeletion, refetch, programs, loading } =
     useScheduledTask();
 
-  const { filteredPrograms, filteredData } = useScheduleFilters({ tasks, programs, filter });
+  const { filteredPrograms, filteredData, filteredTasks } = useScheduleFilters({ tasks, programs, filter });
   const percentageOfCompletedTasks = calculateCompletionPercentage(tasks);
   const months = getMonths();
+  const years = getYears(tasks);
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -77,10 +79,10 @@ function Schedule(): JSX.Element {
       </Box>
 
       {/* Statistics Cards */}
-      <StatisticsCards tasks={tasks} />
+      <StatisticsCards tasks={filteredTasks} />
 
       {/* Filters */}
-      <FilterSection filter={filter} setFilter={setFilter} filteredPrograms={filteredPrograms} months={months} />
+      <FilterSection filter={filter} setFilter={setFilter} filteredPrograms={filteredPrograms} months={months} years={years} />
 
       {/* Tasks List */}
       <TaskListSection
@@ -126,7 +128,11 @@ function Schedule(): JSX.Element {
               mode="create"
               onClose={() => setOpenScheduleTaskForm(false)}
               onSave={() => {}}
-              createTask={(data) => handleScheduledTaskCreation({ ...data, status: "pending" as const })}
+              createTask={async (data) => {
+                await handleScheduledTaskCreation({ ...data, status: "pending" as const });
+                await refetch();
+                setOpenScheduleTaskForm(false);
+              }}
               userId={user?.uid}
               loading={loading}
             />

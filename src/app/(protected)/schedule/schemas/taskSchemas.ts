@@ -27,6 +27,7 @@ export const filterSchema = z.object({
   month: z.string().default(""),
   status: z.string().default(""),
   search: z.string().default(""),
+  year: z.string().default(""),
 });
 
 // Types
