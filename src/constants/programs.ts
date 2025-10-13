@@ -1,5 +1,7 @@
 import type { Program } from "../types";
 import { WYKAZ_AKT } from "./acts";
+import { SchoolTypes } from "@/types";
+import { schoolTypes } from "./index";
 
 export const PROGRAM_TYPE = {
   PROGRAMOWY: "programowy",
@@ -13,6 +15,7 @@ export const programs: Program[] = [
     name: "Trzymaj formę",
     programType: PROGRAM_TYPE.PROGRAMOWY,
     description: "",
+    schoolTypes: [schoolTypes.SZKOLA_PODSTAWOWA],
   },
   {
     id: "2",
@@ -20,6 +23,8 @@ export const programs: Program[] = [
     name: "HIV/AIDS",
     programType: PROGRAM_TYPE.PROGRAMOWY,
     description: "",
+
+    schoolTypes: [schoolTypes.LICEUM, schoolTypes.TECHNIKUM, schoolTypes.SZKOLA_BRANZOWA],
   },
   {
     id: "3",
@@ -27,6 +32,7 @@ export const programs: Program[] = [
     name: "Ars - czyli jak dbać o miłość",
     programType: PROGRAM_TYPE.PROGRAMOWY,
     description: "",
+    schoolTypes: [schoolTypes.LICEUM, schoolTypes.TECHNIKUM, schoolTypes.SZKOLA_BRANZOWA],
   },
   {
     id: "4",
@@ -41,6 +47,7 @@ export const programs: Program[] = [
     name: "Zdrowe zęby mamy, marchewkę zajadamy",
     programType: PROGRAM_TYPE.PROGRAMOWY,
     description: "",
+    schoolTypes: [schoolTypes.PRZEDSZKOLE, schoolTypes.ZLOBEK, schoolTypes.ODDZIAL_PRZEDSZKOLNY],
   },
   {
     id: "6",
@@ -48,6 +55,7 @@ export const programs: Program[] = [
     name: "Higiena naszą tarczą ochronną",
     programType: PROGRAM_TYPE.PROGRAMOWY,
     description: "",
+    schoolTypes: [schoolTypes.SZKOLA_PODSTAWOWA, schoolTypes.SZKOLA_PODSTAWOWA_SPECJALNA],
   },
   {
     id: "7",
@@ -55,6 +63,7 @@ export const programs: Program[] = [
     name: "Porozmawiajmy o zdrowiu i nowych zagrożeniach",
     programType: PROGRAM_TYPE.PROGRAMOWY,
     description: "",
+    schoolTypes: [schoolTypes.SZKOLA_PODSTAWOWA],
   },
   {
     id: "8",
@@ -132,6 +141,7 @@ export const programs: Program[] = [
     name: "Podstępne WZW",
     programType: PROGRAM_TYPE.NIEPROGRAMOWY,
     description: "",
+    schoolTypes: [schoolTypes.LICEUM, schoolTypes.TECHNIKUM, schoolTypes.SZKOLA_BRANZOWA],
   },
   {
     id: "19",
@@ -153,6 +163,7 @@ export const programs: Program[] = [
     name: "Znamię, znam je",
     programType: PROGRAM_TYPE.NIEPROGRAMOWY,
     description: "",
+    schoolTypes: [schoolTypes.LICEUM, schoolTypes.TECHNIKUM, schoolTypes.SZKOLA_POLICEALNA],
   },
   {
     id: "22",
@@ -230,6 +241,7 @@ export const programs: Program[] = [
     name: "Czyste powietrze wokół nas",
     programType: PROGRAM_TYPE.NIEPROGRAMOWY,
     description: "",
+    schoolTypes: [schoolTypes.PRZEDSZKOLE, schoolTypes.ZLOBEK, schoolTypes.ODDZIAL_PRZEDSZKOLNY],
   },
   {
     id: "33",
