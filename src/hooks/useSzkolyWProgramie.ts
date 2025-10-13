@@ -144,7 +144,7 @@ export const useSzkolyWProgramie = () => {
     const schoolParticipationsMap = createSchoolParticipationsMap(allParticipations);
     const newSchoolsInfo = calculateSchoolParticipationInfo(schools, programs, schoolParticipationsMap);
     const newProgramStats = calculateProgramStats(schools, programs, schoolParticipationsMap);
-    const newGeneralStats = calculateGeneralStats(schools, newSchoolsInfo, newProgramStats);
+    const newGeneralStats = calculateGeneralStats(schools, newSchoolsInfo, newProgramStats, allParticipations);
 
     return {
       schoolsInfo: newSchoolsInfo,

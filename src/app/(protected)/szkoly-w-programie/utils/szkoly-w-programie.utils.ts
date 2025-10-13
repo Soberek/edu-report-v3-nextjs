@@ -54,16 +54,20 @@ export const calculateProgramStats = (
 export const calculateGeneralStats = (
   schools: readonly School[],
   schoolsInfo: readonly SchoolParticipationInfo[],
-  programStats: ProgramStats
+  programStats: ProgramStats,
+  allParticipations: readonly SchoolProgramParticipation[]
 ): { totalSchools: number; nonParticipatingCount: number; totalParticipations: number; totalMissingParticipations: number } => {
-  let totalParticipations = 0;
   let totalMissingParticipations = 0;
   Object.values(programStats).forEach((s) => {
-    totalParticipations += s.participating;
     totalMissingParticipations += s.notParticipating;
   });
   const nonParticipatingCount = schoolsInfo.filter((i) => i.notParticipating.length > 0).length;
-  return { totalSchools: schools.length, nonParticipatingCount, totalParticipations, totalMissingParticipations };
+  return { 
+    totalSchools: schools.length, 
+    nonParticipatingCount, 
+    totalParticipations: allParticipations.length, 
+    totalMissingParticipations 
+  };
 };
 
 export const addParticipationCountToPrograms = (programs: readonly Program[], participations: readonly SchoolProgramParticipation[]) => {
