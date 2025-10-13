@@ -1,5 +1,5 @@
 import React from "react";
-import { AuthForm } from "@/components/auth";
+import { AuthForm } from "@/features/auth";
 import { loginFormSchema } from "../utils";
 import { LOGIN_CONSTANTS } from "../constants";
 import type { LoginFormData } from "../utils";

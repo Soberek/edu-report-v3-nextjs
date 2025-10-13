@@ -1,11 +1,7 @@
 "use client";
 import { Box, Alert, Snackbar, Typography, Container, Paper, Tabs, Tab, Fade, useTheme, useMediaQuery } from "@mui/material";
 import { useState } from "react";
-import { useContacts } from "@/hooks/useContact";
-import ContactList from "./components/list";
-import ContactForm from "./components/form";
-import ContactStats from "./components/stats";
-import ContactSearch from "./components/search";
+import { useContacts, ContactList, ContactForm, ContactStats, ContactSearch } from "@/features/contacts";
 
 export default function Contacts(): React.ReactNode {
   const { contacts, loading, error, snackbar, handleContactSubmit, handleContactDelete, handleContactUpdate, handleCloseSnackbar } =

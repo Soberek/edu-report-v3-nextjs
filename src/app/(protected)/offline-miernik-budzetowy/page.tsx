@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { BudgetMeterPage } from "./components/BudgetMeterPage";
+import { BudgetMeterPage } from "@/features/offline-miernik-budzetowy";
 
 /**
  * Offline Budget Meter route page

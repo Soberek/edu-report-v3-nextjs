@@ -1,9 +1,5 @@
 /**
- * Layout Components
- *
- * This module provides layout components for managing the overall structure
- * and authentication-based rendering of the application.
+ * Layout Components - Barrel Export
  */
 
-export { AuthenticatedLayout } from "./AuthenticatedLayout";
-export { default as AuthenticatedLayoutDefault } from "./AuthenticatedLayout";
+export * from './AuthenticatedLayout';

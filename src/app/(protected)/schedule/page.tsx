@@ -3,13 +3,18 @@ import { useState, type JSX } from "react";
 import { Box, Button, Modal, Typography, Container } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { useUser } from "@/hooks/useUser";
-import TaskForm from "./components/form";
-import { useScheduledTask } from "@/hooks/useScheduledTask";
-import { StatisticsCards } from "./components/StatisticsCards";
-import { FilterSection } from "./components/FilterSection";
-import { TaskListSection } from "./components/TaskListSection";
-import { useScheduleFilters } from "./hooks/useScheduleFilters";
-import { calculateCompletionPercentage, localizeMonth, getMonths, getYears } from "./utils/scheduleUtils";
+import { useScheduledTask } from "@/features/schedule/hooks/useScheduledTask";
+import { 
+  TaskForm,
+  StatisticsCards,
+  FilterSection,
+  TaskListSection,
+  useScheduleFilters,
+  calculateCompletionPercentage,
+  localizeMonth,
+  getMonths,
+  getYears
+} from "@/features/schedule";
 
 function Schedule(): JSX.Element {
   const [openScheduleTaskForm, setOpenScheduleTaskForm] = useState(false);

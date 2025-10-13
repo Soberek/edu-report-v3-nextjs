@@ -1,9 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Box, Tabs, Tab, Paper, CircularProgress } from "@mui/material";
-import ParticipationView from "./components/ParticipationView";
-import NonParticipationView from "./components/NonParticipationView";
-import { useSzkolyWProgramie } from "@/app/(protected)/szkoly-w-programie/hooks/useSzkolyWProgramie";
+import { ParticipationView, NonParticipationView, useSzkolyWProgramie } from "@/features/szkoly-w-programie";
 
 function a11yProps(index: number) {
   return {

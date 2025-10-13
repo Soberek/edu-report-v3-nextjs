@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { DateField } from "@mui/x-date-pickers/DateField";
 import { Controller, Control, FieldPath, FieldValues } from "react-hook-form";
-import { formatDateForInput } from "@/utils/shared/dayjsUtils";
+import { formatDateForInput } from "@/utils/dayjsUtils";
 import dayjs from "dayjs";
 import { PickerValue } from "@mui/x-date-pickers/internals";
 

@@ -4,14 +4,17 @@ import { Container, Box } from "@mui/material";
 import { Add, School, ContentCopy } from "@mui/icons-material";
 import type { School as SchoolType } from "@/types";
 import { PageHeader, PrimaryButton, SecondaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
-import { useSchoolState } from "./hooks/useSchoolState";
-import { useSchoolFilters } from "./hooks/useSchoolFilters";
-import { useSchoolStats } from "./hooks/useSchoolStats";
-import { SchoolForm } from "./components/SchoolForm";
-import { SchoolTable } from "./components/SchoolTable";
-import { SchoolFilter } from "./components/SchoolFilter";
-import { SchoolStats } from "./components/SchoolStats";
-import type { CreateSchoolFormData, EditSchoolFormData } from "./schemas/schoolSchemas";
+import { 
+  useSchoolState,
+  useSchoolFilters,
+  useSchoolStats,
+  SchoolForm,
+  SchoolTable,
+  SchoolFilter,
+  SchoolStats,
+  type CreateSchoolFormData,
+  type EditSchoolFormData
+} from "@/features/schools";
 
 export default function Schools(): React.ReactNode {
   const { state, setFilter, toggleForm, setEditSchool, handleCreateSchool, handleUpdateSchool, handleDeleteSchool } = useSchoolState();
@@ -47,9 +50,9 @@ export default function Schools(): React.ReactNode {
 
   const handleFormSave = async (data: CreateSchoolFormData | EditSchoolFormData) => {
     if (state.editSchool) {
-      await handleUpdateSchool(state.editSchool.id, data);
+      await handleUpdateSchool(state.editSchool.id, data as EditSchoolFormData);
     } else {
-      await handleCreateSchool(data);
+      await handleCreateSchool(data as CreateSchoolFormData);
     }
   };
 

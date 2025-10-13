@@ -1,18 +1,26 @@
 "use client";
 import React, { useCallback, useMemo } from "react";
 import { Box, Button, CircularProgress, Container, Typography, Alert, Stack } from "@mui/material";
-import { useIzrzForm } from "./hooks/useIzrzForm";
-import { useFormSubmission } from "./hooks/useFormSubmission";
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { TASK_TYPES } from "@/constants/tasks";
 import { programs } from "@/constants/programs";
 import type { School } from "@/types";
-import { TemplateSelector } from "./components/TemplateSelector";
-import { FormField } from "./components/FormField";
-import { TaskDescriptionTemplateSelector } from "./components/ViewerDescriptionTemplateSelector";
-import { AudienceGroupBuilder } from "./components/AudienceGroupBuilder";
-import { PAGE_CONSTANTS, FIELD_LABELS, FIELD_PLACEHOLDERS, BUTTON_CONSTANTS, STYLE_CONSTANTS } from "./constants";
+import {
+  useIzrzForm,
+  useFormSubmission,
+  TemplateSelector,
+  FormField,
+  TaskDescriptionTemplateSelector,
+  AudienceGroupBuilder,
+} from "@/features/wygeneruj-izrz";
+import {
+  PAGE_CONSTANTS,
+  FIELD_LABELS,
+  FIELD_PLACEHOLDERS,
+  BUTTON_CONSTANTS,
+  STYLE_CONSTANTS,
+} from "@/features/wygeneruj-izrz/constants";
 
 export default function IzrzForm() {
   const userContext = useUser();

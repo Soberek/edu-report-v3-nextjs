@@ -5,4 +5,4 @@ export {
   isRetryableError,
   requiresUserAction,
   logErrorInDevelopment,
-} from "@/components/auth";
+} from "@/features/auth";

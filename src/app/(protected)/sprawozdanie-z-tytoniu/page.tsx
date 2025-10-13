@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Container } from "@mui/material";
-import HealthInspectionAggregator from "./components/HealthInspectionAggregator";
+import { HealthInspectionAggregator } from "@/features/sprawozdanie-z-tytoniu";
 
 export default function OchronaZdrowiaPage() {
   return (

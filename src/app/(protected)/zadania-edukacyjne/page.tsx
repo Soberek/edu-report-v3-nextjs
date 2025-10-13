@@ -3,12 +3,20 @@ import React, { useMemo } from "react";
 import { Container, Box } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { PageHeader, PrimaryButton, ErrorDisplay, LoadingSpinner } from "@/components/shared";
-import { EducationalTaskForm } from "./components";
-import { FilterSection, TaskGroups, EmptyState } from "./components";
-import { useEducationalTasksPage } from "./hooks/useEducationalTasksPage";
-import { MONTH_NAMES } from "./types";
-import { PAGE_CONSTANTS, UI_CONSTANTS, BUTTON_LABELS, MESSAGES, STYLE_CONSTANTS } from "./constants";
-import type { EducationalTaskFormProps } from "./types";
+import { 
+  EducationalTaskForm,
+  FilterSection, 
+  TaskGroups, 
+  EmptyState,
+  useEducationalTasksPage,
+  MONTH_NAMES,
+  PAGE_CONSTANTS, 
+  UI_CONSTANTS, 
+  BUTTON_LABELS, 
+  MESSAGES, 
+  STYLE_CONSTANTS,
+  type EducationalTaskFormProps
+} from "@/features/zadania-edukacyjne";
 // import type { EducationalTask } from "@/types";
 
 export default function EducationalTasks(): React.ReactNode {

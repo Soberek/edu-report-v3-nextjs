@@ -1,6 +1,28 @@
 import "@testing-library/jest-dom";
 import React from "react";
 
+// Setup DOM environment
+import { configure } from "@testing-library/react";
+
+// Configure testing library
+configure({
+  testIdAttribute: "data-testid",
+});
+
+// Setup DOM environment for testing
+if (typeof document !== 'undefined') {
+  // Ensure document.body exists
+  if (!document.body) {
+    const body = document.createElement('body');
+    document.documentElement.appendChild(body);
+  }
+  
+  // Create a container element for React to render into
+  const container = document.createElement('div');
+  container.id = 'root';
+  document.body.appendChild(container);
+}
+
 // Mock CSS imports
 Object.defineProperty(window, "matchMedia", {
   writable: true,

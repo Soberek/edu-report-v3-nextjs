@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import rateLimiter from "./src/lib/rate-limit";
+import rateLimiter from "./src/lib/api/rate-limit";
 
 /**
  * Middleware for global rate limiting on API routes

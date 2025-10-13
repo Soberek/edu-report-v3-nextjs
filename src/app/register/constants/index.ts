@@ -1,4 +1,4 @@
-import { SHARED_AUTH_CONSTANTS } from "@/components/auth";
+import { SHARED_AUTH_CONSTANTS } from "@/features/auth";
 
 /**
  * Registration-specific constants that extend shared auth constants
@@ -32,4 +32,4 @@ export const REGISTER_CONSTANTS = {
 } as const;
 
 // Re-export shared regex
-export { EMAIL_REGEX } from "@/components/auth";
+export { EMAIL_REGEX } from "@/features/auth";

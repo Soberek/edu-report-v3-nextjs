@@ -1,14 +1,22 @@
 "use client";
 import React, { useState } from "react";
-import { AdminOnly } from "@/components/auth";
+import { AdminOnly } from "@/features/auth";
 import { Container, Box } from "@mui/material";
 import { PageHeader, ErrorDisplay } from "@/components/shared";
-import { useHolidays } from "./hooks";
-import { useHolidayGraphics } from "./hooks/useHolidayGraphics";
-import { UrlInput, HolidaysList, ActionSection, ResultsSection, ExportSection, MockTemplateTest } from "./components";
-import { GeneratedPostsWithGraphics } from "./components/GeneratedPostsWithGraphics";
-import type { GeneratedImagePostImagesResult } from "@/services/generatedImagePostImagesService";
-import type { HolidayTemplateConfig, GeneratedPostWithGraphics } from "./types";
+import {
+  useHolidays,
+  useHolidayGraphics,
+  UrlInput,
+  HolidaysList,
+  ActionSection,
+  ResultsSection,
+  ExportSection,
+  MockTemplateTest,
+  GeneratedPostsWithGraphics,
+  type GeneratedImagePostImagesResult,
+  type HolidayTemplateConfig,
+  type GeneratedPostWithGraphics,
+} from "@/features/holidays";
 
 // Main component
 export default function Holidays() {

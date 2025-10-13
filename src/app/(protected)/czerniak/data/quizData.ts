@@ -1,4 +1,4 @@
-import { QuizQuestion, MelanomaCase, ABCDEFeature, EducationalContent } from "../types";
+import { QuizQuestion, MelanomaCase, ABCDEFeature, EducationalContent } from "../types/index";
 
 // ABCDE Features for melanoma detection
 export const ABCDE_FEATURES: ABCDEFeature[] = [

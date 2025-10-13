@@ -1,2 +1,2 @@
 // Re-export shared ErrorAlert component
-export { ErrorAlert } from "@/components/auth";
+export { ErrorAlert } from "@/features/auth";

@@ -1,5 +1,5 @@
 import React from "react";
-import { AuthForm } from "@/components/auth";
+import { AuthForm } from "@/features/auth";
 import { registerFormSchema } from "../utils";
 import { REGISTER_CONSTANTS } from "../constants";
 import type { RegisterFormData } from "../utils";

@@ -3,10 +3,18 @@ import React, { useState } from "react";
 import { Container, Box } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { PageHeader, PrimaryButton, ErrorDisplay, LoadingSpinner, useConfirmDialog } from "@/components/shared";
-import { useProgramsState, useProgramFilters, useProgramStats } from "./hooks";
-import { ProgramForm, ProgramTable, ProgramFilter, ProgramStats } from "./components";
-import type { CreateProgramFormData, Program } from "./types";
-import type { ProgramFilter as ProgramFilterType } from "./hooks/useProgramFilters";
+import { 
+  useProgramsState, 
+  useProgramFilters, 
+  useProgramStats,
+  ProgramForm, 
+  ProgramTable, 
+  ProgramFilterComponent, 
+  ProgramStats,
+  type CreateProgramFormData,
+  type Program,
+  type ProgramFilter as ProgramFilterType
+} from "@/features/programy-edukacyjne";
 
 export default function Programs(): React.ReactNode {
   const { state, handleCreateProgram, handleUpdateProgram, handleDeleteProgram, toggleForm, setEditProgram } = useProgramsState();
@@ -80,7 +88,7 @@ export default function Programs(): React.ReactNode {
       <ProgramStats totalPrograms={totalPrograms} programowyCount={programowyCount} nieprogramowyCount={nieprogramowyCount} />
 
       {/* Filters */}
-      <ProgramFilter filter={filter} onFilterChange={setFilter} uniqueProgramTypes={uniqueProgramTypes} />
+      <ProgramFilterComponent filter={filter} onFilterChange={setFilter} uniqueProgramTypes={uniqueProgramTypes} />
 
       {/* Program Form */}
       {state.openForm && (

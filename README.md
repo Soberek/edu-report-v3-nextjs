@@ -151,57 +151,80 @@ Edu Report V3 is a comprehensive educational management system built with Next.j
 
 ## 📁 Project Structure
 
+> **🎯 New Architecture**: This project follows a **feature-based architecture** for better modularity and maintainability. See [REFACTORING_STRATEGY.md](REFACTORING_STRATEGY.md) for details.
+
 ```
 edu-report-v3-nextjs/
 ├── src/
+│   ├── common/                 # 🆕 Shared/reusable code
+│   │   ├── components/         # Generic UI components
+│   │   │   ├── ui/            # Base primitives
+│   │   │   ├── shared/        # Business components
+│   │   │   └── layout/        # Layout components
+│   │   ├── hooks/             # Generic React hooks
+│   │   ├── utils/             # Generic utilities
+│   │   └── types/             # Global types
+│   │
 │   ├── app/                    # Next.js App Router
-│   │   ├── (protected)/        # Protected routes requiring authentication
-│   │   │   ├── schools/        # School management module
-│   │   │   │   ├── components/ # School-specific components
-│   │   │   │   ├── hooks/      # School management hooks
-│   │   │   │   ├── schemas/    # Zod validation schemas
-│   │   │   │   └── types/      # TypeScript interfaces
-│   │   │   ├── schedule/       # Task management system
-│   │   │   ├── wygeneruj-izrz/ # IZRZ report generator
-│   │   │   ├── czerniak/       # Melanoma education module
-│   │   │   ├── habit-tracker/  # Personal development tracker
-│   │   │   ├── contacts/       # Contact management
-│   │   │   └── ...             # Other modules
+│   │   ├── (protected)/        # Protected routes
+│   │   │   ├── holidays/      # 🆕 Feature-based module (reference)
+│   │   │   │   ├── components/
+│   │   │   │   ├── hooks/
+│   │   │   │   ├── services/  # Feature-specific services
+│   │   │   │   ├── utils/     # Feature-specific utils
+│   │   │   │   ├── types/
+│   │   │   │   └── README.md
+│   │   │   ├── contacts/      # Contact management
+│   │   │   │   ├── components/
+│   │   │   │   ├── hooks/     # 🆕 Feature hooks
+│   │   │   │   └── ...
+│   │   │   ├── schools/        # School management
+│   │   │   ├── schedule/       # Task management
+│   │   │   │   ├── hooks/     # 🆕 Feature hooks
+│   │   │   │   └── ...
+│   │   │   ├── programy-edukacyjne/ # Educational programs
+│   │   │   │   ├── hooks/     # 🆕 Feature hooks
+│   │   │   │   └── ...
+│   │   │   └── ...             # Other feature modules
+│   │   │
 │   │   ├── api/                # API routes
-│   │   │   ├── auth/           # Authentication endpoints
-│   │   │   │   ├── verify/     # Token verification
-│   │   │   │   └── set-role/   # Role management
-│   │   │   ├── users/          # User management CRUD
-│   │   │   ├── generate-izrz/  # IZRZ generation endpoint
-│   │   │   ├── openai/         # OpenAI integration
-│   │   │   └── unsplash-photo-by-tag/ # Image fetching
+│   │   │   ├── auth/           # Authentication
+│   │   │   ├── users/          # User management
+│   │   │   ├── openai/         # AI integration
+│   │   │   └── ...
+│   │   │
 │   │   ├── layout.tsx          # Root layout
-│   │   ├── page.tsx            # Home page
-│   │   └── globals.css         # Global styles
-│   ├── components/             # Shared components
-│   │   ├── ui/                 # UI components (navbar, drawer, etc.)
-│   │   └── shared/             # Reusable components
-│   ├── hooks/                  # Custom React hooks
-│   ├── types/                  # Global TypeScript types
-│   ├── constants/              # Application constants
+│   │   └── page.tsx            # Home page
+│   │
+│   ├── components/
+│   │   └── auth/              # Auth feature components
+│   │
 │   ├── providers/              # Context providers
 │   ├── firebase/               # Firebase configuration
-│   │   ├── config.ts           # Client-side Firebase
-│   │   ├── admin.ts            # Firebase Admin SDK
-│   │   └── ProtectedPage.tsx  # Auth guard component
-│   ├── models/                 # Data models and schemas
-│   ├── services/               # Business logic services
-│   └── utils/                  # Utility functions
-│       ├── auth.ts             # Server-side auth utilities
-│       └── firestore-admin.ts  # Firestore admin helpers
+│   ├── services/               # Shared services
+│   └── ...
+│
 ├── public/                     # Static assets
-│   ├── generate-templates/     # Word document templates
-│   └── ...                     # Images, icons, etc.
-├── package.json                # Dependencies and scripts
-├── next.config.ts              # Next.js configuration
-├── tailwind.config.js          # Tailwind CSS configuration
-└── tsconfig.json               # TypeScript configuration
+├── REFACTORING_STRATEGY.md    # 🆕 Architecture strategy
+├── REFACTORING_SUMMARY.md     # 🆕 What's been done
+├── MIGRATION_GUIDE.md         # 🆕 Migration guide
+└── ...
 ```
+
+### 🏗️ Architecture Highlights
+
+- **Feature-Based Modules**: Each feature contains all its code (components, hooks, services, utils, types)
+- **Common Module**: Truly shared, generic code used across features
+- **Clear Boundaries**: Features are self-contained and loosely coupled
+- **Easy Navigation**: Related code is co-located
+
+**📚 Learn More**: 
+- [Architecture Overview](ARCHITECTURE.md) - **Start here!** Complete architecture guide
+- [Refactoring Strategy](REFACTORING_STRATEGY.md) - Overall architecture plan
+- [Migration Guide](MIGRATION_GUIDE.md) - How to update imports
+- [Refactoring Complete](REFACTORING_COMPLETE.md) - What was accomplished
+- [Holidays Module](src/app/(protected)/holidays/README.md) - Reference implementation
+- [Common Module](src/common/README.md) - Shared code guidelines
 
 ## 🔧 Environment Variables
 
