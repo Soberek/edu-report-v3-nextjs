@@ -32,6 +32,7 @@ export interface Program {
   name: string;
   programType: "programowy" | "nieprogramowy";
   description: string;
+  schoolTypes?: SchoolTypes[];
 }
 
 export type SchoolTypes =
