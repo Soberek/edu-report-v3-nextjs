@@ -62,11 +62,11 @@ export const calculateGeneralStats = (
     totalMissingParticipations += s.notParticipating;
   });
   const nonParticipatingCount = schoolsInfo.filter((i) => i.notParticipating.length > 0).length;
-  return { 
-    totalSchools: schools.length, 
-    nonParticipatingCount, 
-    totalParticipations: allParticipations.length, 
-    totalMissingParticipations 
+  return {
+    totalSchools: schools.length,
+    nonParticipatingCount,
+    totalParticipations: allParticipations.length,
+    totalMissingParticipations,
   };
 };
 
