@@ -1,6 +1,9 @@
 // Re-export user types
 export * from "./user";
 
+// Re-export SchoolProgramParticipation types
+export * from "../models/SchoolProgramParticipation";
+
 export type ArchiveCategories = "A" | "B5" | "B10" | "BE" | "BE5" | "BE10";
 
 export interface Akt {
