@@ -14,7 +14,7 @@ export const createSchoolParticipationsMap = (
   participations: readonly SchoolProgramParticipation[]
 ): Readonly<Record<string, readonly string[]>> => {
   const map: Record<string, string[]> = {};
-  
+
   participations.forEach((participation) => {
     if (!map[participation.schoolId]) {
       map[participation.schoolId] = [];
@@ -28,13 +28,8 @@ export const createSchoolParticipationsMap = (
 /**
  * Gets applicable programs for a school based on school types
  */
-export const getApplicablePrograms = (
-  school: School,
-  programs: readonly Program[]
-): readonly Program[] => {
-  return programs.filter((program) =>
-    program.schoolTypes?.some((programType) => school.type.includes(programType))
-  );
+export const getApplicablePrograms = (school: School, programs: readonly Program[]): readonly Program[] => {
+  return programs.filter((program) => program.schoolTypes?.some((programType) => school.type.includes(programType)));
 };
 
 /**
@@ -48,14 +43,10 @@ export const calculateSchoolParticipationInfo = (
   return schools.map((school) => {
     const applicablePrograms = getApplicablePrograms(school, programs);
     const participatingProgramIds = schoolParticipationsMap[school.id] || [];
-    
-    const participating = applicablePrograms.filter((program) =>
-      participatingProgramIds.includes(program.id)
-    );
-    
-    const notParticipating = applicablePrograms.filter((program) =>
-      !participatingProgramIds.includes(program.id)
-    );
+
+    const participating = applicablePrograms.filter((program) => participatingProgramIds.includes(program.id));
+
+    const notParticipating = applicablePrograms.filter((program) => !participatingProgramIds.includes(program.id));
 
     return {
       schoolName: school.name,
@@ -117,9 +108,7 @@ export const calculateGeneralStats = (
     totalMissingParticipations += stats.notParticipating;
   });
 
-  const nonParticipatingCount = schoolsInfo.filter(
-    (info) => info.notParticipating.length > 0
-  ).length;
+  const nonParticipatingCount = schoolsInfo.filter((info) => info.notParticipating.length > 0).length;
 
   return {
     totalSchools: schools.length,
@@ -178,9 +167,7 @@ export const filterSchoolsByStatus = (
 ): readonly SchoolParticipationInfo[] => {
   switch (status) {
     case "participating":
-      return schoolsInfo.filter(
-        (s) => s.participating.length > 0
-      );
+      return schoolsInfo.filter((s) => s.participating.length > 0);
     case "notParticipating":
       return schoolsInfo.filter((s) => s.notParticipating.length > 0);
     case "all":
@@ -208,18 +195,12 @@ export const filterSchoolsByProgram = (
   programId: string | null
 ): readonly SchoolParticipationInfo[] => {
   if (!programId) return schoolsInfo;
-  return schoolsInfo.filter(
-    (s) =>
-      s.participating.some((p) => p.id === programId) ||
-      s.notParticipating.some((p) => p.id === programId)
-  );
+  return schoolsInfo.filter((s) => s.participating.some((p) => p.id === programId) || s.notParticipating.some((p) => p.id === programId));
 };
 
 /**
  * Gets available school years from participations
  */
-export const getAvailableSchoolYears = (
-  participations: readonly SchoolProgramParticipation[]
-): readonly string[] => {
+export const getAvailableSchoolYears = (participations: readonly SchoolProgramParticipation[]): readonly string[] => {
   return [...new Set(participations.map((p) => p.schoolYear))].sort();
 };
