@@ -104,6 +104,7 @@ export const navRoutes: NavRoute[] = [
     icon: <FaSchool />,
     description: "Szkoły uczestniczące w programach",
   },
+
   {
     title: "Baza kontaktów",
     path: "/contacts",
