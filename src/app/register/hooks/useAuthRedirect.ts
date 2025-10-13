@@ -1,4 +1,4 @@
-import { useAuthRedirect as useSharedAuthRedirect } from "@/components/auth";
+import { useAuthRedirect as useSharedAuthRedirect } from "@/features/auth";
 import { REGISTER_CONSTANTS } from "../constants";
 
 /**

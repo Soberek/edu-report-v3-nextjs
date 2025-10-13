@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimit } from "@/lib/rate-limit-helpers";
+import { checkRateLimit } from "@/lib/api/rate-limit-helpers";
 
 export interface PostImagesUploadResult {
   id: string;

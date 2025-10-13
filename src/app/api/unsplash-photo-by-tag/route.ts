@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { fetchUnsplashPhotos } from "@/services/unsplashService";
-import { checkRateLimit } from "@/lib/rate-limit-helpers";
+import { checkRateLimit } from "@/lib/api/rate-limit-helpers";
 
 // Secret/API key expected in request header 'x-api-key'
 // IMPORTANT: use a dedicated UNSPLASH_API_SECRET for this route. Do NOT fall back to

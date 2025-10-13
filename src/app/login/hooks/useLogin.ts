@@ -1,6 +1,6 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/config";
-import { useAuthForm } from "@/components/auth";
+import { useAuthForm } from "@/features/auth";
 import { LOGIN_CONSTANTS } from "../constants";
 import type { LoginFormData } from "../utils";
 

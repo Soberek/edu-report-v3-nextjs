@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { verifyAuthToken } from "@/utils/auth";
-import { checkRateLimit } from "@/lib/rate-limit-helpers";
+import { checkRateLimit } from "@/lib/api/rate-limit-helpers";
 
 /**
  * POST /api/auth/verify - Verify a Firebase ID token

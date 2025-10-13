@@ -1,11 +1,11 @@
 import { useState, useMemo, useCallback } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
-import { usePrograms } from "@/hooks/useProgram";
+import { usePrograms } from "@/features/programy-edukacyjne/hooks/useProgram";
 import { School, Program, Contact, SchoolProgramParticipation, SchoolProgramParticipationDTO, SchoolYear } from "@/types";
 import { schoolProgramParticipationDTOSchema, schoolProgramParticiapationUpdateDTOSchema } from "@/models/SchoolProgramParticipation";
-import { createLookupMaps, mapParticipationsForDisplay } from "@/app/(protected)/szkoly-w-programie/utils";
-import { MESSAGES } from "@/app/(protected)/szkoly-w-programie/constants";
+import { createLookupMaps, mapParticipationsForDisplay } from "@/features/szkoly-w-programie/utils";
+import { MESSAGES } from "@/features/szkoly-w-programie/constants";
 import type {
   SnackbarState,
   ProgramWithCount,

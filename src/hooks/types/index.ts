@@ -4,4 +4,4 @@
  */
 
 // Re-export feature-local types to preserve compatibility
-export * from "@/app/(protected)/szkoly-w-programie/types/szkoly-w-programie.types";
+export * from "./szkoly-w-programie.types";

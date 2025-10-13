@@ -1,7 +1,7 @@
 import React from "react";
 import { Avatar, Typography, Box, Chip, Tooltip } from "@mui/material";
 import { CalendarToday, Group, Notes } from "@mui/icons-material";
-import { formatDateForTable, formatDate } from "@/utils/shared/dayjsUtils";
+import { formatDateForTable, formatDate } from "@/utils/dayjsUtils";
 
 // Utility functions
 export const getInitials = (name: string): string => {

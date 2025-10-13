@@ -5,13 +5,13 @@ import { Box, Typography, Tabs, Tab, Card, CardContent, Button, Chip, LinearProg
 import { Quiz, School, Assessment, Visibility } from "@mui/icons-material";
 
 // Import components and data
-import { QuizQuestionComponent } from "./components/QuizQuestion";
-import { QuizResults } from "./components/QuizResults";
-import { EducationalContentComponent } from "./components/EducationalContent";
-import { MelanomaCasesQuiz } from "./components/MelanomaCasesQuiz";
-import { useQuiz } from "./hooks/useQuiz";
+import { QuizQuestionComponent } from "@/features/czerniak/components/QuizQuestion";
+import { QuizResults } from "@/features/czerniak/components/QuizResults";
+import { EducationalContentComponent } from "@/features/czerniak/components/EducationalContent";
+import { MelanomaCasesQuiz } from "@/features/czerniak/components/MelanomaCasesQuiz";
+import { useQuiz } from "@/features/czerniak/hooks/useQuiz";
 import { QUIZ_QUESTIONS, MELANOMA_CASES, ABCDE_FEATURES, EDUCATIONAL_CONTENT } from "./data/quizData";
-import { QuizSettings } from "./types";
+import { QuizSettings } from "@/features/czerniak";
 
 interface TabPanelProps {
   children?: React.ReactNode;

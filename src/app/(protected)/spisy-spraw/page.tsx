@@ -5,7 +5,7 @@ import { Container, Alert, Snackbar, Box, Button, TextField, InputAdornment } fr
 import { useReducer, useRef } from "react";
 import { Add, Description, Category, FilterList, Search } from "@mui/icons-material";
 
-import {
+import { 
   ActCaseRecordsTable,
   FilterSection,
   EditActForm,
@@ -14,10 +14,13 @@ import {
   EditDialog,
   ConfirmDialog,
   StatsCard,
-} from "./components";
-import { DEFAULT_FORM_VALUES, INITIAL_STATE, UI_CONFIG, MESSAGES } from "./constants";
-import { spisySprawReducer } from "./reducers/spisySprawReducer";
-import { useSpisySpraw } from "./hooks";
+  DEFAULT_FORM_VALUES, 
+  INITIAL_STATE, 
+  UI_CONFIG, 
+  MESSAGES,
+  spisySprawReducer,
+  useSpisySpraw
+} from "@/features/spisy-spraw";
 import type { CaseRecord } from "@/types";
 
 export default function Acts() {

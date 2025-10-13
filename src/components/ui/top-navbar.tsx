@@ -28,7 +28,7 @@ import { useUser } from "@/hooks/useUser";
 
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/config";
-import { useSearch } from "../../hooks/useSearch";
+import { useSearch } from "@/hooks/useSearch";
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import { useRouter } from "next/navigation";

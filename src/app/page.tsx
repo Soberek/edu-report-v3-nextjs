@@ -13,8 +13,8 @@ import {
   TodoCalendar,
   TodoEditDialog,
   TodoKanban,
-} from "@/app/(protected)/todo";
-import type { Todo } from "@/app/(protected)/todo/types";
+  type Todo,
+} from "@/features/todo";
 
 export default function Home() {
   const { user, loading } = useUser();

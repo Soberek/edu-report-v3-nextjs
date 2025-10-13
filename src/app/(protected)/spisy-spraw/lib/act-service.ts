@@ -1,5 +1,5 @@
 import type { CaseRecord } from "@/types";
-import { ActCreateDTO, ActUpdateDTO, type ActCreate, type ActUpdate } from "../schemas";
+import { ActCreateDTO, ActUpdateDTO, type ActCreate, type ActUpdate } from "@/features/spisy-spraw/schemas/actSchemas";
 
 /**
  * Act Service

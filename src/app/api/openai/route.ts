@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { checkRateLimit } from "@/lib/rate-limit-helpers";
+import { checkRateLimit } from "@/lib/api/rate-limit-helpers";
 import { NextRequest } from "next/server";
 
 const openai = new OpenAI({

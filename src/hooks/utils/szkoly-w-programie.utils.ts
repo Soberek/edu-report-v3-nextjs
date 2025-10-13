@@ -1,4 +1,4 @@
-import type { School, Program, SchoolProgramParticipation } from "@/types";
+import type { School, Program, SchoolProgramParticipation, SchoolYear } from "@/types";
 import type {
   SchoolParticipationInfo,
   ProgramStats,
@@ -201,6 +201,6 @@ export const filterSchoolsByProgram = (
 /**
  * Gets available school years from participations
  */
-export const getAvailableSchoolYears = (participations: readonly SchoolProgramParticipation[]): readonly string[] => {
-  return [...new Set(participations.map((p) => p.schoolYear))].sort();
+export const getAvailableSchoolYears = (participations: readonly SchoolProgramParticipation[]): SchoolYear[] => {
+  return [...new Set(participations.map((p) => p.schoolYear))].sort() as SchoolYear[];
 };

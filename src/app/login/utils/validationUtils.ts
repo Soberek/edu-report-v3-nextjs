@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { baseAuthFormSchema, validateAuthForm, BaseAuthFormData } from "@/components/auth";
+import { baseAuthFormSchema, validateAuthForm, BaseAuthFormData } from "@/features/auth";
 
 /**
  * Login form schema extends the base auth form schema
@@ -24,4 +24,4 @@ export const validateLoginForm = (
 };
 
 // Re-export shared validation utilities
-export { isValidEmail, isValidPassword } from "@/components/auth";
+export { isValidEmail, isValidPassword } from "@/features/auth";

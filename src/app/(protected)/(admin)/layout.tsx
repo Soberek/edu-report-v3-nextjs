@@ -1,6 +1,6 @@
 "use client";
 
-import { RoleProtected } from "@/components/auth";
+import { RoleProtected } from "@/features/auth";
 import { UserRole } from "@/types/user";
 
 interface AdminLayoutProps {
