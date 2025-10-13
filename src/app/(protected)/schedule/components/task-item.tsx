@@ -11,6 +11,7 @@ import { DateField } from "@mui/x-date-pickers/DateField";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 
 type Props = {
   task: ScheduledTaskType;
@@ -30,6 +31,7 @@ export const Task: React.FC<Props> = ({
   onEdit,
 }) => {
   const [openStatusChange, setOpenStatusChange] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const isCompleted = task.status === "completed";
 
   const getTaskTypeEmoji = (taskType: TaskType["label"] | undefined) => {
@@ -90,6 +92,11 @@ export const Task: React.FC<Props> = ({
       completedDate: dayjs(task.dueDate).format("YYYY-MM-DD"),
     },
   });
+
+  const handleDeleteConfirm = () => {
+    deleteTask(task.id);
+    setConfirmOpen(false);
+  };
 
   return (
     <>
@@ -166,6 +173,15 @@ export const Task: React.FC<Props> = ({
           </Box>
         </Paper>
       </Modal>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Potwierdź usunięcie"
+        message={`Czy na pewno chcesz usunąć zadanie "${taskType?.label || ""}"? Tej operacji nie można cofnąć.`}
+        type="delete"
+      />
 
       {/* Ultra Compact Task Card */}
       <Paper
@@ -295,7 +311,7 @@ export const Task: React.FC<Props> = ({
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                deleteTask(task.id);
+                setConfirmOpen(true);
               }}
               sx={{
                 width: 20,

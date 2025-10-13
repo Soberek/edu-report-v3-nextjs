@@ -30,6 +30,7 @@ interface FilterState {
   month: string;
   status: string;
   search: string;
+  year: string;
 }
 
 interface FilterSectionProps {
@@ -37,6 +38,7 @@ interface FilterSectionProps {
   setFilter: React.Dispatch<React.SetStateAction<FilterState>>;
   filteredPrograms: Program[];
   months: { [key: string]: string };
+  years: string[];
 }
 
 export const FilterSection: React.FC<FilterSectionProps> = ({
@@ -44,6 +46,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   setFilter,
   filteredPrograms,
   months,
+  years,
 }) => {
   return (
     <Paper
@@ -195,6 +198,43 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <CalendarToday sx={{ fontSize: 16, color: "#1976d2" }} />
                       <Typography>{label}</Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* Year Filter */}
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: "#2c3e50" }}>
+              <CalendarToday sx={{ mr: 1, verticalAlign: "middle" }} />
+              Rok:
+            </Typography>
+            <FormControl fullWidth size="small">
+              <InputLabel>Rok</InputLabel>
+              <Select
+                value={filter.year}
+                onChange={(e) => setFilter((prev) => ({ ...prev, year: e.target.value }))}
+                label="Rok"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    background: "white",
+                  },
+                }}
+              >
+                <MenuItem value="">
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <CalendarToday sx={{ fontSize: 16, color: "#666" }} />
+                    <Typography>Wszystkie lata</Typography>
+                  </Box>
+                </MenuItem>
+                {years.map((year) => (
+                  <MenuItem key={year} value={year}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <CalendarToday sx={{ fontSize: 16, color: "#1976d2" }} />
+                      <Typography>{year}</Typography>
                     </Box>
                   </MenuItem>
                 ))}

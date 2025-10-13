@@ -27,7 +27,7 @@ import type { TaskFormProps } from "../types";
 import type { CreateTaskFormData, EditTaskFormData } from "../schemas/taskSchemas";
 
 interface Props extends TaskFormProps {
-  createTask?: (itemData: CreateTaskFormData) => void;
+  createTask?: (itemData: CreateTaskFormData) => Promise<void>;
 }
 
 export default function TaskForm({ mode, task, onClose, onSave, userId, createTask, loading = false }: Props): React.ReactElement {
@@ -35,11 +35,11 @@ export default function TaskForm({ mode, task, onClose, onSave, userId, createTa
     mode,
     task,
     userId,
-    onSubmit: (data) => {
+    onSubmit: async (data) => {
       if (mode === "edit" && task) {
         onSave(task.id, data as Partial<EditTaskFormData>);
       } else if (mode === "create" && createTask) {
-        createTask(data as CreateTaskFormData);
+        await createTask(data as CreateTaskFormData);
       }
     },
   });

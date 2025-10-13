@@ -25,6 +25,15 @@ export const localizeMonth = (month: string): string => {
   return months[month] || month;
 };
 
+export const getYears = (tasks: ScheduledTaskType[]): string[] => {
+  if (!tasks) return [];
+  const years = new Set<string>();
+  tasks.forEach((task) => {
+    years.add(new Date(task.dueDate).getFullYear().toString());
+  });
+  return Array.from(years).sort((a, b) => parseInt(b) - parseInt(a));
+};
+
 export const getMonths = (): { [key: string]: string } => ({
   january: "Styczeń",
   february: "Luty",

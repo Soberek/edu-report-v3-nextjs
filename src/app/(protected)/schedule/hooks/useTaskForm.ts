@@ -11,7 +11,7 @@ interface UseTaskFormProps {
   mode: "create" | "edit";
   task?: ScheduledTaskType | null;
   userId?: string;
-  onSubmit: (data: CreateTaskFormData | EditTaskFormData) => void;
+  onSubmit: (data: CreateTaskFormData | EditTaskFormData) => Promise<void>;
 }
 
 export const useTaskForm = ({ mode, task, userId, onSubmit }: UseTaskFormProps) => {

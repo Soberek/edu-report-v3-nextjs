@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
 import type { Program } from "@/types";
 import { TASK_TYPES } from "@/constants/tasks";
+import dayjs from "dayjs";
 
 interface FilterState {
   programIds: string[];
@@ -9,6 +10,7 @@ interface FilterState {
   month: string;
   status: string;
   search: string;
+  year: string;
 }
 
 interface UseScheduleFiltersProps {
@@ -35,101 +37,73 @@ export const useScheduleFilters = ({ tasks, programs, filter }: UseScheduleFilte
     [tasks]
   );
 
+  const filteredTasks = useMemo(() => {
+    return sortedTasks.filter((task) => {
+      // Program filter
+      if (filter.programIds.length > 0 && !filter.programIds.includes(task.programId)) {
+        return false;
+      }
+
+      // Task type filter
+      if (filter.taskTypeId && task.taskTypeId !== filter.taskTypeId) {
+        return false;
+      }
+
+      // Status filter
+      if (filter.status && task.status !== filter.status) {
+        return false;
+      }
+
+      const taskDate = dayjs(task.dueDate);
+
+      // Year filter
+      if (filter.year && taskDate.year().toString() !== filter.year) {
+        return false;
+      }
+
+      // Month filter
+      if (filter.month && taskDate.format("MMMM").toLowerCase() !== filter.month.toLowerCase()) {
+        return false;
+      }
+
+      // Search filter
+      if (filter.search) {
+        const searchLower = filter.search.toLowerCase();
+        const taskType = Object.values(TASK_TYPES).find((type) => type.id === task.taskTypeId);
+        const program = programs.find((p) => p.id === task.programId);
+        const searchText = `${taskType?.label || ""} ${task.description || ""} ${program?.name || ""}`.toLowerCase();
+        if (!searchText.includes(searchLower)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [sortedTasks, filter, programs]);
+
   // Aggregate tasks by month and program
-  const aggregateByMonthAndThenByProgram = useMemo(
-    () =>
-      sortedTasks.reduce(
-        (acc, task) => {
-          const month = new Date(task.dueDate).toLocaleDateString("en-US", { month: "long", year: "numeric" });
-          const programId = task.programId;
-
-          if (!acc[month]) {
-            acc[month] = {};
-          }
-          if (!acc[month][programId]) {
-            acc[month][programId] = [];
-          }
-          acc[month][programId].push(task);
-          return acc;
-        },
-        {} as {
-          [month: string]: { [programId: string]: ScheduledTaskType[] };
-        }
-      ),
-    [sortedTasks]
-  );
-
-  // Apply filters
   const filteredData = useMemo(() => {
-    let result = { ...aggregateByMonthAndThenByProgram };
+    return filteredTasks.reduce(
+      (acc, task) => {
+        const month = dayjs(task.dueDate).format("MMMM YYYY");
+        const programId = task.programId;
 
-    // Apply program filter
-    if (filter.programIds.length > 0) {
-      result = Object.keys(aggregateByMonthAndThenByProgram).reduce((acc, month) => {
-        const monthData = aggregateByMonthAndThenByProgram[month];
-        const filteredPrograms: { [programId: string]: ScheduledTaskType[] } = {};
-
-        filter.programIds.forEach((programId) => {
-          if (monthData?.[programId]) {
-            filteredPrograms[programId] = monthData[programId];
-          }
-        });
-
-        if (Object.keys(filteredPrograms).length > 0) {
-          acc[month] = filteredPrograms;
+        if (!acc[month]) {
+          acc[month] = {};
         }
+        if (!acc[month][programId]) {
+          acc[month][programId] = [];
+        }
+        acc[month][programId].push(task);
         return acc;
-      }, {} as typeof aggregateByMonthAndThenByProgram);
-    }
-
-    // Apply month filter
-    if (filter.month) {
-      const filteredMonths = Object.keys(result).filter((month) =>
-        month.toLowerCase().includes(filter.month.toLowerCase())
-      );
-      result = filteredMonths.reduce((acc, month) => {
-        acc[month] = result[month];
-        return acc;
-      }, {} as typeof aggregateByMonthAndThenByProgram);
-    }
-
-    // Apply status and search filters to tasks within each program
-    if (filter.status || filter.search || filter.taskTypeId) {
-      result = Object.keys(result).reduce((acc, month) => {
-        acc[month] = {};
-        Object.keys(result[month]).forEach((programId) => {
-          const filteredTasks = result[month][programId].filter((task) => {
-            // Status filter
-            if (filter.status && task.status !== filter.status) return false;
-
-            // Search filter
-            if (filter.search) {
-              const searchLower = filter.search.toLowerCase();
-              const taskType = Object.values(TASK_TYPES).find((type) => type.id === task.taskTypeId);
-              const program = programs.find((p) => p.id === task.programId);
-              const searchText = `${taskType?.label || ""} ${task.description || ""} ${program?.name || ""}`.toLowerCase();
-              if (!searchText.includes(searchLower)) return false;
-            }
-
-            // Task type filter
-            if (filter.taskTypeId && task.taskTypeId !== filter.taskTypeId) return false;
-
-            return true;
-          });
-
-          if (filteredTasks.length > 0) {
-            acc[month][programId] = filteredTasks;
-          }
-        });
-        return acc;
-      }, {} as typeof aggregateByMonthAndThenByProgram);
-    }
-
-    return result;
-  }, [aggregateByMonthAndThenByProgram, filter, programs]);
+      },
+      {} as { [month: string]: { [programId: string]: ScheduledTaskType[] } }
+    );
+  }, [filteredTasks]);
 
   return {
     filteredPrograms,
+    filteredTasks,
     filteredData,
   };
 };
