@@ -180,7 +180,7 @@ export const filterSchoolsByStatus = (
   switch (status) {
     case "participating":
       return schoolsInfo.filter(
-        (s) => s.participating.length > 0 && s.notParticipating.length === 0
+        (s) => s.participating.length > 0
       );
     case "notParticipating":
       return schoolsInfo.filter((s) => s.notParticipating.length > 0);
