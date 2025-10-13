@@ -183,7 +183,7 @@ export const TaskListSection: React.FC<TaskListSectionProps> = ({
         onClose={handleCloseEditDialog}
         onSave={handleSaveTask}
         userId={userId}
-        createTask={() => {}}
+        createTask={async () => {}}
         loading={false}
       />
     </Paper>
