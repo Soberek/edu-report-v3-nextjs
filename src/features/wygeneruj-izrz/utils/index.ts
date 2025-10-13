@@ -4,11 +4,11 @@
  * Formats file size in bytes to human readable format
  */
 export const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return "0 Bytes";
+  if (bytes === 0 || bytes < 0 || !Number.isFinite(bytes)) return "0 Bytes";
 
   const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
@@ -29,8 +29,9 @@ export const isValidTemplateFile = (file: File): boolean => {
  */
 export const generateUniqueFilename = (originalName: string): string => {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const extension = originalName.split(".").pop();
-  const nameWithoutExtension = originalName.replace(/\.[^/.]+$/, "");
+  const parts = originalName.split(".");
+  const extension = parts.length > 1 ? parts.pop() : "undefined";
+  const nameWithoutExtension = parts.join(".");
 
   return `${nameWithoutExtension}_${timestamp}.${extension}`;
 };
@@ -43,7 +44,11 @@ export const debounce = <T extends (...args: unknown[]) => unknown>(func: T, wai
 
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
+    if (wait <= 0) {
+      func(...args);
+    } else {
+      timeout = setTimeout(() => func(...args), wait);
+    }
   };
 };
 

@@ -79,6 +79,7 @@ export const useFormSubmission = ({ onSuccess, onError }: UseFormSubmissionProps
         const errorMessage = error instanceof Error ? error.message : MESSAGES.ERROR.GENERATION_FAILED;
         onError?.(new Error(errorMessage));
         throw error;
+        throw error;
       }
     },
     [createFormData, extractFilename, triggerDownload, onSuccess, onError]
