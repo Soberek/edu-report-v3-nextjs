@@ -51,14 +51,17 @@ describe("useIzrzForm", () => {
   });
 
   // Helper to populate form with valid data
-  const populateForm = (result: ReturnType<typeof renderHook<ReturnType<typeof useIzrzForm>, unknown>>['result'], formData: IzrzFormData) => {
+  const populateForm = (
+    result: ReturnType<typeof renderHook<ReturnType<typeof useIzrzForm>, unknown>>["result"],
+    formData: IzrzFormData
+  ) => {
     Object.entries(formData).forEach(([key, value]) => {
       result.current.setValue(key as keyof IzrzFormData, value);
     });
   };
 
   // Helper to submit form
-  const submitForm = async (result: ReturnType<typeof renderHook<ReturnType<typeof useIzrzForm>, unknown>>['result']) => {
+  const submitForm = async (result: ReturnType<typeof renderHook<ReturnType<typeof useIzrzForm>, unknown>>["result"]) => {
     const submitEvent = { preventDefault: () => {} } as React.FormEvent;
     await result.current.handleSubmit(submitEvent);
   };
