@@ -1,11 +1,18 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
-import { Box, Typography, Paper } from "@mui/material";
-import { School as SchoolIcon } from "@mui/icons-material";
+import { Box, Typography, Paper, Snackbar, Alert, Menu, MenuItem, ListItemIcon, ListItemText, Button } from "@mui/material";
+import {
+  School as SchoolIcon,
+  Email as EmailIcon,
+  Person as PersonIcon,
+  Business as BusinessIcon,
+  SelectAll as SelectAllIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+} from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 // import type { Contact, Program, School } from "@/types";
 import { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { createColumns } from "./TableConfig";
-import { LoadingSpinner, EmptyState, DataTable, defaultActions, EditDialog, ActionButton } from "@/components/shared";
+import { LoadingSpinner, EmptyState, DataTable, defaultActions, EditDialog } from "@/components/shared";
 import { EditParticipationForm } from "./EditParticipationForm";
 import { ParticipationForm } from "./ParticipationForm";
 import { mapParticipationsForDisplay, createDefaultFormValues } from "../utils";
@@ -31,6 +38,12 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
+  const [copySnackbar, setCopySnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [emailMenuAnchor, setEmailMenuAnchor] = useState<null | HTMLElement>(null);
   const formRef = useRef<{ submit: () => void; isDirty: boolean } | null>(null);
 
   // Form for adding new participations
@@ -43,6 +56,32 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
     () => mapParticipationsForDisplay(participations, schoolsMap, contactsMap, programsMap),
     [participations, schoolsMap, contactsMap, programsMap]
   );
+
+  // Count available emails by type
+  const emailCounts = useMemo(() => {
+    const coordinatorEmails = new Set(
+      mappedParticipations.map((row) => row.coordinatorEmail).filter((email) => email && email.trim() !== "")
+    );
+
+    const schoolEmails = new Set(mappedParticipations.map((row) => row.schoolEmail).filter((email) => email && email.trim() !== ""));
+
+    const allEmails = mappedParticipations.flatMap((row) => {
+      const emails = [];
+      if (row.coordinatorEmail && row.coordinatorEmail.trim() !== "") {
+        emails.push(row.coordinatorEmail);
+      }
+      if (row.schoolEmail && row.schoolEmail.trim() !== "") {
+        emails.push(row.schoolEmail);
+      }
+      return emails;
+    });
+
+    return {
+      coordinator: coordinatorEmails.size,
+      school: schoolEmails.size,
+      both: new Set(allEmails).size,
+    };
+  }, [mappedParticipations]);
 
   const handleEditParticipation = useCallback((participation: SchoolProgramParticipation) => {
     setEditingParticipation(participation);
@@ -112,6 +151,93 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
     [onDelete]
   );
 
+  const handleOpenEmailMenu = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    setEmailMenuAnchor(event.currentTarget);
+  }, []);
+
+  const handleCloseEmailMenu = useCallback(() => {
+    setEmailMenuAnchor(null);
+  }, []);
+
+  const handleCopyEmails = useCallback(
+    (type: "coordinator" | "school" | "both") => {
+      let emailsToCopy: string[] = [];
+      let typeLabel = "";
+
+      if (type === "coordinator") {
+        emailsToCopy = Array.from(
+          new Set(
+            mappedParticipations
+              .map((row: MappedParticipation) => row.coordinatorEmail)
+              .filter((email): email is string => !!email && email.trim() !== "")
+          )
+        );
+        typeLabel = "koordynatorów";
+      } else if (type === "school") {
+        emailsToCopy = Array.from(
+          new Set(
+            mappedParticipations
+              .map((row: MappedParticipation) => row.schoolEmail)
+              .filter((email): email is string => !!email && email.trim() !== "")
+          )
+        );
+        typeLabel = "szkół";
+      } else {
+        // both
+        const allEmails = mappedParticipations.flatMap((row: MappedParticipation) => {
+          const emails = [];
+          if (row.coordinatorEmail && row.coordinatorEmail.trim() !== "") {
+            emails.push(row.coordinatorEmail);
+          }
+          if (row.schoolEmail && row.schoolEmail.trim() !== "") {
+            emails.push(row.schoolEmail);
+          }
+          return emails;
+        });
+        emailsToCopy = Array.from(new Set(allEmails));
+        typeLabel = "wszystkich";
+      }
+
+      if (emailsToCopy.length === 0) {
+        setCopySnackbar({
+          open: true,
+          message: "Brak adresów email do skopiowania",
+          severity: "error",
+        });
+        handleCloseEmailMenu();
+        return;
+      }
+
+      // Format emails with semicolon separator
+      const emailString = emailsToCopy.join("; ");
+
+      // Copy to clipboard
+      navigator.clipboard
+        .writeText(emailString)
+        .then(() => {
+          setCopySnackbar({
+            open: true,
+            message: `Skopiowano ${emailsToCopy.length} ${typeLabel} adresów email do schowka`,
+            severity: "success",
+          });
+        })
+        .catch(() => {
+          setCopySnackbar({
+            open: true,
+            message: "Nie udało się skopiować adresów email",
+            severity: "error",
+          });
+        });
+
+      handleCloseEmailMenu();
+    },
+    [mappedParticipations, handleCloseEmailMenu]
+  );
+
+  const handleCloseCopySnackbar = useCallback(() => {
+    setCopySnackbar((prev) => ({ ...prev, open: false }));
+  }, []);
+
   const columns = useMemo(() => createColumns(), []);
   const actions = useMemo(
     () => [
@@ -157,25 +283,47 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
         <SchoolIcon sx={{ color: STYLE_CONSTANTS.COLORS.PRIMARY }} />
         {PAGE_CONSTANTS.TABLE_TITLE} ({mappedParticipations.length})
       </Typography>
-      <ActionButton
-        onClick={handleAddParticipation}
-        variant="contained"
-        size="small"
-        sx={{
-          borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.MEDIUM,
-          textTransform: "none",
-          fontWeight: "bold",
-          background: STYLE_CONSTANTS.GRADIENTS.PRIMARY,
-          boxShadow: "0 2px 8px rgba(25, 118, 210, 0.3)",
-          "&:hover": {
-            background: STYLE_CONSTANTS.GRADIENTS.PRIMARY_HOVER,
-            boxShadow: "0 4px 12px rgba(25, 118, 210, 0.4)",
-            transform: "translateY(-1px)",
-          },
-        }}
-      >
-        Dodaj uczestnictwo
-      </ActionButton>
+      <Box sx={{ display: "flex", gap: 1 }}>
+        <Button
+          onClick={handleOpenEmailMenu}
+          variant="outlined"
+          size="small"
+          startIcon={<EmailIcon />}
+          endIcon={<ArrowDropDownIcon />}
+          sx={{
+            borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.MEDIUM,
+            textTransform: "none",
+            fontWeight: "bold",
+            borderColor: STYLE_CONSTANTS.COLORS.PRIMARY,
+            color: STYLE_CONSTANTS.COLORS.PRIMARY,
+            "&:hover": {
+              borderColor: STYLE_CONSTANTS.COLORS.PRIMARY,
+              background: "rgba(25, 118, 210, 0.04)",
+            },
+          }}
+        >
+          Kopiuj e-maile ({emailCounts.both})
+        </Button>
+        <Button
+          onClick={handleAddParticipation}
+          variant="contained"
+          size="small"
+          sx={{
+            borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.MEDIUM,
+            textTransform: "none",
+            fontWeight: "bold",
+            background: STYLE_CONSTANTS.GRADIENTS.PRIMARY,
+            boxShadow: "0 2px 8px rgba(25, 118, 210, 0.3)",
+            "&:hover": {
+              background: STYLE_CONSTANTS.GRADIENTS.PRIMARY_HOVER,
+              boxShadow: "0 4px 12px rgba(25, 118, 210, 0.4)",
+              transform: "translateY(-1px)",
+            },
+          }}
+        >
+          Dodaj uczestnictwo
+        </Button>
+      </Box>
     </Box>
   );
 
@@ -265,6 +413,52 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
       </Paper>
       {renderEditDialog()}
       {renderAddDialog()}
+
+      {/* Email Copy Menu */}
+      <Menu
+        anchorEl={emailMenuAnchor}
+        open={Boolean(emailMenuAnchor)}
+        onClose={handleCloseEmailMenu}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <MenuItem onClick={() => handleCopyEmails("both")}>
+          <ListItemIcon>
+            <SelectAllIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={`Wszystkie (${emailCounts.both})`} />
+        </MenuItem>
+        <MenuItem onClick={() => handleCopyEmails("coordinator")}>
+          <ListItemIcon>
+            <PersonIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={`Koordynatorzy (${emailCounts.coordinator})`} />
+        </MenuItem>
+        <MenuItem onClick={() => handleCopyEmails("school")}>
+          <ListItemIcon>
+            <BusinessIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={`Szkoły (${emailCounts.school})`} />
+        </MenuItem>
+      </Menu>
+
+      {/* Copy Emails Snackbar */}
+      <Snackbar
+        open={copySnackbar.open}
+        autoHideDuration={3000}
+        onClose={handleCloseCopySnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseCopySnackbar} severity={copySnackbar.severity} sx={{ width: "100%" }}>
+          {copySnackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

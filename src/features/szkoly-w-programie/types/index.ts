@@ -4,7 +4,7 @@ import type { SelectOption } from "./shared";
 import type { UseFormReturn } from "react-hook-form";
 
 // Re-export types from szkoly-w-programie.types
-export * from "./szkoly-w-programie.types"; 
+export * from "./szkoly-w-programie.types";
 
 // Message types
 export interface SnackbarMessage {
@@ -31,6 +31,7 @@ export interface EditDialogState {
 // Table types
 export interface MappedParticipation extends SchoolProgramParticipation {
   readonly schoolName: string;
+  readonly schoolEmail?: string;
   readonly programName: string;
   readonly coordinatorName: string;
   readonly coordinatorEmail?: string;
