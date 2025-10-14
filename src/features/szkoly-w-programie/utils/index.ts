@@ -73,6 +73,7 @@ export const mapParticipationsForDisplay = (
     return {
       ...participation,
       schoolName: school?.name || "N/A",
+      schoolEmail: school?.email,
       programName: program?.name || "N/A",
       coordinatorName: coordinator ? `${coordinator.firstName} ${coordinator.lastName}` : "N/A",
       coordinatorEmail: coordinator?.email,
@@ -119,7 +120,6 @@ export const getCurrentSchoolYear = (): string => {
   const schoolYearStart = currentMonth >= SCHOOL_YEAR_START_MONTH ? currentYear : currentYear - 1;
   return `${schoolYearStart}/${schoolYearStart + 1}`;
 };
-
 
 /**
  * Checks if school year is valid
