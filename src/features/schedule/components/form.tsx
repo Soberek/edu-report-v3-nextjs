@@ -41,14 +41,18 @@ export default function TaskForm({ mode, task, onClose, onSave, userId, createTa
     task,
     userId,
     onSubmit: async (data) => {
+      console.log("Task form submitted with data:", data);
       if (mode === "edit" && task) {
+        console.log("Editing existing task:", task.id);
         await onSave(task.id, data as Partial<EditTaskFormData>);
         setSuccessMessage("Zadanie zostało zaktualizowane!");
       } else if (mode === "create" && createTask) {
+        console.log("Creating new task with data:", data);
         await createTask(data as CreateTaskFormData);
         setSuccessMessage("Zadanie zostało dodane! Możesz dodać kolejne.");
       }
       setShowSuccess(true);
+      console.log("Form submission complete, showing success message");
     },
   });
 

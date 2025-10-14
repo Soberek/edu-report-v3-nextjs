@@ -12,16 +12,7 @@ import {
   OutlinedInput,
   Chip,
 } from "@mui/material";
-import {
-  FilterList,
-  Search,
-  Clear,
-  CheckCircle,
-  Assignment,
-  Pending,
-  CalendarToday,
-  School,
-} from "@mui/icons-material";
+import { FilterList, Search, Clear, CheckCircle, Assignment, Pending, CalendarToday, School } from "@mui/icons-material";
 import type { Program } from "@/types";
 
 interface FilterState {
@@ -41,13 +32,7 @@ interface FilterSectionProps {
   years: string[];
 }
 
-export const FilterSection: React.FC<FilterSectionProps> = ({
-  filter,
-  setFilter,
-  filteredPrograms,
-  months,
-  years,
-}) => {
+export const FilterSection: React.FC<FilterSectionProps> = ({ filter, setFilter, filteredPrograms, months, years }) => {
   return (
     <Paper
       elevation={0}
@@ -100,9 +85,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
               <TextField
                 placeholder="Szukaj po nazwie, opisie lub programie..."
                 value={filter.search}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFilter((prev) => ({ ...prev, search: e.target.value }))
-                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter((prev) => ({ ...prev, search: e.target.value }))}
                 size="small"
                 sx={{
                   flex: 1,
@@ -248,58 +231,93 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
               <School sx={{ mr: 1, verticalAlign: "middle" }} />
               Programy:
             </Typography>
-            <FormControl fullWidth size="small">
-              <InputLabel>Wybierz programy</InputLabel>
-              <Select
-                multiple
-                value={filter.programIds}
-                onChange={(e) => setFilter((prev) => ({ ...prev, programIds: e.target.value as string[] }))}
-                input={<OutlinedInput label="Wybierz programy" />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selected.map((value) => {
-                      const program = filteredPrograms.find((p) => p.id === value);
-                      return (
-                        <Chip
-                          key={value}
-                          label={program ? `${program.code} ${program.name}` : value}
-                          size="small"
-                          sx={{
-                            background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
-                            color: "white",
-                            fontSize: "0.75rem",
-                            height: 20,
-                          }}
-                        />
-                      );
-                    })}
-                  </Box>
-                )}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                    background: "white",
-                    minHeight: 40,
-                  },
-                }}
-              >
-                {filteredPrograms.map((program) => (
-                  <MenuItem key={program.id} value={program.id}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <School sx={{ fontSize: 16, color: "#1976d2" }} />
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {program.code}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {program.name}
-                        </Typography>
+
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+              <FormControl sx={{ flex: 1 }} fullWidth size="small">
+                <InputLabel>Wybierz programy</InputLabel>
+                <Select
+                  multiple
+                  value={filter.programIds}
+                  onChange={(e) => {
+                    const value = e.target.value as string[];
+                    // If the special ALL option was selected, clear selection
+                    if (value.includes("ALL")) {
+                      setFilter((prev) => ({ ...prev, programIds: [] }));
+                    } else {
+                      setFilter((prev) => ({ ...prev, programIds: value }));
+                    }
+                  }}
+                  input={<OutlinedInput label="Wybierz programy" />}
+                  renderValue={(selected) => {
+                    const sel = (selected as string[]) || [];
+                    if (sel.length === 0) {
+                      return <Typography color="text.secondary">Wszystkie programy</Typography>;
+                    }
+                    return (
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {sel.map((value) => {
+                          const program = filteredPrograms.find((p) => p.id === value);
+                          return (
+                            <Chip
+                              key={value}
+                              label={program ? `${program.code} ${program.name}` : value}
+                              size="small"
+                              sx={{
+                                background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+                                color: "white",
+                                fontSize: "0.75rem",
+                                height: 20,
+                              }}
+                            />
+                          );
+                        })}
                       </Box>
+                    );
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      background: "white",
+                      minHeight: 40,
+                    },
+                  }}
+                >
+                  <MenuItem value="ALL">
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <School sx={{ fontSize: 16, color: "#666" }} />
+                      <Typography>Wszystkie programy</Typography>
                     </Box>
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  {filteredPrograms.map((program) => (
+                    <MenuItem key={program.id} value={program.id}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <School sx={{ fontSize: 16, color: "#1976d2" }} />
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {program.code}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {program.name}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Clear selected programs button */}
+              {filter.programIds && filter.programIds.length > 0 && (
+                <IconButton
+                  aria-label="Wyczyść programy"
+                  size="small"
+                  onClick={() => setFilter((prev) => ({ ...prev, programIds: [] }))}
+                  sx={{ background: "rgba(0,0,0,0.05)", borderRadius: 1 }}
+                >
+                  <Clear />
+                </IconButton>
+              )}
+            </Box>
           </Box>
         </Box>
       </Box>

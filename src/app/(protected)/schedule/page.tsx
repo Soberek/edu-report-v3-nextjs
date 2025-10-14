@@ -134,8 +134,11 @@ function Schedule(): JSX.Element {
               onClose={() => setOpenScheduleTaskForm(false)}
               onSave={() => {}}
               createTask={async (data) => {
+                console.log("Page createTask called with data:", data);
                 await handleScheduledTaskCreation({ ...data, status: "pending" as const });
+                console.log("handleScheduledTaskCreation completed");
                 await refetch();
+                console.log("Data refetched after task creation");
                 // Don't close modal - let user add more tasks
               }}
               userId={user?.uid}
