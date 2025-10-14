@@ -23,7 +23,7 @@ export const useTaskForm = ({ mode, task, userId, onSubmit }: UseTaskFormProps) 
   const form = useForm({
     resolver: zodResolver(schema),
     mode: "onChange",
-    defaultValues: isEditMode 
+    defaultValues: isEditMode
       ? {
           taskTypeId: task?.taskTypeId || TASK_TYPES.PRELEKCJA.id,
           programId: task?.programId || programs[0]?.id || "",
@@ -66,14 +66,16 @@ export const useTaskForm = ({ mode, task, userId, onSubmit }: UseTaskFormProps) 
   }, [isEditMode, task, reset]);
 
   // Handle form submission
-  const handleFormSubmit = handleSubmit((data) => {
+  const handleFormSubmit = handleSubmit(async (data) => {
     const formData = {
       ...data,
       status,
       ...(isEditMode && { id: task?.id }),
       ...(mode === "create" && { userId }),
     };
-    onSubmit(formData as CreateTaskFormData | EditTaskFormData);
+    await onSubmit(formData as CreateTaskFormData | EditTaskFormData);
+
+    // Don't reset form - keep fields filled for quick editing and adding similar tasks
   });
 
   // Validation helpers

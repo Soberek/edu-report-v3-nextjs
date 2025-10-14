@@ -4,7 +4,7 @@ import { Box, Button, Modal, Typography, Container } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { useUser } from "@/hooks/useUser";
 import { useScheduledTask } from "@/features/schedule/hooks/useScheduledTask";
-import { 
+import {
   TaskForm,
   StatisticsCards,
   FilterSection,
@@ -13,7 +13,7 @@ import {
   calculateCompletionPercentage,
   localizeMonth,
   getMonths,
-  getYears
+  getYears,
 } from "@/features/schedule";
 
 function Schedule(): JSX.Element {
@@ -136,7 +136,7 @@ function Schedule(): JSX.Element {
               createTask={async (data) => {
                 await handleScheduledTaskCreation({ ...data, status: "pending" as const });
                 await refetch();
-                setOpenScheduleTaskForm(false);
+                // Don't close modal - let user add more tasks
               }}
               userId={user?.uid}
               loading={loading}
