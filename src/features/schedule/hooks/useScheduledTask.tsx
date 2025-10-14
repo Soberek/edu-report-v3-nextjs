@@ -18,6 +18,7 @@ export const useScheduledTask = () => {
   } = useFirebaseData<ScheduledTaskType>("scheduled-tasks", userContext.user?.uid);
 
   const handleScheduledTaskCreation = (itemData: ScheduledTaskDTOType) => {
+    console.log("handleScheduledTaskCreation called with itemData:", itemData);
     const newScheduledTask: ScheduledTaskDTOType = {
       ...itemData,
     };
@@ -26,10 +27,13 @@ export const useScheduledTask = () => {
     if (!parsedData.success) {
       const errorMessages = parsedData.error.issues.map((err) => err.message).join("\n");
       alert(`Błąd walidacji w useScheduledTask (create):\n${errorMessages}`);
+      console.error("Validation error:", parsedData.error.issues);
       return;
     }
 
+    console.log("Task validation passed, creating task with data:", parsedData.data);
     createTask(parsedData.data);
+    console.log("Task creation initiated");
   };
 
   const handleScheduledTaskUpdate = (id: string, updates: Partial<ScheduledTaskType>) => {

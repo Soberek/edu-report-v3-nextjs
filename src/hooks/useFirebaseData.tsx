@@ -73,10 +73,17 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
 
   const createItem = useCallback(
     async (itemData: Omit<T, "id" | "createdAt" | "updatedAt" | "userId">) => {
-      if (!userId) return null;
+      console.log("useFirebaseData createItem called with data:", itemData);
+      if (!userId) {
+        console.error("Cannot create item - userId is not available");
+        return null;
+      }
 
       try {
+        console.log(`Creating document in ${collectionName} with userId: ${userId}`);
         const newId = await service.createDocument(userId, itemData);
+        console.log(`Document created with ID: ${newId}`);
+
         const newItem = {
           ...itemData,
           id: newId,
@@ -85,11 +92,14 @@ export function useFirebaseData<T extends { id: string }>(collectionName: string
           userId: userId,
         } as unknown as T;
 
+        console.log("Refetching data after document creation");
         // Refetch żeby mieć świeże dane z bazy
         await fetchData();
+        console.log("Data refetched successfully");
 
         return newItem;
       } catch (err) {
+        console.error("Error in createItem:", err);
         dispatch({
           type: "SET_ERROR",
           payload: err instanceof Error ? err.message : "Failed to create item",

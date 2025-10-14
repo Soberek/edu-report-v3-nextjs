@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -14,8 +14,10 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  Alert,
+  Snackbar,
 } from "@mui/material";
-import { Assignment, School, CalendarToday, Description, Save, Edit, Cancel } from "@mui/icons-material";
+import { Assignment, School, CalendarToday, Description, Save, Edit, Cancel, Close, CheckCircle } from "@mui/icons-material";
 import { Controller } from "react-hook-form";
 import { TASK_TYPES } from "@/constants/tasks";
 import { programs } from "@/constants/programs";
@@ -31,16 +33,26 @@ interface Props extends TaskFormProps {
 }
 
 export default function TaskForm({ mode, task, onClose, onSave, userId, createTask, loading = false }: Props): React.ReactElement {
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
   const { control, handleSubmit, formState, isFormValid } = useTaskForm({
     mode,
     task,
     userId,
     onSubmit: async (data) => {
+      console.log("Task form submitted with data:", data);
       if (mode === "edit" && task) {
-        onSave(task.id, data as Partial<EditTaskFormData>);
+        console.log("Editing existing task:", task.id);
+        await onSave(task.id, data as Partial<EditTaskFormData>);
+        setSuccessMessage("Zadanie zostało zaktualizowane!");
       } else if (mode === "create" && createTask) {
+        console.log("Creating new task with data:", data);
         await createTask(data as CreateTaskFormData);
+        setSuccessMessage("Zadanie zostało dodane! Możesz dodać kolejne.");
       }
+      setShowSuccess(true);
+      console.log("Form submission complete, showing success message");
     },
   });
 
@@ -235,18 +247,19 @@ export default function TaskForm({ mode, task, onClose, onSave, userId, createTa
             </Box>
           </Box>
 
-          {/* Submit Button */}
+          {/* Submit Buttons */}
           <Box
             sx={{
               display: "flex",
               justifyContent: "flex-end",
+              gap: 2,
               mt: 3,
               pt: 3,
               borderTop: "1px solid rgba(0,0,0,0.1)",
             }}
           >
             {isEditMode ? (
-              <Box sx={{ display: "flex", gap: 2 }}>
+              <>
                 <Button
                   onClick={onClose}
                   disabled={loading}
@@ -278,34 +291,55 @@ export default function TaskForm({ mode, task, onClose, onSave, userId, createTa
                 >
                   {loading ? "Zapisywanie..." : "Zapisz zmiany"}
                 </Button>
-              </Box>
+              </>
             ) : (
-              <Button
-                type="submit"
-                disabled={loading || !isFormValid}
-                variant="contained"
-                startIcon={<Save />}
-                sx={{
-                  borderRadius: 3,
-                  textTransform: "none",
-                  fontWeight: "bold",
-                  px: 4,
-                  py: 1.5,
-                  background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
-                  boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
-                  "&:hover": {
-                    background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
-                    boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
-                    transform: "translateY(-1px)",
-                  },
-                  "&:disabled": {
-                    background: "rgba(0,0,0,0.12)",
-                    color: "rgba(0,0,0,0.26)",
-                  },
-                }}
-              >
-                {loading ? "Zapisywanie..." : "Zaplanuj zadanie"}
-              </Button>
+              <>
+                <Button
+                  onClick={onClose}
+                  disabled={loading}
+                  startIcon={<Close />}
+                  sx={{
+                    borderRadius: 3,
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    px: 4,
+                    py: 1.5,
+                    background: "rgba(0,0,0,0.05)",
+                    color: "text.secondary",
+                    "&:hover": {
+                      background: "rgba(0,0,0,0.1)",
+                    },
+                  }}
+                >
+                  Zamknij
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading || !isFormValid}
+                  variant="contained"
+                  startIcon={loading ? undefined : <Save />}
+                  sx={{
+                    borderRadius: 3,
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    px: 4,
+                    py: 1.5,
+                    background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+                    boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
+                    "&:hover": {
+                      background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
+                      boxShadow: "0 6px 16px rgba(25, 118, 210, 0.4)",
+                      transform: "translateY(-1px)",
+                    },
+                    "&:disabled": {
+                      background: "rgba(0,0,0,0.12)",
+                      color: "rgba(0,0,0,0.26)",
+                    },
+                  }}
+                >
+                  {loading ? "Zapisywanie..." : "Zaplanuj zadanie"}
+                </Button>
+              </>
             )}
           </Box>
         </Box>
@@ -347,5 +381,29 @@ export default function TaskForm({ mode, task, onClose, onSave, userId, createTa
     );
   }
 
-  return formContent;
+  return (
+    <>
+      {formContent}
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setShowSuccess(false)}
+          severity="success"
+          icon={<CheckCircle />}
+          sx={{
+            borderRadius: 2,
+            boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
+          }}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
+    </>
+  );
 }
