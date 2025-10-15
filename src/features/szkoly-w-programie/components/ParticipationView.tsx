@@ -2,17 +2,12 @@
 "use client";
 import React, { useMemo } from "react";
 import { Alert, Box } from "@mui/material";
-import { useForm } from "react-hook-form";
 import { SchoolProgramParticipationTable } from "./table";
-import { ParticipationForm } from "./ParticipationForm";
 import { ProgramStatistics } from "./ProgramStatistics";
 
 import { PageHeader, LoadingSpinner, SelectorWithCounts, NotificationSnackbar } from "@/components/shared";
-import { SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import type { SchoolYear } from "@/types";
-import { createDefaultFormValues } from "../utils";
 import { PAGE_CONSTANTS, STYLE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
-import type { ParticipationFormProps } from "../types";
 import { useSzkolyWProgramie } from "@/hooks/useSzkolyWProgramie";
 
 type ParticipationViewProps = ReturnType<typeof useSzkolyWProgramie>;
@@ -39,20 +34,6 @@ export default function ParticipationView(props: ParticipationViewProps) {
     closeNotification,
   } = props;
 
-  // Form configuration
-  const formMethods = useForm<SchoolProgramParticipationDTO>({
-    defaultValues: createDefaultFormValues(),
-  });
-
-  const formProps: ParticipationFormProps = {
-    schools,
-    contacts,
-    programs,
-    loading: isLoading,
-    onSubmit: handleSubmit,
-    formMethods,
-  };
-
   // Memoized data for performance
   const memoizedData = useMemo(
     () => ({
@@ -77,8 +58,6 @@ export default function ParticipationView(props: ParticipationViewProps) {
     );
 
   const renderHeader = () => <PageHeader title={PAGE_CONSTANTS.TITLE} subtitle={PAGE_CONSTANTS.SUBTITLE} />;
-
-  const renderFormSection = () => <ParticipationForm {...formProps} />;
 
   const renderStatisticsSection = () => <ProgramStatistics participations={participations} programs={programs} />;
 
@@ -166,7 +145,6 @@ export default function ParticipationView(props: ParticipationViewProps) {
         {renderSchoolYearSelector()}
         {renderProgramSelector()}
       </Box>
-      {renderFormSection()}
       {renderTableSection()}
       {renderSnackbar()}
     </Box>
