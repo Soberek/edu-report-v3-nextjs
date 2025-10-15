@@ -2,7 +2,6 @@
 export { FilterSection } from "./FilterSection";
 export { TaskGroups } from "./TaskGroups";
 export { TaskCard } from "./TaskCard";
-export { EmptyState } from "./EmptyState";
 
 // Form components
 export { EducationalTaskForm } from "./EducationalTaskForm";

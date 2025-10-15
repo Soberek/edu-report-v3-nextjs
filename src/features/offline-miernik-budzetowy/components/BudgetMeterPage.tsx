@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { Container, Typography, Box, Alert } from "@mui/material";
 import { useBudgetMeter, useTabManager } from "../hooks";
-import { FileUploader, MonthSelector, ProcessingButton, StatisticsCards, TabNavigation, TabContent, EmptyState } from "./";
+import { FileUploader, MonthSelector, ProcessingButton, StatisticsCards, TabNavigation, TabContent } from "./";
+import { EmptyState } from "@/components/shared";
 import { UI_CONFIG, AUTO_PROCESSING } from "../constants";
 import { canProcessData, getSelectedMonthsCount, shouldAutoProcess, getCurrentError } from "../utils";
 
@@ -70,7 +71,12 @@ export const BudgetMeterPage: React.FC = () => {
 
       <DataVisualization show={showDataVisualization} activeTab={activeTab} onTabChange={handleTabChange} state={state} />
 
-      <EmptyState show={showEmptyState} />
+      {showEmptyState && (
+        <EmptyState
+          title="Rozpocznij od wczytania pliku Excel"
+          description="Wybierz plik z danymi programów edukacyjnych, aby rozpocząć analizę"
+        />
+      )}
     </Container>
   );
 };

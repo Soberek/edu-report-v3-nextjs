@@ -2,12 +2,11 @@
 import React, { useMemo } from "react";
 import { Container, Box } from "@mui/material";
 import { Add } from "@mui/icons-material";
-import { PageHeader, PrimaryButton, ErrorDisplay, LoadingSpinner } from "@/components/shared";
+import { PageHeader, PrimaryButton, ErrorDisplay, LoadingSpinner, EmptyState } from "@/components/shared";
 import { 
   EducationalTaskForm,
   FilterSection, 
   TaskGroups, 
-  EmptyState,
   useEducationalTasksPage,
   MONTH_NAMES,
   PAGE_CONSTANTS, 
@@ -90,7 +89,20 @@ export default function EducationalTasks(): React.ReactNode {
     }
 
     if (filteredTasks.length === 0) {
-      return <EmptyState hasTasks={tasks.length > 0} onAddTask={handleAddTask} />;
+      const title = tasks.length > 0 ? PAGE_CONSTANTS.EMPTY_STATE.NO_FILTERED_TASKS : PAGE_CONSTANTS.EMPTY_STATE.NO_TASKS;
+      const description = tasks.length > 0 ? PAGE_CONSTANTS.EMPTY_STATE.NO_FILTERED_DESCRIPTION : PAGE_CONSTANTS.EMPTY_STATE.NO_TASKS_DESCRIPTION;
+      
+      return (
+        <EmptyState
+          title={title}
+          description={description}
+          action={{
+            label: BUTTON_LABELS.ADD_TASK,
+            onClick: handleAddTask,
+            icon: <Add />
+          }}
+        />
+      );
     }
 
     return (

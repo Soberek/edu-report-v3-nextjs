@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@mui/material";
-import { StatsCard } from "./StatsCard";
+import { StatsCard } from "@/components/shared";
 import { UI_CONFIG } from "../../constants";
 import type { AggregatedData } from "../../types";
 
@@ -28,8 +28,8 @@ export const StatisticsCards: React.FC<StatisticsCardsProps> = ({ data, show }) 
         mb: UI_CONFIG.SECTION_SPACING,
       }}
     >
-      <StatsCard icon="📊" label="Ogólna liczba działań" value={data.allActions} color="primary" />
-      <StatsCard icon="👥" label="Ogólna liczba odbiorców" value={data.allPeople} color="success" />
+      <StatsCard title="Ogólna liczba działań" value={data.allActions} color="primary" />
+      <StatsCard title="Ogólna liczba odbiorców" value={data.allPeople} color="success" />
     </Box>
   );
 };
