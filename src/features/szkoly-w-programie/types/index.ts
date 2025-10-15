@@ -46,6 +46,7 @@ export interface ParticipationFormProps {
   readonly loading: boolean;
   readonly onSubmit: (data: SchoolProgramParticipationDTO) => Promise<void>;
   readonly formMethods: UseFormReturn<SchoolProgramParticipationDTO>;
+  readonly showSubmitButton?: boolean;
 }
 
 export interface TableProps {
