@@ -1,39 +1,72 @@
 import React from "react";
 import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  IconButton,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Autocomplete,
+  Box,
   Chip,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography,
   useTheme,
 } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material/styles";
 import { FilterList, Search, Clear } from "@mui/icons-material";
 
-export interface FilterField {
+type FilterOption = string | number;
+
+interface BaseFilterField {
   id: string;
-  type: "text" | "select" | "autocomplete" | "multiselect";
   label: string;
   placeholder?: string;
-  options?: string[];
-  value: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onChange: (value: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
-  clearable?: boolean;
   fullWidth?: boolean;
   gridColumn?: string;
+  clearable?: boolean;
 }
+
+export interface TextFilterField extends BaseFilterField {
+  type: "text";
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export interface SelectFilterField extends BaseFilterField {
+  type: "select";
+  value: string;
+  onChange: (value: string) => void;
+  options: ReadonlyArray<FilterOption>;
+  emptyOptionLabel?: string;
+}
+
+export interface AutocompleteFilterField extends BaseFilterField {
+  type: "autocomplete";
+  value: string;
+  onChange: (value: string) => void;
+  options: ReadonlyArray<FilterOption>;
+}
+
+export interface MultiselectFilterField extends BaseFilterField {
+  type: "multiselect";
+  value: string[];
+  onChange: (value: string[]) => void;
+  options: ReadonlyArray<FilterOption>;
+}
+
+export type FilterField =
+  | TextFilterField
+  | SelectFilterField
+  | AutocompleteFilterField
+  | MultiselectFilterField;
 
 export interface FilterSectionProps {
   title?: string;
   fields: FilterField[];
   onClearAll?: () => void;
   showClearAll?: boolean;
-  sx?: object;
+  sx?: SxProps<Theme>;
 }
 
 /**
@@ -68,7 +101,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
             {...commonProps}
             label={field.label}
             placeholder={field.placeholder}
-            value={field.value || ""}
+            value={field.value ?? ""}
             onChange={(e) => field.onChange(e.target.value)}
             InputProps={{
               startAdornment: <Search sx={{ mr: 1, color: "text.secondary" }} />,
@@ -76,33 +109,38 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
           />
         );
 
-      case "select":
+      case "select": {
+        const emptyLabel = field.emptyOptionLabel ?? "Wszystkie";
         return (
           <FormControl {...commonProps}>
             <InputLabel>{field.label}</InputLabel>
             <Select
-              value={field.value || ""}
-              onChange={(e) => field.onChange(e.target.value)}
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(String(e.target.value))}
               label={field.label}
             >
               <MenuItem value="">
-                <em>Wszystkie</em>
+                <em>{emptyLabel}</em>
               </MenuItem>
-              {field.options?.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
+              {field.options.map((option) => {
+                const optionValue = String(option);
+                return (
+                  <MenuItem key={optionValue} value={optionValue}>
+                    {optionValue}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
         );
+      }
 
       case "autocomplete":
         return (
-          <Autocomplete
-            value={field.value || ""}
-            onChange={(_, newValue) => field.onChange(newValue || "")}
-            options={field.options || []}
+          <Autocomplete<string, false, false, false>
+            value={field.value ?? ""}
+            onChange={(_, newValue) => field.onChange(newValue ?? "")}
+            options={field.options.map((option) => String(option))}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -116,11 +154,11 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
 
       case "multiselect":
         return (
-          <Autocomplete
+          <Autocomplete<string, true, false, false>
             multiple
-            value={field.value || []}
+            value={field.value ?? []}
             onChange={(_, newValue) => field.onChange(newValue)}
-            options={field.options || []}
+            options={field.options.map((option) => String(option))}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -135,7 +173,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
                   variant="outlined"
                   label={option}
                   {...getTagProps({ index })}
-                  key={option}
+                  key={`${field.id}-${option}`}
                 />
               ))
             }
@@ -151,7 +189,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
     if (Array.isArray(field.value)) {
       return field.value.length > 0;
     }
-    return field.value && field.value !== "";
+    return Boolean(field.value);
   });
 
   return (
@@ -215,7 +253,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
 
 // Helper function to create common filter fields
 export const createFilterFields = {
-  search: (value: string, onChange: (value: string) => void, placeholder?: string): FilterField => ({
+  search: (value: string, onChange: (value: string) => void, placeholder?: string): TextFilterField => ({
     id: "search",
     type: "text",
     label: "Szukaj",
@@ -230,14 +268,16 @@ export const createFilterFields = {
     label: string,
     value: string,
     onChange: (value: string) => void,
-    options: string[]
-  ): FilterField => ({
+    options: ReadonlyArray<FilterOption>,
+    emptyOptionLabel?: string,
+  ): SelectFilterField => ({
     id,
     type: "select",
     label,
     value,
     onChange,
     options,
+    emptyOptionLabel,
   }),
 
   autocomplete: (
@@ -245,8 +285,8 @@ export const createFilterFields = {
     label: string,
     value: string,
     onChange: (value: string) => void,
-    options: string[]
-  ): FilterField => ({
+    options: ReadonlyArray<FilterOption>
+  ): AutocompleteFilterField => ({
     id,
     type: "autocomplete",
     label,
@@ -260,8 +300,8 @@ export const createFilterFields = {
     label: string,
     value: string[],
     onChange: (value: string[]) => void,
-    options: string[]
-  ): FilterField => ({
+    options: ReadonlyArray<FilterOption>
+  ): MultiselectFilterField => ({
     id,
     type: "multiselect",
     label,
