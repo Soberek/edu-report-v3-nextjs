@@ -16,7 +16,13 @@ import {
 import type { SxProps, Theme } from "@mui/material/styles";
 import { FilterList, Search, Clear } from "@mui/icons-material";
 
-type FilterOption = string | number;
+type PrimitiveFilterOption = string | number;
+interface FilterOptionObject {
+  label: string;
+  value: PrimitiveFilterOption;
+}
+
+type FilterOption = PrimitiveFilterOption | FilterOptionObject;
 
 interface BaseFilterField {
   id: string;
@@ -81,6 +87,14 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   sx = {},
 }) => {
   const theme = useTheme();
+  const isObjectOption = (option: FilterOption): option is FilterOptionObject =>
+    typeof option === "object" && option !== null && "value" in option && "label" in option;
+
+  const getOptionValue = (option: FilterOption): PrimitiveFilterOption =>
+    isObjectOption(option) ? option.value : option;
+
+  const getOptionLabel = (option: FilterOption): string =>
+    isObjectOption(option) ? option.label : String(option);
 
   const renderField = (field: FilterField) => {
     const commonProps = {
@@ -116,17 +130,21 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
             <InputLabel>{field.label}</InputLabel>
             <Select
               value={field.value ?? ""}
-              onChange={(e) => field.onChange(String(e.target.value))}
+              onChange={(e) => {
+                const selectedValue = String(e.target.value);
+                field.onChange(selectedValue);
+              }}
               label={field.label}
             >
               <MenuItem value="">
                 <em>{emptyLabel}</em>
               </MenuItem>
               {field.options.map((option) => {
-                const optionValue = String(option);
+                const optionValue = String(getOptionValue(option));
+                const optionLabel = getOptionLabel(option);
                 return (
                   <MenuItem key={optionValue} value={optionValue}>
-                    {optionValue}
+                    {optionLabel}
                   </MenuItem>
                 );
               })}
@@ -138,9 +156,22 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
       case "autocomplete":
         return (
           <Autocomplete<string, false, false, false>
-            value={field.value ?? ""}
-            onChange={(_, newValue) => field.onChange(newValue ?? "")}
-            options={field.options.map((option) => String(option))}
+            value={
+              field.value
+                ? getOptionLabel(
+                    field.options.find((option) => String(getOptionValue(option)) === field.value) ?? field.value
+                  )
+                : ""
+            }
+            onChange={(_, newValue) => {
+              if (!newValue) {
+                field.onChange("");
+                return;
+              }
+              const matchedOption = field.options.find((option) => getOptionLabel(option) === newValue);
+              field.onChange(String(getOptionValue(matchedOption ?? newValue)));
+            }}
+            options={field.options.map((option) => getOptionLabel(option))}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -156,9 +187,18 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
         return (
           <Autocomplete<string, true, false, false>
             multiple
-            value={field.value ?? []}
-            onChange={(_, newValue) => field.onChange(newValue)}
-            options={field.options.map((option) => String(option))}
+            value={(field.value ?? []).map((item) => {
+              const matchedOption = field.options.find((option) => String(getOptionValue(option)) === item);
+              return matchedOption ? getOptionLabel(matchedOption) : item;
+            })}
+            onChange={(_, newValue) => {
+              const selectedValues = newValue.map((label) => {
+                const matchedOption = field.options.find((option) => getOptionLabel(option) === label);
+                return String(getOptionValue(matchedOption ?? label));
+              });
+              field.onChange(selectedValues);
+            }}
+            options={field.options.map((option) => getOptionLabel(option))}
             renderInput={(params) => (
               <TextField
                 {...params}
