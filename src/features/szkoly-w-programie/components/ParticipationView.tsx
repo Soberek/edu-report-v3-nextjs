@@ -1,14 +1,15 @@
  
 "use client";
 import React, { useMemo } from "react";
-import { Alert, Snackbar, Box } from "@mui/material";
+import { Alert, Box } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { SchoolProgramParticipationTable } from "./table";
 import { ParticipationForm } from "./ParticipationForm";
 import { ProgramStatistics } from "./ProgramStatistics";
 
-import { PageHeader, LoadingSpinner, SelectorWithCounts } from "@/components/shared";
+import { PageHeader, LoadingSpinner, SelectorWithCounts, NotificationSnackbar } from "@/components/shared";
 import { SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
+import type { SchoolYear } from "@/types";
 import { createDefaultFormValues } from "../utils";
 import { PAGE_CONSTANTS, STYLE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
 import type { ParticipationFormProps } from "../types";
@@ -34,8 +35,8 @@ export default function ParticipationView(props: ParticipationViewProps) {
     handleSubmit,
     handleUpdateParticipation,
     handleDeleteParticipation,
-    snackbar,
-    handleCloseSnackbar,
+    notification,
+    closeNotification,
   } = props;
 
   // Form configuration
@@ -82,8 +83,17 @@ export default function ParticipationView(props: ParticipationViewProps) {
   const renderStatisticsSection = () => <ProgramStatistics participations={participations} programs={programs} />;
 
   const renderSchoolYearSelector = () => {
-    const SCHOOL_YEARS: string[] = ["2024/2025", "2025/2026", "2026/2027", "2027/2028"];
-    const displayYears = SCHOOL_YEARS.filter((year) => availableSchoolYears.includes(year as any));
+    const SCHOOL_YEARS: SchoolYear[] = ["2024/2025", "2025/2026", "2026/2027", "2027/2028"];
+    const displayYears = SCHOOL_YEARS.filter((year) => availableSchoolYears.includes(year));
+    const handleYearChange = (value: string) => {
+      if (value === "all") {
+        setSelectedSchoolYear("all");
+        return;
+      }
+      if (SCHOOL_YEARS.includes(value as SchoolYear)) {
+        setSelectedSchoolYear(value as SchoolYear);
+      }
+    };
     
     return (
       <SelectorWithCounts
@@ -94,7 +104,7 @@ export default function ParticipationView(props: ParticipationViewProps) {
           name: year,
           count: participations.filter((p) => p.schoolYear === year).length,
         }))}
-        onChange={(value) => setSelectedSchoolYear(value as any)}
+        onChange={handleYearChange}
         showAllOption
         allOptionLabel="Wszystkie lata"
         showChipForSelected={true}
@@ -135,25 +145,12 @@ export default function ParticipationView(props: ParticipationViewProps) {
   );
 
   const renderSnackbar = () => (
-    <Snackbar
-      open={snackbar.open}
+    <NotificationSnackbar
+      notification={notification}
+      onClose={closeNotification}
       autoHideDuration={UI_CONSTANTS.SNACKBAR_DURATION}
-      onClose={handleCloseSnackbar}
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
-    >
-      <Alert
-        onClose={handleCloseSnackbar}
-        severity={snackbar.type}
-        variant="filled"
-        sx={{
-          width: "100%",
-          borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.MEDIUM,
-          boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-        }}
-      >
-        {snackbar.message}
-      </Alert>
-    </Snackbar>
+    />
   );
 
   if (isLoading) {
@@ -169,6 +166,7 @@ export default function ParticipationView(props: ParticipationViewProps) {
         {renderSchoolYearSelector()}
         {renderProgramSelector()}
       </Box>
+      {renderFormSection()}
       {renderTableSection()}
       {renderSnackbar()}
     </Box>

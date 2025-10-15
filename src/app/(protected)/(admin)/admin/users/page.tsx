@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Container, Typography, CircularProgress, Box, Button, Alert, Snackbar } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import { Container, Typography, CircularProgress, Box, Button, Alert } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import { useUser } from "@/hooks/useUser";
 import { useAdminUsers, type AdminUser } from "@/hooks/useAdminUsers";
@@ -10,6 +10,8 @@ import { CreateUserDialog } from "./components/CreateUserDialog";
 import { EditUserDialog } from "./components/EditUserDialog";
 import { ResetPasswordDialog } from "./components/ResetPasswordDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { NotificationSnackbar } from "@/components/shared";
+import { useNotification } from "@/hooks";
 
 export default function AdminUsersPage() {
   const { userData, loading: userLoading } = useUser();
@@ -27,36 +29,24 @@ export default function AdminUsersPage() {
   // Selected user states
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
 
-  // Snackbar states
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: "success" | "error" | "info";
-  }>({ open: false, message: "", severity: "success" });
+  const { notification, showSuccess, showError, close: closeNotification } = useNotification();
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoadingUsers(true);
     try {
       const fetchedUsers = await listUsers();
       setUsers(fetchedUsers);
     } catch (error) {
-      showSnackbar("Nie udało się pobrać listy użytkowników", "error");
+      console.error("Failed to fetch admin users", error);
+      showError("Nie udało się pobrać listy użytkowników");
     } finally {
       setLoadingUsers(false);
     }
-  };
+  }, [listUsers, showError]);
 
-  const showSnackbar = (message: string, severity: "success" | "error" | "info") => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   // Create user handlers
   const handleOpenCreateDialog = () => {
@@ -71,7 +61,7 @@ export default function AdminUsersPage() {
     try {
       await createUser(data);
       await fetchUsers();
-      showSnackbar("Użytkownik utworzony pomyślnie", "success");
+      showSuccess("Użytkownik utworzony pomyślnie");
     } catch (error) {
       throw error; // Let dialog handle the error
     }
@@ -92,7 +82,7 @@ export default function AdminUsersPage() {
     try {
       await updateUser(uid, updates);
       await fetchUsers();
-      showSnackbar("Użytkownik zaktualizowany pomyślnie", "success");
+      showSuccess("Użytkownik zaktualizowany pomyślnie");
     } catch (error) {
       throw error; // Let dialog handle the error
     }
@@ -131,9 +121,10 @@ export default function AdminUsersPage() {
       await deleteUser(selectedUser.uid);
       await fetchUsers();
       handleCloseDeleteDialog();
-      showSnackbar("Użytkownik usunięty pomyślnie", "success");
+      showSuccess("Użytkownik usunięty pomyślnie");
     } catch (error) {
-      showSnackbar("Nie udało się usunąć użytkownika", "error");
+      console.error("Failed to delete admin user", error);
+      showError("Nie udało się usunąć użytkownika");
     }
   };
 
@@ -235,16 +226,12 @@ export default function AdminUsersPage() {
       />
 
       {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
+      <NotificationSnackbar
+        notification={notification}
+        onClose={closeNotification}
         autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      />
     </>
   );
 }

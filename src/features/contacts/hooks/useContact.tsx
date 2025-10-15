@@ -3,6 +3,7 @@ import { z } from "zod";
 
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
+import { useNotification } from "@/hooks";
 
 // Zod schema for contact validation
 const ContactSchema = z.object({
@@ -26,15 +27,7 @@ export type ContactCreateDTO = Omit<ContactT, "id" | "createdAt" | "userId">;
 
 export const useContacts = () => {
   const userContext = useUser();
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    type: "success" | "error" | "info" | "warning" | "";
-    message: string;
-  }>({
-    open: false,
-    type: "",
-    message: "",
-  });
+  const { notification, showSuccess, showError, close: closeNotification } = useNotification();
   const [error, setError] = useState<string | null>(null);
 
   const userId = userContext.user?.uid;
@@ -58,17 +51,14 @@ export const useContacts = () => {
       await createItem({
         ...validatedData,
       });
-      setSnackbar({
-        open: true,
-        type: "success",
-        message: "Kontakt dodany pomyślnie",
-      });
+      showSuccess("Kontakt dodany pomyślnie");
     } catch (error) {
       if (error instanceof z.ZodError) {
         setError("Validation failed");
       } else {
         setError("Failed to create contact");
       }
+      showError("Nie udało się utworzyć kontaktu");
     }
   };
 
@@ -77,11 +67,7 @@ export const useContacts = () => {
       setError(null);
       const validatedData = ContactCreateSchema.parse(contactData);
       await updateItem(id, validatedData);
-      setSnackbar({
-        open: true,
-        type: "success",
-        message: "Kontakt zaktualizowany pomyślnie",
-      });
+      showSuccess("Kontakt zaktualizowany pomyślnie");
     } catch (error) {
       if (error instanceof z.ZodError) {
         setError("Validation failed");
@@ -90,6 +76,7 @@ export const useContacts = () => {
       }
       //
       setError("Failed to update contact");
+      showError("Nie udało się zaktualizować kontaktu");
     }
   };
 
@@ -97,33 +84,21 @@ export const useContacts = () => {
     try {
       setError(null);
       await deleteItem(id);
-      setSnackbar({
-        open: true,
-        type: "success",
-        message: "Kontakt usunięty pomyślnie",
-      });
+      showSuccess("Kontakt usunięty pomyślnie");
     } catch (error) {
       setError("Failed to delete contact" + error);
+      showError("Nie udało się usunąć kontaktu");
     }
-  };
-
-  const handleShowSnackbar = (message: string, type: "success" | "error" | "info" | "warning" | "") => {
-    setSnackbar({ open: true, message, type });
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
   };
 
   return {
     contacts,
     loading,
     error: error || fetchError,
-    snackbar,
+    notification,
     handleContactDelete,
     handleContactUpdate,
     handleContactSubmit,
-    handleShowSnackbar,
-    handleCloseSnackbar,
+    closeNotification,
   };
 };

@@ -1,10 +1,11 @@
 "use client";
-import { Box, Alert, Snackbar, Typography, Container, Paper, Tabs, Tab, Fade, useTheme, useMediaQuery } from "@mui/material";
+import { Box, Typography, Container, Paper, Tabs, Tab, Fade, useTheme, useMediaQuery } from "@mui/material";
 import { useState } from "react";
 import { useContacts, ContactList, ContactForm, ContactStats, ContactSearch } from "@/features/contacts";
+import { NotificationSnackbar } from "@/components/shared";
 
 export default function Contacts(): React.ReactNode {
-  const { contacts, loading, error, snackbar, handleContactSubmit, handleContactDelete, handleContactUpdate, handleCloseSnackbar } =
+  const { contacts, loading, error, notification, handleContactSubmit, handleContactDelete, handleContactUpdate, closeNotification } =
     useContacts();
   const [activeTab, setActiveTab] = useState(0);
   const theme = useTheme();
@@ -105,26 +106,12 @@ export default function Contacts(): React.ReactNode {
         </Box>
       </Paper>
 
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbar.open}
+      <NotificationSnackbar
+        notification={notification}
+        onClose={closeNotification}
         autoHideDuration={4000}
-        onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.type || "info"}
-          variant="filled"
-          sx={{
-            width: "100%",
-            borderRadius: 2,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-          }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      />
     </Container>
   );
 }
