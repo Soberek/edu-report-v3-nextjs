@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Container, Alert, Snackbar, Box, Button, TextField, InputAdornment } from "@mui/material";
+import { Container, Alert, Box, Button, TextField, InputAdornment } from "@mui/material";
 import { useReducer, useRef } from "react";
 import { Add, Description, Category, FilterList, Search } from "@mui/icons-material";
 
@@ -22,6 +22,7 @@ import {
   useSpisySpraw
 } from "@/features/spisy-spraw";
 import type { CaseRecord } from "@/types";
+import { NotificationSnackbar } from "@/components/shared";
 
 export default function Acts() {
   // Organized state management with useReducer
@@ -60,7 +61,8 @@ export default function Acts() {
     confirmDelete,
     saveCaseRecord,
     closeEditDialog,
-    closeSnackbar,
+    notification,
+    closeNotification,
     changeCode,
     searchChange,
   } = useSpisySpraw({
@@ -195,16 +197,12 @@ export default function Acts() {
       />
 
       {/* Snackbar for notifications */}
-      <Snackbar
-        open={state.snackbar.open}
+      <NotificationSnackbar
+        notification={notification}
+        onClose={closeNotification}
         autoHideDuration={UI_CONFIG.SNACKBAR_AUTO_HIDE_DURATION}
-        onClose={closeSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      >
-        <Alert onClose={closeSnackbar} severity={state.snackbar.type} sx={{ width: "100%" }}>
-          {state.snackbar.message}
-        </Alert>
-      </Snackbar>
+      />
 
       {/* Create Dialog */}
       <EditDialog

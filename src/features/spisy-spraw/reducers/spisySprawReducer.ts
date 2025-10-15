@@ -70,25 +70,6 @@ export function spisySprawReducer(state: SpisySprawState, action: SpisySprawActi
         createLoading: action.payload,
       };
 
-    case "SHOW_SNACKBAR":
-      return {
-        ...state,
-        snackbar: {
-          open: true,
-          type: action.payload.type,
-          message: action.payload.message,
-        },
-      };
-
-    case "CLOSE_SNACKBAR":
-      return {
-        ...state,
-        snackbar: {
-          ...state.snackbar,
-          open: false,
-        },
-      };
-
     case "RESET_FORM":
       return {
         ...state,
@@ -148,15 +129,6 @@ export const actions = {
   setCreateLoading: (payload: boolean) => ({
     type: "SET_CREATE_LOADING" as const,
     payload,
-  }),
-
-  showSnackbar: (payload: { type: "success" | "error" | "info" | "warning"; message: string }) => ({
-    type: "SHOW_SNACKBAR" as const,
-    payload,
-  }),
-
-  closeSnackbar: () => ({
-    type: "CLOSE_SNACKBAR" as const,
   }),
 
   resetForm: () => ({

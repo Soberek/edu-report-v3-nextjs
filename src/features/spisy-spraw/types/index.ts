@@ -11,11 +11,6 @@ export interface SpisySprawState {
   dialogLoading: boolean;
   createLoading: boolean;
   recordToDelete: string | null;
-  snackbar: {
-    open: boolean;
-    type: "success" | "error" | "info" | "warning";
-    message: string;
-  };
 }
 
 export type SpisySprawAction =
@@ -29,8 +24,6 @@ export type SpisySprawAction =
   | { type: "CLOSE_DELETE_DIALOG" }
   | { type: "SET_DIALOG_LOADING"; payload: boolean }
   | { type: "SET_CREATE_LOADING"; payload: boolean }
-  | { type: "SHOW_SNACKBAR"; payload: { type: "success" | "error" | "info" | "warning"; message: string } }
-  | { type: "CLOSE_SNACKBAR" }
   | { type: "RESET_FORM" };
 
 // Business logic types
@@ -38,8 +31,6 @@ export interface ActOption {
   code: string;
   name: string;
 }
-
-export type SnackbarType = "success" | "error" | "info" | "warning";
 
 export interface FormSubmitData {
   data: CaseRecord;

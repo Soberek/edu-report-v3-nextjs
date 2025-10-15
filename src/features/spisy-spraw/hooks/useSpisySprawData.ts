@@ -1,10 +1,11 @@
 import { useMemo, useCallback } from "react";
+import { useNotification } from "@/hooks";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
 import type { CaseRecord } from "@/types";
 
 // Local imports - organized by domain
-import { ActCreateDTO, ActUpdateDTO, type ActCreate } from "../schemas/actSchemas";
+import { ActCreateDTO, ActUpdateDTO } from "../schemas/actSchemas";
 import {
   filterRecordsByCode,
   sortRecordsByDate,
@@ -39,6 +40,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
 
   const user = useUser();
   const userId = user.user?.uid;
+  const { notification, showSuccess, showError, close: closeNotification } = useNotification();
 
   const {
     data: actRecords,
@@ -101,12 +103,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
   const handleAddActRecord = useCallback(
     async (data: CaseRecord | Omit<CaseRecord, "id" | "userId" | "createdAt">) => {
       if (!userId) {
-        dispatch(
-          actions.showSnackbar({
-            type: "error",
-            message: "User not authenticated",
-          })
-        );
+        showError("User not authenticated");
         return;
       }
 
@@ -120,22 +117,17 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
         await createItem(parsedData as Omit<CaseRecord, "id" | "createdAt" | "updatedAt" | "userId">);
         await refetch();
 
-        dispatch(
-          actions.showSnackbar({
-            type: "success",
-            message: MESSAGES.ADD_SUCCESS,
-          })
-        );
+        showSuccess(MESSAGES.ADD_SUCCESS);
         reset();
         dispatch(actions.closeCreateDialog());
       } catch (error) {
         console.error("❌ Error creating record:", error);
-        handleValidationError(error, dispatch, MESSAGES.ADD_ERROR);
+        handleValidationError(error, showError, MESSAGES.ADD_ERROR);
       } finally {
         dispatch(actions.setCreateLoading(false));
       }
     },
-    [userId, createItem, refetch, dispatch, reset]
+    [userId, createItem, refetch, dispatch, reset, showSuccess, showError]
   );
 
   /**
@@ -146,12 +138,7 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
       if (!state.editingCaseRecord) return;
 
       if (!userId) {
-        dispatch(
-          actions.showSnackbar({
-            type: "error",
-            message: "User not authenticated",
-          })
-        );
+        showError("User not authenticated");
         return;
       }
 
@@ -170,20 +157,15 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
         await updateItem(id, updateData);
         await refetch();
 
-        dispatch(
-          actions.showSnackbar({
-            type: "success",
-            message: MESSAGES.UPDATE_SUCCESS,
-          })
-        );
+        showSuccess(MESSAGES.UPDATE_SUCCESS);
         dispatch(actions.closeEditDialog());
       } catch (error) {
-        handleValidationError(error, dispatch, MESSAGES.UPDATE_ERROR);
+        handleValidationError(error, showError, MESSAGES.UPDATE_ERROR);
       } finally {
         dispatch(actions.setDialogLoading(false));
       }
     },
-    [state.editingCaseRecord, userId, updateItem, refetch, dispatch]
+    [state.editingCaseRecord, userId, updateItem, refetch, dispatch, showSuccess, showError]
   );
 
   /**
@@ -195,22 +177,12 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
         await deleteItem(caseId);
         await refetch();
 
-        dispatch(
-          actions.showSnackbar({
-            type: "success",
-            message: MESSAGES.DELETE_SUCCESS,
-          })
-        );
+        showSuccess(MESSAGES.DELETE_SUCCESS);
       } catch {
-        dispatch(
-          actions.showSnackbar({
-            type: "error",
-            message: MESSAGES.DELETE_ERROR,
-          })
-        );
+        showError(MESSAGES.DELETE_ERROR);
       }
     },
-    [deleteItem, refetch, dispatch]
+    [deleteItem, refetch, showSuccess, showError]
   );
 
   // --------------------------------------------------------------------------
@@ -296,13 +268,6 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
   );
 
   /**
-   * Closes the snackbar notification
-   */
-  const handleCloseSnackbar = useCallback(() => {
-    dispatch(actions.closeSnackbar());
-  }, [dispatch]);
-
-  /**
    * Handles code filter change
    */
   const handleCodeChange = useCallback(
@@ -352,7 +317,8 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
     confirmDelete: handleConfirmDelete,
     saveCaseRecord: handleSaveActRecord,
     closeEditDialog: handleCloseEditDialog,
-    closeSnackbar: handleCloseSnackbar,
+    notification,
+    closeNotification,
     changeCode: handleCodeChange,
   };
 };

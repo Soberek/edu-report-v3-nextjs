@@ -33,11 +33,6 @@ export const INITIAL_STATE = {
   dialogLoading: false,
   createLoading: false,
   recordToDelete: null,
-  snackbar: {
-    open: false,
-    type: "success" as const,
-    message: "",
-  },
 };
 
 // UI constants
