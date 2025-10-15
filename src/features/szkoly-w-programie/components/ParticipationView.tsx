@@ -7,8 +7,7 @@ import { SchoolProgramParticipationTable } from "./table";
 import { ParticipationForm } from "./ParticipationForm";
 import { ProgramStatistics } from "./ProgramStatistics";
 import { SchoolYearSelector } from "./SchoolYearSelector";
-import { ProgramSelector } from "./ProgramSelector";
-import { PageHeader, LoadingSpinner } from "@/components/shared";
+import { PageHeader, LoadingSpinner, SelectorWithCounts } from "@/components/shared";
 import { SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { createDefaultFormValues } from "../utils";
 import { PAGE_CONSTANTS, STYLE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
@@ -82,12 +81,40 @@ export default function ParticipationView(props: ParticipationViewProps) {
 
   const renderStatisticsSection = () => <ProgramStatistics participations={participations} programs={programs} />;
 
-  const renderSchoolYearSelector = () => (
-    <SchoolYearSelector selectedYear={selectedSchoolYear} onYearChange={setSelectedSchoolYear} availableYears={[...availableSchoolYears]} />
-  );
+  const renderSchoolYearSelector = () => {
+    const SCHOOL_YEARS: string[] = ["2024/2025", "2025/2026", "2026/2027", "2027/2028"];
+    const displayYears = SCHOOL_YEARS.filter((year) => availableSchoolYears.includes(year as any));
+    
+    return (
+      <SelectorWithCounts
+        label="Rok szkolny"
+        value={selectedSchoolYear}
+        items={displayYears.map((year) => ({
+          id: year,
+          name: year,
+          count: participations.filter((p) => p.schoolYear === year).length,
+        }))}
+        onChange={(value) => setSelectedSchoolYear(value as any)}
+        showAllOption
+        allOptionLabel="Wszystkie lata"
+        showChipForSelected={true}
+      />
+    );
+  };
 
   const renderProgramSelector = () => (
-    <ProgramSelector selectedProgram={selectedProgram} onProgramChange={setSelectedProgram} availablePrograms={[...availablePrograms]} />
+    <SelectorWithCounts
+      label="Program"
+      value={selectedProgram}
+      items={availablePrograms.map((p) => ({
+        id: p.id,
+        name: p.name,
+        count: p.participationCount,
+      }))}
+      onChange={setSelectedProgram}
+      showAllOption
+      allOptionLabel="Wszystkie programy"
+    />
   );
 
   const renderTableSection = () => (

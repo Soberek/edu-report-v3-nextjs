@@ -153,7 +153,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
           <Chip
             key={index}
             label={chip.label}
-            color={chip.color as any}
+            color={chip.color as "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"}
             variant={chip.variant || "outlined"}
             size="small"
           />

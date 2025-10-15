@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useMemo } from "react";
-import { Box, Typography, Paper, Snackbar, Alert, Menu, MenuItem, ListItemIcon, ListItemText, Button } from "@mui/material";
+import { Box, Typography, Paper, Menu, MenuItem, ListItemIcon, ListItemText, Button } from "@mui/material";
 import {
   School as SchoolIcon,
   Email as EmailIcon,
@@ -12,13 +12,14 @@ import { useForm } from "react-hook-form";
 // import type { Contact, Program, School } from "@/types";
 import { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { createColumns } from "./TableConfig";
-import { LoadingSpinner, EmptyState, DataTable, defaultActions, EditDialog } from "@/components/shared";
+import { LoadingSpinner, EmptyState, DataTable, defaultActions, EditDialog, NotificationSnackbar } from "@/components/shared";
 import { EditParticipationForm } from "./EditParticipationForm";
 import { ParticipationForm } from "./ParticipationForm";
 import { mapParticipationsForDisplay, createDefaultFormValues } from "../utils";
 import { STYLE_CONSTANTS, PAGE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
 import type { TableProps, MappedParticipation } from "../types";
 import { Contact, Program, School } from "@/types";
+import { useNotification } from "@/hooks";
 
 export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   schoolsMap,
@@ -38,11 +39,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [dialogLoading, setDialogLoading] = useState(false);
-  const [copySnackbar, setCopySnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const { notification, showSuccess, showError, close: closeNotification } = useNotification();
   const [emailMenuAnchor, setEmailMenuAnchor] = useState<null | HTMLElement>(null);
   const formRef = useRef<{ submit: () => void; isDirty: boolean } | null>(null);
 
@@ -199,11 +196,7 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
       }
 
       if (emailsToCopy.length === 0) {
-        setCopySnackbar({
-          open: true,
-          message: "Brak adresów email do skopiowania",
-          severity: "error",
-        });
+        showError("Brak adresów email do skopiowania");
         handleCloseEmailMenu();
         return;
       }
@@ -215,28 +208,16 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
       navigator.clipboard
         .writeText(emailString)
         .then(() => {
-          setCopySnackbar({
-            open: true,
-            message: `Skopiowano ${emailsToCopy.length} ${typeLabel} adresów email do schowka`,
-            severity: "success",
-          });
+          showSuccess(`Skopiowano ${emailsToCopy.length} ${typeLabel} adresów email do schowka`);
         })
         .catch(() => {
-          setCopySnackbar({
-            open: true,
-            message: "Nie udało się skopiować adresów email",
-            severity: "error",
-          });
+          showError("Nie udało się skopiować adresów email");
         });
 
       handleCloseEmailMenu();
     },
-    [mappedParticipations, handleCloseEmailMenu]
+    [mappedParticipations, handleCloseEmailMenu, showSuccess, showError]
   );
-
-  const handleCloseCopySnackbar = useCallback(() => {
-    setCopySnackbar((prev) => ({ ...prev, open: false }));
-  }, []);
 
   const columns = useMemo(() => createColumns(), []);
   const actions = useMemo(
@@ -448,17 +429,13 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
         </MenuItem>
       </Menu>
 
-      {/* Copy Emails Snackbar */}
-      <Snackbar
-        open={copySnackbar.open}
+      {/* Notification Snackbar */}
+      <NotificationSnackbar
+        notification={notification}
+        onClose={closeNotification}
         autoHideDuration={3000}
-        onClose={handleCloseCopySnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseCopySnackbar} severity={copySnackbar.severity} sx={{ width: "100%" }}>
-          {copySnackbar.message}
-        </Alert>
-      </Snackbar>
+      />
     </>
   );
 };

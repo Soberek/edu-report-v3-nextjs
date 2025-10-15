@@ -20,6 +20,8 @@ export { PageHeader, SimplePageHeader } from "./PageHeader";
 export { TabPanel, AnimatedTabPanel } from "./TabPanel";
 export { EmptyState, NoDataEmptyState, ErrorEmptyState } from "./EmptyState";
 export { ResponseDisplay } from "./response-display";
+export { NotificationSnackbar } from "./NotificationSnackbar";
+export { SelectorWithCounts } from "./SelectorWithCounts";
 
 // New components
 export { AutocompleteField } from "./AutocompleteField";
@@ -27,7 +29,6 @@ export { AvatarWithText, Tag, InfoBadge, NotesCell, DateCell, getInitials, getRa
 export { FilterSection, createFilterFields } from "./FilterSection";
 export { GenericDialog, ConfirmDialog as GenericConfirmDialog, FormDialog } from "./GenericDialog";
 export { SkeletonCard, StatsSkeleton, ContentSkeleton, ListSkeleton, GridSkeleton } from "./SkeletonCard";
-export { AlertSection, ErrorAlert, WarningAlert, SuccessAlert, InfoAlert, CollapsibleAlert } from "./AlertSection";
 export { ContentCard, StatsCard as ContentStatsCard, ContactCard, TaskCard } from "./ContentCard";
 export { TableWrapper, CaseRecordsTable, ProgramTable, SchoolTable } from "./TableWrapper";
 
@@ -48,6 +49,5 @@ export type { AvatarWithTextProps, TagProps, InfoBadgeProps, NotesCellProps, Dat
 export type { FilterField, FilterSectionProps } from "./FilterSection";
 export type { GenericDialogProps } from "./GenericDialog";
 export type { SkeletonCardProps } from "./SkeletonCard";
-export type { AlertSectionProps } from "./AlertSection";
 export type { ContentCardProps } from "./ContentCard";
 export type { TableWrapperProps } from "./TableWrapper";

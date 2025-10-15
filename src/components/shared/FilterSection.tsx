@@ -21,8 +21,8 @@ export interface FilterField {
   label: string;
   placeholder?: string;
   options?: string[];
-  value: any;
-  onChange: (value: any) => void;
+  value: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onChange: (value: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   clearable?: boolean;
   fullWidth?: boolean;
   gridColumn?: string;
