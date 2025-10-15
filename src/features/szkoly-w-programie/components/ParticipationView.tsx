@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { SchoolProgramParticipationTable } from "./table";
 import { ParticipationForm } from "./ParticipationForm";
 import { ProgramStatistics } from "./ProgramStatistics";
-import { SchoolYearSelector } from "./SchoolYearSelector";
+
 import { PageHeader, LoadingSpinner, SelectorWithCounts } from "@/components/shared";
 import { SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { createDefaultFormValues } from "../utils";
