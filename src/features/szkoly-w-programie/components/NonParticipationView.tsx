@@ -1,29 +1,53 @@
 "use client";
-import React from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Grid,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  ToggleButtonGroup,
-  ToggleButton,
-  Autocomplete,
-  TextField,
-} from "@mui/material";
-import { PageHeader, LoadingSpinner, StatsCard, NoDataEmptyState, EmptyState } from "@/components/shared";
+import React, { useMemo } from "react";
+import { Box, Chip, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { PageHeader, LoadingSpinner, StatsCard, FilterSection, TableWrapper, type FilterField } from "@/components/shared";
 import { useSzkolyWProgramie } from "@/hooks/useSzkolyWProgramie";
 import type { Program } from "@/types";
+import type { SchoolParticipationInfo } from "../types";
 
 type NonParticipationViewProps = ReturnType<typeof useSzkolyWProgramie>;
+
+interface ProgramStatsRow {
+  id: string;
+  programName: string;
+  participating: number;
+  notParticipating: number;
+  eligible: number;
+  [key: string]: string | number; // index signature to satisfy Record<string, unknown>
+}
+
+interface SchoolParticipationRow extends SchoolParticipationInfo {
+  id: string;
+  [key: string]: unknown;
+}
+
+const STATUS_OPTIONS = [
+  { label: "Wszystkie szkoły", value: "all" },
+  { label: "Uczestniczące", value: "participating" },
+  { label: "Nieuczestniczące", value: "notParticipating" },
+] as const;
+
+// Define the custom sort order for programs (update with actual program names as needed)
+const CUSTOM_SORT_ORDER = [
+  "Program A",
+  "Program B",
+  "Program C",
+] as const;
+
+const renderPrograms = (programs: readonly Program[], color: "success" | "error") => (
+  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+    {programs.length > 0 ? (
+      programs.map((program) => <Chip key={program.id} label={program.name} size="small" color={color} />)
+    ) : (
+      <Typography variant="body2" color="text.secondary">
+        Brak
+      </Typography>
+    )}
+  </Box>
+);
 
 export default function NonParticipationView(props: NonParticipationViewProps) {
   const {
@@ -41,39 +65,135 @@ export default function NonParticipationView(props: NonParticipationViewProps) {
     setStatusFilter,
   } = props;
 
+  const sortedProgramStats = useMemo(
+    () =>
+      Object.entries(programStats).sort(([nameA], [nameB]) => {
+        const indexA = CUSTOM_SORT_ORDER.indexOf(nameA as (typeof CUSTOM_SORT_ORDER)[number]);
+        const indexB = CUSTOM_SORT_ORDER.indexOf(nameB as (typeof CUSTOM_SORT_ORDER)[number]);
+
+        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        return nameA.localeCompare(nameB);
+      }),
+    [programStats]
+  );
+
+  const schoolOptions = useMemo(
+    () => schools.map((school) => ({ label: school.name, value: school.name })),
+    [schools]
+  );
+
+  const programOptions = useMemo(
+    () => programs.map((program) => ({ label: program.name, value: program.id })),
+    [programs]
+  );
+
+  const filterFields: FilterField[] = [
+    {
+      id: "schoolFilter",
+      type: "select",
+      label: "Szkoła",
+      value: schoolFilter ?? "",
+      onChange: (value) => setSchoolFilter(value || null),
+      options: schoolOptions,
+      emptyOptionLabel: "Wszystkie szkoły",
+    },
+    {
+      id: "programFilter",
+      type: "select",
+      label: "Program",
+      value: programFilter ?? "",
+      onChange: (value) => setProgramFilter(value || null),
+      options: programOptions,
+      emptyOptionLabel: "Wszystkie programy",
+    },
+    {
+      id: "statusFilter",
+      type: "select",
+      label: "Status uczestnictwa",
+      value: statusFilter,
+      onChange: (value) => setStatusFilter((value as NonParticipationViewProps["statusFilter"]) || "all"),
+      options: STATUS_OPTIONS,
+    },
+  ];
+
+  const handleClearFilters = () => {
+    setSchoolFilter(null);
+    setProgramFilter(null);
+    setStatusFilter("all");
+  };
+
+  const programStatsRows: ProgramStatsRow[] = useMemo(
+    () =>
+      sortedProgramStats.map(([name, stats]) => ({
+        id: name,
+        programName: name,
+        participating: stats.participating,
+        notParticipating: stats.notParticipating,
+        eligible: stats.eligible,
+      })),
+    [sortedProgramStats]
+  );
+
+  const programStatsColumns: GridColDef<ProgramStatsRow>[] = useMemo(
+    () => [
+      { field: "programName", headerName: "Nazwa programu", flex: 1, minWidth: 220 },
+      { field: "participating", headerName: "Uczestniczące", flex: 0.6, minWidth: 150, type: "number" },
+      { field: "notParticipating", headerName: "Nieuczestniczące", flex: 0.7, minWidth: 170, type: "number" },
+      { field: "eligible", headerName: "Kwalifikujące się szkoły", flex: 0.8, minWidth: 190, type: "number" },
+    ],
+    []
+  );
+
+  const schoolRows: SchoolParticipationRow[] = useMemo(
+    () =>
+      schoolsInfo.map((school) => ({
+        id: school.schoolName,
+        ...school,
+      })),
+    [schoolsInfo]
+  );
+
+  const schoolColumns: GridColDef<SchoolParticipationRow>[] = useMemo(
+    () => [
+      { field: "schoolName", headerName: "Nazwa szkoły", flex: 1, minWidth: 240 },
+      {
+        field: "participating",
+        headerName: "Programy, w których szkoła uczestniczy",
+        flex: 1.2,
+        minWidth: 260,
+        sortable: false,
+        filterable: false,
+        renderCell: (params: GridRenderCellParams<SchoolParticipationRow, SchoolParticipationRow["participating"]>) =>
+          renderPrograms(params.row.participating, "success"),
+      },
+      {
+        field: "notParticipating",
+        headerName: "Brakujące programy",
+        flex: 1.2,
+        minWidth: 260,
+        sortable: false,
+        filterable: false,
+        renderCell: (params: GridRenderCellParams<SchoolParticipationRow, SchoolParticipationRow["notParticipating"]>) =>
+          renderPrograms(params.row.notParticipating, "error"),
+      },
+    ],
+    []
+  );
+
   if (isLoading) {
     return <LoadingSpinner message="Ładowanie danych o udziale szkół..." />;
   }
 
-  const customSortOrder = [
-    "Zdrowe zęby mamy, marchewkę zajadamy",
-    "Czyste powietrze wokół nas",
-    "Higiena naszą tarczą ochronną",
-    "Porozmawiajmy o zdrowiu i nowych zagrożeniach",
-    "Trzymaj formę",
-  ];
-
-  const sortedProgramStats = Object.entries(programStats).sort(([nameA], [nameB]) => {
-    const indexA = customSortOrder.indexOf(nameA);
-    const indexB = customSortOrder.indexOf(nameB);
-
-    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-    if (indexA !== -1) return -1;
-    if (indexB !== -1) return 1;
-    return nameA.localeCompare(nameB);
-  });
-
-  const schoolOptions = schools.map((s) => ({ id: s.name, name: s.name }));
-  const programOptions = programs.map((p: Program) => ({ id: p.id, name: p.name }));
-
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, display: "flex", flexDirection: "column", gap: 3 }}>
       <PageHeader
         title="Status udziału szkół w programach"
         subtitle="Przegląd udziału w programach i kwalifikowalności dla każdej szkoły."
       />
 
-      <Grid container spacing={3} sx={{ mb: 3 }}>
+      <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 3 }}>
           <StatsCard title="Liczba wszystkich szkół" value={generalStats.totalSchools.toString()} />
         </Grid>
@@ -88,136 +208,29 @@ export default function NonParticipationView(props: NonParticipationViewProps) {
         </Grid>
       </Grid>
 
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Filtry
-          </Typography>
-          <Grid container spacing={2} alignItems="center">
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Autocomplete
-                options={schoolOptions}
-                getOptionLabel={(o) => o.name}
-                value={schoolOptions.find((o) => o.id === schoolFilter) || null}
-                onChange={(_e, value: { id: string; name: string } | null) => setSchoolFilter(value?.id || null)}
-                renderInput={(params) => <TextField {...params} label="Filtruj według szkoły" />}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <Autocomplete
-                options={programOptions}
-                getOptionLabel={(o: { id: string; name: string }) => o.name}
-                value={programOptions.find((o: { id: string; name: string }) => o.id === programFilter) || null}
-                onChange={(_e, value: { id: string; name: string } | null) => setProgramFilter(value?.id || null)}
-                renderInput={(params) => <TextField {...params} label="Filtruj według programu" />}
-              />
-            </Grid>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <ToggleButtonGroup
-                value={statusFilter}
-                exclusive
-                onChange={(_e: React.MouseEvent<HTMLElement>, newValue: "all" | "participating" | "notParticipating" | null) => {
-                  if (newValue) setStatusFilter(newValue);
-                }}
-                aria-label="participation status"
-                fullWidth
-              >
-                <ToggleButton value="all" aria-label="all schools">
-                  Wszystkie
-                </ToggleButton>
-                <ToggleButton value="participating" aria-label="participating schools">
-                  Uczestniczące
-                </ToggleButton>
-                <ToggleButton value="notParticipating" aria-label="not participating schools">
-                  Nieuczestniczące
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+      <FilterSection fields={filterFields} onClearAll={handleClearFilters} sx={{ maxWidth: 1200 }} />
 
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Statystyki programów
-          </Typography>
-          <TableContainer component={Paper}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Nazwa programu</TableCell>
-                  <TableCell align="right">Uczestniczące</TableCell>
-                  <TableCell align="right">Nieuczestniczące</TableCell>
-                  <TableCell align="right">Szkoły kwalifikujące się</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedProgramStats.map(([name, stats]) => (
-                  <TableRow key={name}>
-                    <TableCell component="th" scope="row">
-                      {name}
-                    </TableCell>
-                    <TableCell align="right">{stats.participating}</TableCell>
-                    <TableCell align="right">{stats.notParticipating}</TableCell>
-                    <TableCell align="right">{stats.eligible}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </CardContent>
-      </Card>
+      <TableWrapper<ProgramStatsRow>
+        title="Statystyki programów"
+        subtitle="Porównanie udziału i kwalifikowalności szkół w programach"
+        data={programStatsRows}
+        columns={programStatsColumns}
+        height={Math.min(400, 160 + programStatsRows.length * 56)}
+        emptyTitle="Brak statystyk programów"
+        emptyDescription="Brak danych spełniających kryteria filtrów."
+        getRowId={(row) => row.id}
+      />
 
-      <Typography variant="h6" gutterBottom>
-        Szczegóły szkół
-      </Typography>
-      {schoolsInfo.length === 0 && !isLoading ? (
-        <EmptyState title="Nie znaleziono szkół pasujących do wybranych filtrów." />
-      ) : (
-        <TableContainer component={Paper}>
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nazwa szkoły</TableCell>
-                <TableCell>Programy, w których szkoła uczestniczy</TableCell>
-                <TableCell>Brakujące programy</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {schoolsInfo.map((school) => (
-                <TableRow key={school.schoolName}>
-                  <TableCell component="th" scope="row" sx={{ verticalAlign: "top" }}>
-                    {school.schoolName}
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                      {school.participating.length > 0 ? (
-                        school.participating.map((p) => <Chip key={p.id} label={p.name} size="small" color="success" />)
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          Brak
-                        </Typography>
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                      {school.notParticipating.length > 0 ? (
-                        school.notParticipating.map((p) => <Chip key={p.id} label={p.name} size="small" color="error" />)
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          Brak
-                        </Typography>
-                      )}
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+      <TableWrapper<SchoolParticipationRow>
+        title="Szczegóły szkół"
+        subtitle="Zestawienie programów realizowanych i brakujących dla poszczególnych szkół"
+        data={schoolRows}
+        columns={schoolColumns}
+        height={600}
+        emptyTitle="Nie znaleziono szkół pasujących do wybranych filtrów."
+        emptyDescription="Zmodyfikuj filtry, aby wyświetlić listę szkół."
+        getRowId={(row) => row.id}
+      />
     </Box>
   );
 }
