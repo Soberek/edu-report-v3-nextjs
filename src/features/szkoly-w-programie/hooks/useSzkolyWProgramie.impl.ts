@@ -2,17 +2,11 @@ import { useState, useMemo, useCallback } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { usePrograms } from "@/features/programy-edukacyjne/hooks/useProgram";
-import { School, Program, Contact, SchoolProgramParticipation, SchoolProgramParticipationDTO, SchoolYear } from "@/types";
+import { School, Contact, SchoolProgramParticipation, SchoolProgramParticipationDTO, SchoolYear } from "@/types";
 import { schoolProgramParticipationDTOSchema, schoolProgramParticiapationUpdateDTOSchema } from "@/models/SchoolProgramParticipation";
 import { createLookupMaps, mapParticipationsForDisplay } from "../utils";
 import { MESSAGES } from "../constants";
-import type {
-  SnackbarState,
-  ProgramWithCount,
-  ProgramStats,
-  GeneralStats,
-  SchoolParticipationInfo,
-} from "../types";
+import type { ProgramWithCount } from "../types";
 import {
   createSchoolParticipationsMap,
   calculateSchoolParticipationInfo,
@@ -27,6 +21,7 @@ import {
   getAvailableSchoolYears,
 } from "../utils/szkoly-w-programie.utils";
 import { getErrorMessage, normalizeStudentCount } from "../utils/error-handler.utils";
+import { useNotification } from "@/hooks";
 
 export const useSzkolyWProgramie = () => {
   const { user } = useUser();
@@ -43,12 +38,7 @@ export const useSzkolyWProgramie = () => {
     deleteItem: deleteSchoolProgramParticipation,
   } = useFirebaseData<SchoolProgramParticipation>("school-program-participation", user?.uid);
 
-  // Snackbar State
-  const [snackbar, setSnackbar] = useState<SnackbarState>({
-    open: false,
-    type: "success",
-    message: "",
-  });
+  const { notification, showSuccess, showError, close: closeNotification } = useNotification();
 
   // --- Filter State ---
   const [selectedSchoolYear, setSelectedSchoolYear] = useState<SchoolYear | "all">("2025/2026");
@@ -121,10 +111,6 @@ export const useSzkolyWProgramie = () => {
     return filtered;
   }, [schoolsInfo, schoolFilter, programFilter, statusFilter]);
 
-  const showSuccessMessage = useCallback((message: string) => setSnackbar({ open: true, type: "success", message }), []);
-  const showErrorMessage = useCallback((message: string) => setSnackbar({ open: true, type: "error", message }), []);
-  const handleCloseSnackbar = useCallback(() => setSnackbar((prev: SnackbarState) => ({ ...prev, open: false })), []);
-
   const handleSubmit = useCallback(
     async (data: SchoolProgramParticipationDTO) => {
       try {
@@ -133,14 +119,14 @@ export const useSzkolyWProgramie = () => {
           studentCount: normalizeStudentCount(data.studentCount),
         });
         await createSchoolProgramParticipation(validatedData);
-        showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_ADDED);
+        showSuccess(MESSAGES.SUCCESS.PARTICIPATION_ADDED);
       } catch (error) {
         const errorMessage = getErrorMessage(error, MESSAGES.ERROR.SAVE_FAILED);
-        showErrorMessage(errorMessage);
+        showError(errorMessage);
         throw error;
       }
     },
-    [createSchoolProgramParticipation, showSuccessMessage, showErrorMessage]
+    [createSchoolProgramParticipation, showSuccess, showError]
   );
 
   const handleUpdateParticipation = useCallback(
@@ -152,33 +138,33 @@ export const useSzkolyWProgramie = () => {
           studentCount: normalizeStudentCount(data.studentCount),
         });
         await updateSchoolProgramParticipation(id, validatedData);
-        showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_UPDATED);
+        showSuccess(MESSAGES.SUCCESS.PARTICIPATION_UPDATED);
       } catch (error) {
         const errorMessage = getErrorMessage(error, MESSAGES.ERROR.UPDATE_FAILED);
-        showErrorMessage(errorMessage);
+        showError(errorMessage);
         throw error;
       }
     },
-    [updateSchoolProgramParticipation, showSuccessMessage, showErrorMessage]
+    [updateSchoolProgramParticipation, showSuccess, showError]
   );
 
   const handleDeleteParticipation = useCallback(
     async (id: string) => {
       try {
         await deleteSchoolProgramParticipation(id);
-        showSuccessMessage(MESSAGES.SUCCESS.PARTICIPATION_DELETED);
+        showSuccess(MESSAGES.SUCCESS.PARTICIPATION_DELETED);
       } catch (error) {
-        showErrorMessage(MESSAGES.ERROR.DELETE_FAILED);
+        showError(MESSAGES.ERROR.DELETE_FAILED);
         throw error;
       }
     },
-    [deleteSchoolProgramParticipation, showSuccessMessage, showErrorMessage]
+    [deleteSchoolProgramParticipation, showSuccess, showError]
   );
 
   return {
     isLoading,
     error,
-    snackbar,
+    notification,
     schools: schools || [],
     contacts: contacts || [],
     programs: programs || [],
@@ -194,7 +180,7 @@ export const useSzkolyWProgramie = () => {
     handleSubmit,
     handleUpdateParticipation,
     handleDeleteParticipation,
-    handleCloseSnackbar,
+    closeNotification,
     schoolsInfo: filteredSchoolsInfo,
     generalStats,
     programStats,

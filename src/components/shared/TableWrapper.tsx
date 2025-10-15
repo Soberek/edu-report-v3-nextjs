@@ -1,20 +1,17 @@
 import React from "react";
-import {
-  Paper,
-  Box,
-  Typography,
-  useTheme,
-  CircularProgress,
-} from "@mui/material";
+import { Paper, Box, Typography, useTheme } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material";
+import type { GridColDef, GridSortModel } from "@mui/x-data-grid";
 import { DataTable, LoadingSpinner, EmptyState } from "./";
+import type { DataTableAction } from "./DataTable";
 
-export interface TableWrapperProps {
+export interface TableWrapperProps<T extends Record<string, unknown>> {
   title: string;
   subtitle?: string;
   icon?: React.ReactNode;
-  data: any[];
-  columns: any[];
-  actions?: any[];
+  data: T[];
+  columns: GridColDef<T>[];
+  actions?: DataTableAction[];
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
@@ -22,18 +19,18 @@ export interface TableWrapperProps {
   emptyActionLabel?: string;
   height?: number;
   pageSizeOptions?: number[];
-  getRowId?: (row: any) => string;
-  sortingModel?: any[];
-  sx?: object;
+  getRowId?: (row: T) => string;
+  sortingModel?: GridSortModel;
+  sx?: SxProps<Theme>;
   showHeader?: boolean;
-  headerSx?: object;
+  headerSx?: SxProps<Theme>;
 }
 
 /**
  * Generic table wrapper component
  * Provides consistent styling and behavior for data tables
  */
-export const TableWrapper: React.FC<TableWrapperProps> = ({
+export const TableWrapper = <T extends Record<string, unknown>>({
   title,
   subtitle,
   icon,
@@ -49,24 +46,28 @@ export const TableWrapper: React.FC<TableWrapperProps> = ({
   pageSizeOptions = [5, 10, 25, 50],
   getRowId,
   sortingModel,
-  sx = {},
+  sx,
   showHeader = true,
-  headerSx = {},
-}) => {
+  headerSx,
+}: TableWrapperProps<T>) => {
   const theme = useTheme();
+  const mergeSx = (...styles: Array<SxProps<Theme> | undefined>): SxProps<Theme> =>
+    styles.filter(Boolean) as SxProps<Theme>;
 
   const renderHeader = () => {
     if (!showHeader) return null;
 
     return (
       <Box
-        sx={{
-          background: "rgba(255,255,255,0.9)",
-          backdropFilter: "blur(10px)",
-          p: 2,
-          borderBottom: "1px solid rgba(255,255,255,0.2)",
-          ...headerSx,
-        }}
+        sx={mergeSx(
+          {
+            background: "rgba(255,255,255,0.9)",
+            backdropFilter: "blur(10px)",
+            p: 2,
+            borderBottom: "1px solid rgba(255,255,255,0.2)",
+          },
+          headerSx
+        )}
       >
         <Typography
           variant="h6"
@@ -123,7 +124,7 @@ export const TableWrapper: React.FC<TableWrapperProps> = ({
     return (
       <Box sx={{ p: 2, background: "transparent" }}>
         <DataTable
-          data={data as Record<string, unknown>[]}
+          data={data}
           columns={columns}
           actions={actions}
           loading={loading}
@@ -131,7 +132,7 @@ export const TableWrapper: React.FC<TableWrapperProps> = ({
           pageSizeOptions={pageSizeOptions}
           getRowId={getRowId}
           sortingModel={sortingModel}
-          sx={{
+          sx={mergeSx({
             background: "white",
             borderRadius: 2,
             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
@@ -163,7 +164,7 @@ export const TableWrapper: React.FC<TableWrapperProps> = ({
               alignItems: "center",
               padding: "8px 16px",
             },
-          }}
+          })}
         />
       </Box>
     );
@@ -172,12 +173,14 @@ export const TableWrapper: React.FC<TableWrapperProps> = ({
   return (
     <Paper
       elevation={0}
-      sx={{
-        borderRadius: 3,
-        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-        overflow: "hidden",
-        ...sx,
-      }}
+      sx={mergeSx(
+        {
+          borderRadius: 3,
+          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+          overflow: "hidden",
+        },
+        sx
+      )}
     >
       {renderHeader()}
       {renderContent()}
@@ -186,15 +189,24 @@ export const TableWrapper: React.FC<TableWrapperProps> = ({
 };
 
 // Specialized table wrappers
-export const CaseRecordsTable: React.FC<{
+type SpecializedTableProps<T extends Record<string, unknown>> = {
   title: string;
-  data: any[];
-  columns: any[];
-  actions: any[];
+  data: T[];
+  columns: GridColDef<T>[];
+  actions: DataTableAction[];
   loading?: boolean;
   onAdd?: () => void;
-}> = ({ title, data, columns, actions, loading, onAdd }) => (
-  <TableWrapper
+};
+
+export const CaseRecordsTable = <T extends Record<string, unknown>>({
+  title,
+  data,
+  columns,
+  actions,
+  loading,
+  onAdd,
+}: SpecializedTableProps<T>) => (
+  <TableWrapper<T>
     title={title}
     data={data}
     columns={columns}
@@ -207,15 +219,15 @@ export const CaseRecordsTable: React.FC<{
   />
 );
 
-export const ProgramTable: React.FC<{
-  title: string;
-  data: any[];
-  columns: any[];
-  actions: any[];
-  loading?: boolean;
-  onAdd?: () => void;
-}> = ({ title, data, columns, actions, loading, onAdd }) => (
-  <TableWrapper
+export const ProgramTable = <T extends Record<string, unknown>>({
+  title,
+  data,
+  columns,
+  actions,
+  loading,
+  onAdd,
+}: SpecializedTableProps<T>) => (
+  <TableWrapper<T>
     title={title}
     data={data}
     columns={columns}
@@ -228,15 +240,15 @@ export const ProgramTable: React.FC<{
   />
 );
 
-export const SchoolTable: React.FC<{
-  title: string;
-  data: any[];
-  columns: any[];
-  actions: any[];
-  loading?: boolean;
-  onAdd?: () => void;
-}> = ({ title, data, columns, actions, loading, onAdd }) => (
-  <TableWrapper
+export const SchoolTable = <T extends Record<string, unknown>>({
+  title,
+  data,
+  columns,
+  actions,
+  loading,
+  onAdd,
+}: SpecializedTableProps<T>) => (
+  <TableWrapper<T>
     title={title}
     data={data}
     columns={columns}

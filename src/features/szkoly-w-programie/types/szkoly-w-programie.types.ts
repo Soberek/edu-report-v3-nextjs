@@ -34,15 +34,6 @@ export interface GeneralStats {
 }
 
 /**
- * Snackbar message state
- */
-export interface SnackbarState {
-  readonly open: boolean;
-  readonly type: "success" | "error";
-  readonly message: string;
-}
-
-/**
  * Program with participation count
  */
 export interface ProgramWithCount extends Program {

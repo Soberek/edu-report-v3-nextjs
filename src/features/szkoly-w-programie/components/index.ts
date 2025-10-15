@@ -5,7 +5,6 @@ export { default as NonParticipationView } from "./NonParticipationView";
 export { ParticipationForm } from "./ParticipationForm";
 export { EditParticipationForm } from "./EditParticipationForm";
 export { ProgramStatistics } from "./ProgramStatistics";
-export { SchoolYearSelector } from "./SchoolYearSelector";
 
 // Table configuration
 export { createColumns, CUSTOM_STYLES, TABLE_COLUMNS, type TableColumnConfig } from "./TableConfig";

@@ -55,9 +55,15 @@ Edu Report V3 is a comprehensive educational management system built with Next.j
 ### 📚 Educational Modules
 
 - **Melanoma Education**: Interactive quiz system for cancer awareness
+- **Flu & Cold Prevention**: Educational content and vaccination info
 - **Habit Tracker**: Personal development and goal tracking
 - **Holiday Calendar**: Automated holiday scraping and management
 - **Contact Management**: Comprehensive contact database
+- **Offline Budget Meter**: Financial planning tool
+- **Tobacco Reports**: Specialized reporting for tobacco education
+- **School Program Participation**: Track school involvement in educational programs
+- **Educational Tasks**: Manage and track educational activities
+- **School Lists**: Administrative record keeping
 
 ### 📈 Analytics & Insights
 
@@ -94,6 +100,7 @@ Edu Report V3 is a comprehensive educational management system built with Next.j
 - **[DocxTemplater 3.66.3](https://docxtemplater.com/)** - Word document generation
 - **[React-PDF 4.3.0](https://react-pdf.org/)** - PDF document creation
 - **[PizZip 3.2.0](https://stuk.github.io/jszip/)** - ZIP file handling
+- **[ExcelJS 4.4.0](https://github.com/exceljs/exceljs)** - Advanced Excel operations
 
 ### AI & External APIs
 
@@ -104,8 +111,10 @@ Edu Report V3 is a comprehensive educational management system built with Next.j
 ### Development Tools
 
 - **[pnpm](https://pnpm.io/)** - Fast, disk space efficient package manager
+- **[Vitest 3.2.4](https://vitest.dev/)** - Modern testing framework
 - **[ESLint 9](https://eslint.org/)** - Code linting and formatting
 - **[Turbopack](https://turbo.build/)** - Next.js bundler for faster builds
+- **[@testing-library](https://testing-library.com/)** - React testing utilities
 
 ## 🚀 Getting Started
 
@@ -153,78 +162,128 @@ Edu Report V3 is a comprehensive educational management system built with Next.j
 
 > **🎯 New Architecture**: This project follows a **feature-based architecture** for better modularity and maintainability. See [REFACTORING_STRATEGY.md](REFACTORING_STRATEGY.md) for details.
 
+## 📁 Project Structure
+
+> **🎯 Feature-Driven Architecture**: This project follows a **feature-based architecture** for better modularity and maintainability. See [REFACTORING_SUMMARY_2025.md](REFACTORING_SUMMARY_2025.md) for details.
+
 ```
 edu-report-v3-nextjs/
 ├── src/
-│   ├── common/                 # 🆕 Shared/reusable code
-│   │   ├── components/         # Generic UI components
-│   │   │   ├── ui/            # Base primitives
-│   │   │   ├── shared/        # Business components
-│   │   │   └── layout/        # Layout components
-│   │   ├── hooks/             # Generic React hooks
-│   │   ├── utils/             # Generic utilities
-│   │   └── types/             # Global types
+│   ├── components/             # Shared UI components
+│   │   ├── ui/                 # Base UI primitives
+│   │   │   ├── bottom-navbar.tsx
+│   │   │   ├── breadcrumbs.tsx
+│   │   │   ├── side-drawer.tsx
+│   │   │   ├── top-navbar.tsx
+│   │   │   └── index.ts
+│   │   │
+│   │   ├── layout/             # Layout components
+│   │   │   ├── AuthenticatedLayout.tsx
+│   │   │   └── index.ts
+│   │   │
+│   │   ├── shared/             # Business components
+│   │   │   ├── ActionButton.tsx
+│   │   │   ├── DataTable.tsx
+│   │   │   ├── EditDialog.tsx
+│   │   │   ├── FilterSection.tsx
+│   │   │   ├── FormField.tsx
+│   │   │   ├── LoadingSpinner.tsx
+│   │   │   ├── NotificationSnackbar.tsx
+│   │   │   ├── PageHeader.tsx
+│   │   │   ├── SelectorWithCounts.tsx
+│   │   │   └── ... (more shared components)
+│   │   │
+│   │   └── index.ts            # Master barrel export
+│   │
+│   ├── features/               # Feature modules
+│   │   ├── auth/               # Authentication feature
+│   │   ├── contacts/           # Contact management
+│   │   ├── schools/            # School management
+│   │   ├── schedule/           # Task scheduling
+│   │   ├── programy-edukacyjne/ # Educational programs
+│   │   ├── szkoly-w-programie/ # School participation
+│   │   ├── zadania-edukacyjne/ # Educational tasks
+│   │   ├── spisy-spraw/        # Administrative records
+│   │   ├── sprawozdanie-z-tytoniu/ # Tobacco reports
+│   │   ├── czerniak/           # Melanoma education
+│   │   ├── grypa-i-przeziebienia/ # Flu prevention
+│   │   ├── holidays/           # Holiday management
+│   │   ├── offline-miernik-budzetowy/ # Budget planning
+│   │   ├── todo/               # Task management
+│   │   ├── wygeneruj-izrz/     # Report generation
+│   │   └── README.md           # Features documentation
+│   │
+│   ├── hooks/                  # Shared React hooks
+│   │   ├── useNotification.ts  # Notification management
+│   │   ├── useAsyncOperation.ts
+│   │   ├── useFormValidation.ts
+│   │   ├── useLocalStorage.ts
+│   │   └── index.ts
 │   │
 │   ├── app/                    # Next.js App Router
 │   │   ├── (protected)/        # Protected routes
-│   │   │   ├── holidays/      # 🆕 Feature-based module (reference)
-│   │   │   │   ├── components/
-│   │   │   │   ├── hooks/
-│   │   │   │   ├── services/  # Feature-specific services
-│   │   │   │   ├── utils/     # Feature-specific utils
-│   │   │   │   ├── types/
-│   │   │   │   └── README.md
-│   │   │   ├── contacts/      # Contact management
-│   │   │   │   ├── components/
-│   │   │   │   ├── hooks/     # 🆕 Feature hooks
-│   │   │   │   └── ...
+│   │   │   ├── contacts/       # Contact management
 │   │   │   ├── schools/        # School management
-│   │   │   ├── schedule/       # Task management
-│   │   │   │   ├── hooks/     # 🆕 Feature hooks
-│   │   │   │   └── ...
+│   │   │   ├── schedule/       # Task scheduling
 │   │   │   ├── programy-edukacyjne/ # Educational programs
-│   │   │   │   ├── hooks/     # 🆕 Feature hooks
-│   │   │   │   └── ...
-│   │   │   └── ...             # Other feature modules
+│   │   │   ├── szkoly-w-programie/ # School program participation
+│   │   │   ├── zadania-edukacyjne/ # Educational tasks
+│   │   │   ├── spisy-spraw/    # Administrative records
+│   │   │   ├── sprawozdanie-z-tytoniu/ # Tobacco reports
+│   │   │   ├── czerniak/       # Melanoma education
+│   │   │   ├── grypa-i-przeziebienia/ # Flu prevention
+│   │   │   ├── holidays/       # Holiday management
+│   │   │   ├── offline-miernik-budzetowy/ # Budget planning
+│   │   │   ├── todo/           # Task management
+│   │   │   ├── wygeneruj-izrz/ # Report generation
+│   │   │   ├── 4fun/           # Miscellaneous features
+│   │   │   ├── (admin)/        # Admin panel
+│   │   │   │   └── users/      # User management
+│   │   │   ├── profile/        # User profile
+│   │   │   └── layout.tsx      # Protected layout
 │   │   │
 │   │   ├── api/                # API routes
 │   │   │   ├── auth/           # Authentication
 │   │   │   ├── users/          # User management
 │   │   │   ├── openai/         # AI integration
-│   │   │   └── ...
+│   │   │   ├── generate-holiday-graphics/ # Graphics generation
+│   │   │   └── upload-to-postimages/ # Image uploads
 │   │   │
 │   │   ├── layout.tsx          # Root layout
 │   │   └── page.tsx            # Home page
 │   │
-│   ├── components/
-│   │   └── auth/              # Auth feature components
-│   │
 │   ├── providers/              # Context providers
 │   ├── firebase/               # Firebase configuration
 │   ├── services/               # Shared services
-│   └── ...
+│   ├── types/                  # Global TypeScript types
+│   ├── utils/                  # Shared utilities
+│   ├── constants/              # Global constants
+│   ├── models/                 # Data models
+│   ├── styles/                 # Global styles
+│   └── theme/                  # Theme configuration
 │
 ├── public/                     # Static assets
-├── REFACTORING_STRATEGY.md    # 🆕 Architecture strategy
-├── REFACTORING_SUMMARY.md     # 🆕 What's been done
-├── MIGRATION_GUIDE.md         # 🆕 Migration guide
+├── coverage/                   # Test coverage reports
+├── REFACTORING_DEDUPLICATION_2025.md # Component deduplication docs
+├── REFACTORING_SUMMARY_2025.md # Architecture refactoring docs
+├── package.json
+├── tsconfig.json
+├── vitest.config.ts
+├── tailwind.config.ts
 └── ...
-```
 
 ### 🏗️ Architecture Highlights
 
 - **Feature-Based Modules**: Each feature contains all its code (components, hooks, services, utils, types)
-- **Common Module**: Truly shared, generic code used across features
+- **Shared Components**: Reusable UI components organized in `/src/components/shared/`
 - **Clear Boundaries**: Features are self-contained and loosely coupled
 - **Easy Navigation**: Related code is co-located
+- **Barrel Exports**: Clean imports via index files
 
-**📚 Learn More**: 
-- [Architecture Overview](ARCHITECTURE.md) - **Start here!** Complete architecture guide
-- [Refactoring Strategy](REFACTORING_STRATEGY.md) - Overall architecture plan
-- [Migration Guide](MIGRATION_GUIDE.md) - How to update imports
-- [Refactoring Complete](REFACTORING_COMPLETE.md) - What was accomplished
-- [Holidays Module](src/app/(protected)/holidays/README.md) - Reference implementation
-- [Common Module](src/common/README.md) - Shared code guidelines
+**📚 Learn More**:
+- [Features Directory](src/features/README.md) - Feature modules overview
+- [Refactoring Summary 2025](REFACTORING_SUMMARY_2025.md) - Architecture refactoring details
+- [Component Deduplication](REFACTORING_DEDUPLICATION_2025.md) - Recent component refactoring
 
 ## 🔧 Environment Variables
 
@@ -286,13 +345,19 @@ For detailed deployment instructions, see the [Next.js Deployment Documentation]
 # Development server with Turbopack
 pnpm run dev
 
-# Production build
+# Production build with Turbopack
 pnpm run build
 
 # Start production server
 pnpm run start
 
-# Lint code
+# Run tests with Vitest
+pnpm run test
+
+# Run tests in watch mode
+pnpm run test:watch
+
+# Lint code with ESLint
 pnpm run lint
 ```
 
@@ -300,7 +365,8 @@ pnpm run lint
 
 - **Hot Reload**: Instant updates with Turbopack
 - **TypeScript**: Full type safety and IntelliSense
-- **ESLint**: Code quality and consistency
+- **Vitest**: Modern testing framework with 620+ tests
+- **ESLint**: Code linting and consistency
 - **Material-UI**: Component library with theming
 - **Firebase Emulator**: Local development with Firebase services
 
@@ -333,3 +399,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Firebase](https://firebase.google.com/) for backend services
 - [OpenAI](https://openai.com/) for AI content generation
 - [Vercel](https://vercel.com/) for seamless deployment
+- [Vitest](https://vitest.dev/) for modern testing framework
+- [React Hook Form](https://react-hook-form.com/) for form state management
+- [Zod](https://zod.dev/) for schema validation
+- [Framer Motion](https://www.framer.com/motion/) for animations
+- [Recharts](https://recharts.org/) for data visualization

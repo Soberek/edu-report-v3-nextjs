@@ -1,12 +1,13 @@
 import React from "react";
 import { Box, CircularProgress, Typography, useTheme } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material/styles";
 
 export interface LoadingSpinnerProps {
   size?: number;
   message?: string;
   fullScreen?: boolean;
   color?: "primary" | "secondary" | "inherit";
-  sx?: object;
+  sx?: SxProps<Theme>;
 }
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
@@ -18,7 +19,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 }) => {
   const theme = useTheme();
 
-  const containerSx = fullScreen
+  const containerSx: SxProps<Theme> = fullScreen
     ? {
         position: "fixed",
         top: 0,
@@ -60,7 +61,7 @@ export const SkeletonLoader: React.FC<{
   lines?: number;
   height?: number;
   width?: string | number;
-  sx?: object;
+  sx?: SxProps<Theme>;
 }> = ({ lines = 3, height = 20, width = "100%", sx = {} }) => {
   return (
     <Box sx={{ width, ...sx }}>

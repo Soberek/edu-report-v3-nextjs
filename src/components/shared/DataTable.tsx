@@ -1,6 +1,12 @@
 import React from "react";
-import { DataGrid, type GridColDef, type GridRowParams } from "@mui/x-data-grid";
-import { Box, IconButton, useTheme } from "@mui/material";
+import {
+  DataGrid,
+  type GridColDef,
+  type GridRowParams,
+  type GridSortModel,
+  type GridRenderCellParams,
+} from "@mui/x-data-grid";
+import { Box, IconButton, useTheme, type SxProps, type Theme } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 
 // Polish localization for DataGrid
@@ -99,17 +105,17 @@ export interface DataTableAction {
   tooltip?: string;
 }
 
-export interface DataTableProps<T = unknown> {
+export interface DataTableProps<T extends Record<string, unknown> = Record<string, unknown>> {
   data: T[];
-  columns: GridColDef[];
+  columns: GridColDef<T>[];
   loading?: boolean;
   height?: number;
   pageSizeOptions?: number[];
   actions?: DataTableAction[];
   onRowClick?: (params: GridRowParams) => void;
   getRowId?: (row: T) => string;
-  sortingModel?: { field: string; sort: "asc" | "desc" }[];
-  sx?: object;
+  sortingModel?: GridSortModel;
+  sx?: SxProps<Theme>;
 }
 
 export const DataTable = <T extends Record<string, unknown>>({
@@ -122,18 +128,20 @@ export const DataTable = <T extends Record<string, unknown>>({
   onRowClick,
   getRowId,
   sortingModel,
-  sx = {},
+  sx,
 }: DataTableProps<T>) => {
   const theme = useTheme();
+  const mergeSx = (...styles: Array<SxProps<Theme> | undefined>): SxProps<Theme> =>
+    styles.filter(Boolean) as SxProps<Theme>;
 
-  const actionColumns: GridColDef[] = actions.map((action, index) => ({
+  const actionColumns: GridColDef<T>[] = actions.map((action, index) => ({
     field: `action_${index}`,
     headerName: "",
     width: 60,
     sortable: false,
     filterable: false,
     disableColumnMenu: true,
-    renderCell: (params: { row: T }) => (
+    renderCell: (params: GridRenderCellParams<T>) => (
       <IconButton
         size="small"
         color={action.color || "primary"}
@@ -149,9 +157,10 @@ export const DataTable = <T extends Record<string, unknown>>({
   }));
 
   const allColumns = [...columns, ...actionColumns];
+  const sortModel: GridSortModel = sortingModel ? [...sortingModel] : [];
 
   return (
-    <Box sx={{ height, width: "100%", ...sx }}>
+    <Box sx={{ height, width: "100%" }}>
       <DataGrid
         rows={data}
         columns={allColumns}
@@ -163,17 +172,18 @@ export const DataTable = <T extends Record<string, unknown>>({
             paginationModel: { page: 0, pageSize: 25 },
           },
           sorting: {
-            sortModel: sortingModel || [],
+            sortModel,
           },
         }}
         onRowClick={onRowClick}
         getRowId={getRowId}
-        sx={{
-          "& .MuiDataGrid-cell": {
-            borderRight: 1,
-            borderColor: "divider",
-            display: "flex",
-            alignItems: "center",
+        sx={mergeSx(
+          {
+            "& .MuiDataGrid-cell": {
+              borderRight: 1,
+              borderColor: "divider",
+              display: "flex",
+              alignItems: "center",
             fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
             fontSize: "0.875rem",
             // Text wrapping properties
@@ -217,7 +227,9 @@ export const DataTable = <T extends Record<string, unknown>>({
           "& .MuiTablePagination-root": {
             fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
           },
-        }}
+          },
+          sx
+        )}
         // Enable Polish-friendly features
         density="standard"
         disableColumnResize={false}
