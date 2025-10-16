@@ -1,7 +1,7 @@
 import { useReducer, useCallback, useMemo } from "react";
 import { budgetMeterReducer, initialBudgetMeterState } from "../reducers/budgetMeterReducer";
 import { validateExcelFile, readExcelFile } from "../utils/fileUtils";
-import { validateExcelData, aggregateData, exportToExcel } from "../utils/dataProcessing";
+import { validateExcelData, aggregateData, exportToExcel, exportToTemplate, exportToCumulativeTemplate } from "../utils/dataProcessing";
 import { ERROR_MESSAGES } from "../types";
 
 export const useBudgetMeter = () => {
@@ -92,15 +92,41 @@ export const useBudgetMeter = () => {
   }, [state.rawData, state.selectedMonths]);
 
   // Export functionality
-  const handleExportToExcel = useCallback(async () => {
+  const handleExportToExcel = useCallback(async (customFileName?: string) => {
     if (!state.aggregatedData) {
       return false;
     }
 
     try {
-      return await exportToExcel(state.aggregatedData);
+      return await exportToExcel(state.aggregatedData, customFileName);
     } catch (error) {
       console.error("Export error:", error);
+      return false;
+    }
+  }, [state.aggregatedData]);
+
+  const handleExportToTemplate = useCallback(async (customFileName?: string) => {
+    if (!state.aggregatedData) {
+      return false;
+    }
+
+    try {
+      return await exportToTemplate(state.aggregatedData, customFileName);
+    } catch (error) {
+      console.error("Export to template error:", error);
+      return false;
+    }
+  }, [state.aggregatedData]);
+
+  const handleExportToCumulativeTemplate = useCallback(async (customFileName?: string) => {
+    if (!state.aggregatedData) {
+      return false;
+    }
+
+    try {
+      return await exportToCumulativeTemplate(state.aggregatedData, customFileName);
+    } catch (error) {
+      console.error("Export to cumulative template error:", error);
       return false;
     }
   }, [state.aggregatedData]);
@@ -142,6 +168,8 @@ export const useBudgetMeter = () => {
 
     // Export
     handleExportToExcel,
+    handleExportToTemplate,
+    handleExportToCumulativeTemplate,
 
     // Reset
     resetState,
