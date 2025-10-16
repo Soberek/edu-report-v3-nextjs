@@ -38,9 +38,8 @@ export const useBudgetMeter = () => {
 
       dispatch({ type: "SET_FILE_DATA", payload: { fileName, rawData: data } });
 
-      // Auto-select all months when file is uploaded
-      const allMonthsSelected = state.selectedMonths.map((month) => ({ ...month, selected: true }));
-      dispatch({ type: "SET_SELECTED_MONTHS", payload: allMonthsSelected });
+      // Keep the existing month selection (default is October)
+      // Don't auto-select all months - let user choose which months to analyze
     } catch (error) {
       dispatch({
         type: "SET_FILE_ERROR",
@@ -70,6 +69,25 @@ export const useBudgetMeter = () => {
     const noMonthsSelected = state.selectedMonths.map((month) => ({ ...month, selected: false }));
     dispatch({ type: "SET_SELECTED_MONTHS", payload: noMonthsSelected });
   }, [state.selectedMonths]);
+
+  const handleSelectPreset = useCallback(
+    (monthNumbers: number[]) => {
+      const presetMonths = state.selectedMonths.map((month) => ({
+        ...month,
+        selected: monthNumbers.includes(month.monthNumber),
+      }));
+      
+      // Only dispatch if selection actually changed to avoid unnecessary re-renders
+      const selectionChanged = presetMonths.some(
+        (month, idx) => month.selected !== state.selectedMonths[idx].selected
+      );
+      
+      if (selectionChanged) {
+        dispatch({ type: "SET_SELECTED_MONTHS", payload: presetMonths });
+      }
+    },
+    [state.selectedMonths]
+  );
 
   // Data processing
   const processData = useCallback(async () => {
@@ -162,6 +180,7 @@ export const useBudgetMeter = () => {
     handleMonthToggle,
     handleMonthSelectAll,
     handleMonthDeselectAll,
+    handleSelectPreset,
 
     // Data processing
     processData,

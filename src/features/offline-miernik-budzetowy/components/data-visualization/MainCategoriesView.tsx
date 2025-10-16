@@ -26,29 +26,7 @@ interface MainCategoriesViewProps {
 export const MainCategoriesView: React.FC<MainCategoriesViewProps> = ({ data }) => {
   return (
     <Box sx={{ mt: 4 }}>
-      {/* Summary Cards */}
-      <Box sx={{ display: "flex", gap: 3, mb: 4, flexWrap: "wrap" }}>
-        <Card sx={{ flex: 1, minWidth: 250 }}>
-          <CardContent>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              Całkowita liczba osób
-            </Typography>
-            <Typography variant="h3" color="primary" fontWeight="bold">
-              {data.grandTotalPeople.toLocaleString("pl-PL")}
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ flex: 1, minWidth: 250 }}>
-          <CardContent>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              Całkowita liczba działań
-            </Typography>
-            <Typography variant="h3" color="secondary" fontWeight="bold">
-              {data.grandTotalActions.toLocaleString("pl-PL")}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Box>
+
 
       {/* Grand Total Monthly Breakdown */}
       {data.monthlyBreakdown && data.monthlyBreakdown.length > 0 && (
