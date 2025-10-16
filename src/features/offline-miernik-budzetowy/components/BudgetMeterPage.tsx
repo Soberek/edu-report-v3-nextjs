@@ -21,6 +21,8 @@ export const BudgetMeterPage: React.FC = () => {
     handleMonthDeselectAll,
     processData,
     handleExportToExcel,
+    handleExportToTemplate,
+    handleExportToCumulativeTemplate,
     resetState,
     hasValidData,
     canProcess,
@@ -50,6 +52,8 @@ export const BudgetMeterPage: React.FC = () => {
         state={state}
         onFileUpload={handleFileUpload}
         onExport={handleExportToExcel}
+        onExportToTemplate={handleExportToTemplate}
+        onExportToCumulativeTemplate={handleExportToCumulativeTemplate}
         onReset={resetState}
         canExport={canExport ?? false}
       />
@@ -101,7 +105,9 @@ const PageHeader: React.FC = () => (
 interface FileUploadSectionProps {
   readonly state: ReturnType<typeof useBudgetMeter>["state"];
   readonly onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  readonly onExport: () => Promise<boolean>;
+  readonly onExport: (customFileName?: string) => Promise<boolean>;
+  readonly onExportToTemplate: (customFileName?: string) => Promise<boolean>;
+  readonly onExportToCumulativeTemplate: (customFileName?: string) => Promise<boolean>;
   readonly onReset: () => void;
   readonly canExport: boolean;
 }
@@ -109,11 +115,13 @@ interface FileUploadSectionProps {
 /**
  * File upload section component
  */
-const FileUploadSection: React.FC<FileUploadSectionProps> = ({ state, onFileUpload, onExport, onReset, canExport }) => (
+const FileUploadSection: React.FC<FileUploadSectionProps> = ({ state, onFileUpload, onExport, onExportToTemplate, onExportToCumulativeTemplate, onReset, canExport }) => (
   <FileUploader
     fileName={state.fileName}
     onFileUpload={onFileUpload}
     onExport={onExport}
+    onExportToTemplate={onExportToTemplate}
+    onExportToCumulativeTemplate={onExportToCumulativeTemplate}
     onReset={onReset}
     isLoading={state.isLoading}
     isProcessing={state.isProcessing}
