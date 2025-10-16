@@ -30,6 +30,7 @@ export const validateExcelFile = (file: File): { isValid: boolean; error?: strin
  * Reads Excel file and returns parsed data
  */
 export const readExcelFile = (file: File): Promise<{ fileName: string; data: ExcelRow[] }> => {
+  console.log("📂 DEBUG: readExcelFile called for:", file.name);
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -37,17 +38,23 @@ export const readExcelFile = (file: File): Promise<{ fileName: string; data: Exc
       try {
         const arrayBuffer = event.target?.result;
         if (!arrayBuffer) {
+          console.log("❌ DEBUG: No arrayBuffer from file reader");
           throw new Error(ERROR_MESSAGES.FILE_READ_ERROR);
         }
 
+        console.log("✅ DEBUG: File read successfully, parsing with ExcelJS...");
         (async () => {
           const workbook = new ExcelJS.Workbook();
           await workbook.xlsx.load(arrayBuffer as ArrayBuffer);
           const worksheet = workbook.worksheets[0];
 
           if (!worksheet) {
+            console.log("❌ DEBUG: No worksheet found in workbook");
             throw new Error(ERROR_MESSAGES.FILE_READ_ERROR);
           }
+
+          console.log("📊 DEBUG: Worksheet found, name:", worksheet.name);
+          console.log("📊 DEBUG: Row count:", worksheet.rowCount);
 
           const headerRow = worksheet.getRow(1);
           const headers: string[] = [];
@@ -55,6 +62,9 @@ export const readExcelFile = (file: File): Promise<{ fileName: string; data: Exc
             const value = cell.value;
             headers[colNumber - 1] = value == null ? "" : String(value);
           });
+
+          console.log("📋 DEBUG: Headers extracted:", headers);
+          console.log("📋 DEBUG: Headers count:", headers.length);
 
           const normalizeCellValue = (cell: ExcelJS.Cell): string | number => {
             const cellValue = cell.value;
@@ -105,8 +115,14 @@ export const readExcelFile = (file: File): Promise<{ fileName: string; data: Exc
 
             if (hasValue) {
               rows.push(rowData);
+              if (rows.length <= 3) {
+                console.log(`📄 DEBUG: Row ${rowNumber} parsed:`, JSON.stringify(rowData, null, 2));
+              }
             }
           });
+
+          console.log("✅ DEBUG: Total rows parsed:", rows.length);
+          console.log("📊 DEBUG: First row sample:", rows[0] ? JSON.stringify(rows[0], null, 2) : "No rows");
 
           resolve({
             fileName: file.name,
