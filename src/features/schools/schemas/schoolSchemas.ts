@@ -1,16 +1,6 @@
 import type { School, SchoolTypes } from "@/types";
+import { VALIDATION_MESSAGES } from "@/constants";
 import { z } from "zod";
-
-// Validation error messages
-const VALIDATION_MESSAGES = {
-  name: "Nazwa jest wymagana",
-  email: "Nieprawidłowy adres email",
-  address: "Adres jest wymagany",
-  city: "Miasto jest wymagane",
-  postalCode: "Kod pocztowy musi być w formacie XX-XXX",
-  municipality: "Gmina jest wymagana",
-  type: "Wybierz przynajmniej jeden typ",
-} as const;
 
 /** Form data for creating a new school */
 export type CreateSchoolFormData = Omit<School, "id" | "createdAt" | "updatedAt">;
@@ -27,16 +17,16 @@ export interface SchoolFilterFormData {
 
 /** Zod schema for creating a school with validated fields */
 export const createSchoolSchema = z.object({
-  name: z.string().trim().min(1, VALIDATION_MESSAGES.name).max(255),
-  email: z.string().trim().toLowerCase().email(VALIDATION_MESSAGES.email),
-  address: z.string().trim().min(1, VALIDATION_MESSAGES.address).max(255),
-  city: z.string().trim().min(1, VALIDATION_MESSAGES.city).max(100),
+  name: z.string().trim().min(1, VALIDATION_MESSAGES.school.name).max(255),
+  email: z.string().trim().toLowerCase().email(VALIDATION_MESSAGES.school.email),
+  address: z.string().trim().min(1, VALIDATION_MESSAGES.school.address).max(255),
+  city: z.string().trim().min(1, VALIDATION_MESSAGES.school.city).max(100),
   postalCode: z
     .string()
     .trim()
-    .regex(/^\d{2}-\d{3}$/, VALIDATION_MESSAGES.postalCode),
-  municipality: z.string().trim().min(1, VALIDATION_MESSAGES.municipality).max(100),
-  type: z.array(z.custom<SchoolTypes>()).min(1, VALIDATION_MESSAGES.type),
+    .regex(/^\d{2}-\d{3}$/, VALIDATION_MESSAGES.school.postalCode),
+  municipality: z.string().trim().min(1, VALIDATION_MESSAGES.school.municipality).max(100),
+  type: z.array(z.custom<SchoolTypes>()).min(1, VALIDATION_MESSAGES.school.type),
 });
 
 /** Zod schema for editing a school with optional fields */

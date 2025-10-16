@@ -20,7 +20,7 @@ import {
   filterSchoolsByProgram,
   getAvailableSchoolYears,
 } from "../utils/szkoly-w-programie.utils";
-import { getErrorMessage, normalizeStudentCount } from "../utils/error-handler.utils";
+import { getErrorMessage, normalizeStudentCount } from "@/hooks/utils/error-handler.utils";
 import { useNotification } from "@/hooks";
 
 export const useSzkolyWProgramie = () => {
