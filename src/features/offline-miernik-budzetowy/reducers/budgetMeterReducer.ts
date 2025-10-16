@@ -7,10 +7,10 @@ export const initialBudgetMeterState: BudgetMeterState = {
   isLoading: false,
   fileError: null,
 
-  // Month selection
+  // Month selection - October (10) is selected by default
   selectedMonths: Array.from({ length: 12 }, (_, index) => ({
     monthNumber: index + 1,
-    selected: false,
+    selected: index + 1 === new Date().getMonth() + 1, // Current month is selected
   })),
   monthError: null,
 

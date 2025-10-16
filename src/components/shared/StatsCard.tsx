@@ -1,6 +1,17 @@
-import React from "react";
-import { Card, CardContent, Typography, Box, useTheme } from "@mui/material";
+import React, { useMemo } from "react";
+import { Card, CardContent, Typography, Box, useTheme, Skeleton } from "@mui/material";
 import { TrendingUp, TrendingDown, TrendingFlat } from "@mui/icons-material";
+
+type ColorVariant = "primary" | "secondary" | "success" | "warning" | "error" | "info";
+
+const GRADIENT_MAP: Record<ColorVariant, string> = {
+  primary: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
+  secondary: "linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%)",
+  success: "linear-gradient(135deg, #2e7d32 0%, #4caf50 100%)",
+  warning: "linear-gradient(135deg, #f57c00 0%, #ff9800 100%)",
+  error: "linear-gradient(135deg, #d32f2f 0%, #f44336 100%)",
+  info: "linear-gradient(135deg, #0288d1 0%, #29b6f6 100%)",
+};
 
 export interface StatsCardProps {
   title: string;
@@ -11,13 +22,13 @@ export interface StatsCardProps {
     direction: "up" | "down" | "flat";
     period?: string;
   };
-  color?: "primary" | "secondary" | "success" | "warning" | "error" | "info";
+  color?: ColorVariant;
   icon?: React.ReactNode;
   loading?: boolean;
   sx?: object;
 }
 
-export const StatsCard: React.FC<StatsCardProps> = ({
+export const StatsCard: React.FC<StatsCardProps> = React.memo(({
   title,
   value,
   subtitle,
@@ -29,20 +40,21 @@ export const StatsCard: React.FC<StatsCardProps> = ({
 }) => {
   const theme = useTheme();
 
-  const getTrendIcon = () => {
+  const getTrendIcon = useMemo(() => {
     if (!trend) return null;
 
+    const iconProps = { sx: { fontSize: 16 } };
     switch (trend.direction) {
       case "up":
-        return <TrendingUp sx={{ fontSize: 16, color: "success.main" }} />;
+        return <TrendingUp {...iconProps} sx={{ ...iconProps.sx, color: "success.main" }} />;
       case "down":
-        return <TrendingDown sx={{ fontSize: 16, color: "error.main" }} />;
+        return <TrendingDown {...iconProps} sx={{ ...iconProps.sx, color: "error.main" }} />;
       default:
-        return <TrendingFlat sx={{ fontSize: 16, color: "text.secondary" }} />;
+        return <TrendingFlat {...iconProps} sx={{ ...iconProps.sx, color: "text.secondary" }} />;
     }
-  };
+  }, [trend]);
 
-  const getTrendColor = () => {
+  const trendColor = useMemo(() => {
     if (!trend) return "text.secondary";
 
     switch (trend.direction) {
@@ -53,26 +65,16 @@ export const StatsCard: React.FC<StatsCardProps> = ({
       default:
         return "text.secondary";
     }
-  };
+  }, [trend]);
 
-  const getGradient = () => {
-    const colorMap = {
-      primary: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
-      secondary: "linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%)",
-      success: "linear-gradient(135deg, #2e7d32 0%, #4caf50 100%)",
-      warning: "linear-gradient(135deg, #f57c00 0%, #ff9800 100%)",
-      error: "linear-gradient(135deg, #d32f2f 0%, #f44336 100%)",
-      info: "linear-gradient(135deg, #0288d1 0%, #29b6f6 100%)",
-    };
-    return colorMap[color];
-  };
+  const gradient = useMemo(() => GRADIENT_MAP[color], [color]);
 
   return (
     <Card
       sx={{
         borderRadius: 3,
         boxShadow: theme.shadows[3],
-        background: getGradient(),
+        background: gradient,
         color: "white",
         position: "relative",
         overflow: "hidden",
@@ -84,9 +86,9 @@ export const StatsCard: React.FC<StatsCardProps> = ({
         ...sx,
       }}
     >
-      <CardContent sx={{ p: 3, position: "relative", zIndex: 1 }}>
-        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", mb: 2 }}>
-          <Box>
+      <CardContent sx={{ p: 2, position: "relative", zIndex: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", mb: 0 }}>
+          <Box sx={{ flex: 1 }}>
             <Typography
               variant="body2"
               sx={{
@@ -105,8 +107,9 @@ export const StatsCard: React.FC<StatsCardProps> = ({
                 mt: 0.5,
                 lineHeight: 1,
               }}
+              aria-label={`${title}: ${value}`}
             >
-              {loading ? "..." : value}
+              {loading ? <Skeleton width="60%" height={40} sx={{ backgroundColor: "rgba(255, 255, 255, 0.3)" }} /> : value}
             </Typography>
             {subtitle && (
               <Typography
@@ -128,6 +131,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
                   fontSize: 48,
                 },
               }}
+              aria-hidden="true"
             >
               {icon}
             </Box>
@@ -135,13 +139,13 @@ export const StatsCard: React.FC<StatsCardProps> = ({
         </Box>
 
         {trend && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            {getTrendIcon()}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 1.5 }}>
+            {getTrendIcon}
             <Typography
               variant="body2"
               sx={{
                 fontWeight: 600,
-                color: getTrendColor(),
+                color: trendColor,
               }}
             >
               {trend.value > 0 ? "+" : ""}
@@ -174,6 +178,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({
           background: "rgba(255, 255, 255, 0.1)",
           zIndex: 0,
         }}
+        aria-hidden="true"
       />
       <Box
         sx={{
@@ -186,10 +191,15 @@ export const StatsCard: React.FC<StatsCardProps> = ({
           background: "rgba(255, 255, 255, 0.05)",
           zIndex: 0,
         }}
+        aria-hidden="true"
       />
     </Card>
   );
-};
+});
+
+StatsCard.displayName = "StatsCard";
 
 // Compact stats card variant
-export const CompactStatsCard: React.FC<Omit<StatsCardProps, "subtitle" | "trend">> = (props) => <StatsCard {...props} />;
+export const CompactStatsCard: React.FC<Omit<StatsCardProps, "subtitle" | "trend">> = React.memo((props) => <StatsCard {...props} />);
+
+CompactStatsCard.displayName = "CompactStatsCard";

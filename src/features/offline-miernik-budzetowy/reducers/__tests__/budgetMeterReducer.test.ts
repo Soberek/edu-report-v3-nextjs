@@ -396,8 +396,16 @@ describe("budgetMeterReducer", () => {
       expect(initialBudgetMeterState.selectedMonths).toHaveLength(12);
     });
 
-    it("should have all months unselected initially", () => {
-      expect(initialBudgetMeterState.selectedMonths.every((m) => m.selected === false)).toBe(true);
+    it("should have current month selected initially", () => {
+      const currentMonthNumber = new Date().getMonth() + 1;
+      const currentMonthSelected = initialBudgetMeterState.selectedMonths.find((m) => m.monthNumber === currentMonthNumber);
+      expect(currentMonthSelected?.selected).toBe(true);
+      
+      // All other months should be unselected
+      const otherMonthsUnselected = initialBudgetMeterState.selectedMonths
+        .filter((m) => m.monthNumber !== currentMonthNumber)
+        .every((m) => m.selected === false);
+      expect(otherMonthsUnselected).toBe(true);
     });
 
     it("should have correct month numbers", () => {
@@ -481,11 +489,30 @@ describe("budgetMeterReducer", () => {
 
     it("should handle toggling all months sequentially", () => {
       let state = initialBudgetMeterState;
+      const currentMonthNumber = new Date().getMonth() + 1;
 
+      // First, unselect the current month by toggling it (going from selected to unselected)
+      state = budgetMeterReducer(state, { type: "TOGGLE_MONTH", payload: currentMonthNumber });
+      expect(state.selectedMonths.find((m) => m.monthNumber === currentMonthNumber)?.selected).toBe(false);
+
+      // Now all months should be in the same unselected state, except others are still unselected
+      // Toggle all other months to select them (they start as unselected)
       for (let i = 1; i <= 12; i++) {
-        state = budgetMeterReducer(state, { type: "TOGGLE_MONTH", payload: i });
+        if (i !== currentMonthNumber) {
+          state = budgetMeterReducer(state, { type: "TOGGLE_MONTH", payload: i });
+        }
       }
 
+      // After this, all months except current should be selected
+      const otherMonthsSelected = state.selectedMonths
+        .filter((m) => m.monthNumber !== currentMonthNumber)
+        .every((m) => m.selected === true);
+      expect(otherMonthsSelected).toBe(true);
+
+      // Finally toggle the current month to select it too
+      state = budgetMeterReducer(state, { type: "TOGGLE_MONTH", payload: currentMonthNumber });
+
+      // Now all months should be selected
       expect(state.selectedMonths.every((m) => m.selected)).toBe(true);
     });
 

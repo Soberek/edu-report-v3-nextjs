@@ -1,7 +1,7 @@
 import { useReducer, useCallback, useMemo } from "react";
 import { budgetMeterReducer, initialBudgetMeterState } from "../reducers/budgetMeterReducer";
 import { validateExcelFile, readExcelFile } from "../utils/fileUtils";
-import { validateExcelData, aggregateData, exportToExcel } from "../utils/dataProcessing";
+import { validateExcelData, aggregateData, exportToExcel, exportToTemplate, exportToCumulativeTemplate } from "../utils/dataProcessing";
 import { ERROR_MESSAGES } from "../types";
 
 export const useBudgetMeter = () => {
@@ -38,9 +38,8 @@ export const useBudgetMeter = () => {
 
       dispatch({ type: "SET_FILE_DATA", payload: { fileName, rawData: data } });
 
-      // Auto-select all months when file is uploaded
-      const allMonthsSelected = state.selectedMonths.map((month) => ({ ...month, selected: true }));
-      dispatch({ type: "SET_SELECTED_MONTHS", payload: allMonthsSelected });
+      // Keep the existing month selection (default is October)
+      // Don't auto-select all months - let user choose which months to analyze
     } catch (error) {
       dispatch({
         type: "SET_FILE_ERROR",
@@ -71,6 +70,25 @@ export const useBudgetMeter = () => {
     dispatch({ type: "SET_SELECTED_MONTHS", payload: noMonthsSelected });
   }, [state.selectedMonths]);
 
+  const handleSelectPreset = useCallback(
+    (monthNumbers: number[]) => {
+      const presetMonths = state.selectedMonths.map((month) => ({
+        ...month,
+        selected: monthNumbers.includes(month.monthNumber),
+      }));
+      
+      // Only dispatch if selection actually changed to avoid unnecessary re-renders
+      const selectionChanged = presetMonths.some(
+        (month, idx) => month.selected !== state.selectedMonths[idx].selected
+      );
+      
+      if (selectionChanged) {
+        dispatch({ type: "SET_SELECTED_MONTHS", payload: presetMonths });
+      }
+    },
+    [state.selectedMonths]
+  );
+
   // Data processing
   const processData = useCallback(async () => {
     if (!state.rawData.length || !state.selectedMonths.some((month) => month.selected)) {
@@ -92,15 +110,41 @@ export const useBudgetMeter = () => {
   }, [state.rawData, state.selectedMonths]);
 
   // Export functionality
-  const handleExportToExcel = useCallback(async () => {
+  const handleExportToExcel = useCallback(async (customFileName?: string) => {
     if (!state.aggregatedData) {
       return false;
     }
 
     try {
-      return await exportToExcel(state.aggregatedData);
+      return await exportToExcel(state.aggregatedData, customFileName);
     } catch (error) {
       console.error("Export error:", error);
+      return false;
+    }
+  }, [state.aggregatedData]);
+
+  const handleExportToTemplate = useCallback(async (customFileName?: string) => {
+    if (!state.aggregatedData) {
+      return false;
+    }
+
+    try {
+      return await exportToTemplate(state.aggregatedData, customFileName);
+    } catch (error) {
+      console.error("Export to template error:", error);
+      return false;
+    }
+  }, [state.aggregatedData]);
+
+  const handleExportToCumulativeTemplate = useCallback(async (customFileName?: string) => {
+    if (!state.aggregatedData) {
+      return false;
+    }
+
+    try {
+      return await exportToCumulativeTemplate(state.aggregatedData, customFileName);
+    } catch (error) {
+      console.error("Export to cumulative template error:", error);
       return false;
     }
   }, [state.aggregatedData]);
@@ -136,12 +180,15 @@ export const useBudgetMeter = () => {
     handleMonthToggle,
     handleMonthSelectAll,
     handleMonthDeselectAll,
+    handleSelectPreset,
 
     // Data processing
     processData,
 
     // Export
     handleExportToExcel,
+    handleExportToTemplate,
+    handleExportToCumulativeTemplate,
 
     // Reset
     resetState,

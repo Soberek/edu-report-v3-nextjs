@@ -1,20 +1,18 @@
 import React, { useRef } from "react";
 import { Box, Button, Typography, Alert, useTheme } from "@mui/material";
-import { CloudUpload, FileDownload, Refresh } from "@mui/icons-material";
+import { CloudUpload, Refresh } from "@mui/icons-material";
 
 interface FileUploaderProps {
   fileName: string;
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onExport: () => Promise<boolean>;
   onReset: () => void;
   isLoading: boolean;
   isProcessing: boolean;
-  canExport: boolean;
   error: string | null;
 }
 
 export const FileUploader: React.FC<FileUploaderProps> = React.memo(
-  ({ fileName, onFileUpload, onExport, onReset, isLoading, isProcessing, canExport, error }) => {
+  ({ fileName, onFileUpload, onReset, isLoading, isProcessing, error }) => {
     const theme = useTheme();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -28,17 +26,6 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
         fileInputRef.current.value = "";
       }
       onReset();
-    };
-
-    const handleExport = async () => {
-      const success = await onExport();
-      if (success) {
-        // Could show success message here
-        console.log("Export successful");
-      } else {
-        // Could show error message here
-        console.error("Export failed");
-      }
     };
 
     return (
@@ -65,10 +52,10 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Obsługiwane formaty: .xlsx, .xls (maks. 10MB)
+             Obsługiwane formaty: .xlsx (maks. 10MB)
           </Typography>
 
-          <input ref={fileInputRef} type="file" accept=".xlsx,.xls" onChange={onFileUpload} style={{ display: "none" }} />
+          <input ref={fileInputRef} type="file" accept=".xlsx" onChange={onFileUpload} style={{ display: "none" }} />
 
           <Button
             variant="contained"
@@ -77,7 +64,7 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
             startIcon={<CloudUpload />}
             sx={{ mr: 2 }}
           >
-            {isLoading ? "Wczytywanie..." : "Wybierz plik"}
+            {isLoading ? "⏳ Wczytywanie..." : "Wybierz plik"}
           </Button>
 
           {fileName && (
@@ -92,29 +79,6 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
           <Alert severity="error" sx={{ mt: 2 }}>
             {error}
           </Alert>
-        )}
-
-        {/* Export Section */}
-        {canExport && (
-          <Box sx={{ mt: 3, textAlign: "center" }}>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleExport}
-              disabled={isProcessing}
-              startIcon={<FileDownload />}
-              sx={{
-                background: `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`,
-                "&:hover": {
-                  background: `linear-gradient(135deg, ${theme.palette.success.dark} 0%, ${theme.palette.success.main} 100%)`,
-                  transform: "translateY(-2px)",
-                  boxShadow: `0 4px 12px ${theme.palette.success.main}40`,
-                },
-              }}
-            >
-              Eksportuj do Excel
-            </Button>
-          </Box>
         )}
       </Box>
     );

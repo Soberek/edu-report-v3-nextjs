@@ -14,6 +14,18 @@ export const DEFAULT_ACTIVE_TAB = TABS.DATA_TABLE;
 
 // Tab Metadata
 export const TAB_CONFIG = [
+    {
+    id: TABS.DATA_TABLE,
+    label: "Miernik budżetowy",
+    icon: "TableChart",
+    testId: "data-table-tab",
+  },
+    {
+    id: TABS.MAIN_CATEGORIES,
+    label: "Wskaźniki ",
+    icon: "Category",
+    testId: "main-categories-tab",
+  },
   {
     id: TABS.ADVANCED_STATS,
     label: "Zaawansowane statystyki",
@@ -22,22 +34,12 @@ export const TAB_CONFIG = [
   },
   {
     id: TABS.BAR_CHARTS,
-    label: "Wykresy słupkowe",
+    label: "Wykresy",
     icon: "BarChart",
     testId: "bar-charts-tab",
   },
-  {
-    id: TABS.DATA_TABLE,
-    label: "Tabela danych",
-    icon: "TableChart",
-    testId: "data-table-tab",
-  },
-  {
-    id: TABS.MAIN_CATEGORIES,
-    label: "Kategorie główne",
-    icon: "Category",
-    testId: "main-categories-tab",
-  },
+
+
 ] as const;
 
 // UI Constants

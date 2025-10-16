@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Grid, Card, CardContent, useTheme, Chip, Divider } from "@mui/material";
+import { Box, Typography, Grid, Card, CardContent, useTheme, Chip } from "@mui/material";
 import { TrendingUp, People, Assignment, CalendarMonth } from "@mui/icons-material";
 import type { AggregatedData, Month, ExcelRow } from "../../types";
 import { MONTH_NAMES } from "../../types";
@@ -119,249 +119,257 @@ export const AdvancedStats: React.FC<AdvancedStatsProps> = React.memo(({ data, s
     const colorValue = theme.palette[color].main;
 
     return (
-      <Card sx={{ height: "100%", position: "relative", overflow: "hidden" }}>
-        <CardContent>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 48,
-                height: 48,
-                borderRadius: 2,
-                backgroundColor: `${colorValue}15`,
-                color: colorValue,
-                mr: 2,
-              }}
-            >
-              {icon}
-            </Box>
-            <Box>
-              <Typography variant="h6" fontWeight="bold" color="text.primary">
-                {title}
-              </Typography>
-              {subtitle && (
-                <Typography variant="body2" color="text.secondary">
-                  {subtitle}
-                </Typography>
-              )}
-            </Box>
-          </Box>
-          <Typography variant="h4" fontWeight="bold" color={colorValue}>
+      <Box
+        sx={{
+          p: 1.5,
+          borderRadius: 1.5,
+          backgroundColor: `${colorValue}08`,
+          border: `1px solid ${colorValue}20`,
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 1.5,
+          transition: "all 0.2s ease",
+          "&:hover": {
+            backgroundColor: `${colorValue}12`,
+            borderColor: `${colorValue}40`,
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: 1,
+            backgroundColor: `${colorValue}15`,
+            color: colorValue,
+            flexShrink: 0,
+          }}
+        >
+          {icon}
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+            {title}
+          </Typography>
+          <Typography variant="body1" fontWeight={700} color={colorValue} sx={{ lineHeight: 1 }}>
             {value}
           </Typography>
-        </CardContent>
-      </Card>
+          {subtitle && (
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.65rem" }}>
+              {subtitle}
+            </Typography>
+          )}
+        </Box>
+      </Box>
     );
   };
 
   return (
-    <Box sx={{ mt: 4 }}>
-      <Typography variant="h5" fontWeight="bold" color="text.primary" sx={{ mb: 3 }}>
+    <Box sx={{ mt: 3 }}>
+      <Typography variant="subtitle1" fontWeight={700} color="text.primary" sx={{ mb: 1.5, fontSize: "0.95rem" }}>
         📊 Zaawansowane Statystyki
       </Typography>
 
-      {/* Overview Stats */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+      {/* Overview Stats - 2x2 Grid */}
+      <Grid container spacing={1} sx={{ mb: 2 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <StatCard
             title="Średnia działań/miesiąc"
             value={averages.actionsPerMonth}
             subtitle={`Z ${selectedMonths.filter((m) => m.selected).length} miesięcy`}
-            icon={<CalendarMonth />}
+            icon={<CalendarMonth sx={{ fontSize: 16 }} />}
             color="primary"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <StatCard
             title="Średnia odbiorców/miesiąc"
             value={averages.peoplePerMonth}
-            subtitle={`Z ${selectedMonths.filter((m) => m.selected).length} miesięcy`}
-            icon={<People />}
+            icon={<People sx={{ fontSize: 16 }} />}
             color="success"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <StatCard
             title="Średnia działań/program"
             value={averages.actionsPerProgram}
             subtitle={`Z ${Object.values(programTypeStats).reduce((sum, stat) => sum + stat.count, 0)} programów`}
-            icon={<Assignment />}
+            icon={<Assignment sx={{ fontSize: 16 }} />}
             color="info"
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <StatCard
             title="Średnia odbiorców/program"
             value={averages.peoplePerProgram}
-            subtitle={`Z ${Object.values(programTypeStats).reduce((sum, stat) => sum + stat.count, 0)} programów`}
-            icon={<TrendingUp />}
+            icon={<TrendingUp sx={{ fontSize: 16 }} />}
             color="warning"
           />
         </Grid>
       </Grid>
 
       {/* Top Performers */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
-                🏆 Najaktywniejszy miesiąc
+      <Grid container spacing={1} sx={{ mb: 2 }}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <Box sx={{ p: 1.5, border: `1px solid ${theme.palette.divider}`, borderRadius: 1.5, backgroundColor: theme.palette.background.paper }}>
+            <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ fontSize: "0.7rem", display: "block", mb: 0.75 }}>
+              🏆 Najaktywniejszy miesiąc
+            </Typography>
+            {topMonth ? (
+              <Chip label={topMonth} color="primary" size="small" sx={{ height: 24, fontSize: "0.75rem" }} />
+            ) : (
+              <Typography variant="caption" color="text.secondary">
+                Brak danych
               </Typography>
-              {topMonth ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Chip label={topMonth} color="primary" variant="filled" sx={{ fontSize: "1rem", fontWeight: "bold" }} />
-                  <Typography variant="body2" color="text.secondary">
-                    {
-                      monthStats[selectedMonths.find((m) => m.selected && MONTH_NAMES[m.monthNumber - 1] === topMonth)?.monthNumber || 0]
-                        ?.actions
-                    }{" "}
-                    działań
-                  </Typography>
-                </Box>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  Brak danych
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
+            )}
+          </Box>
         </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
-                🎯 Najpopularniejszy typ programu
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <Box sx={{ p: 1.5, border: `1px solid ${theme.palette.divider}`, borderRadius: 1.5, backgroundColor: theme.palette.background.paper }}>
+            <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ fontSize: "0.7rem", display: "block", mb: 0.75 }}>
+              🎯 Najpopularniejszy typ
+            </Typography>
+            {topProgramType ? (
+              <Chip label={topProgramType} color="primary" size="small" sx={{ height: 24, fontSize: "0.75rem"}} />
+            ) : (
+              <Typography variant="caption" color="text.secondary">
+                Brak danych
               </Typography>
-              {topProgramType ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Chip label={topProgramType} color="secondary" variant="filled" sx={{ fontSize: "1rem", fontWeight: "bold" }} />
-                  <Typography variant="body2" color="text.secondary">
-                    {programTypeStats[topProgramType]?.actions} działań
-                  </Typography>
-                </Box>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  Brak danych
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
+            )}
+          </Box>
         </Grid>
       </Grid>
 
-      {/* Monthly Breakdown */}
-      <Card sx={{ mb: 4 }}>
-        <CardContent>
-          <Typography variant="h6" fontWeight="bold" color="text.primary" sx={{ mb: 3 }}>
-            📅 Szczegóły miesięczne
-          </Typography>
-          <Grid container spacing={2}>
-            {selectedMonths
-              .filter((month) => month.selected)
-              .map((month) => {
-                const monthData = monthStats[month.monthNumber];
-                return (
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={month.monthNumber}>
-                    <Box
-                      sx={{
-                        p: 2,
-                        border: `1px solid ${theme.palette.divider}`,
-                        borderRadius: 2,
-                        backgroundColor: theme.palette.grey[50],
-                      }}
-                    >
-                      <Typography variant="subtitle1" fontWeight="bold" color="text.primary">
-                        {MONTH_NAMES[month.monthNumber - 1]}
-                      </Typography>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          Działania: <strong>{monthData?.actions || 0}</strong>
+      {/* Monthly Breakdown - Compact */}
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ fontSize: "0.7rem", display: "block", mb: 1 }}>
+          📅 Szczegóły miesięczne
+        </Typography>
+        <Grid container spacing={0.75}>
+          {selectedMonths
+            .filter((month) => month.selected)
+            .map((month) => {
+              const monthData = monthStats[month.monthNumber];
+              return (
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={month.monthNumber}>
+                  <Box
+                    sx={{
+                      p: 1.25,
+                      border: `1px solid ${theme.palette.divider}`,
+                      borderRadius: 1,
+                      backgroundColor: theme.palette.grey[50],
+                    }}
+                  >
+                    <Typography variant="caption" fontWeight={600} color="text.primary" sx={{ fontSize: "0.75rem", display: "block", mb: 0.75 }}>
+                      {MONTH_NAMES[month.monthNumber - 1]}
+                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                          Działania:
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Odbiorcy: <strong>{monthData?.people || 0}</strong>
+                        <Typography variant="caption" fontWeight={600} sx={{ fontSize: "0.7rem" }}>
+                          {monthData?.actions || 0}
                         </Typography>
                       </Box>
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                        Programy: <strong>{monthData?.programs || 0}</strong>
-                      </Typography>
+                      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                          Odbiorcy:
+                        </Typography>
+                        <Typography variant="caption" fontWeight={600} sx={{ fontSize: "0.7rem" }}>
+                          {monthData?.people || 0}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                          Programy:
+                        </Typography>
+                        <Typography variant="caption" fontWeight={600} sx={{ fontSize: "0.7rem" }}>
+                          {monthData?.programs || 0}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Grid>
-                );
-              })}
-          </Grid>
-        </CardContent>
-      </Card>
+                  </Box>
+                </Grid>
+              );
+            })}
+        </Grid>
+      </Box>
 
-      {/* Program Type Breakdown */}
-      <Card>
-        <CardContent>
-          <Typography variant="h6" fontWeight="bold" color="text.primary" sx={{ mb: 3 }}>
-            📚 Statystyki typów programów
-          </Typography>
-          <Grid container spacing={2}>
-            {Object.entries(programTypeStats).map(([type, stats]) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={type}>
-                <Box
-                  sx={{
-                    p: 3,
-                    border: `1px solid ${theme.palette.divider}`,
-                    borderRadius: 2,
-                    backgroundColor: theme.palette.background.paper,
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: theme.palette.grey[50],
-                      transform: "translateY(-2px)",
-                      boxShadow: theme.shadows[2],
-                    },
-                  }}
-                >
-                  <Typography variant="subtitle1" fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
-                    {type}
-                  </Typography>
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Programy:
+      {/* Program Type Breakdown - Compact */}
+      <Box>
+        <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ fontSize: "0.7rem", display: "block", mb: 1 }}>
+          📚 Typy programów
+        </Typography>
+        <Grid container spacing={0.75}>
+          {Object.entries(programTypeStats).map(([type, stats]) => (
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={type}>
+              <Box
+                sx={{
+                  p: 1.25,
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: 1,
+                  backgroundColor: theme.palette.background.paper,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    backgroundColor: theme.palette.grey[50],
+                    transform: "translateY(-1px)",
+                  },
+                }}
+              >
+                <Typography variant="caption" fontWeight={600} color="text.primary" sx={{ fontSize: "0.75rem", display: "block", mb: 0.75 }}>
+                  {type}
+                </Typography>
+                <Grid container spacing={0.5}>
+                  <Grid size={{ xs: 6 }}>
+                    <Box sx={{ fontSize: "0.65rem" }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.65rem", display: "block" }}>
+                        Programy
                       </Typography>
-                      <Typography variant="body2" fontWeight="bold">
+                      <Typography variant="caption" fontWeight={700} sx={{ fontSize: "0.8rem" }}>
                         {stats.count}
                       </Typography>
                     </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Działania:
+                  </Grid>
+                  <Grid size={{ xs: 6 }}>
+                    <Box sx={{ fontSize: "0.65rem" }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.65rem", display: "block" }}>
+                        Działania
                       </Typography>
-                      <Typography variant="body2" fontWeight="bold">
+                      <Typography variant="caption" fontWeight={700} sx={{ fontSize: "0.8rem" }}>
                         {stats.actions}
                       </Typography>
                     </Box>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Odbiorcy:
+                  </Grid>
+                  <Grid size={{ xs: 6 }}>
+                    <Box sx={{ fontSize: "0.65rem" }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.65rem", display: "block" }}>
+                        Odbiorcy
                       </Typography>
-                      <Typography variant="body2" fontWeight="bold">
+                      <Typography variant="caption" fontWeight={700} sx={{ fontSize: "0.8rem" }}>
                         {stats.people}
                       </Typography>
                     </Box>
-                    <Divider sx={{ my: 1 }} />
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Średnia działań/program:
+                  </Grid>
+                  <Grid size={{ xs: 6 }}>
+                    <Box sx={{ fontSize: "0.65rem" }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.65rem", display: "block" }}>
+                        Średnia
                       </Typography>
-                      <Typography variant="body2" fontWeight="bold">
+                      <Typography variant="caption" fontWeight={700} sx={{ fontSize: "0.8rem" }}>
                         {stats.count > 0 ? Math.round(stats.actions / stats.count) : 0}
                       </Typography>
                     </Box>
-                  </Box>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </CardContent>
-      </Card>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     </Box>
   );
 });

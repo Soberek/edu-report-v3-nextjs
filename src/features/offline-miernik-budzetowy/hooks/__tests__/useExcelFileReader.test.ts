@@ -1,18 +1,83 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import useExcelFileReader from "../useExcelFileReader";
 
-// Mock XLSX
-vi.mock("xlsx", () => ({
-  read: vi.fn(),
-  utils: {
-    sheet_to_json: vi.fn(),
+// Mock ExcelJS
+const mockLoad = vi.fn();
+const mockGetRow = vi.fn();
+const mockEachRow = vi.fn();
+const mockEachCell = vi.fn();
+
+// Store the last created workbook instance
+let lastWorkbookInstance: {
+  xlsx: { load: typeof mockLoad };
+  worksheets: unknown[];
+} | null = null;
+
+const createMockWorksheet = (headers: string[], rows: unknown[][]) => ({
+  getRow: (rowNumber: number) => {
+    if (rowNumber === 1) {
+      return {
+        eachCell: (options: { includeEmpty?: boolean }, callback: (cell: unknown, colNumber: number) => void) => {
+          headers.forEach((header, index) => {
+            callback({ value: header, text: header }, index + 1);
+          });
+        },
+      };
+    }
+    return { eachCell: vi.fn() };
+  },
+  eachRow: (options: { includeEmpty?: boolean }, callback: (row: unknown, rowNumber: number) => void) => {
+    // First call for header row
+    callback(
+      {
+        getCell: (colIndex: number) => ({
+          value: headers[colIndex - 1],
+          text: headers[colIndex - 1] ?? "",
+        }),
+        eachCell: (opts: { includeEmpty?: boolean }, cb: (cell: unknown, colNumber: number) => void) => {
+          headers.forEach((header, index) => {
+            cb({ value: header, text: header }, index + 1);
+          });
+        },
+      },
+      1
+    );
+
+    // Then data rows
+    rows.forEach((rowData, index) => {
+      callback(
+        {
+          getCell: (colIndex: number) => ({
+            value: rowData[colIndex - 1],
+            text: String(rowData[colIndex - 1] ?? ""),
+          }),
+        },
+        index + 2 // Skip header row
+      );
+    });
+  },
+});
+
+vi.mock("exceljs", () => ({
+  default: {
+    Workbook: vi.fn().mockImplementation(() => {
+      const workbookInstance: {
+        xlsx: { load: typeof mockLoad };
+        worksheets: unknown[];
+      } = {
+        xlsx: {
+          load: mockLoad,
+        },
+        worksheets: [],
+      };
+      
+      // Store reference to this instance
+      lastWorkbookInstance = workbookInstance;
+      
+      return workbookInstance;
+    }),
   },
 }));
-
-import * as XLSX from "xlsx";
-
-const mockXLSXRead = XLSX.read as jest.MockedFunction<typeof XLSX.read>;
-const mockSheetToJson = XLSX.utils.sheet_to_json as jest.MockedFunction<typeof XLSX.utils.sheet_to_json>;
 
 describe("useExcelFileReader", () => {
   beforeEach(() => {
@@ -34,72 +99,98 @@ describe("useExcelFileReader", () => {
     it("should handle successful file reading", async () => {
       const { result } = renderHook(() => useExcelFileReader());
 
-      const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const mockWorkbook = {
-        SheetNames: ["Sheet1"],
-        Sheets: { Sheet1: {} },
-      };
-      const mockData = [{ Data: "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }];
+      const mockFile = new File(["test"], "test.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
 
-      mockXLSXRead.mockReturnValue(mockWorkbook);
-      mockSheetToJson.mockReturnValue(mockData);
+      const headers = ["Data", "Liczba działań", "Liczba ludzi"];
+      const rowsData = [["2024-01-01", 5, 10]];
+      const mockWorksheet = createMockWorksheet(headers, rowsData);
+
+      // Mock the load to set worksheets on the instance
+      mockLoad.mockImplementation(async () => {
+        if (lastWorkbookInstance) {
+          lastWorkbookInstance.worksheets = [mockWorksheet];
+        }
+        return Promise.resolve();
+      });
 
       const mockEvent = {
         target: { files: [mockFile] },
-      } as React.ChangeEvent<HTMLInputElement>;
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
-        await result.current.handleFileUpload(mockEvent);
+        result.current.handleFileUpload(mockEvent);
+        await waitFor(
+          () => {
+            expect(result.current.isLoading).toBe(false);
+          },
+          { timeout: 3000 }
+        );
       });
 
-      expect(mockXLSXRead).toHaveBeenCalledWith(expect.any(ArrayBuffer), { type: "array" });
-      expect(mockSheetToJson).toHaveBeenCalledWith(mockWorkbook.Sheets.Sheet1, { raw: false });
       expect(result.current.fileName).toBe("test.xlsx");
-      expect(result.current.rawData).toEqual(mockData);
-      expect(result.current.isLoading).toBe(false);
+      expect(result.current.rawData).toEqual([
+        { Data: "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 },
+      ]);
       expect(result.current.error).toBeNull();
     });
 
     it("should handle file reading error", async () => {
       const { result } = renderHook(() => useExcelFileReader());
 
-      const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-
-      mockXLSXRead.mockImplementation(() => {
-        throw new Error("File reading error");
+      const mockFile = new File(["test"], "test.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
+
+      mockLoad.mockRejectedValue(new Error("File reading error"));
 
       const mockEvent = {
         target: { files: [mockFile] },
-      } as React.ChangeEvent<HTMLInputElement>;
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
-        await result.current.handleFileUpload(mockEvent);
+        result.current.handleFileUpload(mockEvent);
+        await waitFor(
+          () => {
+            expect(result.current.isLoading).toBe(false);
+          },
+          { timeout: 3000 }
+        );
       });
 
       expect(result.current.fileName).toBe("");
       expect(result.current.rawData).toEqual([]);
-      expect(result.current.isLoading).toBe(false);
       expect(result.current.error).toBe("File reading error");
     });
 
     it("should handle missing sheet", async () => {
       const { result } = renderHook(() => useExcelFileReader());
 
-      const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const mockWorkbook = { Sheets: {} };
+      const mockFile = new File(["test"], "test.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
 
-      mockXLSXRead.mockReturnValue(mockWorkbook);
+      // Mock empty worksheets array
+      mockLoad.mockImplementation(async function (this: { worksheets: unknown[] }) {
+        this.worksheets = [];
+      });
 
       const mockEvent = {
         target: { files: [mockFile] },
-      } as React.ChangeEvent<HTMLInputElement>;
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
-        await result.current.handleFileUpload(mockEvent);
+        result.current.handleFileUpload(mockEvent);
+        await waitFor(
+          () => {
+            expect(result.current.isLoading).toBe(false);
+          },
+          { timeout: 3000 }
+        );
       });
 
-      expect(result.current.error).toBe("Cannot read properties of undefined (reading '0')");
+      expect(result.current.error).toBe("Brak arkusza w pliku");
       expect(result.current.fileName).toBe("");
       expect(result.current.rawData).toEqual([]);
     });
@@ -107,44 +198,67 @@ describe("useExcelFileReader", () => {
     it("should handle empty sheet data", async () => {
       const { result } = renderHook(() => useExcelFileReader());
 
-      const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const mockWorkbook = { Sheets: { Sheet1: {} } };
+      const mockFile = new File(["test"], "test.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
 
-      mockXLSXRead.mockReturnValue(mockWorkbook);
-      mockSheetToJson.mockReturnValue([]);
+      const headers = ["Data", "Liczba działań"];
+      const rowsData: never[] = [];
+      const mockWorksheet = createMockWorksheet(headers, rowsData);
+
+      mockLoad.mockImplementation(async () => {
+        if (lastWorkbookInstance) {
+          lastWorkbookInstance.worksheets = [mockWorksheet];
+        }
+        return Promise.resolve();
+      });
 
       const mockEvent = {
         target: { files: [mockFile] },
-      } as React.ChangeEvent<HTMLInputElement>;
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
-        await result.current.handleFileUpload(mockEvent);
+        result.current.handleFileUpload(mockEvent);
+        await waitFor(
+          () => {
+            expect(result.current.isLoading).toBe(false);
+          },
+          { timeout: 3000 }
+        );
       });
 
-      expect(result.current.error).toBe("Cannot read properties of undefined (reading '0')");
-      expect(result.current.fileName).toBe("");
       expect(result.current.rawData).toEqual([]);
+      expect(result.current.fileName).toBe("test.xlsx");
+      expect(result.current.error).toBeNull();
     });
 
     it("should set loading state during file reading", async () => {
       const { result } = renderHook(() => useExcelFileReader());
 
-      const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const mockWorkbook = {
-        SheetNames: ["Sheet1"],
-        Sheets: { Sheet1: {} },
-      };
-      const mockData = [{ Data: "2024-01-01", "Liczba działań": 5, "Liczba ludzi": 10 }];
+      const mockFile = new File(["test"], "test.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
 
-      mockXLSXRead.mockReturnValue(mockWorkbook);
-      mockSheetToJson.mockReturnValue(mockData);
+      const headers = ["Data", "Liczba działań", "Liczba ludzi"];
+      const rowsData = [["2024-01-01", 5, 10]];
+      const mockWorksheet = createMockWorksheet(headers, rowsData);
+
+      mockLoad.mockImplementation(async function (this: { worksheets: unknown[] }) {
+        this.worksheets = [mockWorksheet];
+      });
 
       const mockEvent = {
         target: { files: [mockFile] },
-      } as React.ChangeEvent<HTMLInputElement>;
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
-        await result.current.handleFileUpload(mockEvent);
+        result.current.handleFileUpload(mockEvent);
+        await waitFor(
+          () => {
+            expect(result.current.isLoading).toBe(false);
+          },
+          { timeout: 3000 }
+        );
       });
 
       // After completion, loading should be false
@@ -153,23 +267,34 @@ describe("useExcelFileReader", () => {
   });
 
   describe("resetState", () => {
-    it("should reset state to initial values", () => {
+    it("should reset state to initial values", async () => {
       const { result } = renderHook(() => useExcelFileReader());
 
       // First modify some state by uploading a file
-      const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const mockWorkbook = { Sheets: { Sheet1: {} } };
-      const mockData = [{ test: "data" }];
+      const mockFile = new File(["test"], "test.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
 
-      mockXLSXRead.mockReturnValue(mockWorkbook);
-      mockSheetToJson.mockReturnValue(mockData);
+      const headers = ["test"];
+      const rowsData = [["data"]];
+      const mockWorksheet = createMockWorksheet(headers, rowsData);
+
+      mockLoad.mockImplementation(async function (this: { worksheets: unknown[] }) {
+        this.worksheets = [mockWorksheet];
+      });
 
       const mockEvent = {
         target: { files: [mockFile] },
-      } as React.ChangeEvent<HTMLInputElement>;
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
-      act(() => {
+      await act(async () => {
         result.current.handleFileUpload(mockEvent);
+        await waitFor(
+          () => {
+            expect(result.current.isLoading).toBe(false);
+          },
+          { timeout: 3000 }
+        );
       });
 
       // Then reset
@@ -188,18 +313,24 @@ describe("useExcelFileReader", () => {
     it("should handle non-Error objects in catch block", async () => {
       const { result } = renderHook(() => useExcelFileReader());
 
-      const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-
-      mockXLSXRead.mockImplementation(() => {
-        throw "String error";
+      const mockFile = new File(["test"], "test.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
+
+      mockLoad.mockRejectedValue("String error");
 
       const mockEvent = {
         target: { files: [mockFile] },
-      } as React.ChangeEvent<HTMLInputElement>;
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
-        await result.current.handleFileUpload(mockEvent);
+        result.current.handleFileUpload(mockEvent);
+        await waitFor(
+          () => {
+            expect(result.current.isLoading).toBe(false);
+          },
+          { timeout: 3000 }
+        );
       });
 
       expect(result.current.error).toBe("Failed to process Excel file");
@@ -208,18 +339,24 @@ describe("useExcelFileReader", () => {
     it("should handle null/undefined errors", async () => {
       const { result } = renderHook(() => useExcelFileReader());
 
-      const mockFile = new File(["test"], "test.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-
-      mockXLSXRead.mockImplementation(() => {
-        throw null;
+      const mockFile = new File(["test"], "test.xlsx", {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
+
+      mockLoad.mockRejectedValue(null);
 
       const mockEvent = {
         target: { files: [mockFile] },
-      } as React.ChangeEvent<HTMLInputElement>;
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
 
       await act(async () => {
-        await result.current.handleFileUpload(mockEvent);
+        result.current.handleFileUpload(mockEvent);
+        await waitFor(
+          () => {
+            expect(result.current.isLoading).toBe(false);
+          },
+          { timeout: 3000 }
+        );
       });
 
       expect(result.current.error).toBe("Failed to process Excel file");
@@ -236,22 +373,33 @@ describe("useExcelFileReader", () => {
       ];
 
       for (const testCase of testCases) {
-        const mockFile = new File(["test"], testCase.name, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-        const mockWorkbook = {
-          SheetNames: ["Sheet1"],
-          Sheets: { Sheet1: {} },
-        };
-        const mockData = [{ test: "data" }];
+        const mockFile = new File(["test"], testCase.name, {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
 
-        mockXLSXRead.mockReturnValue(mockWorkbook);
-        mockSheetToJson.mockReturnValue(mockData);
+        const headers = ["test"];
+        const rowsData = [["data"]];
+        const mockWorksheet = createMockWorksheet(headers, rowsData);
+
+        mockLoad.mockImplementation(async () => {
+          if (lastWorkbookInstance) {
+            lastWorkbookInstance.worksheets = [mockWorksheet];
+          }
+          return Promise.resolve();
+        });
 
         const mockEvent = {
           target: { files: [mockFile] },
-        } as React.ChangeEvent<HTMLInputElement>;
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
 
         await act(async () => {
-          await result.current.handleFileUpload(mockEvent);
+          result.current.handleFileUpload(mockEvent);
+          await waitFor(
+            () => {
+              expect(result.current.isLoading).toBe(false);
+            },
+            { timeout: 3000 }
+          );
         });
 
         expect(result.current.fileName).toBe(testCase.expected);

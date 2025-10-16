@@ -256,7 +256,7 @@ describe("useBudgetMeter", () => {
         await result.current.handleExportToExcel();
       });
 
-      expect(mockExportToExcel).toHaveBeenCalledWith(mockAggregated);
+      expect(mockExportToExcel).toHaveBeenCalledWith(mockAggregated, undefined);
     });
 
     it("should handle export error", async () => {
