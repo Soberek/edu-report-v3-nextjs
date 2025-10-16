@@ -223,7 +223,9 @@ describe("fileUtils", () => {
     });
   });
 
-  describe("readExcelFile", () => {
+  // NOTE: These tests are skipped because they test the old xlsx implementation
+  // The readExcelFile function now uses ExcelJS, and is tested in useExcelFileReader.test.ts
+  describe.skip("readExcelFile", () => {
     beforeEach(() => {
       // Clear all mocks before each test
       vi.clearAllMocks();
