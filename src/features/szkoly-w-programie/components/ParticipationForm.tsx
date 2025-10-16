@@ -185,7 +185,15 @@ const ParticipationFormSubmitButton: React.FC<{
   </Box>
 );
 
-export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, contacts, programs, loading, onSubmit, formMethods }) => {
+export const ParticipationForm: React.FC<ParticipationFormProps> = ({
+  schools,
+  contacts,
+  programs,
+  loading,
+  onSubmit,
+  formMethods,
+  showSubmitButton = true,
+}) => {
   const { control, handleSubmit, reset, formState } = formMethods;
   const { isDirty } = formState;
 
@@ -207,7 +215,7 @@ export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, c
   };
 
   return (
-    <CustomFormSection title={PAGE_CONSTANTS.FORM_TITLE}>
+    <CustomFormSection title={PAGE_CONSTANTS.FORM_TITLE} sx={{mt: 5}}>
       <Box
         component="form"
         onSubmit={handleSubmit(handleFormSubmit)}
@@ -224,7 +232,7 @@ export const ParticipationForm: React.FC<ParticipationFormProps> = ({ schools, c
           programsOptions={programsOptions}
           schoolYearsOptions={schoolYearsOptions}
         />
-        <ParticipationFormSubmitButton loading={loading} isDirty={isDirty} />
+        {showSubmitButton && <ParticipationFormSubmitButton loading={loading} isDirty={isDirty} />}
       </Box>
     </CustomFormSection>
   );

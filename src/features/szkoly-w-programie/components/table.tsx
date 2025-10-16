@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 // import type { Contact, Program, School } from "@/types";
 import { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
 import { createColumns } from "./TableConfig";
-import { LoadingSpinner, EmptyState, DataTable, defaultActions, EditDialog, NotificationSnackbar } from "@/components/shared";
+import { LoadingSpinner, EmptyState, DataTable, defaultActions, GenericDialog, NotificationSnackbar } from "@/components/shared";
 import { EditParticipationForm } from "./EditParticipationForm";
 import { ParticipationForm } from "./ParticipationForm";
 import { mapParticipationsForDisplay, createDefaultFormValues } from "../utils";
@@ -332,13 +332,16 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
   );
 
   const renderEditDialog = () => (
-    <EditDialog
+    <GenericDialog
       open={editDialogOpen}
       onClose={handleCloseEditDialog}
       title="Edytuj uczestnictwo szkoły"
+      subtitle="Aktualizuj dane programu i opiekuna"
       onSave={handleSaveParticipation}
       loading={dialogLoading}
       maxWidth={UI_CONSTANTS.DIALOG_MAX_WIDTH}
+      saveText="Zapisz zmiany"
+      saveDisabled={dialogLoading}
     >
       <EditParticipationForm
         ref={formRef}
@@ -348,16 +351,20 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
         programs={programs as Program[]}
         onSubmit={handleFormSubmit}
       />
-    </EditDialog>
+    </GenericDialog>
   );
 
   const renderAddDialog = () => (
-    <EditDialog
+    <GenericDialog
       open={addDialogOpen}
       onClose={handleCloseAddDialog}
       title="Dodaj uczestnictwo szkoły"
+      subtitle="Wypełnij formularz, aby przypisać szkołę do programu"
       loading={dialogLoading}
       maxWidth={UI_CONSTANTS.DIALOG_MAX_WIDTH}
+      onSave={() => addFormMethods.handleSubmit(handleAddFormSubmit)()}
+      saveText="Dodaj uczestnictwo"
+      saveDisabled={dialogLoading || !addFormMethods.formState.isDirty}
     >
       <ParticipationForm
         schools={schools as School[]}
@@ -366,8 +373,9 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
         loading={dialogLoading}
         onSubmit={handleAddFormSubmit}
         formMethods={addFormMethods}
+        showSubmitButton={false}
       />
-    </EditDialog>
+    </GenericDialog>
   );
 
   if (errorMessage) {
