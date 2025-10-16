@@ -1,13 +1,19 @@
 import { z } from "zod";
+import { VALIDATION_MESSAGES } from "@/constants/validationMessages";
 
-// Activity schemas
+/**
+ * Audience group schema - defines a group of people for activities
+ */
 const audienceGroupSchema = z.object({
   id: z.string(),
-  name: z.string().min(1, "Nazwa grupy jest wymagana"),
+  name: z.string().min(1, VALIDATION_MESSAGES.common.required),
   type: z.enum(["dzieci", "młodzież", "dorośli", "seniorzy"]),
-  count: z.number().min(1, "Liczba uczestników musi być większa niż 0"),
+  count: z.number().min(1, VALIDATION_MESSAGES.common.minValue(1)),
 });
 
+/**
+ * Activity schema - represents a single educational activity
+ */
 const activitySchema = z.object({
   type: z.enum([
     "presentation",
@@ -31,24 +37,31 @@ const activitySchema = z.object({
     "street_happening",
     "other"
   ]),
-  title: z.string().min(1, "Tytuł aktywności jest wymagany"),
+  title: z.string().min(1, VALIDATION_MESSAGES.common.required),
   description: z.string().optional(),
-  actionCount: z.number().min(1, "Liczba działań musi być większa niż 0").optional(),
-  audienceGroups: z.array(audienceGroupSchema).min(1, "Dodaj przynajmniej jedną grupę odbiorców").optional(),
+  actionCount: z.number().min(1, VALIDATION_MESSAGES.common.minValue(1)).optional(),
+  audienceGroups: z.array(audienceGroupSchema).min(1, VALIDATION_MESSAGES.common.required).optional(),
 });
 
-// Main form schema
+/**
+ * Schema for creating a new educational task
+ * Includes validation for all required fields and nested objects
+ */
 export const createEducationalTaskSchema = z.object({
-  title: z.string().min(1, "Tytuł jest wymagany"),
-  programName: z.string().min(1, "Nazwa programu jest wymagana"),
-  date: z.string().min(1, "Data jest wymagana"),
-  schoolId: z.string().min(1, "Szkoła jest wymagana"),
-  taskNumber: z.string().min(1, "Numer zadania jest wymagany"),
-  referenceNumber: z.string().min(1, "Numer referencyjny jest wymagany"),
+  title: z.string().min(1, VALIDATION_MESSAGES.common.required),
+  programName: z.string().min(1, VALIDATION_MESSAGES.program.name),
+  date: z.string().min(1, VALIDATION_MESSAGES.common.required),
+  schoolId: z.string().min(1, VALIDATION_MESSAGES.common.required),
+  taskNumber: z.string().min(1, VALIDATION_MESSAGES.task.title),
+  referenceNumber: z.string().min(1, VALIDATION_MESSAGES.act.referenceNumber),
   referenceId: z.string().optional(),
-  activities: z.array(activitySchema).min(1, "Dodaj przynajmniej jedną aktywność"),
+  activities: z.array(activitySchema).min(1, VALIDATION_MESSAGES.common.required),
 });
 
+/**
+ * Schema for editing an existing educational task
+ * Extends create schema with required ID field
+ */
 export const editEducationalTaskSchema = createEducationalTaskSchema.extend({
   id: z.string(),
 });
@@ -58,4 +71,3 @@ export type CreateEducationalTaskFormData = z.infer<typeof createEducationalTask
 export type EditEducationalTaskFormData = z.infer<typeof editEducationalTaskSchema>;
 export type ActivityFormData = z.infer<typeof activitySchema>;
 export type AudienceGroupFormData = z.infer<typeof audienceGroupSchema>;
-
