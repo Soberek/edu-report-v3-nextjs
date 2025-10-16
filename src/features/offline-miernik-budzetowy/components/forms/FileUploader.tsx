@@ -65,10 +65,10 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Obsługiwane formaty: .xlsx, .xls (maks. 10MB)
+            Obsługiwane formaty: .xlsx (maks. 10MB)
           </Typography>
 
-          <input ref={fileInputRef} type="file" accept=".xlsx,.xls" onChange={onFileUpload} style={{ display: "none" }} />
+          <input ref={fileInputRef} type="file" accept=".xlsx" onChange={onFileUpload} style={{ display: "none" }} />
 
           <Button
             variant="contained"

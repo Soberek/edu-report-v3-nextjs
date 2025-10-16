@@ -103,8 +103,8 @@ export const FileValidationSchema = z.object({
   name: z.string().min(1),
   type: z.string().refine((type) => 
     type.includes("spreadsheet") || type.includes("excel") || 
-    type.endsWith(".xlsx") || type.endsWith(".xls"),
-    "Plik musi być w formacie Excel (.xlsx lub .xls)"
+    type.endsWith(".xlsx"),
+    "Plik musi być w formacie Excel (.xlsx)"
   ),
   size: z.number().max(10 * 1024 * 1024, "Plik nie może być większy niż 10MB"),
 });

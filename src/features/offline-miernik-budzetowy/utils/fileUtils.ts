@@ -1,3 +1,4 @@
+import ExcelJS from "exceljs";
 import { VALID_FILE_EXTENSIONS, MAX_FILE_SIZE, ERROR_MESSAGES, type ExcelRow } from "../types";
 
 /**
@@ -39,20 +40,81 @@ export const readExcelFile = (file: File): Promise<{ fileName: string; data: Exc
           throw new Error(ERROR_MESSAGES.FILE_READ_ERROR);
         }
 
-        // Dynamic import to avoid bundling XLSX in the main bundle
-        import("xlsx")
-          .then((XLSX) => {
-            const workbook = XLSX.read(arrayBuffer, { type: "array" });
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const data = XLSX.utils.sheet_to_json(worksheet, { raw: false });
+        (async () => {
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(arrayBuffer as ArrayBuffer);
+          const worksheet = workbook.worksheets[0];
 
-            resolve({
-              fileName: file.name,
-              data: data as ExcelRow[],
+          if (!worksheet) {
+            throw new Error(ERROR_MESSAGES.FILE_READ_ERROR);
+          }
+
+          const headerRow = worksheet.getRow(1);
+          const headers: string[] = [];
+          headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            const value = cell.value;
+            headers[colNumber - 1] = value == null ? "" : String(value);
+          });
+
+          const normalizeCellValue = (cell: ExcelJS.Cell): string | number => {
+            const cellValue = cell.value;
+
+            if (cellValue == null) {
+              return "";
+            }
+
+            if (typeof cellValue === "number") {
+              return cellValue;
+            }
+
+            if (typeof cellValue === "string") {
+              return cellValue;
+            }
+
+            if (cellValue instanceof Date) {
+              return cellValue.toISOString();
+            }
+
+            if (typeof cellValue === "boolean") {
+              return cellValue ? "TRUE" : "FALSE";
+            }
+
+            return cell.text ?? String(cellValue);
+          };
+
+          const rows: ExcelRow[] = [];
+
+          worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+            if (rowNumber === 1) return;
+
+            const rowData: ExcelRow = {};
+            let hasValue = false;
+
+            headers.forEach((header, index) => {
+              if (!header) return;
+
+              const cell = row.getCell(index + 1);
+              const normalized = normalizeCellValue(cell);
+
+              if (normalized !== "") {
+                hasValue = true;
+              }
+
+              rowData[header] = normalized;
             });
-          })
-          .catch(reject);
+
+            if (hasValue) {
+              rows.push(rowData);
+            }
+          });
+
+          resolve({
+            fileName: file.name,
+            data: rows,
+          });
+        })().catch((error: unknown) => {
+          reject(error instanceof Error ? error : new Error(ERROR_MESSAGES.FILE_READ_ERROR));
+        });
       } catch {
         reject(new Error(ERROR_MESSAGES.FILE_READ_ERROR));
       }

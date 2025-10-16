@@ -1,5 +1,6 @@
 import moment from "moment";
 import { z } from "zod";
+import ExcelJS from "exceljs";
 import type { ExcelRow, Month, AggregatedData, ProgramsData } from "../types";
 import { ExcelRowSchema, ERROR_MESSAGES } from "../types";
 
@@ -111,43 +112,53 @@ export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData
  */
 export const exportToExcel = async (data: AggregatedData): Promise<boolean> => {
   try {
-    const XLSX = await import("xlsx");
-
     if (!data.aggregated || Object.keys(data.aggregated).length === 0) {
       console.warn("No data provided for Excel export.");
       return false;
     }
 
-    const dataArray: (string | number)[][] = [];
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Miernik");
+
+    worksheet.columns = [
+      { width: 15 },
+      { width: 40 },
+      { width: 10 },
+      { width: 10 },
+    ];
 
     Object.entries(data.aggregated).forEach(([programType, programData]) => {
-      dataArray.push([programType]);
+      worksheet.addRow([programType, null, null, null]);
+
       Object.entries(programData).forEach(([programName, actions], idx) => {
-        dataArray.push([`${++idx}`, programName, ""]);
+        const programIndex = idx + 1;
+        worksheet.addRow([`${programIndex}`, programName, null, null]);
 
         Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
-          const { people, actionNumber: action_number } = actionData;
-          dataArray.push([`${idx}.${++actionIdx}`, actionName, people, action_number]);
+          const actionIndex = `${programIndex}.${actionIdx + 1}`;
+          worksheet.addRow([actionIndex, actionName, actionData.people, actionData.actionNumber]);
         });
       });
     });
 
-    const worksheet = XLSX.utils.json_to_sheet(dataArray);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
 
-    // Basic styling is limited with xlsx library
-    // You can set column widths:
-    worksheet["!cols"] = [
-      { wch: 15 }, // Column A width
-      { wch: 40 }, // Column B width
-      { wch: 5 }, // Column C width
-      { wch: 5 }, // Column D width
-    ];
-
-    const workbook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Miernik");
-
-    XLSX.writeFile(workbook, "miernik.xlsx");
+    if (window.navigator && "msSaveOrOpenBlob" in window.navigator) {
+      // @ts-expect-error: legacy IE API
+      window.navigator.msSaveOrOpenBlob(blob, "miernik.xlsx");
+    } else {
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = "miernik.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
 
     return true;
   } catch (error) {

@@ -1,5 +1,6 @@
 import { useReducer, useCallback } from "react";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { VALID_FILE_EXTENSIONS } from "../types";
 
 export interface ExcelRow {
   [key: string]: string | number;
@@ -69,8 +70,33 @@ const useExcelFileReader = () => {
   }, []);
 
   const validateFile = (file: File): boolean => {
-    const validExtensions = [".xlsx", ".xls"];
-    return validExtensions.some((ext) => file.name.toLowerCase().endsWith(ext));
+    return VALID_FILE_EXTENSIONS.some((ext) => file.name.toLowerCase().endsWith(ext));
+  };
+
+  const normalizeCellValue = (cell: ExcelJS.Cell): string | number => {
+    const value = cell.value;
+
+    if (value == null) {
+      return "";
+    }
+
+    if (typeof value === "number") {
+      return value;
+    }
+
+    if (typeof value === "string") {
+      return value;
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    if (typeof value === "boolean") {
+      return value ? "TRUE" : "FALSE";
+    }
+
+    return cell.text ?? String(value);
   };
 
   const processExcelFile = useCallback((file: File) => {
@@ -87,16 +113,56 @@ const useExcelFileReader = () => {
           throw new Error("Failed to read file data");
         }
 
-        const workbook = XLSX.read(arrayBuffer, { type: "array" });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        const data = XLSX.utils.sheet_to_json(worksheet, {
-          raw: false,
-        }) as ExcelRow[];
+        (async () => {
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(arrayBuffer as ArrayBuffer);
 
-        dispatch({
-          type: "LOADING_SUCCESS",
-          payload: { fileName: file.name, rawData: data },
+          const worksheet = workbook.worksheets[0];
+          if (!worksheet) {
+            throw new Error("Brak arkusza w pliku");
+          }
+
+          const headerRow = worksheet.getRow(1);
+          const headers: string[] = [];
+          headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            const headerValue = cell.value;
+            headers[colNumber - 1] = headerValue == null ? "" : String(headerValue);
+          });
+
+          const data: ExcelRow[] = [];
+
+          worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+            if (rowNumber === 1) return;
+
+            const rowData: ExcelRow = {};
+            let hasValue = false;
+
+            headers.forEach((header, index) => {
+              if (!header) return;
+              const cell = row.getCell(index + 1);
+              const normalizedValue = normalizeCellValue(cell);
+
+              if (normalizedValue !== "") {
+                hasValue = true;
+              }
+
+              rowData[header] = normalizedValue;
+            });
+
+            if (hasValue) {
+              data.push(rowData);
+            }
+          });
+
+          dispatch({
+            type: "LOADING_SUCCESS",
+            payload: { fileName: file.name, rawData: data },
+          });
+        })().catch((error: unknown) => {
+          dispatch({
+            type: "LOADING_ERROR",
+            payload: error instanceof Error ? error.message : "Failed to process Excel file",
+          });
         });
       } catch (error) {
         dispatch({
