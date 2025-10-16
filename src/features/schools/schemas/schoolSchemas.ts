@@ -1,32 +1,49 @@
 import type { School, SchoolTypes } from "@/types";
 import { z } from "zod";
 
-// Form data types
+// Validation error messages
+const VALIDATION_MESSAGES = {
+  name: "Nazwa jest wymagana",
+  email: "Nieprawidłowy adres email",
+  address: "Adres jest wymagany",
+  city: "Miasto jest wymagane",
+  postalCode: "Kod pocztowy musi być w formacie XX-XXX",
+  municipality: "Gmina jest wymagana",
+  type: "Wybierz przynajmniej jeden typ",
+} as const;
+
+/** Form data for creating a new school */
 export type CreateSchoolFormData = Omit<School, "id" | "createdAt" | "updatedAt">;
 
+/** Form data for editing an existing school */
 export type EditSchoolFormData = Partial<CreateSchoolFormData>;
 
+/** Form data for filtering schools */
 export interface SchoolFilterFormData {
   search: string;
   type: SchoolTypes[];
   city: string;
 }
 
-// Validation schemas
+/** Zod schema for creating a school with validated fields */
 export const createSchoolSchema = z.object({
-  name: z.string().min(1, "Nazwa jest wymagana"),
-  email: z.string().email("Nieprawidłowy adres email"),
-  address: z.string().min(1, "Adres jest wymagany"),
-  city: z.string().min(1, "Miasto jest wymagane"),
-  postalCode: z.string().min(1, "Kod pocztowy jest wymagany"),
-  municipality: z.string().min(1, "Gmina jest wymagana"),
-  type: z.array(z.custom<SchoolTypes>()).min(1, "Wybierz przynajmniej jeden typ"),
-}) satisfies z.ZodType<CreateSchoolFormData>;
+  name: z.string().trim().min(1, VALIDATION_MESSAGES.name).max(255),
+  email: z.string().trim().toLowerCase().email(VALIDATION_MESSAGES.email),
+  address: z.string().trim().min(1, VALIDATION_MESSAGES.address).max(255),
+  city: z.string().trim().min(1, VALIDATION_MESSAGES.city).max(100),
+  postalCode: z
+    .string()
+    .trim()
+    .regex(/^\d{2}-\d{3}$/, VALIDATION_MESSAGES.postalCode),
+  municipality: z.string().trim().min(1, VALIDATION_MESSAGES.municipality).max(100),
+  type: z.array(z.custom<SchoolTypes>()).min(1, VALIDATION_MESSAGES.type),
+});
 
+/** Zod schema for editing a school with optional fields */
 export const editSchoolSchema = createSchoolSchema.partial();
 
-// Default values
-export const defaultSchoolFormValues: Partial<CreateSchoolFormData> = {
+/** Default values for school creation form */
+export const defaultSchoolFormValues: CreateSchoolFormData = {
   name: "",
   email: "",
   address: "",
@@ -36,6 +53,7 @@ export const defaultSchoolFormValues: Partial<CreateSchoolFormData> = {
   type: [],
 };
 
+/** Default values for school filter form */
 export const defaultFilterValues: SchoolFilterFormData = {
   search: "",
   type: [],
