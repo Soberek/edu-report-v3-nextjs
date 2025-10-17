@@ -1,11 +1,13 @@
  
 "use client";
-import React, { useMemo } from "react";
-import { Alert, Box } from "@mui/material";
+import React, { useMemo, useState } from "react";
+import { Alert, Box, TextField, InputAdornment } from "@mui/material";
+import { Search as SearchIcon } from "@mui/icons-material";
 import { SchoolProgramParticipationTable } from "./table";
 import { ProgramStatistics } from "./ProgramStatistics";
 
 import { PageHeader, LoadingSpinner, SelectorWithCounts, NotificationSnackbar } from "@/components/shared";
+import { useDebounce } from "@/hooks";
 import type { SchoolYear } from "@/types";
 import { PAGE_CONSTANTS, STYLE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
 import { useSzkolyWProgramie } from "@/hooks/useSzkolyWProgramie";
@@ -13,6 +15,11 @@ import { useSzkolyWProgramie } from "@/hooks/useSzkolyWProgramie";
 type ParticipationViewProps = ReturnType<typeof useSzkolyWProgramie>;
 
 export default function ParticipationView(props: ParticipationViewProps) {
+  // Local state for search input (immediate feedback)
+  const [searchInput, setSearchInput] = useState<string>("");
+  // Debounced search value (throttled to 300ms for actual filtering)
+  const debouncedSearch = useDebounce(searchInput, 300);
+
   const {
     schools,
     contacts,
@@ -32,7 +39,14 @@ export default function ParticipationView(props: ParticipationViewProps) {
     handleDeleteParticipation,
     notification,
     closeNotification,
+    tableSearch,
+    setTableSearch,
   } = props;
+
+  // Update the hook's search state with debounced value
+  React.useEffect(() => {
+    setTableSearch(debouncedSearch);
+  }, [debouncedSearch, setTableSearch]);
 
   // Memoized data for performance
   const memoizedData = useMemo(
@@ -106,6 +120,25 @@ export default function ParticipationView(props: ParticipationViewProps) {
     />
   );
 
+  const renderTableSearch = () => (
+    <TextField
+      placeholder="Szukaj w tabeli..."
+      value={searchInput}
+      onChange={(e) => setSearchInput(e.target.value)}
+      variant="outlined"
+      size="small"
+      fullWidth
+      sx={{ maxWidth: 400 }}
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            <SearchIcon sx={{ color: "text.secondary" }} />
+          </InputAdornment>
+        ),
+      }}
+    />
+  );
+
   const renderTableSection = () => (
     <SchoolProgramParticipationTable
       participations={participations}
@@ -141,9 +174,12 @@ export default function ParticipationView(props: ParticipationViewProps) {
       {renderHeader()}
       {renderErrorAlert()}
       {renderStatisticsSection()}
-      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
+      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2, alignItems: "flex-end" }}>
         {renderSchoolYearSelector()}
         {renderProgramSelector()}
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        {renderTableSearch()}
       </Box>
       {renderTableSection()}
       {renderSnackbar()}

@@ -108,3 +108,59 @@ export const filterSchoolsByProgram = (schoolsInfo: readonly SchoolParticipation
 
 export const getAvailableSchoolYears = (participations: readonly SchoolProgramParticipation[]): SchoolYear[] =>
   [...new Set(participations.map((p) => p.schoolYear))].sort() as SchoolYear[];
+
+/**
+ * Search through participation data across all columns in the table
+ * Searches: school name, program names, coordinator info (name, email, phone), school year, student count, notes, and all other fields
+ * @param participations Array of participation records to search
+ * @param schoolsMap Map of schools by ID
+ * @param contactsMap Map of contacts by ID
+ * @param programsMap Map of programs by ID
+ * @param searchQuery The search term (case-insensitive)
+ * @returns Filtered participations matching the search query
+ */
+export const searchParticipations = (
+  participations: readonly SchoolProgramParticipation[],
+  schoolsMap: Record<string, School>,
+  contactsMap: Record<string, { firstName?: string; lastName?: string; email?: string; phone?: string }>,
+  programsMap: Record<string, Program>,
+  searchQuery: string
+): readonly SchoolProgramParticipation[] => {
+  if (!searchQuery.trim()) return participations;
+
+  const query = searchQuery.toLowerCase().trim();
+
+  return participations.filter((participation) => {
+  const school = schoolsMap[participation.schoolId];
+  const program = programsMap[participation.programId];
+  const coordinator = participation.coordinatorId ? contactsMap[participation.coordinatorId] : null;
+
+    // Collect all searchable text from the participation record
+    const searchableTexts = [
+      // School information
+      school?.name?.toLowerCase() || "",
+      school?.email?.toLowerCase() || "",
+      school?.address?.toLowerCase() || "",
+      school?.city?.toLowerCase() || "",
+      
+      // Program information
+      program?.name?.toLowerCase() || "",
+      program?.description?.toLowerCase() || "",
+      
+      // Coordinator information
+      coordinator?.firstName?.toLowerCase() || "",
+      coordinator?.lastName?.toLowerCase() || "",
+      coordinator?.email?.toLowerCase() || "",
+      coordinator?.phone?.toLowerCase() || "",
+      
+      // Participation details
+      participation.schoolYear?.toLowerCase() || "",
+      participation.studentCount?.toString() || "",
+      participation.notes?.toLowerCase() || "",
+      participation.reportSubmitted ? "tak" : "nie",
+    ];
+
+    // Check if query matches any of the searchable texts
+    return searchableTexts.some((text) => text.includes(query));
+  });
+};

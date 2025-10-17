@@ -5,4 +5,3 @@
  */
 
 export * from "./filters";
-export * from "./error-handler";

@@ -19,8 +19,9 @@ import {
   filterSchoolsByName,
   filterSchoolsByProgram,
   getAvailableSchoolYears,
+  searchParticipations,
 } from "../utils/szkoly-w-programie.utils";
-import { getErrorMessage, normalizeStudentCount } from "../utils/error-handler.utils";
+import { getErrorMessage, normalizeStudentCount } from "@/hooks/utils/error-handler.utils";
 import { useNotification } from "@/hooks";
 
 export const useSzkolyWProgramie = () => {
@@ -46,6 +47,7 @@ export const useSzkolyWProgramie = () => {
   const [schoolFilter, setSchoolFilter] = useState<string | null>(null);
   const [programFilter, setProgramFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<"all" | "participating" | "notParticipating">("all");
+  const [tableSearch, setTableSearch] = useState<string>("");
 
   const isLoading = useMemo(
     () => schoolsLoading || contactsLoading || programsLoading || participationsLoading,
@@ -59,8 +61,10 @@ export const useSzkolyWProgramie = () => {
     if (!allParticipations) return [];
     let filtered = filterBySchoolYear(allParticipations, selectedSchoolYear);
     filtered = filterByProgram(filtered, selectedProgram);
+    // Apply table search filter
+    filtered = searchParticipations(filtered, lookupMaps.schoolsMap, lookupMaps.contactsMap, lookupMaps.programsMap, tableSearch);
     return filtered;
-  }, [allParticipations, selectedSchoolYear, selectedProgram]);
+  }, [allParticipations, selectedSchoolYear, selectedProgram, tableSearch, lookupMaps]);
 
   const mappedParticipations = useMemo(
     () => mapParticipationsForDisplay(filteredParticipations, lookupMaps.schoolsMap, lookupMaps.contactsMap, lookupMaps.programsMap),
@@ -73,9 +77,12 @@ export const useSzkolyWProgramie = () => {
   }, [allParticipations]);
 
   const availablePrograms = useMemo<ProgramWithCount[]>(() => {
-    if (!filteredParticipations || !programs) return [];
-    return Array.from(addParticipationCountToPrograms(programs, filteredParticipations));
-  }, [filteredParticipations, programs]);
+    if (!allParticipations || !programs) return [];
+    // Calculate counts from all participations for the selected school year
+    // (not filtered by program, so dropdown always shows accurate counts)
+    const yearFilteredParticipations = filterBySchoolYear(allParticipations, selectedSchoolYear);
+    return Array.from(addParticipationCountToPrograms(programs, yearFilteredParticipations));
+  }, [allParticipations, selectedSchoolYear, programs]);
 
   const { schoolsInfo, generalStats, programStats } = useMemo(() => {
     if (isLoading || !schools || !programs || !allParticipations) {
@@ -106,10 +113,12 @@ export const useSzkolyWProgramie = () => {
   const filteredSchoolsInfo = useMemo(() => {
     let filtered = schoolsInfo;
     filtered = filterSchoolsByName(filtered, schoolFilter);
-    filtered = filterSchoolsByProgram(filtered, programFilter);
+    // Use selectedProgram if available, otherwise use programFilter
+    const activeProgramFilter = selectedProgram !== "all" ? selectedProgram : programFilter;
+    filtered = filterSchoolsByProgram(filtered, activeProgramFilter);
     filtered = filterSchoolsByStatus(filtered, statusFilter);
     return filtered;
-  }, [schoolsInfo, schoolFilter, programFilter, statusFilter]);
+  }, [schoolsInfo, schoolFilter, selectedProgram, programFilter, statusFilter]);
 
   const handleSubmit = useCallback(
     async (data: SchoolProgramParticipationDTO) => {
@@ -190,6 +199,8 @@ export const useSzkolyWProgramie = () => {
     setProgramFilter,
     statusFilter,
     setStatusFilter,
+    tableSearch,
+    setTableSearch,
     lookupMaps,
   };
 };

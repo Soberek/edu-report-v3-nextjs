@@ -1,5 +1,6 @@
 import type { SchoolYear, SchoolTypes } from "../types";
 export * from "./materials";
+export * from "./validationMessages";
 
 export const schoolYears: SchoolYear[] = ["2024/2025", "2025/2026", "2026/2027", "2027/2028"] as const;
 

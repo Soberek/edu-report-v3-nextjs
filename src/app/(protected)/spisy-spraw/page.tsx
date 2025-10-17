@@ -87,11 +87,11 @@ export default function Acts() {
       <PageHeader title="Spisy Spraw" subtitle="Zarządzanie aktami spraw administracyjnych" />
 
       {/* Error Alerts */}
-      {errorMessages?.map((error, index) => (
-        <Alert key={index} severity="error" sx={{ mb: 2 }}>
-          {error}
+      {errorMessages && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {errorMessages}
         </Alert>
-      ))}
+      )}
 
       {/* Statistics Cards */}
       <Box

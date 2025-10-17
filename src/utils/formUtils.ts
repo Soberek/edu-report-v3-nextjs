@@ -1,9 +1,31 @@
 import { z } from "zod";
 
+/**
+ * Create a strongly-typed Zod form schema from field definitions
+ * @template T The form data type
+ * @param fields Record mapping field names to Zod schemas
+ * @returns Zod schema for the form type T
+ * @example
+ * const schema = createFormSchema<User>({
+ *   name: z.string().min(1),
+ *   email: z.string().email(),
+ * });
+ */
 export const createFormSchema = <T extends Record<string, unknown>>(fields: Record<keyof T, z.ZodTypeAny>): z.ZodSchema<T> => {
   return z.object(fields) as z.ZodSchema<T>;
 };
 
+/**
+ * Create a form schema where all fields are optional
+ * @template T The form data type
+ * @param fields Record mapping field names to Zod schemas
+ * @returns Zod schema for partial type T (all fields optional)
+ * @example
+ * const schema = createOptionalFormSchema<User>({
+ *   name: z.string(),
+ *   email: z.string(),
+ * }); // All fields become optional
+ */
 export const createOptionalFormSchema = <T extends Record<string, unknown>>(
   fields: Record<keyof T, z.ZodTypeAny>
 ): z.ZodSchema<Partial<T>> => {
@@ -17,6 +39,17 @@ export const createOptionalFormSchema = <T extends Record<string, unknown>>(
   return z.object(optionalFields) as z.ZodSchema<Partial<T>>;
 };
 
+/**
+ * Extract default values from a Zod schema based on field types
+ * Supports: string, number, boolean, array, optional, and default values
+ * @template T The form data type
+ * @param schema The Zod schema to extract defaults from
+ * @returns Object with default values for each field (empty string for strings, 0 for numbers, false for booleans, etc.)
+ * @example
+ * const schema = z.object({ name: z.string(), age: z.number() });
+ * const defaults = getFormDefaultValues(schema);
+ * // { name: "", age: 0 }
+ */
 export const getFormDefaultValues = <T extends Record<string, unknown>>(schema: z.ZodSchema<T>): Partial<T> => {
   const shape = (schema as z.ZodObject<z.ZodRawShape>).shape;
   const defaults: Partial<T> = {};
@@ -40,6 +73,18 @@ export const getFormDefaultValues = <T extends Record<string, unknown>>(schema: 
   return defaults;
 };
 
+/**
+ * Validate form data against a Zod schema and collect errors
+ * Gracefully handles Zod validation errors, returning structured error messages
+ * @template T The form data type
+ * @param data The form data to validate (can be partial)
+ * @param schema The Zod schema to validate against
+ * @returns Object with isValid flag and errors record (keyed by field path for nested fields)
+ * @example
+ * const schema = z.object({ email: z.string().email() });
+ * const result = validateFormData({ email: "invalid" }, schema);
+ * // { isValid: false, errors: { email: "Invalid email" } }
+ */
 export const validateFormData = <T extends Record<string, unknown>>(
   data: Partial<T>,
   schema: z.ZodSchema<T>

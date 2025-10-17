@@ -109,7 +109,7 @@ export interface DataTableProps<T extends Record<string, unknown> = Record<strin
   data: T[];
   columns: GridColDef<T>[];
   loading?: boolean;
-  height?: number;
+  height?: number | string;
   pageSizeOptions?: number[];
   actions?: DataTableAction[];
   onRowClick?: (params: GridRowParams) => void;
@@ -122,7 +122,7 @@ export const DataTable = <T extends Record<string, unknown>>({
   data,
   columns,
   loading = false,
-  height = 400,
+  height = "auto",
   pageSizeOptions = [10, 25, 50],
   actions = [],
   onRowClick,

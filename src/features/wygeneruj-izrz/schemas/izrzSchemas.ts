@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+/**
+ * Schema for the IZRZ form
+ * Validates all required fields for generating the IZRZ document
+ */
 export const izrzFormSchema = z.object({
   templateFile: z.instanceof(File, { message: "Szablon jest wymagany" }),
   caseNumber: z.string().min(1, "Numer sprawy jest wymagany"),
@@ -18,6 +22,9 @@ export const izrzFormSchema = z.object({
 
 export type IzrzFormData = z.infer<typeof izrzFormSchema>;
 
+/**
+ * Default form values for IZRZ form initialization
+ */
 export const defaultFormValues: Partial<IzrzFormData> = {
   caseNumber: "",
   reportNumber: "",
@@ -33,6 +40,10 @@ export const defaultFormValues: Partial<IzrzFormData> = {
   rozdzielnik: false,
 };
 
+/**
+ * Pre-defined templates for viewer description
+ * Provides common descriptions for educational activities
+ */
 export const viewerDescriptionTemplates = [
   { 
     key: "poz", 
@@ -60,4 +71,3 @@ export const viewerDescriptionTemplates = [
     description: 'W ramach obchodów Światowego Dnia Bez Tytoniu przeprowadzono zajęcia edukacyjne z uczniami klas V, VI, VII i VIII. W trakcie zajęć wykorzystano filmy edukacyjne dotyczące szkodliwości tytoniu i e-papierosów.' 
   },
 ];
-

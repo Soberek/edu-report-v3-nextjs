@@ -1,5 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
 
+/**
+ * React hook for managing localStorage with JSON serialization
+ * Automatically syncs state with localStorage and handles SSR safely
+ * @template T The type of value to store
+ * @param key The localStorage key
+ * @param initialValue Default value if nothing is stored
+ * @returns Tuple of [storedValue, setValue, removeValue]
+ * @example
+ * const [user, setUser, removeUser] = useLocalStorage<User>("user", {});
+ * setUser({ id: 1, name: "John" }); // Updates both state and localStorage
+ * removeUser(); // Clears both state and localStorage
+ *
+ * // setValue also supports functional updates like useState:
+ * setUser(prev => ({ ...prev, name: "Jane" }));
+ */
 export const useLocalStorage = <T>(key: string, initialValue: T) => {
   // Get from local storage then parse stored json or return initialValue
   const [storedValue, setStoredValue] = useState<T>(() => {
