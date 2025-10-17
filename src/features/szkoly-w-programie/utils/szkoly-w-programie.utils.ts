@@ -121,9 +121,9 @@ export const getAvailableSchoolYears = (participations: readonly SchoolProgramPa
  */
 export const searchParticipations = (
   participations: readonly SchoolProgramParticipation[],
-  schoolsMap: Record<string, any>,
-  contactsMap: Record<string, any>,
-  programsMap: Record<string, any>,
+  schoolsMap: Record<string, School>,
+  contactsMap: Record<string, { firstName?: string; lastName?: string; email?: string; phone?: string }>,
+  programsMap: Record<string, Program>,
   searchQuery: string
 ): readonly SchoolProgramParticipation[] => {
   if (!searchQuery.trim()) return participations;
@@ -131,9 +131,9 @@ export const searchParticipations = (
   const query = searchQuery.toLowerCase().trim();
 
   return participations.filter((participation) => {
-    const school = schoolsMap[participation.schoolId];
-    const program = programsMap[participation.programId];
-    const coordinator = participation.coordinatorId ? contactsMap[participation.coordinatorId] : null;
+  const school = schoolsMap[participation.schoolId];
+  const program = programsMap[participation.programId];
+  const coordinator = participation.coordinatorId ? contactsMap[participation.coordinatorId] : null;
 
     // Collect all searchable text from the participation record
     const searchableTexts = [
