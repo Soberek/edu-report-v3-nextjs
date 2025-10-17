@@ -43,7 +43,7 @@ describe("programSchemas", () => {
       const invalidData = {
         code: "PROG-2024-001",
         name: "Program Edukacyjny",
-        programType: "invalid" as any,
+        programType: "invalid" as unknown,
         description: "Opis programu edukacyjnego",
       };
 
@@ -117,7 +117,7 @@ describe("programSchemas", () => {
     it("validates fields when provided", () => {
       const dataWithInvalidType = {
         id: "123",
-        programType: "invalid" as any,
+        programType: "invalid" as unknown,
       };
 
       const result = editProgramSchema.safeParse(dataWithInvalidType);

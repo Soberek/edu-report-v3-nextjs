@@ -2,6 +2,7 @@ import { useMemo, useCallback } from "react";
 import { useNotification } from "@/hooks";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useUser } from "@/hooks/useUser";
+import { getErrorMessage } from "@/hooks/utils/error-handler.utils";
 import type { CaseRecord } from "@/types";
 
 // Local imports - organized by domain
@@ -11,8 +12,6 @@ import {
   sortRecordsByDate,
   searchRecords,
   suggestNextReferenceNumber,
-  handleValidationError,
-  formatErrorMessages,
 } from "../utils";
 import { createActsOptions, MESSAGES } from "../constants";
 import { actions } from "../reducers/spisySprawReducer";
@@ -69,7 +68,10 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
     return sortRecordsByDate(searched);
   }, [actRecords, state.selectedCode.code, state.searchQuery]);
 
-  const errorMessages = useMemo(() => formatErrorMessages(actRecordsError), [actRecordsError]);
+  const errorMessages = useMemo(() => {
+    if (!actRecordsError) return null;
+    return getErrorMessage(actRecordsError, "Błąd podczas ładowania danych");
+  }, [actRecordsError]);
 
   // Statistics
   const stats = useMemo(() => {
@@ -122,7 +124,8 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
         dispatch(actions.closeCreateDialog());
       } catch (error) {
         console.error("❌ Error creating record:", error);
-        handleValidationError(error, showError, MESSAGES.ADD_ERROR);
+        const errorMessage = getErrorMessage(error, MESSAGES.ADD_ERROR);
+        showError(errorMessage);
       } finally {
         dispatch(actions.setCreateLoading(false));
       }
@@ -160,7 +163,8 @@ export const useSpisySpraw = ({ state, dispatch, formRef, reset }: UseSpisySpraw
         showSuccess(MESSAGES.UPDATE_SUCCESS);
         dispatch(actions.closeEditDialog());
       } catch (error) {
-        handleValidationError(error, showError, MESSAGES.UPDATE_ERROR);
+        const errorMessage = getErrorMessage(error, MESSAGES.UPDATE_ERROR);
+        showError(errorMessage);
       } finally {
         dispatch(actions.setDialogLoading(false));
       }
