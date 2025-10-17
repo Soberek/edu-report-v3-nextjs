@@ -90,7 +90,7 @@ const ExcelPasteButton: React.FC<ExcelPasteButtonProps> = ({ aggregatedData }) =
   };
 
   return (
-    <Box sx={{ display: "flex", gap: 2, alignItems: "flex-end", flexWrap: "wrap", mt: 3 }}>
+    <Box sx={{ display: "grid", gap: 2, alignItems: "flex-end", flexWrap: "wrap", mt: 3, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gridTemplateRows: 'auto' }}>
       <TextField
         label="Tytuł pliku (opcjonalnie)"
         placeholder="np. Załacznik nr 1"
@@ -117,7 +117,7 @@ const ExcelPasteButton: React.FC<ExcelPasteButtonProps> = ({ aggregatedData }) =
         startIcon={isProcessing ? <CircularProgress size={20} color="inherit" /> : null}
         sx={{ height: 40 }}
       >
-        {isProcessing ? "Eksportowanie..." : "Export Raport"}
+        {isProcessing ? "Eksportowanie..." : "Pobierz sprawozdanie"}
       </Button>
     </Box>
   );

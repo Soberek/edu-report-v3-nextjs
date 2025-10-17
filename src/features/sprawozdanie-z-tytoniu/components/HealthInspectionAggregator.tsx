@@ -32,7 +32,7 @@ const HealthInspectionAggregator: React.FC = () => {
       {/* Header */}
       <Paper elevation={0} sx={{ p: 4, mb: 3, bgcolor: "primary.main", color: "white" }}>
         <Typography variant="h3" fontWeight="bold" gutterBottom>
-          Agregacja Danych - Ochrona Zdrowia
+          Agregacja Danych - Tytoń
         </Typography>
         <Typography variant="h6">
           Wgraj do {MAX_FILES} plików Excel z danymi kontroli obiektów. Program automatycznie zsumuje dane i wygeneruje raport zbiorczy.
