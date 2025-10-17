@@ -275,9 +275,16 @@ const fillWorksheetSections = (
     Object.entries(programData).forEach(([programName, actions]) => {
       programCounter++;
 
-      // Add program name row (no data, just name)
-      worksheet.getCell(`A${currentRow}`).value = `${programCounter}.`;
-      worksheet.getCell(`G${currentRow}`).value = `${programCounter}.`;
+      // Column A: numer programu i style
+      const programNumberCell = worksheet.getCell(`A${currentRow}`);
+      programNumberCell.value = `${programCounter}.`;
+      styleProgramNameCell(programNumberCell, programNumberCell, `${sectionPrefix}-Programowe`);
+
+
+      // Column G: numer programu i style
+      const programNumberCellG = worksheet.getCell(`G${currentRow}`);
+      programNumberCellG.value = `${programCounter}.`;
+      styleProgramNameCell(programNumberCellG, programNumberCellG, `${sectionPrefix}-Programowe`);
 
       // Column B: nazwa programu
       const programNameCell = worksheet.getCell(`B${currentRow}`);
@@ -316,8 +323,15 @@ const fillWorksheetSections = (
     Object.entries(programData).forEach(([programName, actions]) => {
       programCounter++;
 
-      worksheet.getCell(`I${currentRow}`).value = `${programCounter}.`;
-      worksheet.getCell(`N${currentRow}`).value = `${programCounter}.`;
+      // Column I: numer programu i style
+      const programNumberCellI = worksheet.getCell(`I${currentRow}`);
+      programNumberCellI.value = `${programCounter}.`;
+      styleProgramNameCell(programNumberCellI, programNumberCellI, `${sectionPrefix}-Nieprogramowe`);
+
+      // Column N: numer programu i style
+      const programNumberCellN = worksheet.getCell(`N${currentRow}`);
+      programNumberCellN.value = `${programCounter}.`;
+      styleProgramNameCell(programNumberCellN, programNumberCellN, `${sectionPrefix}-Nieprogramowe`);
 
       const programNameCellNie = worksheet.getCell(`J${currentRow}`);
 
