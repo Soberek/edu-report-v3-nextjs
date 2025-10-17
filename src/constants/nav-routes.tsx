@@ -40,6 +40,14 @@ export interface NavRoute {
 
 export const navRoutes: NavRoute[] = [
   // Admin-only routes
+    {
+    title: "Strona Główna",
+    path: "/",
+    category: "main",
+    isPrivate: true,
+    icon: <FaHome />,
+    description: "Panel główny aplikacji",
+  },
   {
     title: "Panel administratora",
     path: "/admin",
@@ -60,21 +68,11 @@ export const navRoutes: NavRoute[] = [
   },
   // Main Dashboard
   {
-    title: "Strona Główna",
-    path: "/",
-    category: "main",
-    isPrivate: true,
-    icon: <FaHome />,
-    description: "Panel główny aplikacji",
-  },
-
-  // Education & Programs
-
-  {
     title: "Czerniak",
     path: "/czerniak",
     category: "education",
     isPrivate: true,
+    isAdminOnly: true,
     icon: <FaUserMd />,
     description: "Moduł edukacyjny o czerniaku",
   },
@@ -83,6 +81,7 @@ export const navRoutes: NavRoute[] = [
     path: "/grypa-i-przeziebienia",
     category: "education",
     isPrivate: true,
+    isAdminOnly: true,
     icon: <FaVirus />,
     description: "Edukacja na temat grypy i przeziębień",
   },
