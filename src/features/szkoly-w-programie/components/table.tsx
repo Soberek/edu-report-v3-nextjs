@@ -318,7 +318,6 @@ export const SchoolProgramParticipationTable: React.FC<TableProps> = ({
           columns={columns}
           actions={actions}
           loading={loading}
-          height={mappedParticipations.length * 80 + 100} // Dynamic height based on rows
           pageSizeOptions={[...UI_CONSTANTS.PAGE_SIZE_OPTIONS]}
           getRowId={(row) => (row as unknown as MappedParticipation).id}
           sx={{
