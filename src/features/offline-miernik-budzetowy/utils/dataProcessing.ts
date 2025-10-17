@@ -8,11 +8,8 @@ import { ExcelRowSchema, ERROR_MESSAGES } from "../types";
  * Validates and processes Excel data
  */
 export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?: string } => {
-  console.log("🔍 DEBUG: validateExcelData called");
-  console.log("📊 DEBUG: Data length:", data?.length);
 
   if (!data || data.length === 0) {
-    console.log("❌ DEBUG: No data in file");
     return {
       isValid: false,
       error: "Plik nie zawiera danych",
@@ -29,16 +26,13 @@ export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?:
     const hasContent = typProgramu !== "" || nazwaProgramu !== "" || dzialanie !== "";
 
     if (!hasContent) {
-      console.log("⏭️  DEBUG: Skipping empty row");
     }
 
     return hasContent;
   });
 
-  console.log("📊 DEBUG: Non-empty rows:", nonEmptyData.length);
 
   if (nonEmptyData.length === 0) {
-    console.log("❌ DEBUG: No non-empty data in file");
     return {
       isValid: false,
       error: "Plik nie zawiera danych (wszystkie wiersze są puste)",
@@ -47,20 +41,15 @@ export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?:
 
   // Check if first row has required columns
   const firstRow = nonEmptyData[0];
-  console.log("📋 DEBUG: First non-empty row data:", JSON.stringify(firstRow, null, 2));
 
   const requiredColumns = ["Typ programu", "Nazwa programu", "Działanie", "Liczba ludzi", "Liczba działań", "Data"];
 
   const presentColumns = Object.keys(firstRow);
-  console.log("✅ DEBUG: Present columns:", presentColumns);
-  console.log("📝 DEBUG: Required columns:", requiredColumns);
 
   const missingColumns = requiredColumns.filter((col) => !presentColumns.includes(col));
-  console.log("❌ DEBUG: Missing columns:", missingColumns);
 
   if (missingColumns.length > 0) {
     const errorMsg = `Plik nie zawiera wymaganych kolumn: ${missingColumns.join(", ")}. Dostępne kolumny: ${presentColumns.join(", ")}`;
-    console.log("🚫 DEBUG: Validation failed - missing columns:", errorMsg);
     return {
       isValid: false,
       error: errorMsg,
@@ -68,31 +57,24 @@ export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?:
   }
 
   try {
-    console.log("🔄 DEBUG: Starting row validation...");
     // Validate each non-empty row
     for (let i = 0; i < nonEmptyData.length; i++) {
       const row = nonEmptyData[i];
-      console.log(`📄 DEBUG: Validating row ${i + 1}:`, JSON.stringify(row, null, 2));
       ExcelRowSchema.parse(row);
     }
 
-    console.log("✅ DEBUG: All rows validated successfully");
     return { isValid: true };
   } catch (error) {
-    console.log("❌ DEBUG: Validation error:", error);
     if (error instanceof z.ZodError) {
       const firstError = error.issues[0];
-      console.log("🔍 DEBUG: Zod error details:", JSON.stringify(firstError, null, 2));
       const path = firstError.path.map((p) => String(p)).join(".");
       const errorMsg = `Błąd w danych (${path}): ${firstError.message}`;
-      console.log("🚫 DEBUG: Formatted error:", errorMsg);
       return {
         isValid: false,
         error: errorMsg,
       };
     }
 
-    console.log("🚫 DEBUG: Unknown error type:", error);
     return {
       isValid: false,
       error: ERROR_MESSAGES.INVALID_DATA_FORMAT,
@@ -119,7 +101,6 @@ export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData
     return typProgramu !== "" || nazwaProgramu !== "" || dzialanie !== "";
   });
 
-  console.log("📊 DEBUG aggregateData: Processing", nonEmptyData.length, "non-empty rows out of", data.length, "total rows");
 
   let allPeople = 0;
   let allActions = 0;
@@ -191,7 +172,6 @@ const styleProgramNameCell = (cell: ExcelJS.Cell, programNumberCell: ExcelJS.Cel
   const currentStyle = cell.style || {};
 
   if (isProgramNumber) {
-    console.log(`Styling ${sectionName} program name cell RED`, cell.address);
     cell.style = {
       ...currentStyle,
       font: {
@@ -202,7 +182,6 @@ const styleProgramNameCell = (cell: ExcelJS.Cell, programNumberCell: ExcelJS.Cel
       },
     };
   } else {
-    console.log(`Styling ${sectionName} action name cell BLACK`, cell.address);
     cell.style = {
       ...currentStyle,
       font: {
@@ -214,7 +193,6 @@ const styleProgramNameCell = (cell: ExcelJS.Cell, programNumberCell: ExcelJS.Cel
     };
   }
 
-  console.log(`Font after setting:`, cell.font);
 };
 
 /**
@@ -342,10 +320,13 @@ const fillWorksheetSections = (
       worksheet.getCell(`N${currentRow}`).value = `${programCounter}.`;
 
       const programNameCellNie = worksheet.getCell(`J${currentRow}`);
+
       programNameCellNie.value = programName;
+
 
       // Style program name cell
       styleProgramNameCell(programNameCellNie, worksheet.getCell(`I${currentRow}`), `${sectionPrefix}-Nieprogramowe`);
+
 
       currentRow++;
 
@@ -382,8 +363,6 @@ const exportToTemplateGeneric = async (
   customFileName?: string
 ): Promise<boolean> => {
   try {
-    console.log(`🚀 DEBUG EXPORT [${exportType}]: Starting export with ${Object.keys(data.aggregated || {}).length} program types`);
-    console.log(`📊 DEBUG EXPORT [${exportType}]: Total people: ${data.allPeople}, Total actions: ${data.allActions}`);
 
     if (!data.aggregated || Object.keys(data.aggregated).length === 0) {
       console.warn(`No data provided for ${exportType} export.`);
@@ -444,7 +423,6 @@ const exportToTemplateGeneric = async (
       URL.revokeObjectURL(url);
     }
 
-    console.log(`✅ DEBUG EXPORT [${exportType}]: Export completed successfully. File: ${fileName}`);
 
     return true;
   } catch (error) {
