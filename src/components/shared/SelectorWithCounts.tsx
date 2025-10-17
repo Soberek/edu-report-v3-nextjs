@@ -60,7 +60,11 @@ export const SelectorWithCounts: React.FC<SelectorWithCountsProps> = ({
     onChange(newValue === allOptionValue ? allOptionValue : newValue);
   };
 
-  const totalCount = items.reduce((sum, item) => sum + (item.count || 0), 0);
+  const sortItemsByCount = items.sort((a, b) => (b.count ?? 0) - (a.count ?? 0));
+const dontShow0Counts = sortItemsByCount.filter(item => item.count && item.count > 0);
+
+  const totalCount = dontShow0Counts.reduce((sum, item) => sum + (item.count ?? 0), 0);
+
   const selectedItem = items.find((item) => item.id === value);
 
   return (
@@ -84,12 +88,12 @@ export const SelectorWithCounts: React.FC<SelectorWithCountsProps> = ({
               </Box>
             </MenuItem>
           )}
-          {items.map((item) => (
+          {dontShow0Counts.map((item) => (
             <MenuItem key={item.id} value={item.id}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
                 <span>{item.name}</span>
                 {item.count !== undefined && (
-                  <Chip label={item.count} size="small" color="secondary" variant="outlined" />
+                  <Chip label={item.count} size="small" color="primary" variant="outlined" />
                 )}
               </Box>
             </MenuItem>

@@ -1,12 +1,13 @@
  
 "use client";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Alert, Box, TextField, InputAdornment } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { SchoolProgramParticipationTable } from "./table";
 import { ProgramStatistics } from "./ProgramStatistics";
 
 import { PageHeader, LoadingSpinner, SelectorWithCounts, NotificationSnackbar } from "@/components/shared";
+import { useDebounce } from "@/hooks";
 import type { SchoolYear } from "@/types";
 import { PAGE_CONSTANTS, STYLE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
 import { useSzkolyWProgramie } from "@/hooks/useSzkolyWProgramie";
@@ -14,6 +15,11 @@ import { useSzkolyWProgramie } from "@/hooks/useSzkolyWProgramie";
 type ParticipationViewProps = ReturnType<typeof useSzkolyWProgramie>;
 
 export default function ParticipationView(props: ParticipationViewProps) {
+  // Local state for search input (immediate feedback)
+  const [searchInput, setSearchInput] = useState<string>("");
+  // Debounced search value (throttled to 300ms for actual filtering)
+  const debouncedSearch = useDebounce(searchInput, 300);
+
   const {
     schools,
     contacts,
@@ -36,6 +42,11 @@ export default function ParticipationView(props: ParticipationViewProps) {
     tableSearch,
     setTableSearch,
   } = props;
+
+  // Update the hook's search state with debounced value
+  React.useEffect(() => {
+    setTableSearch(debouncedSearch);
+  }, [debouncedSearch, setTableSearch]);
 
   // Memoized data for performance
   const memoizedData = useMemo(
@@ -112,8 +123,8 @@ export default function ParticipationView(props: ParticipationViewProps) {
   const renderTableSearch = () => (
     <TextField
       placeholder="Szukaj w tabeli..."
-      value={tableSearch}
-      onChange={(e) => setTableSearch(e.target.value)}
+      value={searchInput}
+      onChange={(e) => setSearchInput(e.target.value)}
       variant="outlined"
       size="small"
       fullWidth
