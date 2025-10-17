@@ -1,7 +1,8 @@
  
 "use client";
 import React, { useMemo } from "react";
-import { Alert, Box } from "@mui/material";
+import { Alert, Box, TextField, InputAdornment } from "@mui/material";
+import { Search as SearchIcon } from "@mui/icons-material";
 import { SchoolProgramParticipationTable } from "./table";
 import { ProgramStatistics } from "./ProgramStatistics";
 
@@ -32,6 +33,8 @@ export default function ParticipationView(props: ParticipationViewProps) {
     handleDeleteParticipation,
     notification,
     closeNotification,
+    tableSearch,
+    setTableSearch,
   } = props;
 
   // Memoized data for performance
@@ -106,6 +109,25 @@ export default function ParticipationView(props: ParticipationViewProps) {
     />
   );
 
+  const renderTableSearch = () => (
+    <TextField
+      placeholder="Szukaj w tabeli..."
+      value={tableSearch}
+      onChange={(e) => setTableSearch(e.target.value)}
+      variant="outlined"
+      size="small"
+      fullWidth
+      sx={{ maxWidth: 400 }}
+      InputProps={{
+        startAdornment: (
+          <InputAdornment position="start">
+            <SearchIcon sx={{ color: "text.secondary" }} />
+          </InputAdornment>
+        ),
+      }}
+    />
+  );
+
   const renderTableSection = () => (
     <SchoolProgramParticipationTable
       participations={participations}
@@ -141,9 +163,12 @@ export default function ParticipationView(props: ParticipationViewProps) {
       {renderHeader()}
       {renderErrorAlert()}
       {renderStatisticsSection()}
-      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
+      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2, alignItems: "flex-end" }}>
         {renderSchoolYearSelector()}
         {renderProgramSelector()}
+      </Box>
+      <Box sx={{ mb: 2 }}>
+        {renderTableSearch()}
       </Box>
       {renderTableSection()}
       {renderSnackbar()}
