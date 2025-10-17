@@ -73,9 +73,12 @@ export const useSzkolyWProgramie = () => {
   }, [allParticipations]);
 
   const availablePrograms = useMemo<ProgramWithCount[]>(() => {
-    if (!filteredParticipations || !programs) return [];
-    return Array.from(addParticipationCountToPrograms(programs, filteredParticipations));
-  }, [filteredParticipations, programs]);
+    if (!allParticipations || !programs) return [];
+    // Calculate counts from all participations for the selected school year
+    // (not filtered by program, so dropdown always shows accurate counts)
+    const yearFilteredParticipations = filterBySchoolYear(allParticipations, selectedSchoolYear);
+    return Array.from(addParticipationCountToPrograms(programs, yearFilteredParticipations));
+  }, [allParticipations, selectedSchoolYear, programs]);
 
   const { schoolsInfo, generalStats, programStats } = useMemo(() => {
     if (isLoading || !schools || !programs || !allParticipations) {
@@ -106,10 +109,12 @@ export const useSzkolyWProgramie = () => {
   const filteredSchoolsInfo = useMemo(() => {
     let filtered = schoolsInfo;
     filtered = filterSchoolsByName(filtered, schoolFilter);
-    filtered = filterSchoolsByProgram(filtered, programFilter);
+    // Use selectedProgram if available, otherwise use programFilter
+    const activeProgramFilter = selectedProgram !== "all" ? selectedProgram : programFilter;
+    filtered = filterSchoolsByProgram(filtered, activeProgramFilter);
     filtered = filterSchoolsByStatus(filtered, statusFilter);
     return filtered;
-  }, [schoolsInfo, schoolFilter, programFilter, statusFilter]);
+  }, [schoolsInfo, schoolFilter, selectedProgram, programFilter, statusFilter]);
 
   const handleSubmit = useCallback(
     async (data: SchoolProgramParticipationDTO) => {
