@@ -164,7 +164,7 @@ export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData
  * Styles a program name cell based on the program number
  * Only cells with value "1." get red/bold styling, others get black/normal
  */
-const styleProgramNameCell = (cell: ExcelJS.Cell, programNumberCell: ExcelJS.Cell, sectionName: string): void => {
+const styleProgramNameCell = (cell: ExcelJS.Cell, programNumberCell: ExcelJS.Cell, ): void => {
   const cellValue = String(programNumberCell.value || "").trim();
   const isProgramNumber = /^\d+\.$/.test(cellValue);
 
@@ -265,7 +265,7 @@ const fillWorksheetSections = (
   worksheet: ExcelJS.Worksheet,
   programoweData: ProgramsData,
   nieprogramoweData: ProgramsData,
-  sectionPrefix: string
+  sectionPrefix: string,
 ): void => {
   // Fill in Programowe section (A7:D94)
   let currentRow = 7;
@@ -278,19 +278,19 @@ const fillWorksheetSections = (
       // Column A: numer programu i style
       const programNumberCell = worksheet.getCell(`A${currentRow}`);
       programNumberCell.value = `${programCounter}.`;
-      styleProgramNameCell(programNumberCell, programNumberCell, `${sectionPrefix}-Programowe`);
+      styleProgramNameCell(programNumberCell, programNumberCell);
 
 
       // Column G: numer programu i style
       const programNumberCellG = worksheet.getCell(`G${currentRow}`);
       programNumberCellG.value = `${programCounter}.`;
-      styleProgramNameCell(programNumberCellG, programNumberCellG, `${sectionPrefix}-Programowe`);
+      styleProgramNameCell(programNumberCellG, programNumberCellG);
 
       // Column B: nazwa programu
       const programNameCell = worksheet.getCell(`B${currentRow}`);
       programNameCell.value = programName;
 
-      styleProgramNameCell(programNameCell, worksheet.getCell(`A${currentRow}`), `${sectionPrefix}-Programowe`);
+      styleProgramNameCell(programNameCell, worksheet.getCell(`A${currentRow}`));
 
       currentRow++;
 
@@ -326,12 +326,12 @@ const fillWorksheetSections = (
       // Column I: numer programu i style
       const programNumberCellI = worksheet.getCell(`I${currentRow}`);
       programNumberCellI.value = `${programCounter}.`;
-      styleProgramNameCell(programNumberCellI, programNumberCellI, `${sectionPrefix}-Nieprogramowe`);
+      styleProgramNameCell(programNumberCellI, programNumberCellI);
 
       // Column N: numer programu i style
       const programNumberCellN = worksheet.getCell(`N${currentRow}`);
       programNumberCellN.value = `${programCounter}.`;
-      styleProgramNameCell(programNumberCellN, programNumberCellN, `${sectionPrefix}-Nieprogramowe`);
+      styleProgramNameCell(programNumberCellN, programNumberCellN);
 
       const programNameCellNie = worksheet.getCell(`J${currentRow}`);
 
@@ -339,7 +339,7 @@ const fillWorksheetSections = (
 
 
       // Style program name cell
-      styleProgramNameCell(programNameCellNie, worksheet.getCell(`I${currentRow}`), `${sectionPrefix}-Nieprogramowe`);
+      styleProgramNameCell(programNameCellNie, worksheet.getCell(`I${currentRow}`));
 
 
       currentRow++;
@@ -373,8 +373,8 @@ const exportToTemplateGeneric = async (
   data: AggregatedData,
   templatePath: string,
   defaultFileName: string,
-  exportType: string,
-  customFileName?: string
+  customFileName?: string,
+  exportType: string = defaultFileName
 ): Promise<boolean> => {
   try {
 
@@ -453,7 +453,7 @@ const exportToTemplateGeneric = async (
  * @returns Promise<boolean> true if export was successful
  */
 export const exportToTemplate = async (data: AggregatedData, customFileName?: string): Promise<boolean> => {
-  return exportToTemplateGeneric(data, "/generate-templates/zalnr1.xlsx", "zalnr1", "TEMPLATE", customFileName);
+  return exportToTemplateGeneric(data, "/generate-templates/zalnr1.xlsx", "zalnr1", customFileName);
 };
 
 /**
@@ -464,5 +464,5 @@ export const exportToTemplate = async (data: AggregatedData, customFileName?: st
  * @returns Promise<boolean> true if export was successful
  */
 export const exportToCumulativeTemplate = async (data: AggregatedData, customFileName?: string): Promise<boolean> => {
-  return exportToTemplateGeneric(data, "/generate-templates/zalnr2.xlsx", "zalnr2", "CUMULATIVE", customFileName);
+  return exportToTemplateGeneric(data, "/generate-templates/zalnr2.xlsx", "zalnr2", customFileName);
 };
