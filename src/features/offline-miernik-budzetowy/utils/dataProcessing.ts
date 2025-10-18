@@ -193,109 +193,73 @@ export const exportToExcel = async (data: AggregatedData, customFileName?: strin
 };
 
 /**
+ * Column configuration for programowe and nieprogramowe sections
+ */
+const COLUMN_CONFIG = {
+  programowe: { number: "A", name: "B", copy: "G", action: "C", wizytacja: "D", people: "H" },
+  nieprogramowe: { number: "I", name: "J", copy: "N", action: "K", wizytacja: "D", people: "O" },
+} as const;
+
+/**
+ * Fills a section (programowe or nieprogramowe) of the worksheet
+ * @param worksheet The worksheet to fill
+ * @param data Programs data to populate
+ * @param columns Column configuration for this section
+ */
+const fillSection = (worksheet: ExcelJS.Worksheet, data: ProgramsData, columns: typeof COLUMN_CONFIG[keyof typeof COLUMN_CONFIG]): number => {
+  let currentRow = 7;
+  let programCounter = 0;
+
+  Object.entries(data).forEach(([, programData]) => {
+    Object.entries(programData).forEach(([programName, actions]) => {
+      programCounter++;
+
+      // Set program number and style
+      const numberCell = worksheet.getCell(`${columns.number}${currentRow}`);
+      numberCell.value = `${programCounter}.`;
+      styleProgramNameCell(numberCell, numberCell);
+
+      const copyCell = worksheet.getCell(`${columns.copy}${currentRow}`);
+      copyCell.value = `${programCounter}.`;
+
+      // Set program name and style
+      const nameCell = worksheet.getCell(`${columns.name}${currentRow}`);
+      nameCell.value = programName;
+      styleProgramNameCell(nameCell, numberCell);
+
+      currentRow++;
+
+      // Add action rows
+      Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
+        const actionIndex = `${programCounter}.${actionIdx + 1}`;
+
+        worksheet.getCell(`${columns.number}${currentRow}`).value = actionIndex;
+        worksheet.getCell(`${columns.copy}${currentRow}`).value = actionIndex;
+        worksheet.getCell(`${columns.name}${currentRow}`).value = actionName;
+
+        // Handle wizytacja vs regular actions
+        const countCell = actionName === "Wizytacja" ? columns.wizytacja : columns.action;
+        worksheet.getCell(`${countCell}${currentRow}`).value = actionData.actionNumber;
+
+        worksheet.getCell(`${columns.people}${currentRow}`).value = actionData.people;
+
+        currentRow++;
+      });
+    });
+  });
+
+  return currentRow;
+};
+
+/**
  * Internal helper function to fill worksheet sections with program and action data
  * @param worksheet The Excel worksheet to fill
  * @param programoweData Programs data to fill
  * @param nieprogramoweData Non-programs data to fill
-
  */
-const fillWorksheetSections = (
-  worksheet: ExcelJS.Worksheet,
-  programoweData: ProgramsData,
-  nieprogramoweData: ProgramsData,
-  sectionPrefix: string,
-): void => {
-  // Fill in Programowe section (A7:D94)
-  let currentRow = 7;
-  let programCounter = 0;
-
-  Object.entries(programoweData).forEach(([programType, programData]) => {
-    Object.entries(programData).forEach(([programName, actions]) => {
-      programCounter++;
-
-      // Column A: numer programu i style
-      const programNumberCell = worksheet.getCell(`A${currentRow}`);
-      programNumberCell.value = `${programCounter}.`;
-      styleProgramNameCell(programNumberCell, programNumberCell);
-
-
-      // Column G: numer programu i style
-      const programNumberCellG = worksheet.getCell(`G${currentRow}`);
-      programNumberCellG.value = `${programCounter}.`;
-      styleProgramNameCell(programNumberCellG, programNumberCellG);
-
-      // Column B: nazwa programu
-      const programNameCell = worksheet.getCell(`B${currentRow}`);
-      programNameCell.value = programName;
-
-      styleProgramNameCell(programNameCell, worksheet.getCell(`A${currentRow}`));
-
-      currentRow++;
-
-      // Add action rows with data
-      Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
-        const actionIndex = `${programCounter}.${actionIdx + 1}`;
-
-        worksheet.getCell(`A${currentRow}`).value = actionIndex;
-        worksheet.getCell(`G${currentRow}`).value = actionIndex;
-        worksheet.getCell(`B${currentRow}`).value = actionName;
-
-        if (actionName === "Wizytacja") {
-          worksheet.getCell(`D${currentRow}`).value = actionData.actionNumber;
-        } else {
-          worksheet.getCell(`C${currentRow}`).value = actionData.actionNumber;
-        }
-
-        worksheet.getCell(`H${currentRow}`).value = actionData.people;
-
-        currentRow++;
-      });
-    });
-  });
-
-  // Fill in Nieprogramowe section (I7:L?)
-  currentRow = 7;
-  programCounter = 0;
-
-  Object.entries(nieprogramoweData).forEach(([programType, programData]) => {
-    Object.entries(programData).forEach(([programName, actions]) => {
-      programCounter++;
-
-      // Column I: numer programu i style
-      const programNumberCellI = worksheet.getCell(`I${currentRow}`);
-      programNumberCellI.value = `${programCounter}.`;
-      styleProgramNameCell(programNumberCellI, programNumberCellI);
-
-      // Column N: numer programu i style
-      const programNumberCellN = worksheet.getCell(`N${currentRow}`);
-      programNumberCellN.value = `${programCounter}.`;
-      styleProgramNameCell(programNumberCellN, programNumberCellN);
-
-      const programNameCellNie = worksheet.getCell(`J${currentRow}`);
-
-      programNameCellNie.value = programName;
-
-
-      // Style program name cell
-      styleProgramNameCell(programNameCellNie, worksheet.getCell(`I${currentRow}`));
-
-
-      currentRow++;
-
-      // Add action rows with data
-      Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
-        const actionIndex = `${programCounter}.${actionIdx + 1}`;
-
-        worksheet.getCell(`I${currentRow}`).value = actionIndex;
-        worksheet.getCell(`N${currentRow}`).value = actionIndex;
-        worksheet.getCell(`J${currentRow}`).value = actionName;
-        worksheet.getCell(`K${currentRow}`).value = actionData.actionNumber;
-        worksheet.getCell(`O${currentRow}`).value = actionData.people;
-
-        currentRow++;
-      });
-    });
-  });
+const fillWorksheetSections = (worksheet: ExcelJS.Worksheet, programoweData: ProgramsData, nieprogramoweData: ProgramsData): void => {
+  fillSection(worksheet, programoweData, COLUMN_CONFIG.programowe);
+  fillSection(worksheet, nieprogramoweData, COLUMN_CONFIG.nieprogramowe);
 };
 
 /**
@@ -349,7 +313,7 @@ const exportToTemplateGeneric = async (
     });
 
     // Fill worksheet sections
-    fillWorksheetSections(worksheet, programoweData, nieprogramoweData, exportType);
+    fillWorksheetSections(worksheet, programoweData, nieprogramoweData);
 
     // Generate filename with current date
     const currentDate = moment().format("DD-MM-YYYY");
