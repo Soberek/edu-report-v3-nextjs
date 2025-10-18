@@ -134,7 +134,31 @@ const styleProgramNameCell = (cell: ExcelJS.Cell, numberCell: ExcelJS.Cell): voi
 };
 
 /**
+ * Triggers browser download of a blob
+ * @param blob The data blob to download
+ * @param fileName The filename for the download
+ */
+const downloadBlob = (blob: Blob, fileName: string): void => {
+  if (window.navigator && "msSaveOrOpenBlob" in window.navigator) {
+    // @ts-expect-error: legacy IE API
+    window.navigator.msSaveOrOpenBlob(blob, fileName);
+  } else {
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+};
+
+/**
  * Exports aggregated data to Excel format (original format)
+ * @param data Aggregated data to export
+ * @param customFileName Optional custom filename
+ * @returns Promise<boolean> true if export was successful
  */
 export const exportToExcel = async (data: AggregatedData, customFileName?: string): Promise<boolean> => {
   try {
