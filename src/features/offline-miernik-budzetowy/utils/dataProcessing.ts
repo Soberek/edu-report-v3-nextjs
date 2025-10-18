@@ -5,233 +5,160 @@ import type { ExcelRow, Month, AggregatedData, ProgramsData } from "../types";
 import { ExcelRowSchema, ERROR_MESSAGES } from "../types";
 
 /**
+ * Checks if a row has any content in required fields
+ */
+const isRowEmpty = (row: ExcelRow): boolean => {
+  const typProgramu = String(row["Typ programu"] || "").trim();
+  const nazwaProgramu = String(row["Nazwa programu"] || "").trim();
+  const dzialanie = String(row["Działanie"] || "").trim();
+  return typProgramu === "" && nazwaProgramu === "" && dzialanie === "";
+};
+
+/**
  * Validates and processes Excel data
+ * @param data Array of Excel rows to validate
+ * @returns Validation result with success status and optional error message
  */
 export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?: string } => {
-  console.log("🔍 DEBUG: validateExcelData called");
-  console.log("📊 DEBUG: Data length:", data?.length);
-
   if (!data || data.length === 0) {
-    console.log("❌ DEBUG: No data in file");
-    return {
-      isValid: false,
-      error: "Plik nie zawiera danych",
-    };
+    return { isValid: false, error: "Plik nie zawiera danych" };
   }
 
-  // Filter out empty rows - rows where all required fields are empty
-  const nonEmptyData = data.filter(row => {
-    const typProgramu = String(row["Typ programu"] || "").trim();
-    const nazwaProgramu = String(row["Nazwa programu"] || "").trim();
-    const dzialanie = String(row["Działanie"] || "").trim();
-
-    // Row is considered non-empty if it has at least one of the main text fields filled
-    const hasContent = typProgramu !== "" || nazwaProgramu !== "" || dzialanie !== "";
-
-    if (!hasContent) {
-      console.log("⏭️  DEBUG: Skipping empty row");
-    }
-
-    return hasContent;
-  });
-
-  console.log("📊 DEBUG: Non-empty rows:", nonEmptyData.length);
+  // Filter out empty rows
+  const nonEmptyData = data.filter((row) => !isRowEmpty(row));
 
   if (nonEmptyData.length === 0) {
-    console.log("❌ DEBUG: No non-empty data in file");
-    return {
-      isValid: false,
-      error: "Plik nie zawiera danych (wszystkie wiersze są puste)",
-    };
+    return { isValid: false, error: "Plik nie zawiera danych (wszystkie wiersze są puste)" };
   }
 
   // Check if first row has required columns
-  const firstRow = nonEmptyData[0];
-  console.log("📋 DEBUG: First non-empty row data:", JSON.stringify(firstRow, null, 2));
-
-  const requiredColumns = [
-    "Typ programu",
-    "Nazwa programu",
-    "Działanie",
-    "Liczba ludzi",
-    "Liczba działań",
-    "Data"
-  ];
-
-  const presentColumns = Object.keys(firstRow);
-  console.log("✅ DEBUG: Present columns:", presentColumns);
-  console.log("📝 DEBUG: Required columns:", requiredColumns);
-
-  const missingColumns = requiredColumns.filter(col => !presentColumns.includes(col));
-  console.log("❌ DEBUG: Missing columns:", missingColumns);
+  const requiredColumns = ["Typ programu", "Nazwa programu", "Działanie", "Liczba ludzi", "Liczba działań", "Data"];
+  const presentColumns = Object.keys(nonEmptyData[0]);
+  const missingColumns = requiredColumns.filter((col) => !presentColumns.includes(col));
 
   if (missingColumns.length > 0) {
     const errorMsg = `Plik nie zawiera wymaganych kolumn: ${missingColumns.join(", ")}. Dostępne kolumny: ${presentColumns.join(", ")}`;
-    console.log("🚫 DEBUG: Validation failed - missing columns:", errorMsg);
-    return {
-      isValid: false,
-      error: errorMsg,
-    };
+    return { isValid: false, error: errorMsg };
   }
 
+  // Validate each non-empty row
   try {
-    console.log("🔄 DEBUG: Starting row validation...");
-    // Validate each non-empty row
-    for (let i = 0; i < nonEmptyData.length; i++) {
-      const row = nonEmptyData[i];
-      console.log(`📄 DEBUG: Validating row ${i + 1}:`, JSON.stringify(row, null, 2));
-      ExcelRowSchema.parse(row);
-    }
-
-    console.log("✅ DEBUG: All rows validated successfully");
+    nonEmptyData.forEach((row) => ExcelRowSchema.parse(row));
     return { isValid: true };
   } catch (error) {
-    console.log("❌ DEBUG: Validation error:", error);
     if (error instanceof z.ZodError) {
-      const firstError = error.issues[0];
-      console.log("🔍 DEBUG: Zod error details:", JSON.stringify(firstError, null, 2));
-      const path = firstError.path.map(p => String(p)).join(".");
-      const errorMsg = `Błąd w danych (${path}): ${firstError.message}`;
-      console.log("🚫 DEBUG: Formatted error:", errorMsg);
-      return {
-        isValid: false,
-        error: errorMsg,
-      };
+      const { path, message } = error.issues[0];
+      const pathStr = path.map(String).join(".");
+      return { isValid: false, error: `Błąd w danych (${pathStr}): ${message}` };
     }
-
-    console.log("🚫 DEBUG: Unknown error type:", error);
-    return {
-      isValid: false,
-      error: ERROR_MESSAGES.INVALID_DATA_FORMAT,
-    };
+    return { isValid: false, error: ERROR_MESSAGES.INVALID_DATA_FORMAT };
   }
 };
 
 /**
  * Aggregates Excel data based on selected months
+ * @param data Array of Excel rows to aggregate
+ * @param months Array of month selection objects
+ * @returns Aggregated data with totals
+ * @throws Error if no months are selected
  */
 export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData => {
-  const selectedMonths = months.filter((month) => month.selected).map((month) => month.monthNumber);
+  const selectedMonths = months.filter((m) => m.selected).map((m) => m.monthNumber);
 
   if (selectedMonths.length === 0) {
     throw new Error("Wybierz przynajmniej jeden miesiąc");
   }
 
-  // Filter out empty rows before processing
-  const nonEmptyData = data.filter(row => {
-    const typProgramu = String(row["Typ programu"] || "").trim();
-    const nazwaProgramu = String(row["Nazwa programu"] || "").trim();
-    const dzialanie = String(row["Działanie"] || "").trim();
-
-    return typProgramu !== "" || nazwaProgramu !== "" || dzialanie !== "";
-  });
-
-  console.log("📊 DEBUG aggregateData: Processing", nonEmptyData.length, "non-empty rows out of", data.length, "total rows");
-
+  const nonEmptyData = data.filter((row) => !isRowEmpty(row));
   let allPeople = 0;
   let allActions = 0;
 
   const aggregated: ProgramsData = nonEmptyData.reduce((acc, item) => {
     try {
-      const validatedRow = ExcelRowSchema.parse(item);
+      const row = ExcelRowSchema.parse(item);
+      const month = moment(row["Data"], "YYYY-MM-DD").month() + 1;
 
-      const programType = validatedRow["Typ programu"];
-      const programName = validatedRow["Nazwa programu"];
-      const programAction = validatedRow["Działanie"];
-      const peopleCount = validatedRow["Liczba ludzi"];
-      const actionCount = validatedRow["Liczba działań"];
+      // Skip if month not selected
+      if (!selectedMonths.includes(month)) return acc;
 
-      const date = moment(validatedRow["Data"], "YYYY-MM-DD");
-      const month = date.month() + 1; // moment months are 0-indexed
+      const { "Typ programu": programType, "Nazwa programu": programName, "Działanie": action, "Liczba ludzi": peopleCount, "Liczba działań": actionCount } = row;
 
-      // Skip if month is not selected
-      if (!selectedMonths.includes(month)) {
-        return acc;
-      }
-
-      // Initialize nested objects if they don't exist
-      if (!acc[programType]) {
-        acc[programType] = {};
-      }
-
-      if (!acc[programType][programName]) {
-        acc[programType][programName] = {};
-      }
-
-      if (!acc[programType][programName][programAction]) {
-        acc[programType][programName][programAction] = {
-          people: 0,
-          actionNumber: 0,
-        };
-      }
+      // Ensure nested objects exist
+      acc[programType] ??= {};
+      acc[programType][programName] ??= {};
+      acc[programType][programName][action] ??= { people: 0, actionNumber: 0 };
 
       // Accumulate values
-      acc[programType][programName][programAction].actionNumber += actionCount;
-      acc[programType][programName][programAction].people += peopleCount;
-
+      acc[programType][programName][action].actionNumber += actionCount;
+      acc[programType][programName][action].people += peopleCount;
       allPeople += peopleCount;
       allActions += actionCount;
 
       return acc;
     } catch (error) {
-      console.error("Error processing row:", item, error);
       throw new Error(`Błąd w wierszu danych: ${error instanceof Error ? error.message : "Nieznany błąd"}`);
     }
   }, {} as ProgramsData);
 
-  return {
-    aggregated,
-    allPeople,
-    allActions,
-  };
+  return { aggregated, allPeople, allActions };
 };
 
 /**
- * Styles a program name cell based on the program number
- * Only cells with value "1." get red/bold styling, others get black/normal
+ * Styling configuration for Excel cells
  */
-const styleProgramNameCell = (
-  cell: ExcelJS.Cell,
-  programNumberCell: ExcelJS.Cell,
-  sectionName: string
-): void => {
-  const cellValue = String(programNumberCell.value || "").trim();
-  const isProgramNumber = /^\d+\.$/.test(cellValue);
-  
-  console.log(`DEBUG: Cell ${cell.address}, Number cell value: "${cellValue}", isProgramNumber: ${isProgramNumber}`);
-  
-  // Get current style or create new one
-  const currentStyle = cell.style || {};
-  
-  if (isProgramNumber) {
-    console.log(`Styling ${sectionName} program name cell RED`, cell.address);
-    cell.style = {
-      ...currentStyle,
-      font: {
-        name: 'Calibri',
-        size: 11,
-        bold: true,
-        color: { argb: 'FFFF0000' }
-      }
-    };
+const CELL_STYLES = {
+  programName: {
+    font: { name: "Calibri", size: 11, bold: true, color: { argb: "FFFF0000" } },
+  },
+  actionName: {
+    font: { name: "Calibri", size: 11, bold: false, color: { argb: "FF000000" } },
+  },
+} as const;
+
+/**
+ * Determines if a cell value represents a program number (e.g., "1.", "2.", "3.")
+ * @param value Cell value to check
+ * @returns true if value matches program number pattern
+ */
+const isProgramNumber = (value: unknown): boolean => /^\d+\.$/.test(String(value || "").trim());
+
+/**
+ * Styles a cell based on whether it's a program or action row
+ * Program rows get red/bold styling, action rows get black/normal
+ * @param cell The cell to style
+ * @param numberCell The number cell to check (determines if it's a program row)
+ */
+const styleProgramNameCell = (cell: ExcelJS.Cell, numberCell: ExcelJS.Cell): void => {
+  const style = isProgramNumber(numberCell.value) ? CELL_STYLES.programName : CELL_STYLES.actionName;
+  cell.style = { ...cell.style, ...style };
+};
+
+/**
+ * Triggers browser download of a blob
+ * @param blob The data blob to download
+ * @param fileName The filename for the download
+ */
+const downloadBlob = (blob: Blob, fileName: string): void => {
+  if (window.navigator && "msSaveOrOpenBlob" in window.navigator) {
+    // @ts-expect-error: legacy IE API
+    window.navigator.msSaveOrOpenBlob(blob, fileName);
   } else {
-    console.log(`Styling ${sectionName} action name cell BLACK`, cell.address);
-    cell.style = {
-      ...currentStyle,
-      font: {
-        name: 'Calibri',
-        size: 11,
-        bold: false,
-        color: { argb: 'FF000000' }
-      }
-    };
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
-  
-  console.log(`Font after setting:`, cell.font);
 };
 
 /**
  * Exports aggregated data to Excel format (original format)
+ * @param data Aggregated data to export
+ * @param customFileName Optional custom filename
+ * @returns Promise<boolean> true if export was successful
  */
 export const exportToExcel = async (data: AggregatedData, customFileName?: string): Promise<boolean> => {
   try {
@@ -243,12 +170,7 @@ export const exportToExcel = async (data: AggregatedData, customFileName?: strin
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Miernik");
 
-    worksheet.columns = [
-      { width: 15 },
-      { width: 40 },
-      { width: 10 },
-      { width: 10 },
-    ];
+    worksheet.columns = [{ width: 15 }, { width: 40 }, { width: 10 }, { width: 10 }];
 
     Object.entries(data.aggregated).forEach(([programType, programData]) => {
       worksheet.addRow([programType, null, null, null]);
@@ -295,23 +217,102 @@ export const exportToExcel = async (data: AggregatedData, customFileName?: strin
 };
 
 /**
- * Exports aggregated data to the zalnr1.xlsx template
- * Fills in "Programowe" section (A7:D94) and "Nieprogramowe" section (I7:L?)
+ * Column configuration for programowe and nieprogramowe sections
  */
-export const exportToTemplate = async (data: AggregatedData, customFileName?: string): Promise<boolean> => {
+const COLUMN_CONFIG = {
+  programowe: { number: "A", name: "B", copy: "G", action: "C", wizytacja: "D", people: "H" },
+  nieprogramowe: { number: "I", name: "J", copy: "N", action: "K", wizytacja: "D", people: "O" },
+} as const;
+
+/**
+ * Fills a section (programowe or nieprogramowe) of the worksheet
+ * @param worksheet The worksheet to fill
+ * @param data Programs data to populate
+ * @param columns Column configuration for this section
+ */
+const fillSection = (worksheet: ExcelJS.Worksheet, data: ProgramsData, columns: typeof COLUMN_CONFIG[keyof typeof COLUMN_CONFIG]): number => {
+  let currentRow = 7;
+  let programCounter = 0;
+
+  Object.entries(data).forEach(([, programData]) => {
+    Object.entries(programData).forEach(([programName, actions]) => {
+      programCounter++;
+
+      // Set program number and style
+      const numberCell = worksheet.getCell(`${columns.number}${currentRow}`);
+      numberCell.value = `${programCounter}.`;
+      styleProgramNameCell(numberCell, numberCell);
+
+      const copyCell = worksheet.getCell(`${columns.copy}${currentRow}`);
+      copyCell.value = `${programCounter}.`;
+
+      // Set program name and style
+      const nameCell = worksheet.getCell(`${columns.name}${currentRow}`);
+      nameCell.value = programName;
+      styleProgramNameCell(nameCell, numberCell);
+
+      currentRow++;
+
+      // Add action rows
+      Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
+        const actionIndex = `${programCounter}.${actionIdx + 1}`;
+
+        worksheet.getCell(`${columns.number}${currentRow}`).value = actionIndex;
+        worksheet.getCell(`${columns.copy}${currentRow}`).value = actionIndex;
+        worksheet.getCell(`${columns.name}${currentRow}`).value = actionName;
+
+        // Handle wizytacja vs regular actions
+        const countCell = actionName === "Wizytacja" ? columns.wizytacja : columns.action;
+        worksheet.getCell(`${countCell}${currentRow}`).value = actionData.actionNumber;
+
+        worksheet.getCell(`${columns.people}${currentRow}`).value = actionData.people;
+
+        currentRow++;
+      });
+    });
+  });
+
+  return currentRow;
+};
+
+/**
+ * Internal helper function to fill worksheet sections with program and action data
+ * @param worksheet The Excel worksheet to fill
+ * @param programoweData Programs data to fill
+ * @param nieprogramoweData Non-programs data to fill
+ */
+const fillWorksheetSections = (worksheet: ExcelJS.Worksheet, programoweData: ProgramsData, nieprogramoweData: ProgramsData): void => {
+  fillSection(worksheet, programoweData, COLUMN_CONFIG.programowe);
+  fillSection(worksheet, nieprogramoweData, COLUMN_CONFIG.nieprogramowe);
+};
+
+/**
+ * Generic export function for template-based Excel files
+ * @param data Aggregated data to export
+ * @param templatePath Path to the template file (e.g., "/generate-templates/zalnr1.xlsx")
+ * @param defaultFileName Default filename without extension
+ * @param exportType Export type for logging purposes
+ * @param customFileName Optional custom filename
+ * @returns Promise<boolean> true if export was successful
+ */
+const exportToTemplateGeneric = async (
+  data: AggregatedData,
+  templatePath: string,
+  defaultFileName: string,
+  customFileName?: string,
+  exportType: string = defaultFileName
+): Promise<boolean> => {
   try {
-    console.log(`🚀 DEBUG EXPORT: Starting template export with ${Object.keys(data.aggregated || {}).length} program types`);
-    console.log(`📊 DEBUG EXPORT: Total people: ${data.allPeople}, Total actions: ${data.allActions}`);
 
     if (!data.aggregated || Object.keys(data.aggregated).length === 0) {
-      console.warn("No data provided for template export.");
+      console.warn(`No data provided for ${exportType} export.`);
       return false;
     }
 
     // Load the template
-    const response = await fetch("/generate-templates/zalnr1.xlsx");
+    const response = await fetch(templatePath);
     if (!response.ok) {
-      throw new Error("Failed to load template file");
+      throw new Error(`Failed to load template file: ${templatePath}`);
     }
 
     const arrayBuffer = await response.arrayBuffer();
@@ -320,7 +321,7 @@ export const exportToTemplate = async (data: AggregatedData, customFileName?: st
 
     const worksheet = workbook.worksheets[0];
     if (!worksheet) {
-      throw new Error("Template worksheet not found");
+      throw new Error(`Template worksheet not found in ${templatePath}`);
     }
 
     // Separate programowe and nieprogramowe data
@@ -328,7 +329,6 @@ export const exportToTemplate = async (data: AggregatedData, customFileName?: st
     const nieprogramoweData: ProgramsData = {};
 
     Object.entries(data.aggregated).forEach(([programType, programData]) => {
-      // Check if programType contains "nieprogramowe" (case-insensitive)
       if (programType.toLowerCase().includes("nieprogramowe")) {
         nieprogramoweData[programType] = programData;
       } else {
@@ -336,118 +336,12 @@ export const exportToTemplate = async (data: AggregatedData, customFileName?: st
       }
     });
 
-    // Fill in Programowe section (A7:D94)
-    let currentRow = 7;
-    let programCounter = 0;
-
-    Object.entries(programoweData).forEach(([programType, programData]) => {
-      Object.entries(programData).forEach(([programName, actions]) => {
-        programCounter++;
-
-        console.log(`📋 DEBUG EXPORT [Programowe]: Processing program #${programCounter}: "${programName}" at row ${currentRow}`);
-
-        // Add program name row (no data, just name)
-        worksheet.getCell(`A${currentRow}`).value = `${programCounter}.`;
-        // Copy of program counter to column G
-        worksheet.getCell(`G${currentRow}`).value = `${programCounter}.`;
-
-        // Column B: nazwa programu
-        const programNameCell = worksheet.getCell(`B${currentRow}`);
-        programNameCell.value = programName;
-
-        console.log(`🎨 DEBUG EXPORT [Programowe]: About to style program name cell B${currentRow} for program "${programName}"`);
-        // Style program name cell
-        styleProgramNameCell(programNameCell, worksheet.getCell(`A${currentRow}`), "Programowe");
-
-        currentRow++;
-
-        // Add action rows with data
-        Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
-          const actionIndex = `${programCounter}.${actionIdx + 1}`;
-
-          console.log(`📋 DEBUG EXPORT [Programowe]: Processing action "${actionName}" at row ${currentRow} (index: ${actionIndex})`);
-
-          // Column A: nr (e.g., 1.1, 1.2)
-          worksheet.getCell(`A${currentRow}`).value = actionIndex;
-
-          // Kopia: Column G nr (e.g., 1.1, 1.2)
-          worksheet.getCell(`G${currentRow}`).value = actionIndex;
-
-          // Column B: nazwa działania
-          worksheet.getCell(`B${currentRow}`).value = actionName;
-
-          console.log(`🎨 DEBUG EXPORT [Programowe]: About to style action name cell B${currentRow} for action "${actionName}"`);
-            styleProgramNameCell(worksheet.getCell(`B${currentRow}`), worksheet.getCell(`A${currentRow}`), "Programowe");
-
-
-          if (actionName === "Wizytacja") {
-            // Column D: liczba wizytacji
-            worksheet.getCell(`D${currentRow}`).value = actionData.actionNumber;
-          } else {
-            // Column C: liczba działań
-            worksheet.getCell(`C${currentRow}`).value = actionData.actionNumber;
-          }
-
-          // Column H: liczba odbiorców
-          worksheet.getCell(`H${currentRow}`).value = actionData.people;
-
-
-
-          currentRow++;
-        });
-      });
-    });
-
-    // Fill in Nieprogramowe section (I7:L?)
-    currentRow = 7;
-    programCounter = 0;
-
-    Object.entries(nieprogramoweData).forEach(([programType, programData]) => {
-      Object.entries(programData).forEach(([programName, actions]) => {
-        programCounter++;
-
-        console.log(`📋 DEBUG EXPORT [Nieprogramowe]: Processing program #${programCounter}: "${programName}" at row ${currentRow}`);
-
-        // Add program name row (no data, just name)
-        worksheet.getCell(`I${currentRow}`).value = `${programCounter}.`;
-        
-                // Column J: program name
-        const programNameCellNie = worksheet.getCell(`J${currentRow}`);
-        programNameCellNie.value = programName;
-
-        console.log(`🎨 DEBUG EXPORT [Nieprogramowe]: About to style program name cell J${currentRow} for program "${programName}"`);
-        // Style program name cell
-        styleProgramNameCell(programNameCellNie, worksheet.getCell(`I${currentRow}`), "Nieprogramowe");
-
-        currentRow++;
-
-        // Add action rows with data
-        Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
-          const actionIndex = `${programCounter}.${actionIdx + 1}`;
-
-          console.log(`📋 DEBUG EXPORT [Nieprogramowe]: Processing action "${actionName}" at row ${currentRow} (index: ${actionIndex})`);
-
-          // Column I: nr (e.g., 1.1, 1.2)
-          worksheet.getCell(`I${currentRow}`).value = actionIndex;
-          worksheet.getCell(`N${currentRow}`).value = actionIndex;
-          // Column J: nazwa działania
-          worksheet.getCell(`J${currentRow}`).value = actionName;
-          // Column K: liczba działań
-          worksheet.getCell(`K${currentRow}`).value = actionData.actionNumber;
-          // Column L: liczba odbiorców
-          worksheet.getCell(`O${currentRow}`).value = actionData.people;
-
-          console.log(`🎨 DEBUG EXPORT [Nieprogramowe]: About to style action name cell J${currentRow} for action "${actionName}"`);
-          styleProgramNameCell(worksheet.getCell(`J${currentRow}`), worksheet.getCell(`I${currentRow}`), "Nieprogramowe");
-
-          currentRow++;
-        });
-      });
-    });
+    // Fill worksheet sections
+    fillWorksheetSections(worksheet, programoweData, nieprogramoweData);
 
     // Generate filename with current date
     const currentDate = moment().format("DD-MM-YYYY");
-    const fileName = `${customFileName || `zalnr1 ${currentDate}`}.xlsx`;
+    const fileName = `${customFileName || `${defaultFileName} ${currentDate}`}.xlsx`;
 
     // Save and download
     const buffer = await workbook.xlsx.writeBuffer();
@@ -469,195 +363,32 @@ export const exportToTemplate = async (data: AggregatedData, customFileName?: st
       URL.revokeObjectURL(url);
     }
 
-    console.log(`✅ DEBUG EXPORT: Template export completed successfully. File: ${fileName}`);
 
     return true;
   } catch (error) {
-    console.error("Error exporting to template:", error);
+    console.error(`Error exporting to ${exportType}:`, error);
     return false;
   }
 };
 
 /**
+ * Exports aggregated data to the zalnr1.xlsx template
+ * Fills in "Programowe" section (A7:D94) and "Nieprogramowe" section (I7:L?)
+ * @param data Aggregated data to export
+ * @param customFileName Optional custom filename
+ * @returns Promise<boolean> true if export was successful
+ */
+export const exportToTemplate = async (data: AggregatedData, customFileName?: string): Promise<boolean> => {
+  return exportToTemplateGeneric(data, "/generate-templates/zalnr1.xlsx", "zalnr1", customFileName);
+};
+
+/**
  * Exports aggregated data to the zalnr2.xlsx template (cumulative/narastający)
  * Fills in "Programowe" section (A7:D94) and "Nieprogramowe" section (I7:L?)
+ * @param data Aggregated data to export
+ * @param customFileName Optional custom filename
+ * @returns Promise<boolean> true if export was successful
  */
 export const exportToCumulativeTemplate = async (data: AggregatedData, customFileName?: string): Promise<boolean> => {
-  try {
-    console.log(`🚀 DEBUG EXPORT [CUMULATIVE]: Starting cumulative template export with ${Object.keys(data.aggregated || {}).length} program types`);
-    console.log(`📊 DEBUG EXPORT [CUMULATIVE]: Total people: ${data.allPeople}, Total actions: ${data.allActions}`);
-
-    if (!data.aggregated || Object.keys(data.aggregated).length === 0) {
-      console.warn("No data provided for cumulative template export.");
-      return false;
-    }
-
-    // Load the cumulative template
-    const response = await fetch("/generate-templates/zalnr2.xlsx");
-    if (!response.ok) {
-      throw new Error("Failed to load cumulative template file (zalnr2.xlsx)");
-    }
-
-    const arrayBuffer = await response.arrayBuffer();
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(arrayBuffer);
-
-    const worksheet = workbook.worksheets[0];
-    if (!worksheet) {
-      throw new Error("Cumulative template worksheet not found");
-    }
-
-    // Separate programowe and nieprogramowe data
-    const programoweData: ProgramsData = {};
-    const nieprogramoweData: ProgramsData = {};
-
-    Object.entries(data.aggregated).forEach(([programType, programData]) => {
-      // Check if programType contains "nieprogramowe" (case-insensitive)
-      if (programType.toLowerCase().includes("nieprogramowe")) {
-        nieprogramoweData[programType] = programData;
-      } else {
-        programoweData[programType] = programData;
-      }
-    });
-
-    // Fill in Programowe section (A7:D94)
-    let currentRow = 7;
-    let programCounter = 0;
-
-    Object.entries(programoweData).forEach(([programType, programData]) => {
-      Object.entries(programData).forEach(([programName, actions]) => {
-        programCounter++;
-
-        console.log(`📋 DEBUG EXPORT [CUMULATIVE-Programowe]: Processing program #${programCounter}: "${programName}" at row ${currentRow}`);
-
-        // Add program name row (no data, just name)
-        worksheet.getCell(`A${currentRow}`).value = `${programCounter}.`;
-        // Copy of program counter to column G
-        worksheet.getCell(`G${currentRow}`).value = `${programCounter}.`;
-
-        // Column B: nazwa programu
-        const programNameCell = worksheet.getCell(`B${currentRow}`);
-        programNameCell.value = programName;
-
-        console.log(`🎨 DEBUG EXPORT [CUMULATIVE-Programowe]: About to style program name cell B${currentRow} for program "${programName}"`);
-        // Style program name cell
-        styleProgramNameCell(programNameCell, worksheet.getCell(`A${currentRow}`), "Cumulative-Programowe");
-
-        currentRow++;
-
-        // Add action rows with data
-        Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
-          const actionIndex = `${programCounter}.${actionIdx + 1}`;
-
-          console.log(`📋 DEBUG EXPORT [CUMULATIVE-Programowe]: Processing action "${actionName}" at row ${currentRow} (index: ${actionIndex})`);
-
-          // Column A: nr (e.g., 1.1, 1.2)
-          worksheet.getCell(`A${currentRow}`).value = actionIndex;
-
-          // Kopia: Column G nr (e.g., 1.1, 1.2)
-          worksheet.getCell(`G${currentRow}`).value = actionIndex;
-
-          // Column B: nazwa działania
-          worksheet.getCell(`B${currentRow}`).value = actionName;
-
-          console.log(`🎨 DEBUG EXPORT [CUMULATIVE-Programowe]: About to style action name cell B${currentRow} for action "${actionName}"`);
-            styleProgramNameCell(worksheet.getCell(`B${currentRow}`), worksheet.getCell(`A${currentRow}`), "Cumulative-Programowe");
-
-
-          if (actionName === "Wizytacja") {
-            // Column D: liczba wizytacji
-            worksheet.getCell(`D${currentRow}`).value = actionData.actionNumber;
-          } else {
-            // Column C: liczba działań
-            worksheet.getCell(`C${currentRow}`).value = actionData.actionNumber;
-          }
-
-          // Column H: liczba odbiorców
-          worksheet.getCell(`H${currentRow}`).value = actionData.people;
-
-
-
-          currentRow++;
-        });
-      });
-    });
-
-    // Fill in Nieprogramowe section (I7:L?)
-    currentRow = 7;
-    programCounter = 0;
-
-    Object.entries(nieprogramoweData).forEach(([programType, programData]) => {
-      Object.entries(programData).forEach(([programName, actions]) => {
-        programCounter++;
-
-        console.log(`📋 DEBUG EXPORT [CUMULATIVE-Nieprogramowe]: Processing program #${programCounter}: "${programName}" at row ${currentRow}`);
-
-        // Add program name row (no data, just name)
-        worksheet.getCell(`I${currentRow}`).value = `${programCounter}.`;
-        
-                // Column J: program name
-        const programNameCellNie = worksheet.getCell(`J${currentRow}`);
-        programNameCellNie.value = programName;
-
-        console.log(`🎨 DEBUG EXPORT [CUMULATIVE-Nieprogramowe]: About to style program name cell J${currentRow} for program "${programName}"`);
-        // Style program name cell
-        styleProgramNameCell(programNameCellNie, worksheet.getCell(`I${currentRow}`), "Cumulative-Nieprogramowe");
-
-        currentRow++;
-
-        // Add action rows with data
-        Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
-          const actionIndex = `${programCounter}.${actionIdx + 1}`;
-
-          console.log(`📋 DEBUG EXPORT [CUMULATIVE-Nieprogramowe]: Processing action "${actionName}" at row ${currentRow} (index: ${actionIndex})`);
-
-          // Column I: nr (e.g., 1.1, 1.2)
-          worksheet.getCell(`I${currentRow}`).value = actionIndex;
-          worksheet.getCell(`N${currentRow}`).value = actionIndex;
-          // Column J: nazwa działania
-          worksheet.getCell(`J${currentRow}`).value = actionName;
-          // Column K: liczba działań
-          worksheet.getCell(`K${currentRow}`).value = actionData.actionNumber;
-          // Column L: liczba odbiorców
-          worksheet.getCell(`O${currentRow}`).value = actionData.people;
-
-          console.log(`🎨 DEBUG EXPORT [CUMULATIVE-Nieprogramowe]: About to style action name cell J${currentRow} for action "${actionName}"`);
-          styleProgramNameCell(worksheet.getCell(`J${currentRow}`), worksheet.getCell(`I${currentRow}`), "Cumulative-Nieprogramowe");
-
-          currentRow++;
-        });
-      });
-    });
-
-    // Generate filename with current date
-    const currentDate = moment().format("DD-MM-YYYY");
-    const fileName = `${customFileName || `zalnr2 ${currentDate}`}.xlsx`;
-
-    // Save and download
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-
-    if (window.navigator && "msSaveOrOpenBlob" in window.navigator) {
-      // @ts-expect-error: legacy IE API
-      window.navigator.msSaveOrOpenBlob(blob, fileName);
-    } else {
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
-
-    console.log(`✅ DEBUG EXPORT [CUMULATIVE]: Cumulative template export completed successfully. File: ${fileName}`);
-
-    return true;
-  } catch (error) {
-    console.error("Error exporting to cumulative template:", error);
-    return false;
-  }
+  return exportToTemplateGeneric(data, "/generate-templates/zalnr2.xlsx", "zalnr2", customFileName);
 };
