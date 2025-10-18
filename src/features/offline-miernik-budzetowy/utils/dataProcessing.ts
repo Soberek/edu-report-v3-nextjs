@@ -5,194 +5,132 @@ import type { ExcelRow, Month, AggregatedData, ProgramsData } from "../types";
 import { ExcelRowSchema, ERROR_MESSAGES } from "../types";
 
 /**
+ * Checks if a row has any content in required fields
+ */
+const isRowEmpty = (row: ExcelRow): boolean => {
+  const typProgramu = String(row["Typ programu"] || "").trim();
+  const nazwaProgramu = String(row["Nazwa programu"] || "").trim();
+  const dzialanie = String(row["Działanie"] || "").trim();
+  return typProgramu === "" && nazwaProgramu === "" && dzialanie === "";
+};
+
+/**
  * Validates and processes Excel data
+ * @param data Array of Excel rows to validate
+ * @returns Validation result with success status and optional error message
  */
 export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?: string } => {
-
   if (!data || data.length === 0) {
-    return {
-      isValid: false,
-      error: "Plik nie zawiera danych",
-    };
+    return { isValid: false, error: "Plik nie zawiera danych" };
   }
 
-  // Filter out empty rows - rows where all required fields are empty
-  const nonEmptyData = data.filter((row) => {
-    const typProgramu = String(row["Typ programu"] || "").trim();
-    const nazwaProgramu = String(row["Nazwa programu"] || "").trim();
-    const dzialanie = String(row["Działanie"] || "").trim();
-
-    // Row is considered non-empty if it has at least one of the main text fields filled
-    const hasContent = typProgramu !== "" || nazwaProgramu !== "" || dzialanie !== "";
-
-    if (!hasContent) {
-    }
-
-    return hasContent;
-  });
-
+  // Filter out empty rows
+  const nonEmptyData = data.filter((row) => !isRowEmpty(row));
 
   if (nonEmptyData.length === 0) {
-    return {
-      isValid: false,
-      error: "Plik nie zawiera danych (wszystkie wiersze są puste)",
-    };
+    return { isValid: false, error: "Plik nie zawiera danych (wszystkie wiersze są puste)" };
   }
 
   // Check if first row has required columns
-  const firstRow = nonEmptyData[0];
-
   const requiredColumns = ["Typ programu", "Nazwa programu", "Działanie", "Liczba ludzi", "Liczba działań", "Data"];
-
-  const presentColumns = Object.keys(firstRow);
-
+  const presentColumns = Object.keys(nonEmptyData[0]);
   const missingColumns = requiredColumns.filter((col) => !presentColumns.includes(col));
 
   if (missingColumns.length > 0) {
     const errorMsg = `Plik nie zawiera wymaganych kolumn: ${missingColumns.join(", ")}. Dostępne kolumny: ${presentColumns.join(", ")}`;
-    return {
-      isValid: false,
-      error: errorMsg,
-    };
+    return { isValid: false, error: errorMsg };
   }
 
+  // Validate each non-empty row
   try {
-    // Validate each non-empty row
-    for (let i = 0; i < nonEmptyData.length; i++) {
-      const row = nonEmptyData[i];
-      ExcelRowSchema.parse(row);
-    }
-
+    nonEmptyData.forEach((row) => ExcelRowSchema.parse(row));
     return { isValid: true };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const firstError = error.issues[0];
-      const path = firstError.path.map((p) => String(p)).join(".");
-      const errorMsg = `Błąd w danych (${path}): ${firstError.message}`;
-      return {
-        isValid: false,
-        error: errorMsg,
-      };
+      const { path, message } = error.issues[0];
+      const pathStr = path.map(String).join(".");
+      return { isValid: false, error: `Błąd w danych (${pathStr}): ${message}` };
     }
-
-    return {
-      isValid: false,
-      error: ERROR_MESSAGES.INVALID_DATA_FORMAT,
-    };
+    return { isValid: false, error: ERROR_MESSAGES.INVALID_DATA_FORMAT };
   }
 };
 
 /**
  * Aggregates Excel data based on selected months
+ * @param data Array of Excel rows to aggregate
+ * @param months Array of month selection objects
+ * @returns Aggregated data with totals
+ * @throws Error if no months are selected
  */
 export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData => {
-  const selectedMonths = months.filter((month) => month.selected).map((month) => month.monthNumber);
+  const selectedMonths = months.filter((m) => m.selected).map((m) => m.monthNumber);
 
   if (selectedMonths.length === 0) {
     throw new Error("Wybierz przynajmniej jeden miesiąc");
   }
 
-  // Filter out empty rows before processing
-  const nonEmptyData = data.filter((row) => {
-    const typProgramu = String(row["Typ programu"] || "").trim();
-    const nazwaProgramu = String(row["Nazwa programu"] || "").trim();
-    const dzialanie = String(row["Działanie"] || "").trim();
-
-    return typProgramu !== "" || nazwaProgramu !== "" || dzialanie !== "";
-  });
-
-
+  const nonEmptyData = data.filter((row) => !isRowEmpty(row));
   let allPeople = 0;
   let allActions = 0;
 
   const aggregated: ProgramsData = nonEmptyData.reduce((acc, item) => {
     try {
-      const validatedRow = ExcelRowSchema.parse(item);
+      const row = ExcelRowSchema.parse(item);
+      const month = moment(row["Data"], "YYYY-MM-DD").month() + 1;
 
-      const programType = validatedRow["Typ programu"];
-      const programName = validatedRow["Nazwa programu"];
-      const programAction = validatedRow["Działanie"];
-      const peopleCount = validatedRow["Liczba ludzi"];
-      const actionCount = validatedRow["Liczba działań"];
+      // Skip if month not selected
+      if (!selectedMonths.includes(month)) return acc;
 
-      const date = moment(validatedRow["Data"], "YYYY-MM-DD");
-      const month = date.month() + 1; // moment months are 0-indexed
+      const { "Typ programu": programType, "Nazwa programu": programName, "Działanie": action, "Liczba ludzi": peopleCount, "Liczba działań": actionCount } = row;
 
-      // Skip if month is not selected
-      if (!selectedMonths.includes(month)) {
-        return acc;
-      }
-
-      // Initialize nested objects if they don't exist
-      if (!acc[programType]) {
-        acc[programType] = {};
-      }
-
-      if (!acc[programType][programName]) {
-        acc[programType][programName] = {};
-      }
-
-      if (!acc[programType][programName][programAction]) {
-        acc[programType][programName][programAction] = {
-          people: 0,
-          actionNumber: 0,
-        };
-      }
+      // Ensure nested objects exist
+      acc[programType] ??= {};
+      acc[programType][programName] ??= {};
+      acc[programType][programName][action] ??= { people: 0, actionNumber: 0 };
 
       // Accumulate values
-      acc[programType][programName][programAction].actionNumber += actionCount;
-      acc[programType][programName][programAction].people += peopleCount;
-
+      acc[programType][programName][action].actionNumber += actionCount;
+      acc[programType][programName][action].people += peopleCount;
       allPeople += peopleCount;
       allActions += actionCount;
 
       return acc;
     } catch (error) {
-      console.error("Error processing row:", item, error);
       throw new Error(`Błąd w wierszu danych: ${error instanceof Error ? error.message : "Nieznany błąd"}`);
     }
   }, {} as ProgramsData);
 
-  return {
-    aggregated,
-    allPeople,
-    allActions,
-  };
+  return { aggregated, allPeople, allActions };
 };
 
 /**
- * Styles a program name cell based on the program number
- * Only cells with value "1." get red/bold styling, others get black/normal
+ * Styling configuration for Excel cells
  */
-const styleProgramNameCell = (cell: ExcelJS.Cell, programNumberCell: ExcelJS.Cell, ): void => {
-  const cellValue = String(programNumberCell.value || "").trim();
-  const isProgramNumber = /^\d+\.$/.test(cellValue);
+const CELL_STYLES = {
+  programName: {
+    font: { name: "Calibri", size: 11, bold: true, color: { argb: "FFFF0000" } },
+  },
+  actionName: {
+    font: { name: "Calibri", size: 11, bold: false, color: { argb: "FF000000" } },
+  },
+} as const;
 
-  // Get current style or create new one
-  const currentStyle = cell.style || {};
+/**
+ * Determines if a cell value represents a program number (e.g., "1.", "2.", "3.")
+ * @param value Cell value to check
+ * @returns true if value matches program number pattern
+ */
+const isProgramNumber = (value: unknown): boolean => /^\d+\.$/.test(String(value || "").trim());
 
-  if (isProgramNumber) {
-    cell.style = {
-      ...currentStyle,
-      font: {
-        name: "Calibri",
-        size: 11,
-        bold: true,
-        color: { argb: "FFFF0000" },
-      },
-    };
-  } else {
-    cell.style = {
-      ...currentStyle,
-      font: {
-        name: "Calibri",
-        size: 11,
-        bold: false,
-        color: { argb: "FF000000" },
-      },
-    };
-  }
-
+/**
+ * Styles a cell based on whether it's a program or action row
+ * Program rows get red/bold styling, action rows get black/normal
+ * @param cell The cell to style
+ * @param numberCell The number cell to check (determines if it's a program row)
+ */
+const styleProgramNameCell = (cell: ExcelJS.Cell, numberCell: ExcelJS.Cell): void => {
+  const style = isProgramNumber(numberCell.value) ? CELL_STYLES.programName : CELL_STYLES.actionName;
+  cell.style = { ...cell.style, ...style };
 };
 
 /**
