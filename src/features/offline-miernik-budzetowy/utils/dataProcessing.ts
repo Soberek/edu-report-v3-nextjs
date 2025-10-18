@@ -169,45 +169,23 @@ export const exportToExcel = async (data: AggregatedData, customFileName?: strin
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Miernik");
-
     worksheet.columns = [{ width: 15 }, { width: 40 }, { width: 10 }, { width: 10 }];
 
     Object.entries(data.aggregated).forEach(([programType, programData]) => {
       worksheet.addRow([programType, null, null, null]);
-
       Object.entries(programData).forEach(([programName, actions], idx) => {
-        const programIndex = idx + 1;
-        // Add program name without data
-        worksheet.addRow([`${programIndex}.`, programName, null, null]);
-
+        worksheet.addRow([`${idx + 1}.`, programName, null, null]);
         Object.entries(actions).forEach(([actionName, actionData], actionIdx) => {
-          const actionIndex = `${programIndex}.${actionIdx + 1}`;
-          // Add action with data: name, liczba działań, liczba odbiorców
+          const actionIndex = `${idx + 1}.${actionIdx + 1}`;
           worksheet.addRow([actionIndex, actionName, actionData.actionNumber, actionData.people]);
         });
       });
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    const currentDate = moment().format("DD-MM-YYYY");
-    const fileName = `${customFileName || `miernik ${currentDate}`}.xlsx`;
-
-    if (window.navigator && "msSaveOrOpenBlob" in window.navigator) {
-      // @ts-expect-error: legacy IE API
-      window.navigator.msSaveOrOpenBlob(blob, fileName);
-    } else {
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const fileName = `${customFileName || `miernik ${moment().format("DD-MM-YYYY")}`}.xlsx`;
+    downloadBlob(blob, fileName);
 
     return true;
   } catch (error) {
@@ -291,7 +269,6 @@ const fillWorksheetSections = (worksheet: ExcelJS.Worksheet, programoweData: Pro
  * @param data Aggregated data to export
  * @param templatePath Path to the template file (e.g., "/generate-templates/zalnr1.xlsx")
  * @param defaultFileName Default filename without extension
- * @param exportType Export type for logging purposes
  * @param customFileName Optional custom filename
  * @returns Promise<boolean> true if export was successful
  */
@@ -299,74 +276,46 @@ const exportToTemplateGeneric = async (
   data: AggregatedData,
   templatePath: string,
   defaultFileName: string,
-  customFileName?: string,
-  exportType: string = defaultFileName
+  customFileName?: string
 ): Promise<boolean> => {
   try {
-
     if (!data.aggregated || Object.keys(data.aggregated).length === 0) {
-      console.warn(`No data provided for ${exportType} export.`);
+      console.warn(`No data provided for export.`);
       return false;
     }
 
-    // Load the template
+    // Load template
     const response = await fetch(templatePath);
-    if (!response.ok) {
-      throw new Error(`Failed to load template file: ${templatePath}`);
-    }
+    if (!response.ok) throw new Error(`Failed to load template: ${templatePath}`);
 
     const arrayBuffer = await response.arrayBuffer();
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(arrayBuffer);
 
     const worksheet = workbook.worksheets[0];
-    if (!worksheet) {
-      throw new Error(`Template worksheet not found in ${templatePath}`);
-    }
+    if (!worksheet) throw new Error("Template worksheet not found");
 
     // Separate programowe and nieprogramowe data
-    const programoweData: ProgramsData = {};
-    const nieprogramoweData: ProgramsData = {};
+    const { programowe: programoweData, nieprogramowe: nieprogramoweData } = Object.entries(data.aggregated).reduce(
+      (acc, [programType, programData]) => {
+        const target = programType.toLowerCase().includes("nieprogramowe") ? "nieprogramowe" : "programowe";
+        acc[target][programType] = programData;
+        return acc;
+      },
+      { programowe: {} as ProgramsData, nieprogramowe: {} as ProgramsData }
+    );
 
-    Object.entries(data.aggregated).forEach(([programType, programData]) => {
-      if (programType.toLowerCase().includes("nieprogramowe")) {
-        nieprogramoweData[programType] = programData;
-      } else {
-        programoweData[programType] = programData;
-      }
-    });
-
-    // Fill worksheet sections
+    // Fill sections and save
     fillWorksheetSections(worksheet, programoweData, nieprogramoweData);
 
-    // Generate filename with current date
-    const currentDate = moment().format("DD-MM-YYYY");
-    const fileName = `${customFileName || `${defaultFileName} ${currentDate}`}.xlsx`;
-
-    // Save and download
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-
-    if (window.navigator && "msSaveOrOpenBlob" in window.navigator) {
-      // @ts-expect-error: legacy IE API
-      window.navigator.msSaveOrOpenBlob(blob, fileName);
-    } else {
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
-
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const fileName = `${customFileName || `${defaultFileName} ${moment().format("DD-MM-YYYY")}`}.xlsx`;
+    downloadBlob(blob, fileName);
 
     return true;
   } catch (error) {
-    console.error(`Error exporting to ${exportType}:`, error);
+    console.error(`Error exporting:`, error);
     return false;
   }
 };
