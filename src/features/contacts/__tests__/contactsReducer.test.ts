@@ -5,7 +5,7 @@
 
 import { describe, it, expect } from "vitest";
 import { contactsReducer, initialState } from "../reducers/contactsReducer";
-import type { Contact } from "../types";
+import type { Contact, ContactsAction } from "../types";
 
 // Mock contact factory
 const mockContact = (overrides?: Partial<Contact>): Contact => ({
@@ -182,9 +182,9 @@ describe("Contacts Reducer", () => {
   describe("unknown action", () => {
     it("should return current state for unknown action", () => {
       const currentState = { data: [mockContact()], loading: false, error: null };
-      const newState = contactsReducer(currentState, {
-        type: "UNKNOWN" as any,
-      });
+      // Create an object that doesn't match any action type
+      const action = { type: "UNKNOWN" } as unknown as ContactsAction;
+      const newState = contactsReducer(currentState, action);
 
       expect(newState).toEqual(currentState);
     });
