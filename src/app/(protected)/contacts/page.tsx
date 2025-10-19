@@ -1,111 +1,125 @@
 "use client";
-import { Box, Typography, Container, Paper, Tabs, Tab, Fade, useTheme, useMediaQuery } from "@mui/material";
+import { Box, Typography, Container, Button } from "@mui/material";
 import { useState } from "react";
-import { useContacts, ContactList, ContactForm, ContactStats, ContactSearch } from "@/features/contacts";
+import { Add } from "@mui/icons-material";
+import {
+  useContacts,
+  ContactList,
+  ContactFormDialog,
+  ContactStats,
+  ContactSearch,
+} from "@/features/contacts";
 import { NotificationSnackbar } from "@/components/shared";
+import { useNotification } from "@/hooks";
+import type { ContactFormData } from "@/features/contacts";
 
-export default function Contacts(): React.ReactNode {
-  const { contacts, loading, error, notification, handleContactSubmit, handleContactDelete, handleContactUpdate, closeNotification } =
+export default function ContactsPage(): React.ReactNode {
+  const { data: contacts, loading, error, createContact, updateContact, deleteContact } =
     useContacts();
-  const [activeTab, setActiveTab] = useState(0);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { notification, close: closeNotification } = useNotification();
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
+  const handleCreateContact = async (data: ContactFormData) => {
+    try {
+      const result = await createContact(data);
+      if (result) {
+        setShowAddDialog(false);
+      }
+    } catch (error) {
+      console.error("Error creating contact:", error);
+    }
+  };
+
+  const handleDeleteContact = async (id: string) => {
+    try {
+      await deleteContact(id);
+    } catch (error) {
+      console.error("Error deleting contact:", error);
+    }
+  };
+
+  const handleUpdateContact = async (id: string, data: ContactFormData) => {
+    try {
+      return await updateContact(id, data);
+    } catch (error) {
+      console.error("Error updating contact:", error);
+      return false;
+    }
   };
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Header */}
-      <Box sx={{ mb: 4, textAlign: "center" }}>
-        <Typography
-          variant="h3"
+      {/* Page Header with Action Button */}
+      <Box sx={{ mb: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box>
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: "bold",
+              background: "linear-gradient(45deg, #1976d2, #42a5f5)",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              mb: 1,
+            }}
+          >
+            Kontakty
+          </Typography>
+          <Typography variant="h6" color="text.secondary">
+            Zarządzaj swoimi kontaktami w jednym miejscu ({contacts.length})
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => setShowAddDialog(true)}
+          disabled={loading}
           sx={{
+            borderRadius: 2,
+            textTransform: "none",
             fontWeight: "bold",
-            background: "linear-gradient(45deg, #1976d2, #42a5f5)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            mb: 2,
+            background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+            "&:hover": {
+              background: "linear-gradient(45deg, #1565c0 30%, #1976d2 90%)",
+            },
           }}
         >
-          Kontakty
-        </Typography>
-        <Typography variant="h6" color="text.secondary">
-          Zarządzaj swoimi kontaktami w jednym miejscu
-        </Typography>
+          Dodaj kontakt
+        </Button>
       </Box>
 
       {/* Stats Cards */}
       <ContactStats contacts={contacts} loading={loading} />
 
-      {/* Main Content */}
-      <Paper
-        elevation={0}
-        sx={{
-          mt: 4,
-          borderRadius: 4,
-          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-          overflow: "hidden",
-        }}
-      >
-        <Box
-          sx={{
-            background: "rgba(255,255,255,0.9)",
-            backdropFilter: "blur(10px)",
-            borderBottom: "1px solid rgba(255,255,255,0.2)",
-          }}
-        >
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            variant={isMobile ? "fullWidth" : "standard"}
-            sx={{
-              "& .MuiTab-root": {
-                textTransform: "none",
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                minHeight: 60,
-              },
-            }}
-          >
-            <Tab label="Wszystkie kontakty" />
-            <Tab label="Dodaj kontakt" />
-            <Tab label="Wyszukaj" />
-          </Tabs>
-        </Box>
+      {/* Search Section */}
+      <Box sx={{ mt: 4, mb: 4 }}>
+        <ContactSearch
+          contacts={contacts}
+          onDelete={handleDeleteContact}
+        />
+      </Box>
 
-        <Box sx={{ p: 3 }}>
-          {/* Tab 0: Contact List */}
-          <Fade in={activeTab === 0} timeout={300}>
-            <Box sx={{ display: activeTab === 0 ? "block" : "none" }}>
-              <ContactList
-                contacts={contacts}
-                loading={loading}
-                error={error}
-                handleContactDelete={handleContactDelete}
-                handleContactUpdate={handleContactUpdate}
-              />
-            </Box>
-          </Fade>
+      {/* Contacts List */}
+      <Box sx={{ mt: 4 }}>
+        <ContactList
+          contacts={contacts}
+          loading={loading}
+          error={error}
+          onEdit={() => {}}
+          onDelete={handleDeleteContact}
+          onUpdate={handleUpdateContact}
+        />
+      </Box>
 
-          {/* Tab 1: Add Contact */}
-          <Fade in={activeTab === 1} timeout={300}>
-            <Box sx={{ display: activeTab === 1 ? "block" : "none" }}>
-              <ContactForm onAddContact={handleContactSubmit} loading={loading} />
-            </Box>
-          </Fade>
+      {/* Add Contact Dialog */}
+      <ContactFormDialog
+        open={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
+        onSave={handleCreateContact}
+        loading={loading}
+      />
 
-          {/* Tab 2: Search */}
-          <Fade in={activeTab === 2} timeout={300}>
-            <Box sx={{ display: activeTab === 2 ? "block" : "none" }}>
-              <ContactSearch contacts={contacts} />
-            </Box>
-          </Fade>
-        </Box>
-      </Paper>
-
+      {/* Notification Snackbar */}
       <NotificationSnackbar
         notification={notification}
         onClose={closeNotification}
