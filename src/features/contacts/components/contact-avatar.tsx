@@ -1,3 +1,4 @@
+import React from "react";
 import { Avatar } from "@mui/material";
 import { getInitials, getAvatarColor, getAvatarDimensions, type AvatarSize } from "../utils";
 
