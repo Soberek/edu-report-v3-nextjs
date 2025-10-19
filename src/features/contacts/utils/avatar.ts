@@ -47,6 +47,9 @@ export function getInitials(firstName: string, lastName: string): string {
  * @returns Hex color code
  */
 export function getAvatarColor(firstName: string): string {
+  if (!firstName || firstName.length === 0) {
+    return AVATAR_COLORS[0]; // Return first color for empty names
+  }
   const charCode = firstName.charCodeAt(0);
   const index = charCode % AVATAR_COLORS.length;
   return AVATAR_COLORS[index];
