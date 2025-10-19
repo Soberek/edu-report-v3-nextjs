@@ -1,42 +1,38 @@
-import { Controller, useForm } from "react-hook-form";
-import { Box, Button, TextField, Typography, Paper, Grid, InputAdornment, Fade } from "@mui/material";
-import { Person, Email, Phone, Save, Clear } from "@mui/icons-material";
-import type { ContactCreateDTO } from "../hooks/useContact";
+import { useForm } from "react-hook-form";
+import { Box, Button, Typography, Paper, Grid, Fade } from "@mui/material";
+import { Person, Save, Clear } from "@mui/icons-material";
+import { FormField } from "@/components/shared/FormField";
+import { ContactFormData } from "../types";
 
-interface Props {
-  onAddContact: (contact: ContactCreateDTO) => void;
-  loading: boolean;
+interface ContactFormProps {
+  onAddContact: (contact: ContactFormData) => Promise<void>;
+  loading?: boolean;
 }
 
-type ContactFormFields = {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-};
-
-export default function ContactForm({ onAddContact, loading }: Props) {
-  const {
-    handleSubmit,
-    reset,
-    control,
-    formState: { errors, isDirty },
-  } = useForm<ContactFormFields>({
+/**
+ * Contact creation form
+ * Validates input and submits new contact data
+ */
+export default function ContactForm({ onAddContact, loading = false }: ContactFormProps) {
+  const { handleSubmit, reset, control, formState: { errors, isDirty, isSubmitting } } = useForm<ContactFormData>({
+    mode: "onBlur",
     defaultValues: {
       firstName: "",
       lastName: "",
-      phone: "",
       email: "",
+      phone: "",
     },
   });
 
-  const onSubmit = (data: ContactFormFields) => {
-    onAddContact(data);
-    reset();
-  };
+  const isLoading = loading || isSubmitting;
 
-  const handleReset = () => {
-    reset();
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      await onAddContact(data);
+      reset();
+    } catch (error) {
+      console.error("Form submission error:", error);
+    }
   };
 
   return (
@@ -70,161 +66,73 @@ export default function ContactForm({ onAddContact, loading }: Props) {
             <Grid container spacing={3}>
               {/* First Name */}
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Controller
+                <FormField<ContactFormData>
                   name="firstName"
                   control={control}
-                  rules={{ required: "Imię jest wymagane." }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Imię"
-                      required
-                      fullWidth
-                      error={!!errors.firstName}
-                      helperText={errors.firstName?.message}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Person sx={{ color: "#666" }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
-                          background: "white",
-                          "&:hover": {
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              borderColor: "#1976d2",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  )}
+                  label="Imię"
+                  type="text"
+                  required
+                  placeholder="np. Jan"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      background: "white",
+                    },
+                  }}
                 />
               </Grid>
 
               {/* Last Name */}
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Controller
+                <FormField<ContactFormData>
                   name="lastName"
                   control={control}
-                  rules={{ required: "Nazwisko jest wymagane." }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Nazwisko"
-                      required
-                      fullWidth
-                      error={!!errors.lastName}
-                      helperText={errors.lastName?.message}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Person sx={{ color: "#666" }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
-                          background: "white",
-                          "&:hover": {
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              borderColor: "#1976d2",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  )}
+                  label="Nazwisko"
+                  type="text"
+                  required
+                  placeholder="np. Kowalski"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      background: "white",
+                    },
+                  }}
                 />
               </Grid>
 
               {/* Email */}
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Controller
+                <FormField<ContactFormData>
                   name="email"
                   control={control}
-                  rules={{
-                    required: "Email jest wymagany.",
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Nieprawidłowy format email.",
+                  label="Adres email"
+                  type="email"
+                  placeholder="np. jan.kowalski@example.com"
+                  helperText="Opcjonalne"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      background: "white",
                     },
                   }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Adres email"
-                      type="email"
-                      required
-                      fullWidth
-                      error={!!errors.email}
-                      helperText={errors.email?.message}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Email sx={{ color: "#666" }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
-                          background: "white",
-                          "&:hover": {
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              borderColor: "#1976d2",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  )}
                 />
               </Grid>
 
               {/* Phone */}
               <Grid size={{ xs: 12, sm: 6 }}>
-                <Controller
+                <FormField<ContactFormData>
                   name="phone"
                   control={control}
-                  rules={{
-                    pattern: {
-                      value: /^[\+]?[0-9\s\-\(\)]{9,}$/,
-                      message: "Nieprawidłowy format numeru telefonu.",
+                  label="Numer telefonu"
+                  type="text"
+                  placeholder="np. 123 456 789"
+                  helperText="Opcjonalne"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      background: "white",
                     },
                   }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Numer telefonu"
-                      type="tel"
-                      fullWidth
-                      error={!!errors.phone}
-                      helperText={errors.phone?.message || "Opcjonalne"}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Phone sx={{ color: "#666" }} />
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
-                          background: "white",
-                          "&:hover": {
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              borderColor: "#1976d2",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  )}
                 />
               </Grid>
 
@@ -241,8 +149,8 @@ export default function ContactForm({ onAddContact, loading }: Props) {
                   <Button
                     type="button"
                     variant="outlined"
-                    onClick={handleReset}
-                    disabled={loading || !isDirty}
+                    onClick={() => reset()}
+                    disabled={isLoading || !isDirty}
                     startIcon={<Clear />}
                     sx={{
                       borderRadius: 2,
@@ -257,7 +165,7 @@ export default function ContactForm({ onAddContact, loading }: Props) {
                   <Button
                     type="submit"
                     variant="contained"
-                    disabled={loading}
+                    disabled={isLoading}
                     startIcon={<Save />}
                     sx={{
                       borderRadius: 2,
@@ -271,7 +179,7 @@ export default function ContactForm({ onAddContact, loading }: Props) {
                       },
                     }}
                   >
-                    {loading ? "Dodawanie..." : "Dodaj kontakt"}
+                    {isLoading ? "Dodawanie..." : "Dodaj kontakt"}
                   </Button>
                 </Box>
               </Grid>
