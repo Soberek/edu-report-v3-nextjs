@@ -3,26 +3,25 @@ import { Box } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { GenericDialog } from "@/components/shared";
 import { FormField } from "@/components/shared/FormField";
-import { Contact, ContactFormData } from "../types";
-import ContactAvatar from "./contact-avatar";
+import { ContactFormData } from "../types";
 
-interface EditDialogProps {
+interface ContactFormDialogProps {
   open: boolean;
-  contact: Contact | null;
   onClose: () => void;
-  onSave: (id: string, data: ContactFormData) => Promise<void>;
+  onSave: (data: ContactFormData) => Promise<void>;
+  loading?: boolean;
 }
 
 /**
- * Dialog for editing contact information
+ * Dialog for creating a new contact
  * Uses shared GenericDialog component for consistency
  */
-export default function EditDialog({
+export default function ContactFormDialog({
   open,
-  contact,
   onClose,
   onSave,
-}: EditDialogProps) {
+  loading = false,
+}: ContactFormDialogProps) {
   const {
     handleSubmit,
     reset,
@@ -38,25 +37,14 @@ export default function EditDialog({
     },
   });
 
-  // Reset form when contact changes
-  React.useEffect(() => {
-    if (contact) {
-      reset({
-        firstName: contact.firstName,
-        lastName: contact.lastName,
-        email: contact.email || "",
-        phone: contact.phone || "",
-      });
-    }
-  }, [contact, reset]);
+  const isLoading = loading || isSubmitting;
 
   const onSubmit = async (data: ContactFormData) => {
-    if (!contact) return;
     try {
-      await onSave(contact.id, data);
+      await onSave(data);
       handleClose();
     } catch (error) {
-      console.error("Error saving contact:", error);
+      console.error("Error creating contact:", error);
     }
   };
 
@@ -65,31 +53,17 @@ export default function EditDialog({
     onClose();
   };
 
-  const headerContent = contact ? (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-      <ContactAvatar
-        firstName={contact.firstName}
-        lastName={contact.lastName}
-        size="medium"
-      />
-      <Box>
-        <div>{contact.firstName} {contact.lastName}</div>
-      </Box>
-    </Box>
-  ) : null;
-
-  if (!contact) return null;
-
   return (
     <GenericDialog
       open={open}
       onClose={handleClose}
-      title="Edytuj kontakt"
-      subtitle={contact ? `${contact.firstName} ${contact.lastName}` : undefined}
+      title="Dodaj nowy kontakt"
+      subtitle="Utwórz nowy wpis w Twoim katalogu kontaktów"
       maxWidth="sm"
-      loading={isSubmitting}
+      loading={isLoading}
       saveDisabled={!isDirty}
       onSave={handleSubmit(onSubmit)}
+      saveText="Dodaj kontakt"
       sx={{
         "& .MuiDialogContent-root": {
           p: 4,
@@ -105,6 +79,7 @@ export default function EditDialog({
           label="Imię"
           type="text"
           required
+          placeholder="np. Jan"
           sx={{
             "& .MuiOutlinedInput-root": {
               borderRadius: 2,
@@ -120,6 +95,7 @@ export default function EditDialog({
           label="Nazwisko"
           type="text"
           required
+          placeholder="np. Kowalski"
           sx={{
             "& .MuiOutlinedInput-root": {
               borderRadius: 2,
@@ -134,6 +110,7 @@ export default function EditDialog({
           control={control}
           label="Adres email"
           type="email"
+          placeholder="np. jan.kowalski@example.com"
           helperText="Opcjonalne"
           sx={{
             "& .MuiOutlinedInput-root": {
@@ -149,6 +126,7 @@ export default function EditDialog({
           control={control}
           label="Numer telefonu"
           type="text"
+          placeholder="np. 123 456 789"
           helperText="Opcjonalne"
           sx={{
             "& .MuiOutlinedInput-root": {

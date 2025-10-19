@@ -1,104 +1,157 @@
-import { useState } from "react";
-import { z } from "zod";
-
+import { useCallback, useReducer, useEffect } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useNotification } from "@/hooks";
+import {
+  Contact,
+  ContactCreateDTO,
+  ContactCreateSchema,
+  UseContactsReturn,
+} from "../types";
+import { contactsReducer, initialState } from "../reducers";
 
-// Zod schema for contact validation
-const ContactSchema = z.object({
-  id: z.string(),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email format").optional(),
-  phone: z.string().optional(),
-  userId: z.string(),
-  createdAt: z.string(),
-});
-
-const ContactCreateSchema = ContactSchema.omit({
-  id: true,
-  createdAt: true,
-  userId: true,
-});
-
-export type ContactT = z.infer<typeof ContactSchema>;
-export type ContactCreateDTO = Omit<ContactT, "id" | "createdAt" | "userId">;
-
-export const useContacts = () => {
+/**
+ * Custom hook for managing contacts
+ * Handles CRUD operations, validation, and notifications
+ *
+ * @example
+ * const { contacts, loading, error, createContact, updateContact, deleteContact } = useContacts();
+ */
+export const useContacts = (): UseContactsReturn => {
+  const [state, dispatch] = useReducer(contactsReducer, initialState);
   const userContext = useUser();
-  const { notification, showSuccess, showError, close: closeNotification } = useNotification();
-  const [error, setError] = useState<string | null>(null);
-
+  const { showSuccess, showError } = useNotification();
   const userId = userContext.user?.uid;
 
-  const { loading, error: fetchError, data: contacts, createItem, deleteItem, updateItem } = useFirebaseData<ContactT>("contacts", userId);
+  const {
+    data: firebaseContacts,
+    loading: firebaseLoading,
+    error: firebaseError,
+    createItem,
+    deleteItem,
+    updateItem,
+    refetch,
+  } = useFirebaseData<Contact>("contacts", userId);
 
-  const handleContactSubmit = async (contactData: ContactCreateDTO) => {
-    try {
-      setError(null);
-      const validatedData = ContactSchema.omit({
-        id: true,
-        createdAt: true,
-        userId: true,
-      }).parse(contactData);
+  // ========================================================================
+  // Sync Firebase data to local state
+  // ========================================================================
 
-      if (!userId) {
-        setError("User not authenticated");
-        return;
-      }
-
-      await createItem({
-        ...validatedData,
-      });
-      showSuccess("Kontakt dodany pomyślnie");
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        setError("Validation failed");
-      } else {
-        setError("Failed to create contact");
-      }
-      showError("Nie udało się utworzyć kontaktu");
+  useEffect(() => {
+    if (!firebaseLoading) {
+      dispatch({ type: "SET_DATA", payload: firebaseContacts });
     }
-  };
+  }, [firebaseContacts, firebaseLoading]);
 
-  const handleContactUpdate = async (id: string, contactData: ContactCreateDTO) => {
-    try {
-      setError(null);
-      const validatedData = ContactCreateSchema.parse(contactData);
-      await updateItem(id, validatedData);
-      showSuccess("Kontakt zaktualizowany pomyślnie");
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        setError("Validation failed");
-      } else {
-        setError("Failed to update contact");
+  useEffect(() => {
+    dispatch({ type: "SET_LOADING", payload: firebaseLoading });
+  }, [firebaseLoading]);
+
+  useEffect(() => {
+    if (firebaseError) {
+      dispatch({ type: "SET_ERROR", payload: firebaseError });
+    }
+  }, [firebaseError]);
+
+  // ========================================================================
+  // Action handlers with validation
+  // ========================================================================
+
+  const createContact = useCallback(
+    async (contactData: ContactCreateDTO): Promise<Contact | null> => {
+      try {
+        dispatch({ type: "CLEAR_ERROR" });
+
+        // Validate data using Zod schema
+        const validatedData = ContactCreateSchema.parse(contactData);
+
+        if (!userId) {
+          const errorMsg = "User not authenticated";
+          dispatch({ type: "SET_ERROR", payload: errorMsg });
+          showError("Nie jesteś zalogowany");
+          return null;
+        }
+
+        const newContact = await createItem(validatedData);
+        showSuccess("Kontakt dodany pomyślnie");
+        return newContact;
+      } catch (error) {
+        const errorMsg =
+          error instanceof Error ? error.message : "Failed to create contact";
+        dispatch({ type: "SET_ERROR", payload: errorMsg });
+        showError("Nie udało się utworzyć kontaktu");
+        return null;
       }
-      //
-      setError("Failed to update contact");
-      showError("Nie udało się zaktualizować kontaktu");
-    }
-  };
+    },
+    [userId, createItem, showSuccess, showError]
+  );
 
-  const handleContactDelete = async (id: string) => {
-    try {
-      setError(null);
-      await deleteItem(id);
-      showSuccess("Kontakt usunięty pomyślnie");
-    } catch (error) {
-      setError("Failed to delete contact" + error);
-      showError("Nie udało się usunąć kontaktu");
-    }
-  };
+  const updateContact = useCallback(
+    async (id: string, contactData: ContactCreateDTO): Promise<boolean> => {
+      try {
+        dispatch({ type: "CLEAR_ERROR" });
+
+        // Validate data using Zod schema
+        const validatedData = ContactCreateSchema.parse(contactData);
+
+        const success = await updateItem(id, validatedData);
+
+        if (success) {
+          showSuccess("Kontakt zaktualizowany pomyślnie");
+        } else {
+          showError("Nie udało się zaktualizować kontaktu");
+        }
+
+        return success;
+      } catch (error) {
+        const errorMsg =
+          error instanceof Error ? error.message : "Failed to update contact";
+        dispatch({ type: "SET_ERROR", payload: errorMsg });
+        showError("Nie udało się zaktualizować kontaktu");
+        return false;
+      }
+    },
+    [updateItem, showSuccess, showError]
+  );
+
+  const deleteContact = useCallback(
+    async (id: string): Promise<boolean> => {
+      try {
+        dispatch({ type: "CLEAR_ERROR" });
+
+        const success = await deleteItem(id);
+
+        if (success) {
+          dispatch({ type: "DELETE_CONTACT", payload: id });
+          showSuccess("Kontakt usunięty pomyślnie");
+        } else {
+          showError("Nie udało się usunąć kontaktu");
+        }
+
+        return success;
+      } catch (error) {
+        const errorMsg =
+          error instanceof Error
+            ? error.message
+            : "Failed to delete contact";
+        dispatch({ type: "SET_ERROR", payload: errorMsg });
+        showError("Nie udało się usunąć kontaktu");
+        return false;
+      }
+    },
+    [deleteItem, showSuccess, showError]
+  );
 
   return {
-    contacts,
-    loading,
-    error: error || fetchError,
-    notification,
-    handleContactDelete,
-    handleContactUpdate,
-    handleContactSubmit,
-    closeNotification,
+    data: state.data,
+    loading: state.loading,
+    error: state.error,
+    refetch,
+    createContact,
+    updateContact,
+    deleteContact,
   };
 };
+
+// Re-export types for backward compatibility
+export type { Contact, ContactCreateDTO };

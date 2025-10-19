@@ -1,55 +1,158 @@
 import React, { useState, useMemo } from "react";
-import { Box, TextField, InputAdornment, Typography, Card, CardContent, Avatar, Chip, Grid, Paper, Divider } from "@mui/material";
-import { Search, Person, Email, Phone, Clear } from "@mui/icons-material";
-import { Contact } from "@/types";
+import { Box, Typography } from "@mui/material";
+import { Delete, Edit, Person } from "@mui/icons-material";
+import type { GridColDef } from "@mui/x-data-grid";
+import { FilterSection, TableWrapper, defaultActions, type DataTableAction } from "@/components/shared";
+import { Contact, ContactFormData } from "../types";
+import { searchContacts } from "../utils";
+import ContactAvatar from "./contact-avatar";
+import EditDialog from "./edit-dialog";
 
 interface ContactSearchProps {
   contacts: Contact[];
+  onEdit?: (contact: Contact) => void;
+  onDelete?: (id: string) => Promise<void>;
 }
 
-export default function ContactSearch({ contacts }: ContactSearchProps) {
+/**
+ * Search and display contacts using shared FilterSection and TableWrapper
+ * Filters by name, email, or phone and displays results in table format
+ */
+export default function ContactSearch({
+  contacts,
+  onEdit,
+  onDelete,
+}: ContactSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const filteredContacts = useMemo(() => {
-    if (!searchTerm.trim()) return contacts;
-
-    const term = searchTerm.toLowerCase();
-    return contacts.filter(
-      (contact) =>
-        contact.firstName.toLowerCase().includes(term) ||
-        contact.lastName.toLowerCase().includes(term) ||
-        contact.email?.toLowerCase().includes(term) ||
-        contact.phone?.includes(term) ||
-        `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(term)
-    );
+    return searchContacts(contacts, searchTerm);
   }, [contacts, searchTerm]);
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  const handleEditContact = (contact: Contact) => {
+    setEditingContact(contact);
+    setEditDialogOpen(true);
   };
 
-  const getRandomColor = (name: string) => {
-    const colors = [
-      "#f44336",
-      "#e91e63",
-      "#9c27b0",
-      "#673ab7",
-      "#3f51b5",
-      "#2196f3",
-      "#03a9f4",
-      "#00bcd4",
-      "#009688",
-      "#4caf50",
-      "#8bc34a",
-      "#cddc39",
-      "#ffeb3b",
-      "#ffc107",
-      "#ff9800",
-      "#ff5722",
-    ];
-    const index = name.charCodeAt(0) % colors.length;
-    return colors[index];
+  const handleSaveContact = async (id: string, data: ContactFormData) => {
+    // Since we're in search view, just update and close
+    setEditDialogOpen(false);
+    setEditingContact(null);
   };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
+    setEditingContact(null);
+  };
+
+  // Table columns configuration
+  const columns: GridColDef<Contact>[] = [
+    {
+      field: "name",
+      headerName: "Kontakt",
+      flex: 1,
+      minWidth: 250,
+      sortable: false,
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, height: "100%" }}>
+          <ContactAvatar
+            firstName={params.row.firstName}
+            lastName={params.row.lastName}
+            size="small"
+          />
+          <Box>
+            <Box sx={{ fontWeight: 600, color: "#2c3e50" }}>
+              {params.row.firstName} {params.row.lastName}
+            </Box>
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params) =>
+        params.row.email ? (
+          <Box
+            component="a"
+            href={`mailto:${params.row.email}`}
+            sx={{
+              color: "#1976d2",
+              textDecoration: "none",
+              fontSize: "0.875rem",
+              "&:hover": { textDecoration: "underline" },
+            }}
+          >
+            {params.row.email}
+          </Box>
+        ) : (
+          <Box sx={{ fontStyle: "italic", color: "text.secondary", fontSize: "0.875rem" }}>
+            Brak
+          </Box>
+        ),
+    },
+    {
+      field: "phone",
+      headerName: "Telefon",
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params) =>
+        params.row.phone ? (
+          <Box
+            component="a"
+            href={`tel:${params.row.phone}`}
+            sx={{
+              color: "#1976d2",
+              textDecoration: "none",
+              fontSize: "0.875rem",
+              "&:hover": { textDecoration: "underline" },
+            }}
+          >
+            {params.row.phone}
+          </Box>
+        ) : (
+          <Box sx={{ fontStyle: "italic", color: "text.secondary", fontSize: "0.875rem" }}>
+            Brak
+          </Box>
+        ),
+    },
+    {
+      field: "createdAt",
+      headerName: "Data dodania",
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params) => (
+        <Box sx={{ fontSize: "0.875rem" }}>
+          {new Date(params.row.createdAt).toLocaleDateString("pl-PL")}
+        </Box>
+      ),
+    },
+  ];
+
+  // Action buttons for DataTable
+  const actions: DataTableAction[] = [
+    defaultActions.edit((id) => {
+      const contact = filteredContacts.find((c) => c.id === id);
+      if (contact) handleEditContact(contact);
+    }),
+    defaultActions.delete((id) => onDelete?.(id)),
+  ];
+
+  const filterFields = [
+    {
+      id: "search",
+      type: "text" as const,
+      label: "Szukaj",
+      placeholder: "Szukaj po imieniu, nazwisku, emailu lub telefonie...",
+      value: searchTerm,
+      onChange: setSearchTerm,
+      gridColumn: "1 / -1",
+    },
+  ];
 
   return (
     <Box>
@@ -57,183 +160,47 @@ export default function ContactSearch({ contacts }: ContactSearchProps) {
         Wyszukaj kontakty
       </Typography>
 
-      {/* Search Input */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2,
-          mb: 3,
-          borderRadius: 3,
-          background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-          border: "1px solid #e0e0e0",
-        }}
-      >
-        <TextField
-          fullWidth
-          placeholder="Szukaj po imieniu, nazwisku, emailu lub telefonie..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search sx={{ color: "#666" }} />
-              </InputAdornment>
-            ),
-            endAdornment: searchTerm && (
-              <InputAdornment position="end">
-                <Clear
-                  sx={{
-                    color: "#666",
-                    cursor: "pointer",
-                    "&:hover": { color: "#1976d2" },
-                  }}
-                  onClick={() => setSearchTerm("")}
-                />
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 2,
-              background: "white",
-              "&:hover": {
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "#1976d2",
-                },
-              },
-            },
-          }}
-        />
-      </Paper>
+      {/* Search Filter Section */}
+      <FilterSection
+        title="Kryteria wyszukiwania"
+        fields={filterFields}
+        onClearAll={() => setSearchTerm("")}
+        showClearAll={Boolean(searchTerm)}
+      />
 
-      {/* Results */}
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="h6" color="text.secondary">
-          {searchTerm ? `Znaleziono ${filteredContacts.length} kontaktów` : `Wszystkie kontakty (${contacts.length})`}
-        </Typography>
-      </Box>
-
-      {/* Contact Cards */}
-      {filteredContacts.length === 0 ? (
-        <Paper
-          elevation={0}
-          sx={{
-            p: 4,
-            textAlign: "center",
-            borderRadius: 3,
-            background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-            border: "1px solid #e0e0e0",
-          }}
-        >
-          <Person sx={{ fontSize: 64, color: "#ccc", mb: 2 }} />
-          <Typography variant="h6" color="text.secondary">
-            {searchTerm ? "Nie znaleziono kontaktów" : "Brak kontaktów"}
-          </Typography>
+      {/* Results Info */}
+      {searchTerm && (
+        <Box sx={{ mb: 2 }}>
           <Typography variant="body2" color="text.secondary">
-            {searchTerm ? "Spróbuj zmienić kryteria wyszukiwania" : "Dodaj swój pierwszy kontakt"}
+            Znaleziono {filteredContacts.length} {filteredContacts.length === 1 ? "kontakt" : "kontaktów"}
           </Typography>
-        </Paper>
-      ) : (
-        <Grid container spacing={2}>
-          {filteredContacts.map((contact) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={contact.id}>
-              <Card
-                sx={{
-                  borderRadius: 3,
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
-                  },
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-                    <Avatar
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        background: getRandomColor(contact.firstName),
-                        fontWeight: "bold",
-                        fontSize: "1.2rem",
-                      }}
-                    >
-                      {getInitials(contact.firstName, contact.lastName)}
-                    </Avatar>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: "bold",
-                          color: "#2c3e50",
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {contact.firstName} {contact.lastName}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Dodano: {new Date(contact.createdAt).toLocaleDateString("pl-PL")}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-                    {contact.email && (
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Email sx={{ color: "#666", fontSize: 20 }} />
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: "#1976d2",
-                            textDecoration: "none",
-                            "&:hover": { textDecoration: "underline" },
-                          }}
-                          component="a"
-                          href={`mailto:${contact.email}`}
-                        >
-                          {contact.email}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {contact.phone && (
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Phone sx={{ color: "#666", fontSize: 20 }} />
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: "#1976d2",
-                            textDecoration: "none",
-                            "&:hover": { textDecoration: "underline" },
-                          }}
-                          component="a"
-                          href={`tel:${contact.phone}`}
-                        >
-                          {contact.phone}
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {!contact.email && !contact.phone && (
-                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
-                        Brak dodatkowych informacji kontaktowych
-                      </Typography>
-                    )}
-                  </Box>
-
-                  <Box sx={{ mt: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
-                    {contact.email && <Chip label="Email" size="small" color="primary" variant="outlined" sx={{ fontSize: "0.75rem" }} />}
-                    {contact.phone && <Chip label="Telefon" size="small" color="success" variant="outlined" sx={{ fontSize: "0.75rem" }} />}
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        </Box>
       )}
+
+      {/* Results Table - Only show when searching */}
+      {searchTerm && (
+        <TableWrapper<Contact>
+          title="Wyniki wyszukiwania"
+          icon={<Person sx={{ color: "#1976d2" }} />}
+          data={filteredContacts}
+          columns={columns}
+          actions={actions}
+          loading={false}
+          emptyTitle="Nie znaleziono kontaktów"
+          emptyDescription="Spróbuj zmienić kryteria wyszukiwania"
+          height={500}
+          getRowId={(row) => row.id}
+          showHeader={true}
+        />
+      )}
+
+      {/* Edit Dialog */}
+      <EditDialog
+        open={editDialogOpen}
+        contact={editingContact}
+        onClose={handleCloseEditDialog}
+        onSave={handleSaveContact}
+      />
     </Box>
   );
 }
