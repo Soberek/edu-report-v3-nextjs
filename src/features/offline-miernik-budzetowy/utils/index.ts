@@ -1,6 +1,9 @@
 /**
  * Utilities Barrel Export
  * Pure functions for data processing and validation
+ *
+ * Note: Indicators-related utilities (indicatorsConfig, indicatorCalculation, aggregateByIndicators, mainCategoryMapping)
+ * are located in taby/wskazniki/utils/ as they're specific to the indicators tab
  */
 
 // File processing utilities
@@ -18,6 +21,5 @@ export { aggregateData as processExcelData } from "./processExcelData";
 // Business logic helper utilities
 export * from "./dataProcessingUtils";
 
-// Main category utilities
-export * from "./mainCategoryMapping";
-export * from "./mainCategoryAggregation";
+// Data filtering utilities
+export * from "./dataFiltering";
