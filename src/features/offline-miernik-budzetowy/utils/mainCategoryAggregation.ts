@@ -1,6 +1,7 @@
 import moment from "moment";
 import { ExcelRow } from "../types";
 import { getMainCategoryFromRow, MainCategory, getAllMainCategories } from "./mainCategoryMapping";
+import { filterExcelData } from "./dataFiltering";
 
 /**
  * Data structure for a single action item
@@ -98,6 +99,9 @@ export function aggregateByMainCategories(rawData: ExcelRow[], selectedMonths?: 
     console.log(`📅 Filtering by months: ${selectedMonths.join(", ")}`);
   }
 
+  // Use centralized filtering to get clean data (removes empty rows and non-program visits)
+  const validData = filterExcelData(rawData);
+
   // Initialize category map - now keyed by sub-category or program
   const categoryMap = new Map<MainCategory, Map<string, CategoryProgramData>>();
 
@@ -112,7 +116,7 @@ export function aggregateByMainCategories(rawData: ExcelRow[], selectedMonths?: 
   const connectionLog = new Map<string, { count: number; programs: Set<string> }>();
 
   // Process each row
-  rawData.forEach((row, index) => {
+  validData.forEach((row, index) => {
     // Extract month from date
     const dateStr = String(row["Data"] || "");
     const date = moment(dateStr, "YYYY-MM-DD");
@@ -124,7 +128,7 @@ export function aggregateByMainCategories(rawData: ExcelRow[], selectedMonths?: 
     }
 
     const mainCategory = getMainCategoryFromRow(row);
-    const programType = String(row["Typ programu"] || "");
+    const programType = String(row["Typ programu"] || "").trim();
     const programName = String(row["Nazwa programu"] || "");
     const subCategoryRaw = String(row["Sub Category"] || row["Podkategoria"] || "").trim();
     // Ignore sub-category if it's "0" or empty
