@@ -34,6 +34,7 @@ export interface AggregatedData {
   aggregated: ProgramsData;
   allPeople: number;
   allActions: number;
+  warnings?: string[]; // Optional warnings (e.g., non-program rows filtered out)
 }
 
 // State Types
@@ -75,23 +76,29 @@ export const ExcelRowSchema = z.object({
   "Nazwa programu": z.string().min(1, "Nazwa programu jest wymagana"),
   "Działanie": z.string().min(1, "Działanie jest wymagane"),
   "Liczba ludzi": z.union([z.string(), z.number()]).transform((val) => {
+    // Handle empty strings as 0
+    if (val === "" || val === 0) return 0;
     const num = typeof val === "string" ? parseFloat(val) : val;
     if (isNaN(num) || num < 0) {
-      throw new Error("Liczba ludzi musi być liczbą większą lub równą 0");
+      throw new Error("People count must be a number >= 0"); // Will be caught and formatted with constants
     }
     return num;
   }),
   "Liczba działań": z.union([z.string(), z.number()]).transform((val) => {
+    // Handle empty strings as 0
+    if (val === "" || val === 0) return 0;
     const num = typeof val === "string" ? parseFloat(val) : val;
     if (isNaN(num) || num < 0) {
-      throw new Error("Liczba działań musi być liczbą większą lub równą 0");
+      throw new Error("Actions count must be a number >= 0"); // Will be caught and formatted with constants
     }
     return num;
   }),
   "Data": z.string().refine((date) => {
+    // Allow empty dates for filtering later
+    if (date === "") return true;
     const parsed = new Date(date);
     return !isNaN(parsed.getTime());
-  }, "Nieprawidłowy format daty"),
+  }, "Nieprawidłowy format daty"), // Keep Polish message for validation
 });
 
 export const MonthSchema = z.object({
@@ -104,9 +111,9 @@ export const FileValidationSchema = z.object({
   type: z.string().refine((type) => 
     type.includes("spreadsheet") || type.includes("excel") || 
     type.endsWith(".xlsx"),
-    "Plik musi być w formacie Excel (.xlsx)"
+    "File must be Excel format (.xlsx)" // Will be caught and formatted with constants
   ),
-  size: z.number().max(10 * 1024 * 1024, "Plik nie może być większy niż 10MB"),
+  size: z.number().max(10 * 1024 * 1024, "File cannot be larger than 10MB"), // Will be caught and formatted with constants
 });
 
 // Constants
@@ -118,13 +125,7 @@ export const MONTH_NAMES = [
 export const VALID_FILE_EXTENSIONS = [".xlsx", ".xls"] as const;
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-// Error Messages
-export const ERROR_MESSAGES = {
-  NO_FILE_SELECTED: "Nie wybrano pliku",
-  INVALID_FILE_TYPE: "Nieprawidłowy typ pliku. Wybierz plik Excel (.xlsx lub .xls)",
-  FILE_TOO_LARGE: "Plik jest zbyt duży. Maksymalny rozmiar to 10MB",
-  FILE_READ_ERROR: "Błąd podczas odczytu pliku",
-  PROCESSING_ERROR: "Błąd podczas przetwarzania danych",
-  NO_MONTHS_SELECTED: "Wybierz przynajmniej jeden miesiąc",
-  INVALID_DATA_FORMAT: "Nieprawidłowy format danych w pliku Excel",
-} as const;
+// Error Messages - Use from constants/errorMessages.ts
+// Re-export for backward compatibility
+export { ERROR_MESSAGES } from "../constants";
+
