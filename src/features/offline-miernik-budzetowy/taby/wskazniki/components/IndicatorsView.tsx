@@ -1,27 +1,51 @@
-import React, { useMemo } from "react";
-import { Box, Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme } from "@mui/material";
+import React from "react";
+import { Box, Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, type Theme } from "@mui/material";
 import type { ExcelRow, Month } from "../../../types";
-import { aggregateByIndicators } from "../utils/aggregateByIndicators";
+import { useWskazniki } from "../hooks/useWskazniki";
 
 interface IndicatorsViewProps {
   readonly rawData: ExcelRow[];
   readonly selectedMonths: Month[];
 }
 
+const CATEGORY_COLORS = [
+  (theme: Theme) => theme.palette.primary.main,
+  (theme: Theme) => theme.palette.success.main,
+  (theme: Theme) => theme.palette.warning.main,
+  (theme: Theme) => theme.palette.error.main,
+  (theme: Theme) => theme.palette.info.main,
+] as const;
+
+const getCategoryColor = (theme: Theme, index: number) => {
+  const colorFn = CATEGORY_COLORS[index % CATEGORY_COLORS.length];
+  return colorFn(theme);
+};
+
 /**
  * Displays data aggregated by indicator categories
- * Shows breakdown by main health categories (Szczepienia, Otyłość, etc)
+ * Uses useWskazniki hook for all state and logic management
  */
 export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selectedMonths }) => {
   const theme = useTheme();
+  const { state, hasData, error } = useWskazniki({
+    rawData,
+    selectedMonths,
+    indicatorId: "palenie_tytoniu",
+  });
 
-  // Calculate aggregated data by categories
-  const aggregatedData = useMemo(() => {
-    const selectedMonthNumbers = selectedMonths.filter((m) => m.selected).map((m) => m.monthNumber);
-    return aggregateByIndicators(rawData, selectedMonthNumbers.length > 0 ? selectedMonthNumbers : undefined);
-  }, [rawData, selectedMonths]);
+  if (error) {
+    return (
+      <Box sx={{ mt: 4 }}>
+        <Card>
+          <CardContent>
+            <Typography color="error">Błąd: {error}</Typography>
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  }
 
-  if (!aggregatedData.byCategory || Object.keys(aggregatedData.byCategory).length === 0) {
+  if (!hasData) {
     return (
       <Box sx={{ mt: 4 }}>
         <Card>
@@ -32,17 +56,6 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
       </Box>
     );
   }
-
-  const getCategoryColor = (index: number) => {
-    const colors = [
-      theme.palette.primary.main,
-      theme.palette.success.main,
-      theme.palette.warning.main,
-      theme.palette.error.main,
-      theme.palette.info.main,
-    ];
-    return colors[index % colors.length];
-  };
 
   return (
     <Box sx={{ mt: 3 }}>
@@ -69,9 +82,9 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.entries(aggregatedData.byCategory).map(([mainCategory, programTypes], categoryIndex) => {
-              const categoryColor = getCategoryColor(categoryIndex);
-              const categoryTotal = aggregatedData.categoryTotals[mainCategory];
+            {Object.entries(state.byCategory).map(([mainCategory, programTypes], categoryIndex) => {
+              const categoryColor = getCategoryColor(theme, categoryIndex);
+              const categoryTotal = state.categoryTotals[mainCategory];
 
               return (
                 <React.Fragment key={mainCategory}>
@@ -79,14 +92,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
                   <TableRow sx={{ backgroundColor: `${categoryColor}08`, borderTop: `2px solid ${categoryColor}20` }}>
                     <TableCell colSpan={5} sx={{ fontWeight: 700, fontSize: "0.85rem", py: 1 }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Box
-                          sx={{
-                            width: 4,
-                            height: 24,
-                            borderRadius: 0.5,
-                            backgroundColor: categoryColor,
-                          }}
-                        />
+                        <Box sx={{ width: 4, height: 24, borderRadius: 0.5, backgroundColor: categoryColor }} />
                         <Typography variant="caption" fontWeight={700} sx={{ fontSize: "0.85rem" }}>
                           {mainCategory}
                         </Typography>
@@ -139,10 +145,10 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
                 RAZEM
               </TableCell>
               <TableCell align="right" sx={{ fontWeight: 700, fontSize: "0.85rem", py: 1.5 }}>
-                {aggregatedData.totalActions}
+                {state.totalActions}
               </TableCell>
               <TableCell align="right" sx={{ fontWeight: 700, fontSize: "0.85rem", py: 1.5 }}>
-                {aggregatedData.totalPeople}
+                {state.totalPeople}
               </TableCell>
             </TableRow>
           </TableBody>
