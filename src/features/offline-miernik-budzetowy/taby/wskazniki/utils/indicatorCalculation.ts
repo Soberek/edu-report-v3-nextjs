@@ -4,7 +4,7 @@
  */
 
 import type { ExcelRow } from "../../../types";
-import type { IndicatorDefinition, MainCategory } from "./indicatorsConfig";
+import type { IndicatorDefinition, MainCategory, ProgramType } from "./indicatorsConfig";
 import { getAllIndicators } from "./indicatorsConfig";
 import { getMainCategoryFromRow } from "./mainCategoryMapping";
 import { isNonProgramVisit } from "../../../utils/dataFiltering";
@@ -33,7 +33,7 @@ export function calculateIndicator(data: ExcelRow[], indicator: IndicatorDefinit
 
   data.forEach((row) => {
     const mainCategory = getMainCategoryFromRow(row);
-    const programType = String(row["Typ programu"] || "").trim();
+    const programType = String(row["Typ programu"] || "").trim() as ProgramType;
     const programName = String(row["Nazwa programu"] || "").trim();
     const isNonProgram = isNonProgramVisit(row);
 
