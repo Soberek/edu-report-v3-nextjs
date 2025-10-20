@@ -2,6 +2,9 @@
  * Constants for the Budget Meter module
  */
 
+// Export error messages
+export * from "./errorMessages";
+
 // Tab Configuration
 export const TABS = {
   ADVANCED_STATS: 0,
