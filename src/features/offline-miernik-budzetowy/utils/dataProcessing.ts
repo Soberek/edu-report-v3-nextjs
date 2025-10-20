@@ -2,17 +2,18 @@ import moment from "moment";
 import { z } from "zod";
 import ExcelJS from "exceljs";
 import type { ExcelRow, Month, AggregatedData, ProgramsData } from "../types";
-import { ExcelRowSchema, ERROR_MESSAGES } from "../types";
-
-/**
- * Checks if a row has any content in required fields
- */
-const isRowEmpty = (row: ExcelRow): boolean => {
-  const typProgramu = String(row["Typ programu"] || "").trim();
-  const nazwaProgramu = String(row["Nazwa programu"] || "").trim();
-  const dzialanie = String(row["Działanie"] || "").trim();
-  return typProgramu === "" && nazwaProgramu === "" && dzialanie === "";
-};
+import { ExcelRowSchema } from "../types";
+import { ERROR_MESSAGES } from "../constants";
+import { filterExcelData, getFilteringWarnings } from "./dataFiltering";
+import {
+  createEmptyDataError,
+  createMissingColumnsError,
+  createNumberFormatError,
+  createDateFormatError,
+  parseZodError,
+  createProcessingError,
+  formatErrorForDisplay,
+} from "./errorHandler";
 
 /**
  * Validates and processes Excel data
@@ -21,37 +22,45 @@ const isRowEmpty = (row: ExcelRow): boolean => {
  */
 export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?: string } => {
   if (!data || data.length === 0) {
-    return { isValid: false, error: "Plik nie zawiera danych" };
+    const error = createEmptyDataError(false);
+    return { isValid: false, error: formatErrorForDisplay(error) };
   }
 
-  // Filter out empty rows
-  const nonEmptyData = data.filter((row) => !isRowEmpty(row));
+  // Filter out invalid and non-program rows using centralized filtering
+  const validData = filterExcelData(data);
 
-  if (nonEmptyData.length === 0) {
-    return { isValid: false, error: "Plik nie zawiera danych (wszystkie wiersze są puste)" };
+  if (validData.length === 0) {
+    const error = createEmptyDataError(true);
+    return { isValid: false, error: formatErrorForDisplay(error) };
   }
 
   // Check if first row has required columns
   const requiredColumns = ["Typ programu", "Nazwa programu", "Działanie", "Liczba ludzi", "Liczba działań", "Data"];
-  const presentColumns = Object.keys(nonEmptyData[0]);
+  const presentColumns = Object.keys(validData[0]);
   const missingColumns = requiredColumns.filter((col) => !presentColumns.includes(col));
 
   if (missingColumns.length > 0) {
-    const errorMsg = `Plik nie zawiera wymaganych kolumn: ${missingColumns.join(", ")}. Dostępne kolumny: ${presentColumns.join(", ")}`;
-    return { isValid: false, error: errorMsg };
+    const error = createMissingColumnsError(missingColumns, presentColumns);
+    return { isValid: false, error: formatErrorForDisplay(error) };
   }
 
-  // Validate each non-empty row
+  // Validate each valid row
   try {
-    nonEmptyData.forEach((row) => ExcelRowSchema.parse(row));
+    validData.forEach((row, index) => {
+      try {
+        ExcelRowSchema.parse(row);
+      } catch (err) {
+        if (err instanceof z.ZodError) {
+          const detailedError = parseZodError(err, index + 2); // +2 because row 1 is header, index starts at 0
+          throw new Error(formatErrorForDisplay(detailedError));
+        }
+        throw err;
+      }
+    });
     return { isValid: true };
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const { path, message } = error.issues[0];
-      const pathStr = path.map(String).join(".");
-      return { isValid: false, error: `Błąd w danych (${pathStr}): ${message}` };
-    }
-    return { isValid: false, error: ERROR_MESSAGES.INVALID_DATA_FORMAT };
+    const errorMessage = error instanceof Error ? error.message : ERROR_MESSAGES.DATA_NO_CONTENT;
+    return { isValid: false, error: errorMessage };
   }
 };
 
@@ -59,7 +68,7 @@ export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?:
  * Aggregates Excel data based on selected months
  * @param data Array of Excel rows to aggregate
  * @param months Array of month selection objects
- * @returns Aggregated data with totals
+ * @returns Aggregated data with totals and warnings about filtered rows
  * @throws Error if no months are selected
  */
 export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData => {
@@ -69,19 +78,28 @@ export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData
     throw new Error("Wybierz przynajmniej jeden miesiąc");
   }
 
-  const nonEmptyData = data.filter((row) => !isRowEmpty(row));
+  // Use centralized filtering to get clean data
+  const validData = filterExcelData(data);
+
   let allPeople = 0;
   let allActions = 0;
+  const warnings: string[] = [];
 
-  const aggregated: ProgramsData = nonEmptyData.reduce((acc, item) => {
+  // Get filtering warnings
+  const { warnings: filteringWarnings } = getFilteringWarnings(data);
+  warnings.push(...filteringWarnings);
+
+  const aggregated: ProgramsData = validData.reduce((acc, item, index) => {
     try {
       const row = ExcelRowSchema.parse(item);
-      const month = moment(row["Data"], "YYYY-MM-DD").month() + 1;
+      const programType = String(row["Typ programu"] || "").trim();
+      const dateStr = String(row["Data"]);
+      const month = moment(dateStr, "YYYY-MM-DD").month() + 1;
 
       // Skip if month not selected
       if (!selectedMonths.includes(month)) return acc;
 
-      const { "Typ programu": programType, "Nazwa programu": programName, "Działanie": action, "Liczba ludzi": peopleCount, "Liczba działań": actionCount } = row;
+      const { "Nazwa programu": programName, "Działanie": action, "Liczba ludzi": peopleCount, "Liczba działań": actionCount } = row;
 
       // Ensure nested objects exist
       acc[programType] ??= {};
@@ -96,11 +114,15 @@ export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData
 
       return acc;
     } catch (error) {
-      throw new Error(`Błąd w wierszu danych: ${error instanceof Error ? error.message : "Nieznany błąd"}`);
+      if (error instanceof z.ZodError) {
+        const detailedError = parseZodError(error, index + 2); // +2 because row 1 is header
+        throw new Error(formatErrorForDisplay(detailedError));
+      }
+      throw createProcessingError(error);
     }
   }, {} as ProgramsData);
 
-  return { aggregated, allPeople, allActions };
+  return { aggregated, allPeople, allActions, warnings };
 };
 
 /**
