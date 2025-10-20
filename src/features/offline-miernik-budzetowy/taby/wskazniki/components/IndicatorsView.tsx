@@ -27,10 +27,10 @@ const getCategoryColor = (theme: Theme, index: number) => {
  */
 export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selectedMonths }) => {
   const theme = useTheme();
-  const { state, hasData, error } = useWskazniki({
+  const { state, hasData, error, formatGroupedName } = useWskazniki({
     rawData,
     selectedMonths,
-    indicatorId: "palenie_tytoniu",
+    useAllGroupings: true,
   });
 
   if (error) {
@@ -89,7 +89,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
               return (
                 <React.Fragment key={mainCategory}>
                   {/* Category Header */}
-                  <TableRow sx={{ backgroundColor: `${categoryColor}08`, borderTop: `2px solid ${categoryColor}20` }}>
+                  <TableRow sx={{ backgroundColor: `${categoryColor}40`, borderTop: `2px solid ${categoryColor}20` }}>
                     <TableCell colSpan={5} sx={{ fontWeight: 700, fontSize: "0.85rem", py: 1 }}>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <Box sx={{ width: 4, height: 24, borderRadius: 0.5, backgroundColor: categoryColor }} />
@@ -110,9 +110,9 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
                     Object.entries(programs).map(([programName, actions]) => (
                       <React.Fragment key={`${programType}-${programName}`}>
                         {/* Program Name Row */}
-                        <TableRow sx={{ backgroundColor: theme.palette.grey[50] }}>
+                        <TableRow sx={{ backgroundColor: theme.palette.grey[200] }}>
                           <TableCell sx={{ pl: 2, fontWeight: 600, color: "text.primary", fontSize: "0.8rem", py: 0.75 }}>
-                            {programName}
+                            {formatGroupedName(programName)}
                           </TableCell>
                           <TableCell colSpan={4} />
                         </TableRow>
