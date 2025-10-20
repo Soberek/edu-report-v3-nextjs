@@ -5,6 +5,7 @@ import type { ExcelRow, Month, AggregatedData, ProgramsData } from "../types";
 import { ExcelRowSchema } from "../types";
 import { ERROR_MESSAGES } from "../constants";
 import { filterExcelData, getFilteringWarnings } from "./dataFiltering";
+import { calculateAllIndicators } from "../taby/wskazniki/utils/indicatorCalculation";
 import {
   createEmptyDataError,
   createMissingColumnsError,
@@ -68,7 +69,7 @@ export const validateExcelData = (data: ExcelRow[]): { isValid: boolean; error?:
  * Aggregates Excel data based on selected months
  * @param data Array of Excel rows to aggregate
  * @param months Array of month selection objects
- * @returns Aggregated data with totals and warnings about filtered rows
+ * @returns Aggregated data with totals, warnings about filtered rows, and indicator results
  * @throws Error if no months are selected
  */
 export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData => {
@@ -88,6 +89,13 @@ export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData
   // Get filtering warnings
   const { warnings: filteringWarnings } = getFilteringWarnings(data);
   warnings.push(...filteringWarnings);
+
+  // Calculate indicators from all valid data (before month filtering)
+  const indicatorsMap = calculateAllIndicators(validData);
+  const indicators: Record<string, unknown> = {};
+  indicatorsMap.forEach((result, indicatorId) => {
+    indicators[indicatorId] = result;
+  });
 
   const aggregated: ProgramsData = validData.reduce((acc, item, index) => {
     try {
@@ -122,7 +130,7 @@ export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData
     }
   }, {} as ProgramsData);
 
-  return { aggregated, allPeople, allActions, warnings };
+  return { aggregated, allPeople, allActions, warnings, indicators };
 };
 
 /**
