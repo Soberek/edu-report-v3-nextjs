@@ -4,10 +4,29 @@
  */
 
 import type { ExcelRow } from "../../../types";
-import type { IndicatorDefinition, MainCategory, ProgramType } from "./indicatorsConfig";
-import { getAllIndicators } from "./indicatorsConfig";
+import type { IndicatorDefinition, ProgramType } from "./indicatorsConfig";
+import { getAllIndicators, PROGRAM_TYPES } from "./indicatorsConfig";
 import { getMainCategoryFromRow } from "./mainCategoryMapping";
 import { isNonProgramVisit } from "../../../utils/dataFiltering";
+
+const PROGRAM_TYPE_VALUES = new Set<string>(Object.values(PROGRAM_TYPES));
+
+function isProgramTypeValue(value: string): value is ProgramType {
+  return PROGRAM_TYPE_VALUES.has(value);
+}
+
+function parseProgramType(value: unknown): ProgramType | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const normalized = value.trim().toUpperCase();
+  if (!normalized) {
+    return undefined;
+  }
+
+  return isProgramTypeValue(normalized) ? normalized : undefined;
+}
 
 /**
  * Indicator calculation result
@@ -33,20 +52,23 @@ export function calculateIndicator(data: ExcelRow[], indicator: IndicatorDefinit
 
   data.forEach((row) => {
     const mainCategory = getMainCategoryFromRow(row);
-    const programType = String(row["Typ programu"] || "").trim() as ProgramType;
+    const programType = parseProgramType(row["Typ programu"]);
     const programName = String(row["Nazwa programu"] || "").trim();
     const isNonProgram = isNonProgramVisit(row);
 
     // Check if this row matches the indicator's criteria
-    // Can match by specificPrograms or by mainCategories
-    let matches = false;
+    // Can match by specificPrograms, programGroups, or mainCategories
+    let matches = true;
 
     if (indicator.specificPrograms && indicator.specificPrograms.length > 0) {
       // If specific programs are defined, check against those
       matches = indicator.specificPrograms.includes(programName);
+    } else if (indicator.programGroups && Object.keys(indicator.programGroups).length > 0) {
+      // Check if program belongs to any defined group
+      matches = Object.values(indicator.programGroups).some((programs) => programs.includes(programName));
     } else if (indicator.mainCategories && indicator.mainCategories.length > 0) {
       // Otherwise check main categories
-      matches = indicator.mainCategories.includes(mainCategory as MainCategory);
+      matches = indicator.mainCategories.includes(mainCategory);
     }
 
     if (!matches) {
@@ -60,11 +82,15 @@ export function calculateIndicator(data: ExcelRow[], indicator: IndicatorDefinit
 
     // Check program type filters if specified
     if (indicator.programTypes) {
-      if (indicator.programTypes.include && !indicator.programTypes.include.includes(programType)) {
-        return;
+      if (indicator.programTypes.include && indicator.programTypes.include.length > 0) {
+        if (!programType || !indicator.programTypes.include.includes(programType)) {
+          return;
+        }
       }
-      if (indicator.programTypes.exclude && indicator.programTypes.exclude.includes(programType)) {
-        return;
+      if (indicator.programTypes.exclude && indicator.programTypes.exclude.length > 0) {
+        if (programType && indicator.programTypes.exclude.includes(programType)) {
+          return;
+        }
       }
     }
 
