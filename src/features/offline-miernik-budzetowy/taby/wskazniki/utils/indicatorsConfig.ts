@@ -132,7 +132,7 @@ export interface IndicatorGroup {
  * Program name to main category mapping
  * Maps all 47 specific program names to their main health categories
  * This is the definitive list of all programs in the system
- * 
+ *
  * Categories distribution:
  * - Szczepienia: 6 programs
  * - Zapobieganie otyłości: 6 programs
@@ -187,7 +187,7 @@ export const PROGRAM_CATEGORY_MAPPING: Record<string, MainCategory> = {
   "Zdrowe zęby mamy, marchewkę zajadamy": MAIN_CATEGORIES.INNE,
   "Higiena naszą tarczą": MAIN_CATEGORIES.INNE,
   "Bezpieczne ferie": MAIN_CATEGORIES.INNE,
-  "Radon": MAIN_CATEGORIES.INNE,
+  Radon: MAIN_CATEGORIES.INNE,
   "Moja szkoła, zdrowa szkoła": MAIN_CATEGORIES.INNE,
   "Profilaktyka wad postawy": MAIN_CATEGORIES.INNE,
   "Znamię, znam je": MAIN_CATEGORIES.INNE,
@@ -197,10 +197,9 @@ export const PROGRAM_CATEGORY_MAPPING: Record<string, MainCategory> = {
   "Profilaktyka nowotworowa": MAIN_CATEGORIES.INNE,
   "Profilaktyka nowotworowa - Profilaktyka raka piersi": MAIN_CATEGORIES.INNE,
   "Profilaktyka nowotworowa - Profilaktyka raka jąder": MAIN_CATEGORIES.INNE,
-  "Cyberprzemoc": MAIN_CATEGORIES.INNE,
+  Cyberprzemoc: MAIN_CATEGORIES.INNE,
   "Power Ukraina": MAIN_CATEGORIES.INNE,
-  "Profilaktyki chorób układu pokarmowego, w tym zatruć pokarmowych – salmonella, grzyby i inne":
-    MAIN_CATEGORIES.INNE,
+  "Profilaktyki chorób układu pokarmowego, w tym zatruć pokarmowych – salmonella, grzyby i inne": MAIN_CATEGORIES.INNE,
 };
 
 // ============================================================================
@@ -210,39 +209,47 @@ export const INDICATORS_CONFIG: IndicatorGroup[] = [
   {
     name: "Zdrowotne",
     indicators: [
-      {
-        id: "szczepienia",
-        name: "Szczepienia",
-        description: "Program szczepień ochronnych",
-        mainCategories: ["Szczepienia"],
-      },
-      {
-        id: "otylosc",
-        name: "Zapobieganie otyłości",
-        description: "Program profilaktyki otyłości i zdrowego stylu życia",
-        mainCategories: ["Zapobieganie otyłości"],
-      },
-      {
-        id: "uzaleznienia",
-        name: "Profilaktyka uzależnień",
-        description: "Program profilaktyki narkomanii, alkoholizmu i papierosów",
-        mainCategories: ["Profilaktyka uzależnień"],
-      },
-      {
-        id: "hiv_aids",
-        name: "HIV/AIDS",
-        description: "Program edukacji w zakresie HIV/AIDS",
-        mainCategories: ["HIV/AIDS"],
-      },
+      // {
+      //   id: "szczepienia",
+      //   name: "Szczepienia",
+      //   description: "Program szczepień ochronnych",
+      //   mainCategories: ["Szczepienia"],
+      // },
+      // {
+      //   id: "otylosc",
+      //   name: "Zapobieganie otyłości",
+      //   description: "Program profilaktyki otyłości i zdrowego stylu życia",
+      //   mainCategories: ["Zapobieganie otyłości"],
+      // },
+      // {
+      //   id: "uzaleznienia",
+      //   name: "Profilaktyka uzależnień",
+      //   description: "Program profilaktyki narkomanii, alkoholizmu i papierosów",
+      //   mainCategories: ["Profilaktyka uzależnień"],
+      // },
+      // {
+      //   id: "hiv_aids",
+      //   name: "HIV/AIDS",
+      //   description: "Program edukacji w zakresie HIV/AIDS",
+      //   mainCategories: ["HIV/AIDS"],
+      // },
       {
         id: "palenie_tytoniu",
         name: "Światowe dni bez tytoniu",
         description: "Pogrupowanie świadomościowych dni dotyczących palenia tytoniu",
         programGroups: {
-          "Dni antytytoniowe": [
-            "Światowy Dzień Rzucania Palenia",
-            "Światowy Dzień bez Tytoniu",
-          ]
+          "Światowy Dzień Rzucania Palenia": ["Światowy Dzień Rzucania Palenia", "Światowy Dzień bez Tytoniu", "Profilaktyka palenia tytoniu"],
+        },
+      },
+      {
+        id: "zdrowy_styl_zycia",
+        name: "Promocja zdrowego stylu życia",
+        description: "Zgrupowane programy promocji zdrowego stylu życia",
+        programGroups: {
+          "Promocja zdrowego stylu życia": [
+            "Promocja zdrowego stylu życia",
+            "Promocja zdrowego stylu życia - inne",
+          ],
         },
       },
     ],
@@ -321,12 +328,7 @@ export function getCategoryForProgram(programName: string): MainCategory {
  * @param indicator Indicator definition with filter criteria
  * @returns true if the row matches the indicator's criteria
  */
-export function matchesIndicator(
-  mainCategory: string,
-  programType: string,
-  programName: string,
-  indicator: IndicatorDefinition
-): boolean {
+export function matchesIndicator(mainCategory: string, programType: string, programName: string, indicator: IndicatorDefinition): boolean {
   // STEP 1: Match program selection criteria (highest priority first)
   if (indicator.specificPrograms && indicator.specificPrograms.length > 0) {
     // If specific programs defined, ONLY these are included
