@@ -58,16 +58,17 @@ export const isNonProgramVisit = (row: ExcelRow): boolean => {
 };
 
 /**
- * Filters Excel data to remove invalid and non-program rows
+ * Filters Excel data to remove invalid rows (but keeps both program and non-program visits)
  * Performs filtering in a central location to ensure consistency across all aggregation functions
  *
  * @param data Raw Excel rows to filter
- * @returns Filtered array containing only valid program rows
+ * @returns Filtered array containing valid rows (both program and non-program)
  *
  * Filtering removes:
  * 1. Completely empty rows (all cells blank) - silently
  * 2. Rows with missing required fields (Nazwa programu, Działanie, Liczba ludzi, Data, etc.) - silently
- * 3. Non-program visits (rows where "Typ programu" contains "nieprogramowe") - silently
+ *
+ * Note: Non-program visits are NOT filtered out here - they are included and displayed separately
  */
 export const filterExcelData = (data: ExcelRow[]): ExcelRow[] => {
   return data.filter((row) => {
@@ -81,10 +82,7 @@ export const filterExcelData = (data: ExcelRow[]): ExcelRow[] => {
       return false;
     }
 
-    // Skip non-program visits
-    if (isNonProgramVisit(row)) {
-      return false;
-    }
+    // NOTE: Non-program visits are NOT filtered here - they will be displayed separately
 
     return true;
   });
@@ -94,33 +92,33 @@ export const filterExcelData = (data: ExcelRow[]): ExcelRow[] => {
  * Tracks which rows were filtered out and returns warnings
  * Useful for informing users about excluded data
  * 
- * Note: Only reports non-program visits as warnings. Completely empty rows are silently filtered out
- * since Excel files often contain many blank rows that don't need user notification.
+ * Note: Reports only completely empty or invalid rows as warnings.
+ * Non-program visits are now included in data and displayed separately.
  *
  * @param data Raw Excel rows to check
  * @returns Object containing row numbers of filtered rows and warning messages
  */
 export const getFilteringWarnings = (data: ExcelRow[]): { filteredRowNumbers: number[]; warnings: string[] } => {
-  const nonProgramRowNumbers: number[] = [];
+  const invalidRowNumbers: number[] = [];
 
   data.forEach((row, index) => {
     const rowNumber = index + 2; // +2 because row 1 is header, index starts at 0
 
-    // Only track non-program visits as warnings
-    // Completely empty rows are silently ignored (common in Excel files)
-    if (!isCompletelyEmptyRow(row) && !isRowEmpty(row) && isNonProgramVisit(row)) {
-      nonProgramRowNumbers.push(rowNumber);
+    // Track completely empty rows and rows with missing required fields
+    if (isCompletelyEmptyRow(row) || isRowEmpty(row)) {
+      invalidRowNumbers.push(rowNumber);
     }
   });
 
   const warnings: string[] = [];
 
-  if (nonProgramRowNumbers.length > 0) {
-    const rowsText = nonProgramRowNumbers.join(", ");
+  if (invalidRowNumbers.length > 0) {
+    const rowsText = invalidRowNumbers.slice(0, 5).join(", ");
+    const moreText = invalidRowNumbers.length > 5 ? `, ... i ${invalidRowNumbers.length - 5} więcej` : "";
     warnings.push(
-      `Znaleziono ${nonProgramRowNumbers.length} wizytacje nieprogramowe w wierszu(ach) ${rowsText} - nie zostały uwzględnione w sumach.`
+      `Pominięto ${invalidRowNumbers.length} niepoprawnych/niekompletnych wierszy (${rowsText}${moreText})`
     );
   }
 
-  return { filteredRowNumbers: nonProgramRowNumbers, warnings };
+  return { filteredRowNumbers: invalidRowNumbers, warnings };
 };
