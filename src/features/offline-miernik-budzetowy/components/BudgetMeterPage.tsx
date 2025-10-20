@@ -1,5 +1,5 @@
 import React, { useEffect, memo } from "react";
-import { Container, Typography, Box, Alert } from "@mui/material";
+import { Container, Box, Alert } from "@mui/material";
 import { useBudgetMeter, useTabManager } from "../hooks";
 import { FileUploader, MonthSelector, ExportButtons, ProcessingButton, StatisticsCards, TabNavigation, TabContent } from "./";
 import { EmptyState, PageHeader } from "@/components/shared";
@@ -76,6 +76,8 @@ export const BudgetMeterPage: React.FC = () => {
       <ProcessingButton show={showProcessingButton} onProcess={processData} canProcess={canProcess} isProcessing={state.isProcessing} />
 
       <ErrorDisplay error={currentError} />
+
+      <WarningsDisplay warnings={state.aggregatedData?.warnings} />
 
       <StatisticsCards show={showStatistics} data={state.aggregatedData!} />
 
@@ -214,6 +216,32 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = memo(({ error }) => {
 });
 
 ErrorDisplay.displayName = "ErrorDisplay";
+
+/**
+ * Warnings display component
+ * Shows info messages about filtered data (e.g., non-program visits)
+ */
+interface WarningsDisplayProps {
+  readonly warnings?: string[];
+}
+
+const WarningsDisplay: React.FC<WarningsDisplayProps> = memo(({ warnings }) => {
+  if (!warnings || warnings.length === 0) {
+    return null;
+  }
+
+  return (
+    <Box sx={{ mb: UI_CONFIG.SECTION_SPACING }}>
+      {warnings.map((warning, index) => (
+        <Alert key={index} severity="info" sx={{ mb: 1 }}>
+          {warning}
+        </Alert>
+      ))}
+    </Box>
+  );
+});
+
+WarningsDisplay.displayName = "WarningsDisplay";
 
 /**
  * Data visualization section props

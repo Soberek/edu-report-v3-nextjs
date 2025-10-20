@@ -2,7 +2,7 @@ import { useReducer, useCallback, useMemo } from "react";
 import { budgetMeterReducer, initialBudgetMeterState } from "../reducers/budgetMeterReducer";
 import { validateExcelFile, readExcelFile } from "../utils/fileUtils";
 import { validateExcelData, aggregateData, exportToExcel, exportToTemplate, exportToCumulativeTemplate } from "../utils/dataProcessing";
-import { ERROR_MESSAGES } from "../types";
+import { ERROR_MESSAGES } from "../constants";
 
 export const useBudgetMeter = () => {
   const [state, dispatch] = useReducer(budgetMeterReducer, initialBudgetMeterState);
@@ -20,7 +20,7 @@ export const useBudgetMeter = () => {
     // Validate file
     const validation = validateExcelFile(file);
     if (!validation.isValid) {
-      dispatch({ type: "SET_FILE_ERROR", payload: validation.error || ERROR_MESSAGES.INVALID_FILE_TYPE });
+      dispatch({ type: "SET_FILE_ERROR", payload: validation.error || ERROR_MESSAGES.FILE_INVALID_TYPE });
       return;
     }
 
@@ -32,7 +32,7 @@ export const useBudgetMeter = () => {
       // Validate data
       const dataValidation = validateExcelData(data);
       if (!dataValidation.isValid) {
-        dispatch({ type: "SET_FILE_ERROR", payload: dataValidation.error || ERROR_MESSAGES.INVALID_DATA_FORMAT });
+        dispatch({ type: "SET_FILE_ERROR", payload: dataValidation.error || ERROR_MESSAGES.DATA_NO_CONTENT });
         return;
       }
 
@@ -43,7 +43,7 @@ export const useBudgetMeter = () => {
     } catch (error) {
       dispatch({
         type: "SET_FILE_ERROR",
-        payload: error instanceof Error ? error.message : ERROR_MESSAGES.FILE_READ_ERROR,
+        payload: error instanceof Error ? error.message : ERROR_MESSAGES.DATA_NO_CONTENT,
       });
     }
   }, []);
@@ -92,7 +92,7 @@ export const useBudgetMeter = () => {
   // Data processing
   const processData = useCallback(async () => {
     if (!state.rawData.length || !state.selectedMonths.some((month) => month.selected)) {
-      dispatch({ type: "SET_PROCESSING_ERROR", payload: "Brak danych do przetworzenia" });
+      dispatch({ type: "SET_PROCESSING_ERROR", payload: ERROR_MESSAGES.NO_DATA_TO_PROCESS });
       return;
     }
 

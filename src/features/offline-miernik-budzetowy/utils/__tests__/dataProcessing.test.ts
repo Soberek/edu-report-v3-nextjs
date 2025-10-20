@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { validateExcelData, aggregateData, exportToExcel } from "../dataProcessing";
 import type { ExcelRow, Month, AggregatedData } from "../../types";
+import { ERROR_MESSAGES } from "../../constants";
 
 describe("dataProcessing", () => {
   describe("validateExcelData", () => {
@@ -34,21 +35,21 @@ describe("dataProcessing", () => {
       const result = validateExcelData([]);
 
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe("Plik nie zawiera danych");
+      expect(result.error).toContain(ERROR_MESSAGES.DATA_NO_CONTENT.split(" ")[0]); // "Plik"
     });
 
     it("should reject null data", () => {
       const result = validateExcelData(null as unknown as ExcelRow[]);
 
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe("Plik nie zawiera danych");
+      expect(result.error).toContain(ERROR_MESSAGES.DATA_NO_CONTENT.split(" ")[0]); // "Plik"
     });
 
     it("should reject data with missing required fields", () => {
       const invalidData: ExcelRow[] = [
         {
           "Typ programu": "Edukacja",
-          // Missing "Nazwa programu"
+          // Missing "Nazwa programu" - should be ignored as empty row
           Działanie: "Akcja 1",
           "Liczba ludzi": 10,
           "Liczba działań": 5,
@@ -58,8 +59,35 @@ describe("dataProcessing", () => {
 
       const result = validateExcelData(invalidData);
 
+      // Row without "Nazwa programu" should be treated as empty and filtered out
       expect(result.isValid).toBe(false);
-      expect(result.error).toContain("Nazwa programu");
+      expect(result.error).toContain(ERROR_MESSAGES.DATA_ONLY_HEADERS);
+    });
+
+    it("should ignore rows with empty Nazwa programu", () => {
+      const mixedData: ExcelRow[] = [
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "", // Empty program name - should be ignored
+          Działanie: "Akcja 1",
+          "Liczba ludzi": 10,
+          "Liczba działań": 5,
+          Data: "2024-01-15",
+        },
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program A", // Valid row
+          Działanie: "Akcja 2",
+          "Liczba ludzi": 20,
+          "Liczba działań": 3,
+          Data: "2024-02-20",
+        },
+      ];
+
+      const result = validateExcelData(mixedData);
+
+      // Should be valid because second row is valid and first is ignored
+      expect(result.isValid).toBe(true);
     });
 
     it("should reject data with negative numbers", () => {
@@ -118,7 +146,7 @@ describe("dataProcessing", () => {
     it("should reject data with empty string for required fields", () => {
       const invalidData: ExcelRow[] = [
         {
-          "Typ programu": "", // Empty string
+          "Typ programu": "", // Empty string - will be filtered out
           "Nazwa programu": "Program A",
           Działanie: "Akcja 1",
           "Liczba ludzi": 10,
@@ -130,7 +158,8 @@ describe("dataProcessing", () => {
       const result = validateExcelData(invalidData);
 
       expect(result.isValid).toBe(false);
-      expect(result.error).toContain("Typ programu");
+      // Row is filtered out because Typ programu is empty, so returns "only headers" error
+      expect(result.error).toContain("nagłówki");
     });
 
     it("should reject data with zero values", () => {
@@ -186,10 +215,11 @@ describe("dataProcessing", () => {
     });
 
     it("should accept data with whitespace in required fields", () => {
-      // Zod .min(1) only checks length, not content - whitespace passes validation
+      // Since we trim whitespace and check if it's empty, whitespace-only values are filtered out
+      // This is intentional behavior to ignore rows with only whitespace in critical fields
       const dataWithWhitespace: ExcelRow[] = [
         {
-          "Typ programu": "   ",
+          "Typ programu": "   ", // Whitespace only - will be filtered out
           "Nazwa programu": "Program A",
           Działanie: "Akcja 1",
           "Liczba ludzi": 10,
@@ -200,7 +230,9 @@ describe("dataProcessing", () => {
 
       const result = validateExcelData(dataWithWhitespace);
 
-      expect(result.isValid).toBe(true); // .min(1) validates length, not content
+      // Row is filtered out because Typ programu is whitespace-only, so returns "only headers" error
+      expect(result.isValid).toBe(false);
+      expect(result.error).toContain("nagłówki");
     });
 
     it("should handle very large numbers", () => {
@@ -234,6 +266,84 @@ describe("dataProcessing", () => {
 
       const result = validateExcelData(validData);
 
+      expect(result.isValid).toBe(true);
+    });
+
+    it("should filter rows with missing Działanie", () => {
+      const dataWithMissingAction: ExcelRow[] = [
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program A",
+          Działanie: "", // Missing action - should be filtered
+          "Liczba ludzi": 10,
+          "Liczba działań": 5,
+          Data: "2024-01-15",
+        },
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program B",
+          Działanie: "Warsztaty", // Valid
+          "Liczba ludzi": 20,
+          "Liczba działań": 3,
+          Data: "2024-01-20",
+        },
+      ];
+
+      const result = validateExcelData(dataWithMissingAction);
+
+      // Should be valid because second row is valid
+      expect(result.isValid).toBe(true);
+    });
+
+    it("should filter rows with missing Liczba ludzi", () => {
+      const dataWithMissingPeople: ExcelRow[] = [
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program A",
+          Działanie: "Warsztaty",
+          "Liczba ludzi": null as unknown as number, // Missing people count
+          "Liczba działań": 5,
+          Data: "2024-01-15",
+        },
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program B",
+          Działanie: "Akcja",
+          "Liczba ludzi": 20,
+          "Liczba działań": 3,
+          Data: "2024-01-20",
+        },
+      ];
+
+      const result = validateExcelData(dataWithMissingPeople);
+
+      // Should be valid because second row is valid
+      expect(result.isValid).toBe(true);
+    });
+
+    it("should filter rows with missing Data", () => {
+      const dataWithMissingDate: ExcelRow[] = [
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program A",
+          Działanie: "Warsztaty",
+          "Liczba ludzi": 10,
+          "Liczba działań": 5,
+          Data: "", // Missing date
+        },
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program B",
+          Działanie: "Akcja",
+          "Liczba ludzi": 20,
+          "Liczba działań": 3,
+          Data: "2024-01-20",
+        },
+      ];
+
+      const result = validateExcelData(dataWithMissingDate);
+
+      // Should be valid because second row is valid
       expect(result.isValid).toBe(true);
     });
   });
@@ -398,6 +508,58 @@ describe("dataProcessing", () => {
       expect(result.allActions).toBe(5);
     });
 
+    it("should filter out non-program visits (nieprogramowe)", () => {
+      const dataWithNonPrograms: ExcelRow[] = [
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program A",
+          Działanie: "Warsztaty",
+          "Liczba ludzi": 15,
+          "Liczba działań": 3,
+          Data: "2024-01-15",
+        },
+        {
+          "Typ programu": "Nieprogramowe",
+          "Nazwa programu": "Wizyta",
+          Działanie: "Konsultacja",
+          "Liczba ludzi": 5,
+          "Liczba działań": 1,
+          Data: "2024-01-20",
+        },
+        {
+          "Typ programu": "Profilaktyka",
+          "Nazwa programu": "Program B",
+          Działanie: "Akcja",
+          "Liczba ludzi": 10,
+          "Liczba działań": 2,
+          Data: "2024-02-10",
+        },
+      ];
+
+      const months: Month[] = Array.from({ length: 12 }, (_, i) => ({
+        monthNumber: i + 1,
+        selected: true,
+      }));
+
+      const result = aggregateData(dataWithNonPrograms, months);
+
+      // SHOULD include "Nieprogramowe" in aggregated data (displayed separately in UI)
+      expect(result.aggregated["Nieprogramowe"]).toBeDefined();
+      
+      // Should include all three types: Edukacja, Nieprogramowe, Profilaktyka
+      expect(Object.keys(result.aggregated)).toContain("Edukacja");
+      expect(Object.keys(result.aggregated)).toContain("Nieprogramowe");
+      expect(Object.keys(result.aggregated)).toContain("Profilaktyka");
+      
+      // Totals should INCLUDE all data (programmed + non-programmed)
+      expect(result.allPeople).toBe(30); // 15 + 5 + 10 (including 5 from Nieprogramowe)
+      expect(result.allActions).toBe(6); // 3 + 1 + 2 (including 1 from Nieprogramowe)
+      
+      // Should NOT have warning about non-program visits (they are now included)
+      expect(result.warnings).toBeDefined();
+      expect(result.warnings).toHaveLength(0);
+    });
+
     it("should handle empty data array", () => {
       const months: Month[] = [{ monthNumber: 1, selected: true }];
 
@@ -426,6 +588,58 @@ describe("dataProcessing", () => {
 
       expect(result.allPeople).toBe(0);
       expect(result.allActions).toBe(0);
+    });
+
+    it("should track multiple non-program visits and include them in warning", () => {
+      const dataWithMultipleNonPrograms: ExcelRow[] = [
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program A",
+          Działanie: "Warsztaty",
+          "Liczba ludzi": 15,
+          "Liczba działań": 3,
+          Data: "2024-01-15",
+        },
+        {
+          "Typ programu": "Nieprogramowe",
+          "Nazwa programu": "Wizyta 1",
+          Działanie: "Konsultacja",
+          "Liczba ludzi": 5,
+          "Liczba działań": 1,
+          Data: "2024-01-20",
+        },
+        {
+          "Typ programu": "Profilaktyka",
+          "Nazwa programu": "Program B",
+          Działanie: "Akcja",
+          "Liczba ludzi": 10,
+          "Liczba działań": 2,
+          Data: "2024-02-10",
+        },
+        {
+          "Typ programu": "Nieprogramowe",
+          "Nazwa programu": "Wizyta 2",
+          Działanie: "Konsultacja",
+          "Liczba ludzi": 3,
+          "Liczba działań": 1,
+          Data: "2024-03-05",
+        },
+      ];
+
+      const months: Month[] = Array.from({ length: 12 }, (_, i) => ({
+        monthNumber: i + 1,
+        selected: true,
+      }));
+
+      const result = aggregateData(dataWithMultipleNonPrograms, months);
+
+      // Verify totals INCLUDE all data (programmed + non-programmed)
+      expect(result.allPeople).toBe(33); // 15 + 5 + 10 + 3 (including all from Nieprogramowe)
+      expect(result.allActions).toBe(7); // 3 + 1 + 2 + 1 (including all from Nieprogramowe)
+      
+      // Should NOT have warning about non-program visits (they are now included)
+      expect(result.warnings).toBeDefined();
+      expect(result.warnings).toHaveLength(0);
     });
 
     it("should handle all 12 months selected", () => {

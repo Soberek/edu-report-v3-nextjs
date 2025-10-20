@@ -12,8 +12,5 @@ export * from "./ui";
 // Form Components (input and form-related)
 export * from "./forms";
 
-// Data Visualization Components (charts, tables)
-export * from "./data-visualization";
-
 // Layout Components (containers and layout)
 export * from "./layout";

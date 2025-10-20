@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip, useTheme } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme } from "@mui/material";
+import type { Theme } from "@mui/material";
 import type { ProgramsData } from "../../types";
 
 interface DataTableProps {
@@ -8,20 +9,20 @@ interface DataTableProps {
   allPeople: number;
 }
 
+const getProgramTypeColor = (index: number, theme: Theme) => {
+  const colors = [
+    theme.palette.primary.main,
+    theme.palette.secondary.main,
+    theme.palette.success.main,
+    theme.palette.warning.main,
+    theme.palette.error.main,
+    theme.palette.info.main,
+  ];
+  return colors[index % colors.length];
+};
+
 export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allActions, allPeople }) => {
   const theme = useTheme();
-
-  const getProgramTypeColor = (index: number) => {
-    const colors = [
-      theme.palette.primary.main,
-      theme.palette.secondary.main,
-      theme.palette.success.main,
-      theme.palette.warning.main,
-      theme.palette.error.main,
-      theme.palette.info.main,
-    ];
-    return colors[index % colors.length];
-  };
 
   return (
     <Box sx={{ mt: 3 }}>
@@ -51,7 +52,7 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
             {Object.entries(data).map(([programType, programs], typeIndex) => (
               <React.Fragment key={programType}>
                 {/* Program Type Header */}
-                <TableRow sx={{ backgroundColor: `${getProgramTypeColor(typeIndex)}08`, borderTop: `2px solid ${getProgramTypeColor(typeIndex)}20` }}>
+                <TableRow sx={{ backgroundColor: `${getProgramTypeColor(typeIndex, theme)}08`, borderTop: `2px solid ${getProgramTypeColor(typeIndex, theme)}20` }}>
                   <TableCell colSpan={5} sx={{ fontWeight: 700, fontSize: "0.85rem", py: 1 }}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Box
@@ -59,7 +60,7 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
                           width: 4,
                           height: 24,
                           borderRadius: 0.5,
-                          backgroundColor: getProgramTypeColor(typeIndex),
+                          backgroundColor: getProgramTypeColor(typeIndex, theme),
                         }}
                       />
                       <Typography variant="caption" fontWeight={700} sx={{ fontSize: "0.85rem" }}>
@@ -111,7 +112,7 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
             ))}
 
             {/* Summary Row */}
-            <TableRow sx={{  color: "white", borderTop: `2px solid ${theme.palette.primary.dark}` }}>
+            <TableRow sx={{ color: "white", borderTop: `2px solid ${theme.palette.primary.dark}` }}>
               <TableCell colSpan={3} sx={{ fontWeight: 700, fontSize: "0.85rem", py: 1.25 }}>
                 📊 PODSUMOWANIE
               </TableCell>

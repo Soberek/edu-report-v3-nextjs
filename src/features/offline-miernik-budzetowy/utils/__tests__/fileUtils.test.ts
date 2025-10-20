@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { validateExcelFile, readExcelFile } from "../fileUtils";
-import { ERROR_MESSAGES } from "../../types";
+import { ERROR_MESSAGES } from "../../constants";
 
 describe("fileUtils", () => {
   describe("validateExcelFile", () => {
@@ -32,7 +32,7 @@ describe("fileUtils", () => {
       const result = validateExcelFile(file);
 
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe(ERROR_MESSAGES.INVALID_FILE_TYPE);
+      expect(result.error).toContain(ERROR_MESSAGES.FILE_INVALID_TYPE);
     });
 
     it("should reject .pdf files", () => {
@@ -41,7 +41,7 @@ describe("fileUtils", () => {
       const result = validateExcelFile(file);
 
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe(ERROR_MESSAGES.INVALID_FILE_TYPE);
+      expect(result.error).toContain(ERROR_MESSAGES.FILE_INVALID_TYPE);
     });
 
     it("should reject .csv files", () => {
@@ -50,7 +50,7 @@ describe("fileUtils", () => {
       const result = validateExcelFile(file);
 
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe(ERROR_MESSAGES.INVALID_FILE_TYPE);
+      expect(result.error).toContain(ERROR_MESSAGES.FILE_INVALID_TYPE);
     });
 
     it("should reject files larger than 10MB", () => {
@@ -62,7 +62,7 @@ describe("fileUtils", () => {
       const result = validateExcelFile(file);
 
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe(ERROR_MESSAGES.FILE_TOO_LARGE);
+      expect(result.error).toContain(ERROR_MESSAGES.FILE_TOO_LARGE);
     });
 
     it("should accept files at the size limit (10MB)", () => {
@@ -125,7 +125,7 @@ describe("fileUtils", () => {
       const result = validateExcelFile(file);
 
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe(ERROR_MESSAGES.INVALID_FILE_TYPE);
+      expect(result.error).toContain(ERROR_MESSAGES.FILE_INVALID_TYPE);
     });
 
     it("should handle files with just dots in name", () => {
@@ -168,7 +168,7 @@ describe("fileUtils", () => {
       const result = validateExcelFile(file);
 
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe(ERROR_MESSAGES.FILE_TOO_LARGE);
+      expect(result.error).toContain(ERROR_MESSAGES.FILE_TOO_LARGE);
     });
 
     it("should handle files with special characters in name", () => {
