@@ -6,8 +6,10 @@ export const createSchoolParticipationsMap = (
 ): Readonly<Record<string, readonly string[]>> => {
   const map: Record<string, string[]> = {};
   participations.forEach((participation) => {
-    if (!map[participation.schoolId]) map[participation.schoolId] = [];
-    map[participation.schoolId].push(participation.programId);
+    if (participation.schoolId) {
+      if (!map[participation.schoolId]) map[participation.schoolId] = [];
+      map[participation.schoolId].push(participation.programId);
+    }
   });
   return map;
 };
