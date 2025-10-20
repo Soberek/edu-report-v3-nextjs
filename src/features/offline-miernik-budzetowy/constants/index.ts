@@ -11,6 +11,7 @@ export const TABS = {
   BAR_CHARTS: 1,
   DATA_TABLE: 2,
   MAIN_CATEGORIES: 3,
+  INDICATORS: 4,
 } as const;
 
 export const DEFAULT_ACTIVE_TAB = TABS.DATA_TABLE;
@@ -24,10 +25,10 @@ export const TAB_CONFIG = [
     testId: "data-table-tab",
   },
     {
-    id: TABS.MAIN_CATEGORIES,
-    label: "Wskaźniki ",
+    id: TABS.INDICATORS,
+    label: "Wskaźniki",
     icon: "Category",
-    testId: "main-categories-tab",
+    testId: "indicators-tab",
   },
   {
     id: TABS.ADVANCED_STATS,
