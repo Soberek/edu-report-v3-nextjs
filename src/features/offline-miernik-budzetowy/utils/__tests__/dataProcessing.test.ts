@@ -543,21 +543,21 @@ describe("dataProcessing", () => {
 
       const result = aggregateData(dataWithNonPrograms, months);
 
-      // Should NOT include "Nieprogramowe" in aggregated data
-      expect(result.aggregated["Nieprogramowe"]).toBeUndefined();
+      // SHOULD include "Nieprogramowe" in aggregated data (displayed separately in UI)
+      expect(result.aggregated["Nieprogramowe"]).toBeDefined();
       
-      // Should only include "Edukacja" and "Profilaktyka"
-      expect(Object.keys(result.aggregated)).toEqual(["Edukacja", "Profilaktyka"]);
+      // Should include all three types: Edukacja, Nieprogramowe, Profilaktyka
+      expect(Object.keys(result.aggregated)).toContain("Edukacja");
+      expect(Object.keys(result.aggregated)).toContain("Nieprogramowe");
+      expect(Object.keys(result.aggregated)).toContain("Profilaktyka");
       
-      // Totals should exclude non-program data
-      expect(result.allPeople).toBe(25); // 15 + 10 (NOT including 5 from Nieprogramowe)
-      expect(result.allActions).toBe(5); // 3 + 2 (NOT including 1 from Nieprogramowe)
+      // Totals should INCLUDE all data (programmed + non-programmed)
+      expect(result.allPeople).toBe(30); // 15 + 5 + 10 (including 5 from Nieprogramowe)
+      expect(result.allActions).toBe(6); // 3 + 1 + 2 (including 1 from Nieprogramowe)
       
-      // Should have warning about filtered non-program visits
+      // Should NOT have warning about non-program visits (they are now included)
       expect(result.warnings).toBeDefined();
-      expect(result.warnings).toHaveLength(1);
-      expect(result.warnings![0]).toContain("Znaleziono 1 wizytacje nieprogramowe w wierszu(ach) 3");
-      expect(result.warnings![0]).toContain("nie zostały uwzględnione w sumach");
+      expect(result.warnings).toHaveLength(0);
     });
 
     it("should handle empty data array", () => {
@@ -633,16 +633,13 @@ describe("dataProcessing", () => {
 
       const result = aggregateData(dataWithMultipleNonPrograms, months);
 
-      // Verify totals exclude all non-program data
-      expect(result.allPeople).toBe(25); // 15 + 10 (NOT including 5 + 3 from Nieprogramowe)
-      expect(result.allActions).toBe(5); // 3 + 2 (NOT including 1 + 1 from Nieprogramowe)
+      // Verify totals INCLUDE all data (programmed + non-programmed)
+      expect(result.allPeople).toBe(33); // 15 + 5 + 10 + 3 (including all from Nieprogramowe)
+      expect(result.allActions).toBe(7); // 3 + 1 + 2 + 1 (including all from Nieprogramowe)
       
-      // Should have warning about multiple filtered non-program visits
+      // Should NOT have warning about non-program visits (they are now included)
       expect(result.warnings).toBeDefined();
-      expect(result.warnings).toHaveLength(1);
-      expect(result.warnings![0]).toContain("Znaleziono 2 wizytacje nieprogramowe");
-      expect(result.warnings![0]).toContain("w wierszu(ach) 3, 5");
-      expect(result.warnings![0]).toContain("nie zostały uwzględnione w sumach");
+      expect(result.warnings).toHaveLength(0);
     });
 
     it("should handle all 12 months selected", () => {
