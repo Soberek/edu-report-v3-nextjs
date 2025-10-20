@@ -9,39 +9,19 @@ import { ProgramStatistics } from "./ProgramStatistics";
 import { PageHeader, LoadingSpinner, SelectorWithCounts, NotificationSnackbar } from "@/components/shared";
 import { useDebounce } from "@/hooks";
 import type { SchoolYear } from "@/types";
-import { PAGE_CONSTANTS, STYLE_CONSTANTS, UI_CONSTANTS, MESSAGES } from "../constants";
-import { useSzkolyWProgramie } from "@/hooks/useSzkolyWProgramie";
+import { PAGE_CONSTANTS, STYLE_CONSTANTS, UI_CONSTANTS, MESSAGES, SCHOOL_YEAR_OPTIONS } from "../constants";
+import { useParticipationData, useParticipationFilters, useParticipationStatus, useParticipationActions } from "../hooks/useSchoolParticipationContext";
 
-type ParticipationViewProps = ReturnType<typeof useSzkolyWProgramie>;
-
-export default function ParticipationView(props: ParticipationViewProps) {
+export default function ParticipationView() {
   // Local state for search input (immediate feedback)
   const [searchInput, setSearchInput] = useState<string>("");
   // Debounced search value (throttled to 300ms for actual filtering)
   const debouncedSearch = useDebounce(searchInput, 300);
 
-  const {
-    schools,
-    contacts,
-    programs,
-    participations,
-    selectedSchoolYear,
-    setSelectedSchoolYear,
-    availableSchoolYears,
-    selectedProgram,
-    setSelectedProgram,
-    availablePrograms,
-    isLoading,
-    error,
-    lookupMaps,
-    handleSubmit,
-    handleUpdateParticipation,
-    handleDeleteParticipation,
-    notification,
-    closeNotification,
-    tableSearch,
-    setTableSearch,
-  } = props;
+  const { isLoading, error } = useParticipationStatus();
+  const { schools, contacts, programs, participations, availableSchoolYears, availablePrograms, lookupMaps } = useParticipationData();
+  const { selectedSchoolYear, setSelectedSchoolYear, selectedProgram, setSelectedProgram, setTableSearch } = useParticipationFilters();
+  const { notification, closeNotification, handleSubmit, handleUpdateParticipation, handleDeleteParticipation } = useParticipationActions();
 
   // Update the hook's search state with debounced value
   React.useEffect(() => {
