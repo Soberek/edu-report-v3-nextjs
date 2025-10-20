@@ -47,7 +47,7 @@ export default function ParticipationView() {
   const renderErrorAlert = () =>
     error && (
       <Alert severity="error" sx={{ mb: STYLE_CONSTANTS.SPACING.MEDIUM }}>
-        {MESSAGES.ERROR.LOAD_FAILED}: {error}
+        {MESSAGES.ERROR.LOAD_FAILED}: {error instanceof Error ? error.message : String(error)}
       </Alert>
     );
 
@@ -125,7 +125,7 @@ export default function ParticipationView() {
       schoolsMap={memoizedData.schoolsMap}
       contactsMap={memoizedData.contactsMap}
       programsMap={memoizedData.programsMap}
-      errorMessage={error}
+      errorMessage={error?.message ?? null}
       loading={isLoading}
       schools={schools}
       contacts={contacts}
