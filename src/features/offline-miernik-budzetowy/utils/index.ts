@@ -6,6 +6,9 @@
 // File processing utilities
 export * from "./fileUtils";
 
+// Error handling utilities
+export * from "./errorHandler";
+
 // Core data processing utilities
 export { validateExcelData, aggregateData, exportToExcel } from "./dataProcessing";
 
