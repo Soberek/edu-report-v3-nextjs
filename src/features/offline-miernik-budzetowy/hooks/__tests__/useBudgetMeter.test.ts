@@ -2,6 +2,7 @@ import { renderHook, act } from "@testing-library/react";
 import { vi } from "vitest";
 import { useBudgetMeter } from "../useBudgetMeter";
 import { initialBudgetMeterState } from "../../reducers/budgetMeterReducer";
+import { ERROR_MESSAGES } from "../../constants";
 
 // Mock the utility functions
 vi.mock("../../utils/fileUtils", () => ({
@@ -54,7 +55,7 @@ describe("useBudgetMeter", () => {
         await result.current.handleFileUpload(mockEvent);
       });
 
-      expect(result.current.state.fileError).toBe("Nie wybrano pliku");
+      expect(result.current.state.fileError).toBe(ERROR_MESSAGES.NO_FILE_SELECTED);
     });
 
     it("should handle invalid file type", async () => {
