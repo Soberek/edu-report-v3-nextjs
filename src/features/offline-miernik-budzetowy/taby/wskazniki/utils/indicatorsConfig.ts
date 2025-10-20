@@ -65,22 +65,54 @@ export type ActionType = (typeof ACTION_TYPES)[keyof typeof ACTION_TYPES];
 
 /**
  * Individual indicator definition
- * Can be defined either by main categories OR by specific programs
+ * Supports multiple filtering strategies to specify which programs are summed
+ *
+ * Priority order (first matching criterion is used):
+ * 1. specificPrograms - if defined, ONLY these exact programs are included
+ * 2. programGroups - named groups of programs from different categories
+ * 3. mainCategories - groups programs by health category
+ * 4. If none is defined, indicator is considered invalid
  */
 export interface IndicatorDefinition {
   id: string;
   name: string;
   description: string;
-  /** Main categories to include in this indicator - used if specificPrograms is not defined */
-  mainCategories?: MainCategory[];
-  /** Specific program names to include - if defined, only these programs are counted (overrides mainCategories) */
+
+  /**
+   * OPTION 1: Select specific programs
+   * If defined, ONLY these exact programs are counted (highest priority)
+   * Example: ["Profilaktyka grypy", "Promocja szczepień ochronnych"]
+   */
   specificPrograms?: string[];
-  /** Optional: specific program types to include/exclude */
-  programTypes?: {
-    include?: string[]; // If specified, only these program types are counted
-    exclude?: string[]; // If specified, these program types are excluded
+
+  /**
+   * OPTION 2: Define custom program groups
+   * Allows grouping programs from different categories together
+   * Useful for creating custom combinations that don't fit category boundaries
+   */
+  programGroups?: {
+    [groupName: string]: string[]; // groupName -> array of program names
   };
-  /** Whether non-program visits should be included */
+
+  /**
+   * OPTION 3: Group by main health categories
+   * If defined and other options not used, all programs in these categories are counted
+   * Example: ["Szczepienia", "Zapobieganie otyłości"]
+   */
+  mainCategories?: MainCategory[];
+
+  /**
+   * Additional program type filters (applied on top of category/program selection)
+   * Useful to exclude or include only certain program types
+   */
+  programTypes?: {
+    /** If specified, only these program types are counted */
+    include?: ProgramType[];
+    /** If specified, these program types are excluded */
+    exclude?: ProgramType[];
+  };
+
+  /** Whether non-program visits (NIEPROGRAMOWE) should be included */
   includeNonProgram?: boolean;
 }
 
@@ -206,10 +238,12 @@ export const INDICATORS_CONFIG: IndicatorGroup[] = [
         id: "palenie_tytoniu",
         name: "Światowe dni bez tytoniu",
         description: "Pogrupowanie świadomościowych dni dotyczących palenia tytoniu",
-        specificPrograms: [
-          "Światowy Dzień Rzucania Palenia",
-          "Światowy Dzień bez Tytoniu",
-        ],
+        programGroups: {
+          "Dni antytytoniowe": [
+            "Światowy Dzień Rzucania Palenia",
+            "Światowy Dzień bez Tytoniu",
+          ]
+        },
       },
     ],
   },
@@ -275,14 +309,16 @@ export function getCategoryForProgram(programName: string): MainCategory {
 
 /**
  * Checks if a row should be included in a specific indicator
- * Can match by:
- * 1. specificPrograms - if defined, only these exact programs are included
- * 2. mainCategories - if specificPrograms not defined, check if main category matches
- * 
+ * Applies filters in priority order:
+ * 1. specificPrograms - if defined, ONLY these programs are counted
+ * 2. programGroups - checks if program belongs to any defined group
+ * 3. mainCategories - groups by health category
+ * 4. programTypes - additional include/exclude filters
+ *
  * @param mainCategory Main category of the row
  * @param programType Program type of the row
  * @param programName Name of the program
- * @param indicator Indicator to check
+ * @param indicator Indicator definition with filter criteria
  * @returns true if the row matches the indicator's criteria
  */
 export function matchesIndicator(
@@ -291,9 +327,22 @@ export function matchesIndicator(
   programName: string,
   indicator: IndicatorDefinition
 ): boolean {
-  // If specific programs are defined, use those
+  // STEP 1: Match program selection criteria (highest priority first)
   if (indicator.specificPrograms && indicator.specificPrograms.length > 0) {
+    // If specific programs defined, ONLY these are included
     if (!indicator.specificPrograms.includes(programName)) {
+      return false;
+    }
+  } else if (indicator.programGroups) {
+    // Check if program belongs to any defined group
+    let foundInGroup = false;
+    for (const groupPrograms of Object.values(indicator.programGroups)) {
+      if (groupPrograms.includes(programName)) {
+        foundInGroup = true;
+        break;
+      }
+    }
+    if (!foundInGroup) {
       return false;
     }
   } else if (indicator.mainCategories && indicator.mainCategories.length > 0) {
@@ -302,17 +351,23 @@ export function matchesIndicator(
       return false;
     }
   } else {
-    // If neither is defined, this indicator is invalid
+    // If none of the selection criteria is defined, this indicator is invalid
     return false;
   }
 
-  // Check program type filters if specified
+  // STEP 2: Apply program type filters (if specified)
   if (indicator.programTypes) {
-    if (indicator.programTypes.include && !indicator.programTypes.include.includes(programType)) {
-      return false;
+    // Check include filter - if specified, programType MUST be in this list
+    if (indicator.programTypes.include && indicator.programTypes.include.length > 0) {
+      if (!indicator.programTypes.include.includes(programType as ProgramType)) {
+        return false;
+      }
     }
-    if (indicator.programTypes.exclude && indicator.programTypes.exclude.includes(programType)) {
-      return false;
+    // Check exclude filter - if specified, programType MUST NOT be in this list
+    if (indicator.programTypes.exclude && indicator.programTypes.exclude.length > 0) {
+      if (indicator.programTypes.exclude.includes(programType as ProgramType)) {
+        return false;
+      }
     }
   }
 
