@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, type Theme } from "@mui/material";
+import { Box, Card, CardContent, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme, type Theme, CircularProgress } from "@mui/material";
 import type { ExcelRow, Month } from "../../../types";
 import { useWskazniki } from "../hooks/useWskazniki";
 
@@ -27,11 +27,19 @@ const getCategoryColor = (theme: Theme, index: number) => {
  */
 export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selectedMonths }) => {
   const theme = useTheme();
-  const { state, hasData, error, formatGroupedName } = useWskazniki({
+  const { state, hasData, error, isLoading, formatGroupedName } = useWskazniki({
     rawData,
     selectedMonths,
     useAllGroupings: true,
   });
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (error) {
     return (
@@ -45,7 +53,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
     );
   }
 
-  if (!hasData) {
+  if (!state || !hasData) {
     return (
       <Box sx={{ mt: 4 }}>
         <Card>
@@ -82,9 +90,9 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.entries(state.byCategory).map(([mainCategory, programTypes], categoryIndex) => {
+            {state?.byCategory && Object.entries(state.byCategory).map(([mainCategory, programTypes], categoryIndex) => {
               const categoryColor = getCategoryColor(theme, categoryIndex);
-              const categoryTotal = state.categoryTotals[mainCategory];
+              const categoryTotal = state?.categoryTotals[mainCategory];
 
               return (
                 <React.Fragment key={mainCategory}>
