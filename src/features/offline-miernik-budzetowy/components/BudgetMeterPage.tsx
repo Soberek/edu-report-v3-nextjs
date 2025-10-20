@@ -77,6 +77,8 @@ export const BudgetMeterPage: React.FC = () => {
 
       <ErrorDisplay error={currentError} />
 
+      <WarningsDisplay warnings={state.aggregatedData?.warnings} />
+
       <StatisticsCards show={showStatistics} data={state.aggregatedData!} />
 
       <DataVisualization show={showDataVisualization} activeTab={activeTab} onTabChange={handleTabChange} state={state} />
@@ -214,6 +216,32 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = memo(({ error }) => {
 });
 
 ErrorDisplay.displayName = "ErrorDisplay";
+
+/**
+ * Warnings display component
+ * Shows info messages about filtered data (e.g., non-program visits)
+ */
+interface WarningsDisplayProps {
+  readonly warnings?: string[];
+}
+
+const WarningsDisplay: React.FC<WarningsDisplayProps> = memo(({ warnings }) => {
+  if (!warnings || warnings.length === 0) {
+    return null;
+  }
+
+  return (
+    <Box sx={{ mb: UI_CONFIG.SECTION_SPACING }}>
+      {warnings.map((warning, index) => (
+        <Alert key={index} severity="info" sx={{ mb: 1 }}>
+          {warning}
+        </Alert>
+      ))}
+    </Box>
+  );
+});
+
+WarningsDisplay.displayName = "WarningsDisplay";
 
 /**
  * Data visualization section props
