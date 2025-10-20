@@ -31,10 +31,11 @@ export interface ProgramsData {
 
 // Aggregated Data Types
 export interface AggregatedData {
-  aggregated: ProgramsData;
+  aggregated: ProgramsData; // All activities (both PROGRAMOWE and NIEPROGRAMOWE)
   allPeople: number;
   allActions: number;
   warnings?: string[]; // Optional warnings (e.g., non-program rows filtered out)
+  indicators?: Record<string, unknown>; // Indicator calculation results (e.g., vaccination stats, obesity prevention, etc.)
 }
 
 // State Types
