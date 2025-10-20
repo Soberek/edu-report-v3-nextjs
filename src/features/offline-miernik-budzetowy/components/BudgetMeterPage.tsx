@@ -1,5 +1,5 @@
 import React, { useEffect, memo } from "react";
-import { Container, Typography, Box, Alert } from "@mui/material";
+import { Container, Box, Alert } from "@mui/material";
 import { useBudgetMeter, useTabManager } from "../hooks";
 import { FileUploader, MonthSelector, ExportButtons, ProcessingButton, StatisticsCards, TabNavigation, TabContent } from "./";
 import { EmptyState, PageHeader } from "@/components/shared";
