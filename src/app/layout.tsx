@@ -11,8 +11,8 @@ import { AuthenticatedLayout } from "@/components/layout/AuthenticatedLayout";
 import QueryClientProvider from "@/providers/QueryClientProvider";
 
 export const metadata: Metadata = {
-  title: "Edu Report",
-  description: "Edu Report - Modern platform for educational reporting and analytics.",
+  title: "Ozipz",
+  description: "Ozipz",
   viewport: "width=device-width, initial-scale=1",
 };
 
