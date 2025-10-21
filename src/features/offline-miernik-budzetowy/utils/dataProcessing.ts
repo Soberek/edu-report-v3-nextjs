@@ -4,7 +4,7 @@ import ExcelJS from "exceljs";
 import type { ExcelRow, Month, AggregatedData, ProgramsData } from "../types";
 import { ExcelRowSchema } from "../types";
 import { ERROR_MESSAGES } from "../constants";
-import { filterExcelData, getFilteringWarnings } from "./dataFiltering";
+import { filterExcelData, getFilteringWarnings, isNonProgramVisitWithWizytacja } from "./dataFiltering";
 import { calculateAllIndicators } from "../taby/wskazniki/utils/indicatorCalculation";
 import {
   createEmptyDataError,
@@ -106,6 +106,9 @@ export const aggregateData = (data: ExcelRow[], months: Month[]): AggregatedData
 
       // Skip if month not selected
       if (!selectedMonths.includes(month)) return acc;
+
+      // Skip non-program visits with wizytacja action (NIEPROGRAMOWE + wizytacja)
+      if (isNonProgramVisitWithWizytacja(item)) return acc;
 
       const { "Nazwa programu": programName, "Działanie": action, "Liczba ludzi": peopleCount, "Liczba działań": actionCount } = row;
 

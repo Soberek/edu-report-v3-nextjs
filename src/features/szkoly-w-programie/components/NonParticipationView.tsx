@@ -4,38 +4,26 @@ import { Box, Chip, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { PageHeader, LoadingSpinner, StatsCard, FilterSection, TableWrapper, type FilterField } from "@/components/shared";
-import { useSzkolyWProgramie } from "@/hooks/useSzkolyWProgramie";
+import { useParticipationData, useParticipationFilters, useParticipationStatus } from "../hooks/useSchoolParticipationContext";
 import type { Program } from "@/types";
-import type { SchoolParticipationInfo } from "../types";
+import type { SchoolParticipationInfo, ProgramStatsItem } from "../types/szkoly-w-programie.types";
 
-type NonParticipationViewProps = ReturnType<typeof useSzkolyWProgramie>;
+type SchoolParticipationRow = SchoolParticipationInfo & {
+  id: string;
+  [key: string]: unknown;
+};
 
-interface ProgramStatsRow {
+type ProgramStatsRow = {
   id: string;
   programName: string;
   participating: number;
   notParticipating: number;
   eligible: number;
-  [key: string]: string | number; // index signature to satisfy Record<string, unknown>
-}
+};
 
-interface SchoolParticipationRow extends SchoolParticipationInfo {
-  id: string;
-  [key: string]: unknown;
-}
+import { CUSTOM_SORT_ORDER, STATUS_FILTER_OPTIONS } from "../constants";
 
-const STATUS_OPTIONS = [
-  { label: "Wszystkie szkoły", value: "all" },
-  { label: "Uczestniczące", value: "participating" },
-  { label: "Nieuczestniczące", value: "notParticipating" },
-] as const;
-
-// Define the custom sort order for programs (update with actual program names as needed)
-const CUSTOM_SORT_ORDER = [
-  "Program A",
-  "Program B",
-  "Program C",
-] as const;
+// ... (rest of the file is unchanged)
 
 const renderPrograms = (programs: readonly Program[], color: "success" | "error") => (
   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -49,21 +37,17 @@ const renderPrograms = (programs: readonly Program[], color: "success" | "error"
   </Box>
 );
 
-export default function NonParticipationView(props: NonParticipationViewProps) {
+export default function NonParticipationView() {
+  const { isLoading } = useParticipationStatus();
+  const { schoolsInfo, generalStats, programStats, schools, programs } = useParticipationData();
   const {
-    schoolsInfo,
-    generalStats,
-    programStats,
-    isLoading,
-    schools,
-    programs,
     schoolFilter,
     setSchoolFilter,
     programFilter,
     setProgramFilter,
     statusFilter,
     setStatusFilter,
-  } = props;
+  } = useParticipationFilters();
 
   const sortedProgramStats = useMemo(
     () =>
@@ -113,8 +97,8 @@ export default function NonParticipationView(props: NonParticipationViewProps) {
       type: "select",
       label: "Status uczestnictwa",
       value: statusFilter,
-      onChange: (value) => setStatusFilter((value as NonParticipationViewProps["statusFilter"]) || "all"),
-      options: STATUS_OPTIONS,
+      onChange: (value) => setStatusFilter((value as "all" | "participating" | "notParticipating") || "all"),
+      options: STATUS_FILTER_OPTIONS,
     },
   ];
 

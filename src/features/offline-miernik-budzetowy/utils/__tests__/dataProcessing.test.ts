@@ -724,6 +724,156 @@ describe("dataProcessing", () => {
       expect(result.allPeople).toBe(1000);
       expect(result.allActions).toBe(1000);
     });
+
+    it("should skip NIEPROGRAMOWE + wizytacja rows from aggregation", () => {
+      const dataWithNonProgramVisits: ExcelRow[] = [
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program A",
+          Działanie: "Warsztaty",
+          "Liczba ludzi": 15,
+          "Liczba działań": 3,
+          Data: "2024-01-15",
+        },
+        {
+          "Typ programu": "Nieprogramowe",
+          "Nazwa programu": "Wizyta 1",
+          Działanie: "Wizytacja", // This should be skipped
+          "Liczba ludzi": 10,
+          "Liczba działań": 2,
+          Data: "2024-01-20",
+        },
+        {
+          "Typ programu": "Nieprogramowe",
+          "Nazwa programu": "Konsultacja",
+          Działanie: "Konsultacja", // This should be included (not wizytacja)
+          "Liczba ludzi": 5,
+          "Liczba działań": 1,
+          Data: "2024-01-25",
+        },
+        {
+          "Typ programu": "Profilaktyka",
+          "Nazwa programu": "Program B",
+          Działanie: "Wizytacja", // This should be included (not NIEPROGRAMOWE)
+          "Liczba ludzi": 8,
+          "Liczba działań": 2,
+          Data: "2024-02-10",
+        },
+      ];
+
+      const months: Month[] = Array.from({ length: 12 }, (_, i) => ({
+        monthNumber: i + 1,
+        selected: true,
+      }));
+
+      const result = aggregateData(dataWithNonProgramVisits, months);
+
+      // Should skip only "Nieprogramowe" + "Wizytacja" rows
+      // Expected: 15 (Edukacja) + 5 (Nieprogramowe Konsultacja) + 8 (Profilaktyka)
+      // NOT included: 10 (Nieprogramowe Wizytacja)
+      expect(result.allPeople).toBe(28); // 15 + 5 + 8
+      expect(result.allActions).toBe(6); // 3 + 1 + 2
+
+      // Verify structure - Nieprogramowe with Konsultacja should exist
+      expect(result.aggregated["Nieprogramowe"]).toBeDefined();
+      expect(result.aggregated["Nieprogramowe"]["Konsultacja"]?.["Konsultacja"]).toBeDefined();
+
+      // But the Wizytacja row should not create an entry
+      expect(result.aggregated["Nieprogramowe"]["Wizyta 1"]).toBeUndefined();
+
+      // Verify warning was generated
+      expect(result.warnings).toBeDefined();
+      expect(result.warnings?.length).toBeGreaterThan(0);
+      expect(result.warnings?.some((w) => w.includes("NIEPROGRAMOWE + wizytacja"))).toBe(true);
+    });
+
+    it("should handle multiple NIEPROGRAMOWE + wizytacja rows", () => {
+      const dataWithMultipleVisits: ExcelRow[] = [
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program A",
+          Działanie: "Warsztaty",
+          "Liczba ludzi": 20,
+          "Liczba działań": 4,
+          Data: "2024-01-15",
+        },
+        {
+          "Typ programu": "Nieprogramowe",
+          "Nazwa programu": "Wizyta 1",
+          Działanie: "Wizytacja",
+          "Liczba ludzi": 5,
+          "Liczba działań": 1,
+          Data: "2024-01-20",
+        },
+        {
+          "Typ programu": "Nieprogramowe",
+          "Nazwa programu": "Wizyta 2",
+          Działanie: "Wizytacja",
+          "Liczba ludzi": 8,
+          "Liczba działań": 2,
+          Data: "2024-02-10",
+        },
+        {
+          "Typ programu": "Nieprogramowe",
+          "Nazwa programu": "Wizyta 3",
+          Działanie: "Wizytacja",
+          "Liczba ludzi": 3,
+          "Liczba działań": 1,
+          Data: "2024-03-05",
+        },
+      ];
+
+      const months: Month[] = Array.from({ length: 12 }, (_, i) => ({
+        monthNumber: i + 1,
+        selected: true,
+      }));
+
+      const result = aggregateData(dataWithMultipleVisits, months);
+
+      // All three wizytacja rows should be skipped
+      expect(result.allPeople).toBe(20); // Only from Edukacja
+      expect(result.allActions).toBe(4); // Only from Edukacja
+
+      // Should have warning with count
+      expect(result.warnings?.some((w) => w.includes("3") && w.includes("NIEPROGRAMOWE + wizytacja"))).toBe(true);
+    });
+
+    it("should be case-insensitive for wizytacja check", () => {
+      const dataWithDifferentCases: ExcelRow[] = [
+        {
+          "Typ programu": "Edukacja",
+          "Nazwa programu": "Program A",
+          Działanie: "Warsztaty",
+          "Liczba ludzi": 15,
+          "Liczba działań": 3,
+          Data: "2024-01-15",
+        },
+        {
+          "Typ programu": "NIEPROGRAMOWE",
+          "Nazwa programu": "Wizyta",
+          Działanie: "WIZYTACJA", // Different case - should still be skipped
+          "Liczba ludzi": 10,
+          "Liczba działań": 2,
+          Data: "2024-01-20",
+        },
+        {
+          "Typ programu": "Nieprogramowe",
+          "Nazwa programu": "Wizyta 2",
+          Działanie: "Wizytacja", // Correct case - should still be skipped
+          "Liczba ludzi": 5,
+          "Liczba działań": 1,
+          Data: "2024-01-25",
+        },
+      ];
+
+      const months: Month[] = [{ monthNumber: 1, selected: true }];
+
+      const result = aggregateData(dataWithDifferentCases, months);
+
+      // Both WIZYTACJA and Wizytacja should be skipped
+      expect(result.allPeople).toBe(15); // Only from Edukacja
+      expect(result.allActions).toBe(3);
+    });
   });
 
   // NOTE: These tests are skipped because they test the old xlsx implementation

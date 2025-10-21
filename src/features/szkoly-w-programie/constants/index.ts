@@ -15,6 +15,19 @@ export const SCHOOL_YEAR_OPTIONS = ["2024/2025", "2025/2026", "2026/2027", "2027
 
 export type SchoolYear = (typeof SCHOOL_YEAR_OPTIONS)[number];
 
+// Custom sort order for programs
+export const CUSTOM_SORT_ORDER = [
+  "Program A",
+  "Program B",
+  "Program C",
+] as const;
+
+export const STATUS_FILTER_OPTIONS = [
+  { label: "Wszystkie szkoły", value: "all" },
+  { label: "Uczestniczące", value: "participating" },
+  { label: "Nieuczestniczące", value: "notParticipating" },
+] as const;
+
 // Message Constants
 export const MESSAGES = {
   SUCCESS: {

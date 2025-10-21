@@ -58,6 +58,21 @@ export const isNonProgramVisit = (row: ExcelRow): boolean => {
 };
 
 /**
+ * Checks if a row represents a non-program visit (NIEPROGRAMOWE) with a visit action (wizytacja)
+ * These rows should be excluded from calculations as per business rules
+ * @param row Excel row to check
+ * @returns true if program type is "NIEPROGRAMOWE" and action is "wizytacja"
+ */
+export const isNonProgramVisitWithWizytacja = (row: ExcelRow): boolean => {
+  const programType = String(row["Typ programu"] || "").trim();
+  const action = String(row["Działanie"] || "").trim();
+  return (
+    programType.toLowerCase().includes("nieprogramowe") &&
+    action.toLowerCase() === "wizytacja"
+  );
+};
+
+/**
  * Filters Excel data to remove invalid rows (but keeps both program and non-program visits)
  * Performs filtering in a central location to ensure consistency across all aggregation functions
  *
@@ -94,12 +109,14 @@ export const filterExcelData = (data: ExcelRow[]): ExcelRow[] => {
  * 
  * Note: Reports only completely empty or invalid rows as warnings.
  * Non-program visits are now included in data and displayed separately.
+ * Non-program visits with "wizytacja" action are excluded from calculations with a warning.
  *
  * @param data Raw Excel rows to check
  * @returns Object containing row numbers of filtered rows and warning messages
  */
 export const getFilteringWarnings = (data: ExcelRow[]): { filteredRowNumbers: number[]; warnings: string[] } => {
   const invalidRowNumbers: number[] = [];
+  const nonProgramWizytacjaRowNumbers: number[] = [];
 
   data.forEach((row, index) => {
     const rowNumber = index + 2; // +2 because row 1 is header, index starts at 0
@@ -107,6 +124,11 @@ export const getFilteringWarnings = (data: ExcelRow[]): { filteredRowNumbers: nu
     // Track completely empty rows and rows with missing required fields
     if (isCompletelyEmptyRow(row) || isRowEmpty(row)) {
       invalidRowNumbers.push(rowNumber);
+    }
+
+    // Track non-program visits with wizytacja action
+    if (isNonProgramVisitWithWizytacja(row)) {
+      nonProgramWizytacjaRowNumbers.push(rowNumber);
     }
   });
 
@@ -117,6 +139,14 @@ export const getFilteringWarnings = (data: ExcelRow[]): { filteredRowNumbers: nu
     const moreText = invalidRowNumbers.length > 5 ? `, ... i ${invalidRowNumbers.length - 5} więcej` : "";
     warnings.push(
       `Pominięto ${invalidRowNumbers.length} niepoprawnych/niekompletnych wierszy (${rowsText}${moreText})`
+    );
+  }
+
+  if (nonProgramWizytacjaRowNumbers.length > 0) {
+    const rowsText = nonProgramWizytacjaRowNumbers.slice(0, 5).join(", ");
+    const moreText = nonProgramWizytacjaRowNumbers.length > 5 ? `, ... i ${nonProgramWizytacjaRowNumbers.length - 5} więcej` : "";
+    warnings.push(
+      `Pominięto ${nonProgramWizytacjaRowNumbers.length} wierszy (NIEPROGRAMOWE + wizytacja) (${rowsText}${moreText})`
     );
   }
 

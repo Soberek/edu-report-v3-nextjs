@@ -6,7 +6,8 @@
 import moment from "moment";
 import type { ExcelRow, ProgramsData } from "../../../types";
 import { getMainCategoryFromRow } from "./mainCategoryMapping";
-import { filterExcelData } from "../../../utils/dataFiltering";
+import { filterExcelData, isNonProgramVisitWithWizytacja } from "../../../utils/dataFiltering";
+import { getIndicatorById, getAllIndicators } from "./indicatorsConfig";
 
 export interface IndicatorCategoryData {
   [mainCategory: string]: ProgramsData;
@@ -17,131 +18,110 @@ export interface IndicatorAggregatedData {
   totalPeople: number;
   totalActions: number;
   categoryTotals: Record<string, { people: number; actions: number }>;
+  groupDefinitions: Record<string, string[]>;
 }
 
-interface AggregationState extends IndicatorAggregatedData {
-  programToGroupMap: Record<string, string>;
-}
-
-type AggregationAction =
-  | { type: "ADD_ROW"; category: string; programType: string; displayName: string; action: string; people: number; actionCount: number }
-  | { type: "INIT_PROGRAM_GROUPS"; programToGroupMap: Record<string, string> };
-
-function aggregationReducer(state: AggregationState, action: AggregationAction): AggregationState {
-  switch (action.type) {
-    case "INIT_PROGRAM_GROUPS":
-      return { ...state, programToGroupMap: action.programToGroupMap };
-
-    case "ADD_ROW": {
-      const { category, programType, displayName, action: actionName, people, actionCount } = action;
-
-      // Initialize nested structures
-      if (!state.byCategory[category]) {
-        state.byCategory[category] = {};
-      }
-      if (!state.byCategory[category][programType]) {
-        state.byCategory[category][programType] = {};
-      }
-      if (!state.byCategory[category][programType][displayName]) {
-        state.byCategory[category][programType][displayName] = {};
-      }
-      if (!state.byCategory[category][programType][displayName][actionName]) {
-        state.byCategory[category][programType][displayName][actionName] = { people: 0, actionNumber: 0 };
-      }
-
-      // Accumulate values
-      state.byCategory[category][programType][displayName][actionName].people += people;
-      state.byCategory[category][programType][displayName][actionName].actionNumber += actionCount;
-
-      // Update category totals
-      if (!state.categoryTotals[category]) {
-        state.categoryTotals[category] = { people: 0, actions: 0 };
-      }
-      state.categoryTotals[category].people += people;
-      state.categoryTotals[category].actions += actionCount;
-
-      // Update grand totals
-      state.totalPeople += people;
-      state.totalActions += actionCount;
-
-      return state;
-    }
-
-    default:
-      return state;
-  }
+export interface AggregateOptions {
+  indicatorId?: string;
+  useAllGroupings?: boolean;
 }
 
 /**
- * Aggregates raw Excel data by indicator categories or groups
- * Groups programs by their main health category OR by custom program groups
- * @param rawData Raw Excel rows
- * @param selectedMonths Optional array of selected month numbers (1-12)
- * @param indicator Optional indicator to use programGroups for custom grouping
- * @returns Aggregated data grouped by main categories or indicator groups
+ * Aggregates raw Excel data by indicator categories or groups.
+ * This is a pure function that handles all core aggregation logic.
+ *
+ * @param rawData Raw Excel rows.
+ * @param selectedMonths Optional array of selected month numbers (1-12).
+ * @param options Aggregation options including indicatorId or useAllGroupings.
+ * @returns Aggregated data grouped by main categories or indicator groups.
  */
 export function aggregateByIndicators(
-  rawData: ExcelRow[], 
+  rawData: ExcelRow[],
   selectedMonths?: number[],
-  indicator?: { programGroups?: { [groupName: string]: string[] } }
+  options: AggregateOptions = {}
 ): IndicatorAggregatedData {
+  const { indicatorId, useAllGroupings } = options;
   const validData = filterExcelData(rawData);
 
-  const initialState: AggregationState = {
+  const result: IndicatorAggregatedData = {
     byCategory: {},
     totalPeople: 0,
     totalActions: 0,
     categoryTotals: {},
-    programToGroupMap: {},
+    groupDefinitions: {},
   };
 
-  // Initialize program groups mapping
-  let state = initialState;
-  if (indicator?.programGroups) {
-    const programToGroupMap: Record<string, string> = {};
-    for (const [groupName, programs] of Object.entries(indicator.programGroups)) {
-      for (const programName of programs) {
-        programToGroupMap[programName] = groupName;
+  // Determine which groupings to use based on options
+  const indicator = indicatorId ? getIndicatorById(indicatorId) : undefined;
+  let groupingsToUse: Record<string, string[]> | undefined = indicator?.programGroups;
+
+  if (useAllGroupings) {
+    const allIndicators = getAllIndicators();
+    const combined: Record<string, string[]> = {};
+    for (const ind of allIndicators) {
+      if (ind.programGroups) {
+        Object.assign(combined, ind.programGroups);
       }
     }
-    state = aggregationReducer(state, { type: "INIT_PROGRAM_GROUPS", programToGroupMap });
+    groupingsToUse = Object.keys(combined).length > 0 ? combined : undefined;
+  }
+  
+  if (groupingsToUse) {
+    result.groupDefinitions = groupingsToUse;
   }
 
   // Process each row
   validData.forEach((row) => {
-    const mainCategory = getMainCategoryFromRow(row);
     const dateStr = String(row["Data"]);
+
+    // Filter by month
+    if (selectedMonths && selectedMonths.length > 0) {
+      const month = moment(dateStr, "YYYY-MM-DD").month() + 1;
+      if (!selectedMonths.includes(month)) return;
+    }
+
+    // Skip NIEPROGRAMOWE + wizytacja rows (business rule: these should be excluded from indicators)
+    if (isNonProgramVisitWithWizytacja(row)) {
+      return;
+    }
+
+    const mainCategory = getMainCategoryFromRow(row);
     const programType = String(row["Typ programu"] || "").trim();
     const programName = String(row["Nazwa programu"] || "").trim();
     const action = String(row["Działanie"] || "").trim();
     const peopleCount = Number(row["Liczba ludzi"] || 0);
     const actionCount = Number(row["Liczba działań"] || 0);
 
-    // Check month filter
-    if (selectedMonths && selectedMonths.length > 0) {
-      const month = moment(dateStr, "YYYY-MM-DD").month() + 1;
-      if (!selectedMonths.includes(month)) return;
+    // Determine the display name (group name or program name)
+    let displayName = programName;
+    if (groupingsToUse) {
+      for (const [groupName, programs] of Object.entries(groupingsToUse)) {
+        if (programs.includes(programName)) {
+          displayName = groupName;
+          break;
+        }
+      }
     }
 
-    // Filter by program groups if defined
-    if (indicator?.programGroups && !state.programToGroupMap[programName]) {
-      return;
+    // Accumulate data by mutating the local 'result' object.
+    // This is safe as 'result' is scoped to this function.
+    if (!result.byCategory[mainCategory]) result.byCategory[mainCategory] = {};
+    if (!result.byCategory[mainCategory][programType]) result.byCategory[mainCategory][programType] = {};
+    if (!result.byCategory[mainCategory][programType][displayName]) result.byCategory[mainCategory][programType][displayName] = {};
+    if (!result.byCategory[mainCategory][programType][displayName][action]) {
+      result.byCategory[mainCategory][programType][displayName][action] = { people: 0, actionNumber: 0 };
     }
+    result.byCategory[mainCategory][programType][displayName][action].people += peopleCount;
+    result.byCategory[mainCategory][programType][displayName][action].actionNumber += actionCount;
 
-    // Use group name if available
-    const displayName = state.programToGroupMap[programName] || programName;
+    // Update totals
+    if (!result.categoryTotals[mainCategory]) result.categoryTotals[mainCategory] = { people: 0, actions: 0 };
+    result.categoryTotals[mainCategory].people += peopleCount;
+    result.categoryTotals[mainCategory].actions += actionCount;
 
-    state = aggregationReducer(state, {
-      type: "ADD_ROW",
-      category: mainCategory,
-      programType,
-      displayName,
-      action,
-      people: peopleCount,
-      actionCount,
-    });
+    result.totalPeople += peopleCount;
+    result.totalActions += actionCount;
   });
 
-  const { programToGroupMap, ...result } = state;
   return result;
 }

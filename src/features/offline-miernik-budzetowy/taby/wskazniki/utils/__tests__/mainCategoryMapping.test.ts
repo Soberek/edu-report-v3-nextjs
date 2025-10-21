@@ -226,6 +226,27 @@ describe("mainCategoryMapping", () => {
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
+    it("should default unknown programs to Inne", () => {
+      // This is problematic behavior!
+      // Unknown programs from Excel should ideally either:
+      // 1. Return undefined/error
+      // 2. Be logged as unknown
+      // 3. Be excluded from indicators
+      // Currently they're silently mapped to "Inne"
+      const row = { "Nazwa programu": "Zupełnie nowy program XYZ" };
+      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
+    });
+
+    it("should default empty program name to Inne", () => {
+      const row = { "Nazwa programu": "" };
+      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
+    });
+
+    it("should default missing program name to Inne", () => {
+      const row = {};
+      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
+    });
+
     it("should map program with special characters to correct category", () => {
       const row = { "Nazwa programu": "Profilaktyki chorób układu pokarmowego, w tym zatruć pokarmowych – salmonella, grzyby i inne" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);

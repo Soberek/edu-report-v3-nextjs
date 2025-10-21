@@ -138,3 +138,17 @@ export class FirebaseService<R> implements Creatable<R>, Readable<R>, Updatable<
     }
   }
 }
+
+/**
+ * A generic fetch function designed to be used as a `queryFn` for TanStack Query.
+ * @param collectionName The name of the Firestore collection.
+ * @param userId The ID of the user to filter documents by.
+ * @returns A promise that resolves to an array of documents.
+ */
+export const fetchCollection = async <T>(collectionName: string, userId: string): Promise<T[]> => {
+  if (!userId) {
+    return []; // Or throw an error, depending on desired behavior for logged-out users
+  }
+  const service = new FirebaseService<T>(collectionName);
+  return service.getDocumentsByUserId(userId);
+};
