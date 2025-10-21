@@ -191,9 +191,12 @@ export default function Home() {
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
               <span className="text-xl text-white">📊</span>
             </div>
-            <span className="text-2xl font-bold text-gray-900">Edu Report V3</span>
+            <span className="text-2xl font-bold text-gray-900">Platforma OZiPZ</span>
           </div>
           <div className="flex items-center space-x-4">
+            <Link href="/offline-miernik-budzetowy" className="px-6 py-2.5 text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200">
+              💰 Miernik Budżetowy
+            </Link>
             <Link href="/login" className="px-6 py-2.5 text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200">
               Zaloguj się
             </Link>
@@ -212,7 +215,7 @@ export default function Home() {
         <header className="text-center mb-20">
           <div className="mb-12">
             {/* Main Heading */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">Edu Report V3</h1>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">Platforma OZiPZ</h1>
 
             {/* Subtitle */}
             <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-normal mb-8">
@@ -223,21 +226,7 @@ export default function Home() {
               sprawozdania budżetowe
             </p>
 
-            {/* Stats */}
-            <div className="flex flex-wrap justify-center gap-12 mb-16">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600">500+</div>
-                <div className="text-sm text-gray-500 font-medium">Szkół w programach</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600">10K+</div>
-                <div className="text-sm text-gray-500 font-medium">Wygenerowanych dokumentów</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600">1000+</div>
-                <div className="text-sm text-gray-500 font-medium">Zadań edukacyjnych</div>
-              </div>
-            </div>
+  
           </div>
 
           {/* CTA Buttons */}
@@ -256,6 +245,7 @@ export default function Home() {
               <span className="mr-3 text-xl">📝</span>
               Zarejestruj się
             </Link>
+
           </div>
         </header>
 
@@ -375,56 +365,8 @@ export default function Home() {
           </div>
         </main>
 
-        {/* Benefits Section */}
-        <section className="bg-white rounded-xl p-12 mb-24 shadow-sm border border-gray-100">
-          <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">Dlaczego Edu Report V3?</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-6 border border-blue-100">
-                <span className="text-2xl">⚡</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">Szybkość i Wydajność</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Automatyzacja procesów generowania dokumentów i raportów oszczędza czas i eliminuje błędy ludzkie.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-50 rounded-xl flex items-center justify-center mx-auto mb-6 border border-green-100">
-                <span className="text-2xl">🔒</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">Bezpieczeństwo Danych</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Zaawansowane szyfrowanie i kontrola dostępu zapewniają pełne bezpieczeństwo wrażliwych danych edukacyjnych.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-6 border border-purple-100">
-                <span className="text-2xl">📊</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-4 text-gray-900">Analityka i Raporty</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Szczegółowe analizy i wizualizacje danych pomagają w podejmowaniu świadomych decyzji edukacyjnych.
-              </p>
-            </div>
-          </div>
-        </section>
+    
 
-        {/* CTA Section */}
-        <div className="text-center bg-blue-600 rounded-xl p-16 text-white">
-          <div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Gotowy na start?</h2>
-            <p className="text-xl md:text-2xl mb-10 opacity-90 max-w-2xl mx-auto leading-relaxed">
-              Dołącz do tysięcy edukatorów, którzy już korzystają z Edu Report V3
-            </p>
-            <Link
-              href="/login"
-              className="group inline-flex items-center px-8 py-4 bg-white text-blue-600 font-semibold text-lg rounded-lg hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md"
-            >
-              <span className="mr-3 text-xl">🚀</span>
-              Rozpocznij teraz
-            </Link>
-          </div>
-        </div>
 
         {/* Footer */}
         <footer className="relative z-10 mt-24 py-12 border-t border-gray-200">
@@ -435,7 +377,7 @@ export default function Home() {
                   <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <span className="text-sm text-white">📊</span>
                   </div>
-                  <span className="text-xl font-bold text-gray-900">Edu Report V3</span>
+                  <span className="text-xl font-bold text-gray-900">OZiPZ</span>
                 </div>
                 <p className="text-gray-600 text-sm leading-relaxed">
                   Nowoczesna platforma do zarządzania edukacją zdrowotną z wykorzystaniem sztucznej inteligencji.
@@ -507,7 +449,7 @@ export default function Home() {
 
             <div className="pt-8 border-t border-gray-200 text-center">
               <p className="text-sm text-gray-600">
-                © 2024 Edu Report V3. Wszystkie prawa zastrzeżone. |
+                © {new Date().getFullYear()} OZiPZ. Wszystkie prawa zastrzeżone. |
                 <Link href="#" className="hover:text-blue-600 transition-colors ml-2">
                   Polityka prywatności
                 </Link>{" "}
@@ -515,6 +457,9 @@ export default function Home() {
                 <Link href="#" className="hover:text-blue-600 transition-colors ml-2">
                   Warunki użytkowania
                 </Link>
+              </p>
+              <p className="text-xs text-gray-500 mt-4">
+                Stworzył: Młodszy Asystent OZiPZ Krzysztof Palpuchowski
               </p>
             </div>
           </div>

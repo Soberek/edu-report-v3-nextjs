@@ -158,7 +158,7 @@ export const navRoutes: NavRoute[] = [
     title: "Offline miernik budżetowy",
     path: "/offline-miernik-budzetowy",
     category: "tools",
-    isPrivate: true,
+    isPrivate: false,
     icon: <FaMoneyBillAlt />,
     description: "Analiza budżetu offline",
   },
