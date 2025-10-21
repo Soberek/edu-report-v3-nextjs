@@ -6,7 +6,7 @@
 import moment from "moment";
 import type { ExcelRow, ProgramsData } from "../../../types";
 import { getMainCategoryFromRow } from "./mainCategoryMapping";
-import { filterExcelData } from "../../../utils/dataFiltering";
+import { filterExcelData, isNonProgramVisitWithWizytacja } from "../../../utils/dataFiltering";
 import { getIndicatorById, getAllIndicators } from "./indicatorsConfig";
 
 export interface IndicatorCategoryData {
@@ -78,6 +78,11 @@ export function aggregateByIndicators(
     if (selectedMonths && selectedMonths.length > 0) {
       const month = moment(dateStr, "YYYY-MM-DD").month() + 1;
       if (!selectedMonths.includes(month)) return;
+    }
+
+    // Skip NIEPROGRAMOWE + wizytacja rows (business rule: these should be excluded from indicators)
+    if (isNonProgramVisitWithWizytacja(row)) {
+      return;
     }
 
     const mainCategory = getMainCategoryFromRow(row);
