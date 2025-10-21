@@ -81,7 +81,7 @@ export const ExcelRowSchema = z.object({
     if (val === "" || val === 0) return 0;
     const num = typeof val === "string" ? parseFloat(val) : val;
     if (isNaN(num) || num < 0) {
-      throw new Error("People count must be a number >= 0"); // Will be caught and formatted with constants
+      throw new Error("Liczba ludzi musi być równa lub większa niż 0"); // Will be caught and formatted with constants
     }
     return num;
   }),
@@ -90,7 +90,7 @@ export const ExcelRowSchema = z.object({
     if (val === "" || val === 0) return 0;
     const num = typeof val === "string" ? parseFloat(val) : val;
     if (isNaN(num) || num < 0) {
-      throw new Error("Actions count must be a number >= 0"); // Will be caught and formatted with constants
+      throw new Error("Liczba działań musi być równa lub większa niż 0"); // Will be caught and formatted with constants
     }
     return num;
   }),

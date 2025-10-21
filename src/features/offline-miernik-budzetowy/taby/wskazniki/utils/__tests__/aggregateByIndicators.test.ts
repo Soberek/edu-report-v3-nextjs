@@ -144,4 +144,111 @@ describe("aggregateByIndicators", () => {
     expect(warsztaty.people).toBe(35); // 20 + 15
     expect(warsztaty.actionNumber).toBe(5); // 2 + 3
   });
+
+  it("should skip NIEPROGRAMOWE + wizytacja rows", () => {
+    const dataWithNonProgramVisits: ExcelRow[] = [
+      {
+        "Typ programu": "PROGRAMOWE",
+        "Nazwa programu": "Profilaktyka grypy",
+        Działanie: "Warsztaty",
+        "Liczba ludzi": 30,
+        "Liczba działań": 5,
+        Data: "2024-01-15",
+      },
+      {
+        "Typ programu": "Nieprogramowe",
+        "Nazwa programu": "Wizyta 1",
+        Działanie: "Wizytacja", // This should be skipped
+        "Liczba ludzi": 10,
+        "Liczba działań": 2,
+        Data: "2024-01-20",
+      },
+      {
+        "Typ programu": "Nieprogramowe",
+        "Nazwa programu": "Konsultacja",
+        Działanie: "Konsultacja", // This should be included
+        "Liczba ludzi": 5,
+        "Liczba działań": 1,
+        Data: "2024-01-25",
+      },
+    ];
+
+    const result = aggregateByIndicators(dataWithNonProgramVisits);
+
+    // Should only include: Profilaktyka grypy (30 people) + Konsultacja (5 people) = 35 people
+    // NOT including Wizytacja (10 people)
+    expect(result.totalPeople).toBe(35); // 30 + 5, NOT 45
+    expect(result.totalActions).toBe(6); // 5 + 1, NOT 8
+  });
+
+  it("should handle multiple NIEPROGRAMOWE + wizytacja rows", () => {
+    const dataWithMultipleVisits: ExcelRow[] = [
+      {
+        "Typ programu": "PROGRAMOWE",
+        "Nazwa programu": "Profilaktyka grypy",
+        Działanie: "Warsztaty",
+        "Liczba ludzi": 30,
+        "Liczba działań": 5,
+        Data: "2024-01-15",
+      },
+      {
+        "Typ programu": "Nieprogramowe",
+        "Nazwa programu": "Wizyta 1",
+        Działanie: "Wizytacja",
+        "Liczba ludzi": 5,
+        "Liczba działań": 1,
+        Data: "2024-01-20",
+      },
+      {
+        "Typ programu": "Nieprogramowe",
+        "Nazwa programu": "Wizyta 2",
+        Działanie: "Wizytacja",
+        "Liczba ludzi": 8,
+        "Liczba działań": 2,
+        Data: "2024-02-10",
+      },
+      {
+        "Typ programu": "Nieprogramowe",
+        "Nazwa programu": "Wizyta 3",
+        Działanie: "Wizytacja",
+        "Liczba ludzi": 3,
+        "Liczba działań": 1,
+        Data: "2024-03-05",
+      },
+    ];
+
+    const result = aggregateByIndicators(dataWithMultipleVisits);
+
+    // Should only include Profilaktyka grypy (30 people)
+    // All three wizytacja rows should be skipped (5+8+3=16 people)
+    expect(result.totalPeople).toBe(30); // Only from Profilaktyka grypy
+    expect(result.totalActions).toBe(5); // Only from Profilaktyka grypy
+  });
+
+  it("should be case-insensitive for wizytacja in indicators", () => {
+    const dataWithCases: ExcelRow[] = [
+      {
+        "Typ programu": "PROGRAMOWE",
+        "Nazwa programu": "Profilaktyka grypy",
+        Działanie: "Warsztaty",
+        "Liczba ludzi": 30,
+        "Liczba działań": 5,
+        Data: "2024-01-15",
+      },
+      {
+        "Typ programu": "NIEPROGRAMOWE",
+        "Nazwa programu": "Wizyta 1",
+        Działanie: "WIZYTACJA", // Different case
+        "Liczba ludzi": 10,
+        "Liczba działań": 2,
+        Data: "2024-01-20",
+      },
+    ];
+
+    const result = aggregateByIndicators(dataWithCases);
+
+    // Should skip the WIZYTACJA row regardless of case
+    expect(result.totalPeople).toBe(30);
+    expect(result.totalActions).toBe(5);
+  });
 });
