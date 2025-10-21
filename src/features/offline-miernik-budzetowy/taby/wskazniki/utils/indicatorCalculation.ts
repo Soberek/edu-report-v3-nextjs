@@ -7,7 +7,7 @@ import type { ExcelRow } from "../../../types";
 import type { IndicatorDefinition, ProgramType } from "./indicatorsConfig";
 import { getAllIndicators, PROGRAM_TYPES } from "./indicatorsConfig";
 import { getMainCategoryFromRow } from "./mainCategoryMapping";
-import { isNonProgramVisit } from "../../../utils/dataFiltering";
+import { isNonProgramVisit, isNonProgramVisitWithWizytacja } from "../../../utils/dataFiltering";
 
 const PROGRAM_TYPE_VALUES = new Set<string>(Object.values(PROGRAM_TYPES));
 
@@ -55,6 +55,11 @@ export function calculateIndicator(data: ExcelRow[], indicator: IndicatorDefinit
     const programType = parseProgramType(row["Typ programu"]);
     const programName = String(row["Nazwa programu"] || "").trim();
     const isNonProgram = isNonProgramVisit(row);
+
+    // Skip NIEPROGRAMOWE + wizytacja rows (business rule: these should be excluded)
+    if (isNonProgramVisitWithWizytacja(row)) {
+      return;
+    }
 
     // Check if this row matches the indicator's criteria
     // Can match by specificPrograms, programGroups, or mainCategories
