@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { TASK_TYPES } from "@/constants/tasks";
 import { programs } from "@/constants/programs";
 import { type ScheduledTaskDTOType, type ScheduledTaskType } from "@/models/ScheduledTaskSchema";
+import { useGlobalNotification } from "@/providers/NotificationProvider";
+import { logError, createErrorContext, safeAsync } from "@/utils";
 
 import { ScheduledTaskDTO } from "@/models/ScheduledTaskSchema";
 
@@ -16,6 +18,8 @@ type Props = {
 };
 
 export const useTaskForm = ({ userId, createTask, refetch, mode = "create", task, onSave }: Props) => {
+  const { showSuccess, showError } = useGlobalNotification();
+
   const { control, handleSubmit, reset } = useForm<ScheduledTaskDTOType>({
     defaultValues: {
       taskTypeId: TASK_TYPES.PRELEKCJA.id,
@@ -52,13 +56,37 @@ export const useTaskForm = ({ userId, createTask, refetch, mode = "create", task
         updatedAt: new Date().toISOString(),
       };
 
-      onSave(task.id, updates);
+      try {
+        await safeAsync(
+          async () => {
+            await onSave(task.id, updates);
+          },
+          "Aktualizacja zadania",
+          undefined
+        );
+        showSuccess("Zadanie zostało pomyślnie zaktualizowane");
+      } catch (error) {
+        logError(error as Error, createErrorContext(
+          "useTaskForm",
+          "onSubmit-edit",
+          { taskId: task.id, updates },
+          userId
+        ));
+        showError("Nie udało się zaktualizować zadania");
+      }
       return;
     }
 
     // Create mode
     if (!userId) {
-      alert("User ID is required to create a task.");
+      const authError = new Error("User ID is required to create a task");
+      logError(authError, createErrorContext(
+        "useTaskForm",
+        "onSubmit-create",
+        { data },
+        userId
+      ));
+      showError("Musisz być zalogowany, aby utworzyć zadanie");
       return;
     }
 
@@ -73,15 +101,38 @@ export const useTaskForm = ({ userId, createTask, refetch, mode = "create", task
 
     if (!validation.success) {
       const errorMessages = validation.error.issues.map((err) => `${err.message} (at ${err.path.join(", ")})`).join("\n");
-      alert(`Błąd walidacji w useTaskForm:\n${errorMessages}`);
+      const validationError = new Error(`Błąd walidacji zadania: ${errorMessages}`);
+      logError(validationError, createErrorContext(
+        "useTaskForm",
+        "onSubmit-create-validation",
+        {
+          data: newScheduledTask,
+          validationIssues: validation.error.issues
+        },
+        userId
+      ));
+      showError("Nie udało się utworzyć zadania - błędne dane");
       return;
     }
 
     try {
-      createTask(newScheduledTask);
-      await refetch();
+      await safeAsync(
+        async () => {
+          createTask(newScheduledTask);
+          await refetch();
+        },
+        "Tworzenie zadania",
+        undefined
+      );
+      showSuccess("Zadanie zostało pomyślnie utworzone");
     } catch (error) {
-      console.error("Error creating task:", error);
+      logError(error as Error, createErrorContext(
+        "useTaskForm",
+        "onSubmit-create",
+        { data: newScheduledTask },
+        userId
+      ));
+      showError("Nie udało się utworzyć zadania");
     }
   };
 

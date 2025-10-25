@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { z } from "zod";
 import { baseAuthFormSchema, isValidEmail, isValidPassword, validateAuthForm } from "../validationUtils";
 import { SHARED_AUTH_CONSTANTS, EMAIL_REGEX } from "../../constants";
-import type { BaseAuthFormData } from "../validationUtils";
+import type { BaseAuthFormDataFromSchema } from "../validationUtils";
 
 describe("validationUtils", () => {
   describe("baseAuthFormSchema", () => {
@@ -246,7 +246,7 @@ describe("validationUtils", () => {
     });
 
     it("should work with baseAuthFormSchema", () => {
-      const validData: BaseAuthFormData = {
+      const validData: BaseAuthFormDataFromSchema = {
         email: "test@example.com",
         password: "password123",
       };
@@ -262,7 +262,7 @@ describe("validationUtils", () => {
         password: "123",
       };
 
-      const result = validateAuthForm(invalidData as BaseAuthFormData, baseAuthFormSchema);
+      const result = validateAuthForm(invalidData as BaseAuthFormDataFromSchema, baseAuthFormSchema);
       expect(result.isValid).toBe(false);
       expect(result.errors).toHaveProperty("email");
       expect(result.errors).toHaveProperty("password");

@@ -3,6 +3,7 @@ import { educationalTasksPageReducer } from "../educationalTasksPageReducer";
 import { INITIAL_PAGE_STATE } from "../../types";
 import { actions } from "../educationalTasksPageReducer";
 import type { EducationalTask } from "@/types";
+import type { EducationalTasksPageAction } from "../../types";
 
 // Mock data for tests
 const mockEducationalTask: EducationalTask = {

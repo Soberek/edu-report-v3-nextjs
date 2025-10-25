@@ -34,10 +34,14 @@ global.fetch = mockFetch;
 describe("TemplateSelector", () => {
   let mockOnTemplateSelect: ReturnType<typeof vi.fn>;
   let mockChoosePredefinedTemplate: ReturnType<typeof vi.fn>;
+  let defaultProps: TemplateSelectorProps;
 
   beforeEach(() => {
     mockOnTemplateSelect = vi.fn();
     mockChoosePredefinedTemplate = vi.fn();
+    defaultProps = {
+      onTemplateSelect: mockOnTemplateSelect,
+    };
 
     vi.mocked(useTemplateManager).mockReturnValue({
       selectedTemplate: null,
@@ -52,10 +56,6 @@ describe("TemplateSelector", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
-
-  const defaultProps: TemplateSelectorProps = {
-    onTemplateSelect: mockOnTemplateSelect,
-  };
 
   describe("rendering", () => {
     it("should render template selector with title", () => {
@@ -110,9 +110,12 @@ describe("TemplateSelector", () => {
 
     it("should show loading state when template is being loaded", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: true,
         error: null,
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} />);
@@ -161,9 +164,12 @@ describe("TemplateSelector", () => {
   describe("error handling", () => {
     it("should display internal error when provided", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: false,
         error: "Internal template error",
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} />);
@@ -173,9 +179,12 @@ describe("TemplateSelector", () => {
 
     it("should display external error when provided", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: false,
         error: null,
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} error="External error" />);
@@ -185,9 +194,12 @@ describe("TemplateSelector", () => {
 
     it("should prioritize external error over internal error", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: false,
         error: "Internal error",
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} error="External error" />);
@@ -198,9 +210,12 @@ describe("TemplateSelector", () => {
 
     it("should not display error when neither internal nor external error is provided", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: false,
         error: null,
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} />);
@@ -212,9 +227,12 @@ describe("TemplateSelector", () => {
   describe("loading state", () => {
     it("should show loading state from internal hook", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: true,
         error: null,
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} />);
@@ -227,9 +245,12 @@ describe("TemplateSelector", () => {
 
     it("should show loading state from external prop", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: false,
         error: null,
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} loading={true} />);
@@ -242,9 +263,12 @@ describe("TemplateSelector", () => {
 
     it("should show loading state when either internal or external loading is true", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: true,
         error: null,
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} loading={false} />);
@@ -307,9 +331,12 @@ describe("TemplateSelector", () => {
 
     it("should disable buttons when loading", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: true,
         error: null,
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} />);
@@ -324,9 +351,12 @@ describe("TemplateSelector", () => {
   describe("error display", () => {
     it("should display error with proper styling", () => {
       vi.mocked(useTemplateManager).mockReturnValue({
+        selectedTemplate: null,
         loading: false,
         error: "Template loading failed",
         choosePredefinedTemplate: mockChoosePredefinedTemplate,
+        handleFileUpload: vi.fn(),
+        clearTemplate: vi.fn(),
       });
 
       render(<TemplateSelector {...defaultProps} />);

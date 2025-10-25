@@ -97,7 +97,10 @@ describe("useEducationalTasks", () => {
     // Reset mocks to default values
     vi.mocked(useUser).mockReturnValue({
       user: mockUser,
+      userData: null,
       loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false),
     });
     vi.mocked(useFirebaseData).mockReturnValue(mockFirebaseData);
   });
@@ -193,7 +196,10 @@ describe("useEducationalTasks", () => {
       // Mock no user
       vi.mocked(useUser).mockReturnValue({
         user: null,
+        userData: null,
         loading: false,
+        isAdmin: false,
+        hasRole: vi.fn(() => false),
       });
 
       const { result } = renderHook(() => useEducationalTasks());
@@ -275,7 +281,10 @@ describe("useEducationalTasks", () => {
       // Mock no user
       vi.mocked(useUser).mockReturnValue({
         user: null,
+        userData: null,
         loading: false,
+        isAdmin: false,
+        hasRole: vi.fn(() => false),
       });
 
       const { result } = renderHook(() => useEducationalTasks());
@@ -337,7 +346,10 @@ describe("useEducationalTasks", () => {
       // Mock no user
       vi.mocked(useUser).mockReturnValue({
         user: null,
+        userData: null,
         loading: false,
+        isAdmin: false,
+        hasRole: vi.fn(() => false),
       });
 
       const { result } = renderHook(() => useEducationalTasks());

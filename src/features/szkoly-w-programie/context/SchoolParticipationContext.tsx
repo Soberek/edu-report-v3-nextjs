@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { createContext, useState, useMemo } from "react";
@@ -45,7 +44,7 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
     [schoolsLoading, contactsLoading, programsLoading, participationsLoading]
   );
   const error = useMemo(
-    () => schoolsError || contactsError || programsError || participationsError,
+    () => (schoolsError || contactsError || programsError || participationsError) as Error | null,
     [schoolsError, contactsError, programsError, participationsError]
   );
 

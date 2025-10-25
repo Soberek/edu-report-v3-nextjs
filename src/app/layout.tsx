@@ -7,6 +7,9 @@ import { NavProvider } from "@/providers/NavProvider";
 import { UserProvider } from "@/providers/UserContext";
 import { SearchProvider } from "@/providers/SearchProvider";
 import LocalizationProviderClient from "@/providers/LocalizationProvder";
+import { NotificationProvider } from "@/providers/NotificationProvider";
+import { GlobalErrorProvider } from "@/providers/GlobalErrorProvider";
+import { GlobalErrorBoundary } from "@/components/shared/GlobalErrorBoundary";
 import { AuthenticatedLayout } from "@/components/layout/AuthenticatedLayout";
 import QueryClientProvider from "@/providers/QueryClientProvider";
 
@@ -24,21 +27,27 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <AppRouterCacheProvider>
-          <LocalizationProviderClient>
-            <ThemeProvider theme={theme}>
-              <SearchProvider>
-                <UserProvider>
-                  <NavProvider>
-                    <QueryClientProvider>
-                      <AuthenticatedLayout>{children}</AuthenticatedLayout>
-                    </QueryClientProvider>
-                  </NavProvider>
-                </UserProvider>
-              </SearchProvider>
-            </ThemeProvider>
-          </LocalizationProviderClient>
-        </AppRouterCacheProvider>
+        <GlobalErrorProvider>
+          <NotificationProvider>
+            <GlobalErrorBoundary>
+              <AppRouterCacheProvider>
+              <LocalizationProviderClient>
+                <ThemeProvider theme={theme}>
+                  <SearchProvider>
+                    <UserProvider>
+                      <NavProvider>
+                        <QueryClientProvider>
+                          <AuthenticatedLayout>{children}</AuthenticatedLayout>
+                        </QueryClientProvider>
+                      </NavProvider>
+                    </UserProvider>
+                  </SearchProvider>
+                </ThemeProvider>
+              </LocalizationProviderClient>
+            </AppRouterCacheProvider>
+          </GlobalErrorBoundary>
+          </NotificationProvider>
+        </GlobalErrorProvider>
       </body>
     </html>
   );

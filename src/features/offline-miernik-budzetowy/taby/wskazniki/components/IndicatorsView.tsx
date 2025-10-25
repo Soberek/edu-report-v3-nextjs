@@ -122,7 +122,7 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
                           <TableCell sx={{ pl: 2, fontWeight: 600, color: "text.primary", fontSize: "0.8rem", py: 0.75 }}>
                             {formatGroupedName(programName)}
                           </TableCell>
-                          <TableCell colSpan={4} />
+                          <TableCell colSpan={3} />
                         </TableRow>
 
                         {/* Action Rows */}
