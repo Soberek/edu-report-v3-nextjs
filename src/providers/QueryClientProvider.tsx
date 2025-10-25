@@ -4,6 +4,11 @@ import React from "react";
 import { QueryClient, QueryClientProvider as ReactQueryClientProvider } from "@tanstack/react-query";
 import { useGlobalNotification } from "./NotificationProvider";
 
+interface QueryError {
+  status?: number;
+  message?: string;
+}
+
 /**
  * Component that handles global error notifications for React Query
  * Must be inside NotificationProvider to access global notifications
@@ -17,9 +22,10 @@ function QueryErrorHandler({ children }: { children: React.ReactNode }) {
       defaultOptions: {
         queries: {
           // Retry failed requests up to 3 times with exponential backoff
-          retry: (failureCount, error: any) => {
+          retry: (failureCount, error: unknown) => {
             // Don't retry on 4xx errors (client errors)
-            if (error?.status >= 400 && error?.status < 500) {
+            const queryError = error as QueryError;
+            if (queryError?.status && queryError.status >= 400 && queryError.status < 500) {
               return false;
             }
             // Retry up to 3 times for other errors
@@ -48,9 +54,10 @@ function QueryErrorHandler({ children }: { children: React.ReactNode }) {
           retryDelay: 1000,
 
           // Global mutation error handler
-          onError: (error: any) => {
+          onError: (error: unknown) => {
             console.error("Mutation error:", error);
-            const message = error?.message || "Wystąpił błąd podczas zapisywania danych";
+            const mutationError = error as QueryError;
+            const message = mutationError?.message || "Wystąpił błąd podczas zapisywania danych";
             showError(`Błąd zapisu: ${message}`);
           },
         },

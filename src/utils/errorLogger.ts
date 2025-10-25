@@ -8,7 +8,7 @@ export interface ErrorLog {
   level: 'error' | 'warning' | 'info';
   message: string;
   error?: Error;
-  context?: Record<string, any>;
+  context?: ErrorContext;
   userAgent?: string;
   url?: string;
   userId?: string;
@@ -19,7 +19,7 @@ export interface ErrorContext {
   userId?: string;
   component?: string;
   action?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 class ErrorLogger {
@@ -132,7 +132,7 @@ export const errorLogger = new ErrorLogger();
 export const createErrorContext = (
   component?: string,
   action?: string,
-  metadata?: Record<string, any>,
+  metadata?: Record<string, unknown>,
   userId?: string
 ): ErrorContext => ({
   component,

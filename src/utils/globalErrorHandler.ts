@@ -95,7 +95,7 @@ export const safeSync = <T>(
 /**
  * Wrapper for event handlers with automatic error handling
  */
-export const withErrorHandler = <T extends any[], R>(
+export const withErrorHandler = <T extends unknown[], R>(
   fn: (...args: T) => R | Promise<R>,
   context?: string
 ) => {
@@ -105,8 +105,9 @@ export const withErrorHandler = <T extends any[], R>(
 
       // Handle async functions
       if (result instanceof Promise) {
-        return result.catch((error: Error) => {
-          errorLogger.logError(error, createErrorContext('withErrorHandler', 'asyncEventHandler', { context }));
+        return result.catch((error: unknown) => {
+          const errorObj = error instanceof Error ? error : new Error(String(error));
+          errorLogger.logError(errorObj, createErrorContext('withErrorHandler', 'asyncEventHandler', { context }));
           return undefined as unknown as R;
         }) as Promise<R>;
       }

@@ -1,6 +1,11 @@
-import { useQuery, useQueryClient, UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
+import { useQuery, useQueries, UseQueryOptions, UseQueryResult } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useGlobalNotification } from "@/providers/NotificationProvider";
+
+interface QueryErrorObject {
+  message?: string;
+  code?: string;
+}
 
 /**
  * Enhanced useQuery hook that automatically shows error notifications
@@ -24,7 +29,7 @@ export function useQueryWithNotifications<TData = unknown, TError = unknown, TQu
       let message = "Wystąpił błąd podczas ładowania danych";
 
       if (query.error && typeof query.error === "object") {
-        const err = query.error as any;
+        const err = query.error as QueryErrorObject;
         if (err.message) {
           message = err.message;
         } else if (err.code) {
@@ -59,13 +64,16 @@ export function useQueryWithNotifications<TData = unknown, TError = unknown, TQu
 
 /**
  * Enhanced useQueries hook that automatically shows error notifications
+ * Uses TanStack Query's useQueries hook instead of manually calling useQuery in a loop
  */
 export function useQueriesWithNotifications<T extends readonly unknown[]>(
   queries: readonly [...{ [K in keyof T]: UseQueryOptions<T[K], unknown, T[K], readonly unknown[]> }],
   context?: string
 ) {
   const { showError } = useGlobalNotification();
-  const results = queries.map((queryOptions) => useQuery(queryOptions));
+  
+  // Use proper useQueries hook instead of calling useQuery in a loop
+  const results = useQueries({ queries: queries as UseQueryOptions<unknown, unknown, unknown, readonly unknown[]>[] });
 
   // Handle errors in all queries
   useEffect(() => {
@@ -76,7 +84,7 @@ export function useQueriesWithNotifications<T extends readonly unknown[]>(
         let message = "Wystąpił błąd podczas ładowania danych";
 
         if (result.error && typeof result.error === "object") {
-          const err = result.error as any;
+          const err = result.error as QueryErrorObject;
           if (err.message) {
             message = err.message;
           } else if (err.code) {
