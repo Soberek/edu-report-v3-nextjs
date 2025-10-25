@@ -45,7 +45,7 @@ const TestWrapper = ({ children, defaultValues }: { children: React.ReactNode; d
     },
   });
 
-  return <form>{React.cloneElement(children as React.ReactElement, { control: form.control })}</form>;
+  return <form>{children}</form>;
 };
 
 describe("FormField", () => {

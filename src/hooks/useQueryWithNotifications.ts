@@ -5,31 +5,29 @@ import { useGlobalNotification } from "@/providers/NotificationProvider";
 /**
  * Enhanced useQuery hook that automatically shows error notifications
  * Wraps the standard useQuery with global error handling
+ * Note: TanStack Query v5+ doesn't support onError in UseQueryOptions
+ * We use useEffect to handle errors instead
  */
 export function useQueryWithNotifications<TData = unknown, TError = unknown, TQueryKey extends readonly unknown[] = readonly unknown[]>(
   options: UseQueryOptions<TData, TError, TData, TQueryKey>,
   context?: string
 ): UseQueryResult<TData, TError> {
   const { showError } = useGlobalNotification();
-  const queryClient = useQueryClient();
 
-  const query = useQuery({
-    ...options,
-    onError: (error: TError) => {
-      // Call original onError if provided
-      options.onError?.(error);
+  const query = useQuery(options);
 
-      // Show global error notification
-      console.error(`Query error${context ? ` (${context})` : ""}:`, error);
+  // Handle errors using useEffect since onError is not supported in v5
+  useEffect(() => {
+    if (query.error) {
+      console.error(`Query error${context ? ` (${context})` : ""}:`, query.error);
 
       let message = "Wystąpił błąd podczas ładowania danych";
 
-      if (error && typeof error === "object") {
-        const err = error as any;
+      if (query.error && typeof query.error === "object") {
+        const err = query.error as any;
         if (err.message) {
           message = err.message;
         } else if (err.code) {
-          // Handle Firebase error codes
           switch (err.code) {
             case "permission-denied":
               message = "Brak uprawnień do wyświetlenia tych danych";
@@ -47,55 +45,41 @@ export function useQueryWithNotifications<TData = unknown, TError = unknown, TQu
               message = `Błąd systemu: ${err.code}`;
           }
         }
-      } else if (typeof error === "string") {
-        message = error;
+      } else if (typeof query.error === "string") {
+        message = query.error;
       }
 
       const fullMessage = context ? `${context}: ${message}` : message;
       showError(fullMessage);
-    },
-  });
-
-  // Show loading notification for long-running queries (optional)
-  useEffect(() => {
-    if (query.isLoading && query.fetchStatus === "fetching") {
-      // Could show a loading notification here if needed
-      // For now, just log for debugging
-      console.debug(`Loading ${context || "data"}...`);
     }
-  }, [query.isLoading, query.fetchStatus, context]);
+  }, [query.error, context, showError]);
 
   return query;
 }
 
 /**
  * Enhanced useQueries hook that automatically shows error notifications
- * Wraps the standard useQueries with global error handling
  */
 export function useQueriesWithNotifications<T extends readonly unknown[]>(
   queries: readonly [...{ [K in keyof T]: UseQueryOptions<T[K], unknown, T[K], readonly unknown[]> }],
   context?: string
 ) {
   const { showError } = useGlobalNotification();
+  const results = queries.map((queryOptions) => useQuery(queryOptions));
 
-  const results = queries.map((query, index) =>
-    useQuery({
-      ...query,
-      onError: (error: unknown) => {
-        // Call original onError if provided
-        query.onError?.(error);
-
-        // Show global error notification
-        console.error(`Query ${index} error${context ? ` (${context})` : ""}:`, error);
+  // Handle errors in all queries
+  useEffect(() => {
+    results.forEach((result, index) => {
+      if (result.error) {
+        console.error(`Query ${index} error${context ? ` (${context})` : ""}:`, result.error);
 
         let message = "Wystąpił błąd podczas ładowania danych";
 
-        if (error && typeof error === "object") {
-          const err = error as any;
+        if (result.error && typeof result.error === "object") {
+          const err = result.error as any;
           if (err.message) {
             message = err.message;
           } else if (err.code) {
-            // Handle common error codes
             switch (err.code) {
               case "permission-denied":
                 message = "Brak uprawnień do wyświetlenia tych danych";
@@ -114,9 +98,9 @@ export function useQueriesWithNotifications<T extends readonly unknown[]>(
 
         const fullMessage = context ? `${context}: ${message}` : message;
         showError(fullMessage);
-      },
-    })
-  );
+      }
+    });
+  }, [results, context, showError]);
 
-  return results;
+  return results as UseQueryResult<T[number]>[];
 }

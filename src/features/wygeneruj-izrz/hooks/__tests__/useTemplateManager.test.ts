@@ -364,9 +364,8 @@ describe("useTemplateManager", () => {
     it("should accept file at exact size limit", () => {
       const { result } = renderHook(() => useTemplateManager({ onTemplateSelect: mockOnTemplateSelect }));
 
-      const exactSizeFile = new File(["content"], "exact.docx", {
+      const exactSizeFile = new File(["x".repeat(10 * 1024 * 1024)], "exact.docx", {
         type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        size: 10 * 1024 * 1024, // Exactly 10MB
       });
 
       act(() => {

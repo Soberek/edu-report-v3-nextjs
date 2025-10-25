@@ -33,7 +33,13 @@ describe("useAuthRedirect", () => {
   });
 
   it("should return shouldRedirect false when user is not authenticated", () => {
-    mockUseUser.mockReturnValue({ user: null, loading: false });
+    mockUseUser.mockReturnValue({
+      user: null,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false),
+    });
 
     const { result } = renderHook(() => useAuthRedirect());
 
@@ -44,7 +50,13 @@ describe("useAuthRedirect", () => {
 
   it("should return shouldRedirect true when user is authenticated", () => {
     const mockUser = { uid: "123", email: "test@example.com" } as User;
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false),
+    });
 
     const { result } = renderHook(() => useAuthRedirect());
 
@@ -55,7 +67,13 @@ describe("useAuthRedirect", () => {
   it("should use custom redirect path when provided", () => {
     const mockUser = { uid: "123", email: "test@example.com" } as User;
     const customRedirect = "/custom-path";
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false),
+    });
 
     const { result } = renderHook(() => useAuthRedirect(customRedirect));
 
@@ -66,7 +84,13 @@ describe("useAuthRedirect", () => {
   it("should use custom default redirect when provided", () => {
     const mockUser = { uid: "123", email: "test@example.com" } as User;
     const customDefault = "/custom-default";
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false),
+    });
 
     const { result } = renderHook(() => useAuthRedirect(undefined, customDefault));
 
@@ -78,7 +102,13 @@ describe("useAuthRedirect", () => {
     const mockUser = { uid: "123", email: "test@example.com" } as User;
     const customRedirect = "/custom-path";
     const customDefault = "/custom-default";
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
 
     const { result } = renderHook(() => useAuthRedirect(customRedirect, customDefault));
 
@@ -88,7 +118,13 @@ describe("useAuthRedirect", () => {
 
   it("should handle user with undefined uid", () => {
     const mockUser = { uid: undefined, email: "test@example.com" } as unknown as User;
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
 
     const { result } = renderHook(() => useAuthRedirect());
 
@@ -98,7 +134,13 @@ describe("useAuthRedirect", () => {
 
   it("should handle user with empty string uid", () => {
     const mockUser = { uid: "", email: "test@example.com" } as User;
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
 
     const { result } = renderHook(() => useAuthRedirect());
 
@@ -108,7 +150,13 @@ describe("useAuthRedirect", () => {
 
   it("should handle user object without uid property", () => {
     const mockUser = { email: "test@example.com" } as User;
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
 
     const { result } = renderHook(() => useAuthRedirect());
 
@@ -120,11 +168,23 @@ describe("useAuthRedirect", () => {
     const mockUser = { uid: "123", email: "test@example.com" } as User;
 
     // Start with no user
-    mockUseUser.mockReturnValue({ user: null, loading: false });
+    mockUseUser.mockReturnValue({
+      user: null,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
     const { rerender } = renderHook(() => useAuthRedirect());
 
     // User becomes authenticated
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
     rerender();
 
     expect(mockRouter.push).toHaveBeenCalledWith(SHARED_AUTH_CONSTANTS.ROUTES.HOME);
@@ -135,18 +195,36 @@ describe("useAuthRedirect", () => {
     const customRedirect = "/dashboard";
 
     // Start with no user
-    mockUseUser.mockReturnValue({ user: null, loading: false });
+    mockUseUser.mockReturnValue({
+      user: null,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
     const { rerender } = renderHook(() => useAuthRedirect(customRedirect));
 
     // User becomes authenticated
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
     rerender();
 
     expect(mockRouter.push).toHaveBeenCalledWith(customRedirect);
   });
 
   it("should not call router.push when user is not authenticated", () => {
-    mockUseUser.mockReturnValue({ user: null, loading: false });
+    mockUseUser.mockReturnValue({
+      user: null,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
 
     renderHook(() => useAuthRedirect());
 
@@ -155,7 +233,13 @@ describe("useAuthRedirect", () => {
 
   it("should maintain stable return values", () => {
     const mockUser = { uid: "123", email: "test@example.com" } as User;
-    mockUseUser.mockReturnValue({ user: mockUser, loading: false });
+    mockUseUser.mockReturnValue({
+      user: mockUser,
+      userData: null,
+      loading: false,
+      isAdmin: false,
+      hasRole: vi.fn(() => false)
+    });
 
     const { result, rerender } = renderHook(() => useAuthRedirect());
 

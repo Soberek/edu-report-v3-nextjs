@@ -50,17 +50,14 @@ describe("wygeneruj-izrz utils", () => {
     beforeEach(() => {
       validFile = new File(["content"], "test.docx", {
         type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        size: 1024,
       });
 
       invalidTypeFile = new File(["content"], "test.txt", {
         type: "text/plain",
-        size: 1024,
       });
 
-      tooLargeFile = new File(["content"], "large.docx", {
+      tooLargeFile = new File(["x".repeat(11 * 1024 * 1024)], "large.docx", {
         type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        size: 11 * 1024 * 1024, // 11MB
       });
     });
 
@@ -83,9 +80,8 @@ describe("wygeneruj-izrz utils", () => {
     });
 
     it("should accept files at the size limit", () => {
-      const exactSizeFile = new File(["content"], "exact.docx", {
+      const exactSizeFile = new File(["x".repeat(10 * 1024 * 1024)], "exact.docx", {
         type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        size: 10 * 1024 * 1024, // Exactly 10MB
       });
 
       expect(isValidTemplateFile(exactSizeFile)).toBe(true);
@@ -94,7 +90,6 @@ describe("wygeneruj-izrz utils", () => {
     it("should accept .doc files", () => {
       const docFile = new File(["content"], "test.doc", {
         type: "application/msword",
-        size: 1024,
       });
 
       expect(isValidTemplateFile(docFile)).toBe(true);
