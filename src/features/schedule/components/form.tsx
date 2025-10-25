@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use } from "react";
 import {
   Box,
   Button,
@@ -14,10 +14,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  Alert,
-  Snackbar,
 } from "@mui/material";
-import { Assignment, School, CalendarToday, Description, Save, Edit, Cancel, Close, CheckCircle } from "@mui/icons-material";
+import { Assignment, School, CalendarToday, Description, Save, Edit, Cancel, Close } from "@mui/icons-material";
 import { Controller } from "react-hook-form";
 import { TASK_TYPES } from "@/constants/tasks";
 import { programs } from "@/constants/programs";
@@ -27,14 +25,14 @@ import dayjs from "dayjs";
 import { useTaskForm } from "../hooks/useTaskForm";
 import type { TaskFormProps } from "../types";
 import type { CreateTaskFormData, EditTaskFormData } from "../schemas/taskSchemas";
+import { useGlobalNotification } from "@/providers/NotificationProvider";
 
 interface Props extends TaskFormProps {
   createTask?: (itemData: CreateTaskFormData) => Promise<void>;
 }
 
 export default function TaskForm({ mode, task, onClose, onSave, userId, createTask, loading = false }: Props): React.ReactElement {
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
+  const { showSuccess, showError } = useGlobalNotification();
 
   const { control, handleSubmit, formState, isFormValid } = useTaskForm({
     mode,
@@ -45,14 +43,13 @@ export default function TaskForm({ mode, task, onClose, onSave, userId, createTa
       if (mode === "edit" && task) {
         console.log("Editing existing task:", task.id);
         await onSave(task.id, data as Partial<EditTaskFormData>);
-        setSuccessMessage("Zadanie zostało zaktualizowane!");
+        showSuccess("Zadanie zostało zaktualizowane!");
       } else if (mode === "create" && createTask) {
         console.log("Creating new task with data:", data);
         await createTask(data as CreateTaskFormData);
-        setSuccessMessage("Zadanie zostało dodane! Możesz dodać kolejne.");
+        showSuccess("Zadanie zostało dodane! Możesz dodać kolejne.");
       }
-      setShowSuccess(true);
-      console.log("Form submission complete, showing success message");
+      console.log("Form submission complete");
     },
   });
 
@@ -381,29 +378,5 @@ export default function TaskForm({ mode, task, onClose, onSave, userId, createTa
     );
   }
 
-  return (
-    <>
-      {formContent}
-
-      {/* Success Snackbar */}
-      <Snackbar
-        open={showSuccess}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccess(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setShowSuccess(false)}
-          severity="success"
-          icon={<CheckCircle />}
-          sx={{
-            borderRadius: 2,
-            boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
-          }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar>
-    </>
-  );
+  return formContent;
 }
