@@ -31,6 +31,7 @@ export { GenericDialog, ConfirmDialog as GenericConfirmDialog, FormDialog } from
 export { SkeletonCard, StatsSkeleton, ContentSkeleton, ListSkeleton, GridSkeleton } from "./SkeletonCard";
 export { ContentCard, StatsCard as ContentStatsCard, ContactCard, TaskCard } from "./ContentCard";
 export { TableWrapper, CaseRecordsTable, ProgramTable, SchoolTable } from "./TableWrapper";
+export { GlobalErrorBoundary, useErrorBoundary } from "./GlobalErrorBoundary";
 
 // Re-export types
 export type { DataTableAction, DataTableProps } from "./DataTable";
