@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { FormField } from "../FormField";
-import { useForm, Control } from "react-hook-form";
+import { useForm, Control, FormProvider } from "react-hook-form";
 import type { IzrzFormData } from "../../schemas/izrzSchemas";
 import type { SelectOption } from "../../types";
 
@@ -26,7 +26,7 @@ vi.mock("../../constants", () => ({
 }));
 
 // Test wrapper component that provides form context
-const TestWrapper = ({ children, defaultValues }: { children: React.ReactNode; defaultValues?: Partial<IzrzFormData> }) => {
+const TestWrapper = ({ children, defaultValues }: { children: (control: Control<IzrzFormData>) => React.ReactNode; defaultValues?: Partial<IzrzFormData> }) => {
   const form = useForm<IzrzFormData>({
     defaultValues: {
       caseNumber: "",
@@ -45,7 +45,11 @@ const TestWrapper = ({ children, defaultValues }: { children: React.ReactNode; d
     },
   });
 
-  return <form>{children}</form>;
+  return (
+    <FormProvider {...form}>
+      <form>{children(form.control)}</form>
+    </FormProvider>
+  );
 };
 
 describe("FormField", () => {
@@ -53,13 +57,15 @@ describe("FormField", () => {
     it("should render text field correctly", () => {
       render(
         <TestWrapper>
-          <FormField
+          {(control) => (
+            <FormField
             name="caseNumber"
             type="text"
             label="Numer sprawy"
             placeholder="Wprowadź numer sprawy"
-            control={{} as Control<IzrzFormData>}
+            control={control}
           />
+          )}
         </TestWrapper>
       );
 
@@ -70,7 +76,9 @@ describe("FormField", () => {
     it("should handle text input changes", async () => {
       render(
         <TestWrapper>
-          <FormField name="caseNumber" type="text" label="Numer sprawy" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="caseNumber" type="text" label="Numer sprawy" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -83,11 +91,13 @@ describe("FormField", () => {
     });
 
     it("should show error message when error is provided", () => {
-      const error = { type: "manual", message: "Numer sprawy jest wymagany" };
+      const error = { type: "manual" as const, message: "Numer sprawy jest wymagany" };
 
       render(
         <TestWrapper>
-          <FormField name="caseNumber" type="text" label="Numer sprawy" control={{} as Control<IzrzFormData>} error={error} />
+          {(control) => (
+            <FormField name="caseNumber" type="text" label="Numer sprawy" control={control} error={error} />
+          )}
         </TestWrapper>
       );
 
@@ -97,7 +107,9 @@ describe("FormField", () => {
     it("should show required indicator when required", () => {
       render(
         <TestWrapper>
-          <FormField name="caseNumber" type="text" label="Numer sprawy" control={{} as Control<IzrzFormData>} required />
+          {(control) => (
+            <FormField name="caseNumber" type="text" label="Numer sprawy" control={control} required />
+          )}
         </TestWrapper>
       );
 
@@ -108,7 +120,9 @@ describe("FormField", () => {
     it("should be disabled when disabled prop is true", () => {
       render(
         <TestWrapper>
-          <FormField name="caseNumber" type="text" label="Numer sprawy" control={{} as Control<IzrzFormData>} disabled />
+          {(control) => (
+            <FormField name="caseNumber" type="text" label="Numer sprawy" control={control} disabled />
+          )}
         </TestWrapper>
       );
 
@@ -121,7 +135,9 @@ describe("FormField", () => {
     it("should render number field correctly", () => {
       render(
         <TestWrapper>
-          <FormField name="viewerCount" type="number" label="Liczba widzów" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="viewerCount" type="number" label="Liczba widzów" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -132,7 +148,9 @@ describe("FormField", () => {
     it("should handle number input changes", async () => {
       render(
         <TestWrapper>
-          <FormField name="viewerCount" type="number" label="Liczba widzów" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="viewerCount" type="number" label="Liczba widzów" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -147,7 +165,9 @@ describe("FormField", () => {
     it("should handle empty number input", async () => {
       render(
         <TestWrapper>
-          <FormField name="viewerCount" type="number" label="Liczba widzów" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="viewerCount" type="number" label="Liczba widzów" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -164,7 +184,9 @@ describe("FormField", () => {
     it("should render date field correctly", () => {
       render(
         <TestWrapper>
-          <FormField name="dateInput" type="date" label="Data" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="dateInput" type="date" label="Data" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -175,7 +197,9 @@ describe("FormField", () => {
     it("should handle date input changes", async () => {
       render(
         <TestWrapper>
-          <FormField name="dateInput" type="date" label="Data" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="dateInput" type="date" label="Data" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -192,7 +216,9 @@ describe("FormField", () => {
     it("should render textarea field correctly", () => {
       render(
         <TestWrapper>
-          <FormField name="taskDescription" type="textarea" label="Opis zadania" multiline control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="taskDescription" type="textarea" label="Opis zadania" multiline control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -202,7 +228,9 @@ describe("FormField", () => {
     it("should handle textarea input changes", async () => {
       render(
         <TestWrapper>
-          <FormField name="taskDescription" type="textarea" label="Opis zadania" multiline control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="taskDescription" type="textarea" label="Opis zadania" multiline control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -217,15 +245,17 @@ describe("FormField", () => {
     it("should use custom minRows and maxRows", () => {
       render(
         <TestWrapper>
-          <FormField
+          {(control) => (
+            <FormField
             name="taskDescription"
             type="textarea"
             label="Opis zadania"
             multiline
             minRows={5}
             maxRows={10}
-            control={{} as Control<IzrzFormData>}
+            control={control}
           />
+          )}
         </TestWrapper>
       );
 
@@ -245,7 +275,9 @@ describe("FormField", () => {
     it("should render select field correctly", () => {
       render(
         <TestWrapper>
-          <FormField name="taskType" type="select" label="Typ zadania" options={mockOptions} control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="taskType" type="select" label="Typ zadania" options={mockOptions} control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -255,7 +287,9 @@ describe("FormField", () => {
     it("should handle select field changes", async () => {
       render(
         <TestWrapper>
-          <FormField name="taskType" type="select" label="Typ zadania" options={mockOptions} control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="taskType" type="select" label="Typ zadania" options={mockOptions} control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -281,18 +315,20 @@ describe("FormField", () => {
     });
 
     it("should show error message for select field", () => {
-      const error = { type: "manual", message: "Typ zadania jest wymagany" };
+      const error = { type: "manual" as const, message: "Typ zadania jest wymagany" };
 
       render(
         <TestWrapper>
-          <FormField
+          {(control) => (
+            <FormField
             name="taskType"
             type="select"
             label="Typ zadania"
             options={mockOptions}
-            control={{} as Control<IzrzFormData>}
+            control={control}
             error={error}
           />
+          )}
         </TestWrapper>
       );
 
@@ -302,14 +338,16 @@ describe("FormField", () => {
     it("should be disabled when disabled prop is true", () => {
       render(
         <TestWrapper>
-          <FormField
+          {(control) => (
+            <FormField
             name="taskType"
             type="select"
             label="Typ zadania"
             options={mockOptions}
-            control={{} as Control<IzrzFormData>}
+            control={control}
             disabled
           />
+          )}
         </TestWrapper>
       );
 
@@ -322,7 +360,9 @@ describe("FormField", () => {
     it("should render checkbox field correctly", () => {
       render(
         <TestWrapper>
-          <FormField name="attendanceList" type="checkbox" label="Lista obecności" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="attendanceList" type="checkbox" label="Lista obecności" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -333,7 +373,9 @@ describe("FormField", () => {
     it("should handle checkbox changes", async () => {
       render(
         <TestWrapper>
-          <FormField name="attendanceList" type="checkbox" label="Lista obecności" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="attendanceList" type="checkbox" label="Lista obecności" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -348,7 +390,9 @@ describe("FormField", () => {
     it("should be disabled when disabled prop is true", () => {
       render(
         <TestWrapper>
-          <FormField name="attendanceList" type="checkbox" label="Lista obecności" control={{} as Control<IzrzFormData>} disabled />
+          {(control) => (
+            <FormField name="attendanceList" type="checkbox" label="Lista obecności" control={control} disabled />
+          )}
         </TestWrapper>
       );
 
@@ -359,11 +403,13 @@ describe("FormField", () => {
 
   describe("error handling", () => {
     it("should display error message when error is provided", () => {
-      const error = { type: "manual", message: "To pole jest wymagane" };
+      const error = { type: "manual" as const, message: "To pole jest wymagane" };
 
       render(
         <TestWrapper>
-          <FormField name="caseNumber" type="text" label="Numer sprawy" control={{} as Control<IzrzFormData>} error={error} />
+          {(control) => (
+            <FormField name="caseNumber" type="text" label="Numer sprawy" control={control} error={error} />
+          )}
         </TestWrapper>
       );
 
@@ -373,7 +419,9 @@ describe("FormField", () => {
     it("should not display error message when error is not provided", () => {
       render(
         <TestWrapper>
-          <FormField name="caseNumber" type="text" label="Numer sprawy" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="caseNumber" type="text" label="Numer sprawy" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -385,7 +433,9 @@ describe("FormField", () => {
     it("should have proper label association", () => {
       render(
         <TestWrapper>
-          <FormField name="caseNumber" type="text" label="Numer sprawy" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="caseNumber" type="text" label="Numer sprawy" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -396,7 +446,9 @@ describe("FormField", () => {
     it("should have proper required attribute", () => {
       render(
         <TestWrapper>
-          <FormField name="caseNumber" type="text" label="Numer sprawy" control={{} as Control<IzrzFormData>} required />
+          {(control) => (
+            <FormField name="caseNumber" type="text" label="Numer sprawy" control={control} required />
+          )}
         </TestWrapper>
       );
 
@@ -409,7 +461,9 @@ describe("FormField", () => {
     it("should render correct field type for text", () => {
       render(
         <TestWrapper>
-          <FormField name="caseNumber" type="text" label="Numer sprawy" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="caseNumber" type="text" label="Numer sprawy" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -419,7 +473,9 @@ describe("FormField", () => {
     it("should render correct field type for number", () => {
       render(
         <TestWrapper>
-          <FormField name="viewerCount" type="number" label="Liczba widzów" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="viewerCount" type="number" label="Liczba widzów" control={control} />
+          )}
         </TestWrapper>
       );
 
@@ -429,7 +485,9 @@ describe("FormField", () => {
     it("should render correct field type for date", () => {
       render(
         <TestWrapper>
-          <FormField name="dateInput" type="date" label="Data" control={{} as Control<IzrzFormData>} />
+          {(control) => (
+            <FormField name="dateInput" type="date" label="Data" control={control} />
+          )}
         </TestWrapper>
       );
 
