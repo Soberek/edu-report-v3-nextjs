@@ -12,6 +12,8 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import type { ScheduledTaskType } from "@/models/ScheduledTaskSchema";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { useGlobalNotification } from "@/providers/NotificationProvider";
+import { logError, createErrorContext } from "@/utils";
 
 type Props = {
   task: ScheduledTaskType;
@@ -32,6 +34,7 @@ export const TaskItem: React.FC<Props> = ({
 }) => {
   const [openStatusChange, setOpenStatusChange] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const { showError } = useGlobalNotification();
   const isCompleted = task.status === "completed";
 
   const getTaskTypeEmoji = (taskType: TaskType["label"] | undefined) => {
@@ -60,7 +63,14 @@ export const TaskItem: React.FC<Props> = ({
       if (!date) return;
       const today = dayjs(date);
       if (!today.isValid()) {
-        alert("Nieprawidłowa data. Użyj formatu YYYY-MM-DD.");
+        const dateError = new Error("Nieprawidłowa data. Użyj formatu YYYY-MM-DD.");
+        logError(dateError, createErrorContext(
+          "TaskItem",
+          "handleToggleStatus",
+          { taskId: task.id, invalidDate: date },
+          task.userId
+        ));
+        showError("Nieprawidłowa data wykonania zadania");
         return;
       }
       updateTask(task.id, {
