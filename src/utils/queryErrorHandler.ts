@@ -1,5 +1,10 @@
 import { useGlobalNotification } from "@/providers/NotificationProvider";
 
+interface QueryError {
+  message?: string;
+  code?: string;
+}
+
 /**
  * Utility hook for handling query errors with global notifications
  * Shows toast notifications for query failures
@@ -7,17 +12,19 @@ import { useGlobalNotification } from "@/providers/NotificationProvider";
 export const useQueryErrorHandler = () => {
   const { showError } = useGlobalNotification();
 
-  const handleQueryError = (error: any, context?: string) => {
+  const handleQueryError = (error: unknown, context?: string) => {
     console.error(`Query error${context ? ` (${context})` : ""}:`, error);
 
     // Extract meaningful error message
     let message = "Wystąpił błąd podczas ładowania danych";
 
-    if (error?.message) {
-      message = error.message;
-    } else if (error?.code) {
+    const queryError = error as QueryError;
+
+    if (queryError?.message) {
+      message = queryError.message;
+    } else if (queryError?.code) {
       // Firebase error codes
-      switch (error.code) {
+      switch (queryError.code) {
         case "permission-denied":
           message = "Brak uprawnień do wyświetlenia tych danych";
           break;
@@ -28,7 +35,7 @@ export const useQueryErrorHandler = () => {
           message = "Nie znaleziono żądanych danych";
           break;
         default:
-          message = `Błąd systemu: ${error.code}`;
+          message = `Błąd systemu: ${queryError.code}`;
       }
     } else if (typeof error === "string") {
       message = error;
@@ -46,7 +53,7 @@ export const useQueryErrorHandler = () => {
  * Can be used with useQuery to automatically handle errors
  */
 export const createQueryOptions = (context?: string) => ({
-  onError: (error: any) => {
+  onError: (error: unknown) => {
     // This will be handled by the global error handler when we implement it
     console.error(`Query failed${context ? ` (${context})` : ""}:`, error);
   },
@@ -56,11 +63,12 @@ export const createQueryOptions = (context?: string) => ({
  * Utility function to create mutation options with error handling
  */
 export const createMutationOptions = (context?: string) => ({
-  onError: (error: any) => {
+  onError: (error: unknown) => {
     console.error(`Mutation failed${context ? ` (${context})` : ""}:`, error);
     // Mutations are already handled globally in QueryClientProvider
   },
-  onSuccess: (data: any) => {
+  onSuccess: (data: unknown) => {
     console.log(`Mutation succeeded${context ? ` (${context})` : ""}:`, data);
   },
 });
+
