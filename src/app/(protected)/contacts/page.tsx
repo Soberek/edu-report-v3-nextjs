@@ -97,6 +97,7 @@ export default function ContactsPage(): React.ReactNode {
       <Box sx={{ mt: 4, mb: 4 }}>
         <ContactSearch
           contacts={contacts}
+          onEdit={setEditingContact}
           onDelete={handleDeleteContact}
         />
       </Box>

@@ -61,11 +61,13 @@ export function useUpdateContact(userId?: string) {
       return await contactsService.updateDocument(id, data);
     },
     onMutate: async ({ id, data }) => {
-      // Cancel outgoing queries
+      // Cancel outgoing queries to prevent race conditions
       await queryClient.cancelQueries({ queryKey: contactKeys.detail(id) });
+      await queryClient.cancelQueries({ queryKey: contactKeys.list(userId) });
 
-      // Get previous data
+      // Get previous data for rollback
       const previousContact = queryClient.getQueryData<Contact>(contactKeys.detail(id));
+      const previousList = queryClient.getQueryData<Contact[]>(contactKeys.list(userId));
 
       // Optimistic update
       const updatedContact: Contact = {
@@ -82,17 +84,28 @@ export function useUpdateContact(userId?: string) {
             : undefined
       );
 
-      return { previousContact };
+      return { previousContact, previousList };
     },
-    onSuccess: () => {
+    onSuccess: (_, { id, data }) => {
+      // No refetch needed - optimistic update already applied
+      // Just update with latest timestamp if server returned it
+      const optimisticContact = queryClient.getQueryData<Contact>(contactKeys.detail(id));
+      if (optimisticContact) {
+        queryClient.setQueryData(contactKeys.detail(id), {
+          ...optimisticContact,
+          updatedAt: new Date().toISOString(),
+        });
+      }
       showSuccess('Kontakt zaktualizowany pomyślnie');
-      queryClient.invalidateQueries({ queryKey: contactKeys.list(userId) });
     },
     onError: (error, _, context) => {
-      // Rollback optimistic update
+      // Rollback optimistic update on error
       if (context?.previousContact) {
         const prevContact = context.previousContact as Contact;
         queryClient.setQueryData(contactKeys.detail(prevContact.id), prevContact);
+      }
+      if (context?.previousList) {
+        queryClient.setQueryData(contactKeys.list(userId), context.previousList);
       }
       const message = error instanceof Error ? error.message : 'Nie udało się zaktualizować kontaktu';
       showError(`Błąd: ${message}`);
@@ -102,7 +115,7 @@ export function useUpdateContact(userId?: string) {
 
 /**
  * Delete contact
- * Uses optimistic update for better UX
+ * Uses optimistic update for better UX - no refetch needed
  */
 export function useDeleteContact(userId?: string) {
   const queryClient = useQueryClient();
@@ -113,13 +126,13 @@ export function useDeleteContact(userId?: string) {
       return await contactsService.deleteDocument(id);
     },
     onMutate: async (id) => {
-      // Cancel outgoing queries
+      // Cancel outgoing queries to prevent race conditions
       await queryClient.cancelQueries({ queryKey: contactKeys.list(userId) });
 
-      // Get previous data
+      // Get previous data for rollback
       const previousContacts = queryClient.getQueryData<Contact[]>(contactKeys.list(userId));
 
-      // Optimistic update
+      // Optimistic update - remove from list immediately
       queryClient.setQueryData(
         contactKeys.list(userId),
         (old: Contact[] | undefined) =>
@@ -129,11 +142,11 @@ export function useDeleteContact(userId?: string) {
       return { previousContacts };
     },
     onSuccess: () => {
+      // No refetch needed - optimistic update already applied
       showSuccess('Kontakt usunięty pomyślnie');
-      queryClient.invalidateQueries({ queryKey: contactKeys.list(userId) });
     },
     onError: (error, _, context) => {
-      // Rollback optimistic update
+      // Rollback optimistic update on error
       if (context?.previousContacts) {
         queryClient.setQueryData(contactKeys.list(userId), context.previousContacts);
       }
