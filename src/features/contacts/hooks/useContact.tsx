@@ -97,6 +97,9 @@ export const useContacts = (): UseContactsReturn => {
         const success = await updateItem(id, validatedData);
 
         if (success) {
+          // Update local state with the updated contact
+          const updatedContact = { ...contactData, id } as Contact;
+          dispatch({ type: "UPDATE_CONTACT", payload: updatedContact });
           showSuccess("Kontakt zaktualizowany pomyślnie");
         } else {
           showError("Nie udało się zaktualizować kontaktu");
