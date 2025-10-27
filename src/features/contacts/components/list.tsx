@@ -4,7 +4,6 @@ import { Edit, Delete, Person } from "@mui/icons-material";
 import type { GridColDef } from "@mui/x-data-grid";
 import { TableWrapper, DataTable, defaultActions, type DataTableAction } from "@/components/shared";
 import { Contact, ContactFormData } from "../types";
-import EditDialog from "./edit-dialog";
 import ContactAvatar from "./contact-avatar";
 
 interface ContactListProps {
@@ -13,7 +12,6 @@ interface ContactListProps {
   error: string | null;
   onEdit: (contact: Contact) => void;
   onDelete: (id: string) => Promise<void>;
-  onUpdate: (id: string, data: ContactFormData) => Promise<boolean>;
 }
 
 /**
@@ -26,27 +24,9 @@ export default function ContactList({
   error,
   onEdit,
   onDelete,
-  onUpdate,
 }: ContactListProps) {
-  const [editingContact, setEditingContact] = useState<Contact | null>(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-
   const handleEditContact = (contact: Contact) => {
-    setEditingContact(contact);
-    setEditDialogOpen(true);
-  };
-
-  const handleSaveContact = async (id: string, data: ContactFormData) => {
-    const success = await onUpdate(id, data);
-    if (success) {
-      setEditDialogOpen(false);
-      setEditingContact(null);
-    }
-  };
-
-  const handleCloseEditDialog = () => {
-    setEditDialogOpen(false);
-    setEditingContact(null);
+    onEdit(contact);
   };
 
   // Table columns configuration for DataTable
@@ -173,14 +153,6 @@ export default function ContactList({
           getRowId={(row) => row.id}
         />
       )}
-
-      {/* Edit Dialog */}
-      <EditDialog
-        open={editDialogOpen}
-        contact={editingContact}
-        onClose={handleCloseEditDialog}
-        onSave={handleSaveContact}
-      />
     </Box>
   );
 }

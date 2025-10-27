@@ -122,13 +122,13 @@ export const IndicatorsView: React.FC<IndicatorsViewProps> = ({ rawData, selecte
                           <TableCell sx={{ pl: 2, fontWeight: 600, color: "text.primary", fontSize: "0.8rem", py: 0.75 }}>
                             {formatGroupedName(programName)}
                           </TableCell>
-                          <TableCell colSpan={3} />
+                          <TableCell colSpan={4} />
                         </TableRow>
 
                         {/* Action Rows */}
                         {Object.entries(actions).map(([actionName, actionData]) => (
                           <TableRow key={actionName} sx={{ "&:hover": { backgroundColor: theme.palette.grey[50] } }}>
-                            <TableCell sx={{ pl: 4, fontSize: "0.75rem", py: 0.5 }} />
+                            <TableCell colSpan={2} sx={{ pl: 4, fontSize: "0.75rem", py: 0.5 }} />
                             <TableCell sx={{ fontSize: "0.75rem", py: 0.5, color: "text.secondary" }}>
                               {actionName}
                             </TableCell>

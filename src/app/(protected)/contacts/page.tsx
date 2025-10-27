@@ -8,16 +8,18 @@ import {
   ContactFormDialog,
   ContactStats,
   ContactSearch,
+  ContactEditDialog,
 } from "@/features/contacts";
 import { NotificationSnackbar } from "@/components/shared";
 import { useNotification } from "@/hooks";
-import type { ContactFormData } from "@/features/contacts";
+import type { ContactFormData, Contact } from "@/features/contacts";
 
 export default function ContactsPage(): React.ReactNode {
   const { data: contacts, loading, error, createContact, updateContact, deleteContact } =
     useContacts();
   const { notification, close: closeNotification } = useNotification();
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
 
   const handleCreateContact = async (data: ContactFormData) => {
     try {
@@ -95,6 +97,7 @@ export default function ContactsPage(): React.ReactNode {
       <Box sx={{ mt: 4, mb: 4 }}>
         <ContactSearch
           contacts={contacts}
+          onEdit={setEditingContact}
           onDelete={handleDeleteContact}
         />
       </Box>
@@ -105,9 +108,8 @@ export default function ContactsPage(): React.ReactNode {
           contacts={contacts}
           loading={loading}
           error={error}
-          onEdit={() => {}}
+          onEdit={setEditingContact}
           onDelete={handleDeleteContact}
-          onUpdate={handleUpdateContact}
         />
       </Box>
 
@@ -117,6 +119,14 @@ export default function ContactsPage(): React.ReactNode {
         onClose={() => setShowAddDialog(false)}
         onSave={handleCreateContact}
         loading={loading}
+      />
+
+      {/* Edit Contact Dialog */}
+      <ContactEditDialog
+        open={editingContact !== null}
+        contact={editingContact}
+        onClose={() => setEditingContact(null)}
+        onSave={handleUpdateContact}
       />
 
       {/* Notification Snackbar */}

@@ -74,7 +74,7 @@ export type ContactsAction =
 // Public API types returned from useContacts hook
 
 export interface UseContactsReturn extends ContactsState {
-  refetch: () => Promise<void>;
+  refetch: () => Promise<unknown>;
   createContact: (data: ContactCreateDTO) => Promise<Contact | null>;
   updateContact: (id: string, data: ContactCreateDTO) => Promise<boolean>;
   deleteContact: (id: string) => Promise<boolean>;

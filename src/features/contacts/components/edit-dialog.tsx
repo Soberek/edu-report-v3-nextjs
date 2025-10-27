@@ -10,7 +10,7 @@ interface EditDialogProps {
   open: boolean;
   contact: Contact | null;
   onClose: () => void;
-  onSave: (id: string, data: ContactFormData) => Promise<void>;
+  onSave: (id: string, data: ContactFormData) => Promise<boolean>;
 }
 
 /**
@@ -53,8 +53,10 @@ export default function EditDialog({
   const onSubmit = async (data: ContactFormData) => {
     if (!contact) return;
     try {
-      await onSave(contact.id, data);
-      handleClose();
+      const success = await onSave(contact.id, data);
+      if (success) {
+        handleClose();
+      }
     } catch (error) {
       console.error("Error saving contact:", error);
     }
