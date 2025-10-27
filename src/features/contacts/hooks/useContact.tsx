@@ -1,6 +1,5 @@
-import { useCallback, useReducer, useEffect } from "react";
+import { useCallback } from "react";
 import { useUser } from "@/hooks/useUser";
-import { useFirebaseData } from "@/hooks/useFirebaseData";
 import { useNotification } from "@/hooks";
 import {
   Contact,
@@ -8,147 +7,81 @@ import {
   ContactCreateSchema,
   UseContactsReturn,
 } from "../types";
-import { contactsReducer, initialState } from "../reducers";
+import { useContacts as useContactsQuery, useCreateContact, useUpdateContact, useDeleteContact } from "../api";
 
 /**
- * Custom hook for managing contacts
- * Handles CRUD operations, validation, and notifications
+ * Custom hook for managing contacts with TanStack Query
+ * Handles CRUD operations with automatic error notifications via useQueryWithNotifications
  *
  * @example
- * const { contacts, loading, error, createContact, updateContact, deleteContact } = useContacts();
+ * const { data: contacts, isPending, error, createContact, updateContact, deleteContact } = useContacts();
  */
 export const useContacts = (): UseContactsReturn => {
-  const [state, dispatch] = useReducer(contactsReducer, initialState);
   const userContext = useUser();
-  const { showSuccess, showError } = useNotification();
+  const { showError } = useNotification();
   const userId = userContext.user?.uid;
 
-  const {
-    data: firebaseContacts,
-    loading: firebaseLoading,
-    error: firebaseError,
-    createItem,
-    deleteItem,
-    updateItem,
-    refetch,
-  } = useFirebaseData<Contact>("contacts", userId);
+  // Queries
+  const { data, isPending, error, refetch } = useContactsQuery(userId);
 
-  // ========================================================================
-  // Sync Firebase data to local state
-  // ========================================================================
-
-  useEffect(() => {
-    if (!firebaseLoading) {
-      dispatch({ type: "SET_DATA", payload: firebaseContacts });
-    }
-  }, [firebaseContacts, firebaseLoading]);
-
-  useEffect(() => {
-    dispatch({ type: "SET_LOADING", payload: firebaseLoading });
-  }, [firebaseLoading]);
-
-  useEffect(() => {
-    if (firebaseError) {
-      dispatch({ type: "SET_ERROR", payload: firebaseError });
-    }
-  }, [firebaseError]);
-
-  // ========================================================================
-  // Action handlers with validation
-  // ========================================================================
+  // Mutations
+  const createMutation = useCreateContact(userId);
+  const updateMutation = useUpdateContact(userId);
+  const deleteMutation = useDeleteContact(userId);
 
   const createContact = useCallback(
     async (contactData: ContactCreateDTO): Promise<Contact | null> => {
       try {
-        dispatch({ type: "CLEAR_ERROR" });
-
         // Validate data using Zod schema
         const validatedData = ContactCreateSchema.parse(contactData);
-
-        if (!userId) {
-          const errorMsg = "User not authenticated";
-          dispatch({ type: "SET_ERROR", payload: errorMsg });
-          showError("Nie jesteś zalogowany");
-          return null;
-        }
-
-        const newContact = await createItem(validatedData);
-        showSuccess("Kontakt dodany pomyślnie");
-        return newContact;
+        const result = await createMutation.mutateAsync(validatedData);
+        return result;
       } catch (error) {
         const errorMsg =
-          error instanceof Error ? error.message : "Failed to create contact";
-        dispatch({ type: "SET_ERROR", payload: errorMsg });
-        showError("Nie udało się utworzyć kontaktu");
+          error instanceof Error ? error.message : "Nie udało się utworzyć kontaktu";
+        showError(errorMsg);
         return null;
       }
     },
-    [userId, createItem, showSuccess, showError]
+    [createMutation, showError]
   );
 
   const updateContact = useCallback(
     async (id: string, contactData: ContactCreateDTO): Promise<boolean> => {
       try {
-        dispatch({ type: "CLEAR_ERROR" });
-
         // Validate data using Zod schema
         const validatedData = ContactCreateSchema.parse(contactData);
-
-        const success = await updateItem(id, validatedData);
-
-        if (success) {
-          // Update local state with the updated contact
-          const updatedContact = { ...contactData, id } as Contact;
-          dispatch({ type: "UPDATE_CONTACT", payload: updatedContact });
-          showSuccess("Kontakt zaktualizowany pomyślnie");
-        } else {
-          showError("Nie udało się zaktualizować kontaktu");
-        }
-
-        return success;
+        await updateMutation.mutateAsync({ id, data: validatedData });
+        return true;
       } catch (error) {
         const errorMsg =
-          error instanceof Error ? error.message : "Failed to update contact";
-        dispatch({ type: "SET_ERROR", payload: errorMsg });
-        showError("Nie udało się zaktualizować kontaktu");
+          error instanceof Error ? error.message : "Nie udało się zaktualizować kontaktu";
+        showError(errorMsg);
         return false;
       }
     },
-    [updateItem, showSuccess, showError]
+    [updateMutation, showError]
   );
 
   const deleteContact = useCallback(
     async (id: string): Promise<boolean> => {
       try {
-        dispatch({ type: "CLEAR_ERROR" });
-
-        const success = await deleteItem(id);
-
-        if (success) {
-          dispatch({ type: "DELETE_CONTACT", payload: id });
-          showSuccess("Kontakt usunięty pomyślnie");
-        } else {
-          showError("Nie udało się usunąć kontaktu");
-        }
-
-        return success;
+        await deleteMutation.mutateAsync(id);
+        return true;
       } catch (error) {
         const errorMsg =
-          error instanceof Error
-            ? error.message
-            : "Failed to delete contact";
-        dispatch({ type: "SET_ERROR", payload: errorMsg });
-        showError("Nie udało się usunąć kontaktu");
+          error instanceof Error ? error.message : "Nie udało się usunąć kontaktu";
+        showError(errorMsg);
         return false;
       }
     },
-    [deleteItem, showSuccess, showError]
+    [deleteMutation, showError]
   );
 
   return {
-    data: state.data,
-    loading: state.loading,
-    error: state.error,
+    data: data || [],
+    loading: isPending || createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
+    error: error instanceof Error ? error.message : null,
     refetch,
     createContact,
     updateContact,
@@ -158,3 +91,4 @@ export const useContacts = (): UseContactsReturn => {
 
 // Re-export types for backward compatibility
 export type { Contact, ContactCreateDTO };
+

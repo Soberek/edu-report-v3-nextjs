@@ -3,10 +3,9 @@ import { Box, Typography } from "@mui/material";
 import { Delete, Edit, Person } from "@mui/icons-material";
 import type { GridColDef } from "@mui/x-data-grid";
 import { FilterSection, TableWrapper, defaultActions, type DataTableAction } from "@/components/shared";
-import { Contact, ContactFormData } from "../types";
+import { Contact } from "../types";
 import { searchContacts } from "../utils";
 import ContactAvatar from "./contact-avatar";
-import EditDialog from "./edit-dialog";
 
 interface ContactSearchProps {
   contacts: Contact[];
@@ -24,27 +23,13 @@ export default function ContactSearch({
   onDelete,
 }: ContactSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingContact, setEditingContact] = useState<Contact | null>(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const filteredContacts = useMemo(() => {
     return searchContacts(contacts, searchTerm);
   }, [contacts, searchTerm]);
 
   const handleEditContact = (contact: Contact) => {
-    setEditingContact(contact);
-    setEditDialogOpen(true);
-  };
-
-  const handleSaveContact = async (id: string, data: ContactFormData) => {
-    // Since we're in search view, just update and close
-    setEditDialogOpen(false);
-    setEditingContact(null);
-  };
-
-  const handleCloseEditDialog = () => {
-    setEditDialogOpen(false);
-    setEditingContact(null);
+    onEdit?.(contact);
   };
 
   // Table columns configuration
@@ -193,14 +178,6 @@ export default function ContactSearch({
           showHeader={true}
         />
       )}
-
-      {/* Edit Dialog */}
-      <EditDialog
-        open={editDialogOpen}
-        contact={editingContact}
-        onClose={handleCloseEditDialog}
-        onSave={handleSaveContact}
-      />
     </Box>
   );
 }

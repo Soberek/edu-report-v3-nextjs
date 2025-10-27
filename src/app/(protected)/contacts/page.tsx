@@ -109,7 +109,6 @@ export default function ContactsPage(): React.ReactNode {
           error={error}
           onEdit={setEditingContact}
           onDelete={handleDeleteContact}
-          onUpdate={handleUpdateContact}
         />
       </Box>
 
