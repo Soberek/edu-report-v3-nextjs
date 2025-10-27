@@ -1,11 +1,11 @@
 /**
  * Contacts Feature Module
- * 
+ *
  * Manages contact creation, editing, deletion, and search.
- * 
+ *
  * @example
  * import { useContacts, ContactList, ContactForm } from '@/features/contacts';
- * 
+ *
  * function ContactsPage() {
  *   const { data: contacts, loading, createContact, updateContact, deleteContact } = useContacts();
  *   return (
@@ -14,11 +14,14 @@
  *       <ContactList contacts={contacts} loading={loading} />
  *     </>
  *   );
- * }
  */
 
 // Hooks
-export { useContacts } from "./hooks";
+export {
+  useContacts,
+  useContactDialogs,
+  useContactOperations,
+} from "./hooks";
 export type { UseContactsReturn } from "./types";
 
 // Components
