@@ -16,7 +16,6 @@ type Action<T> =
   | { type: "DELETE_ITEM"; payload: string };
 
 function reducer<T extends { id: string }>(state: State<T>, action: Action<T>): State<T> {
-  console.log("Reducer action:", action);
   switch (action.type) {
     case "SET_LOADING":
       return { ...state, loading: action.payload };
