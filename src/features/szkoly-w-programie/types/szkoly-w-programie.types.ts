@@ -70,12 +70,18 @@ export interface SchoolParticipationContextType {
   // Status
   readonly isLoading: boolean;
   readonly error: Error | null;
+  
   // Raw Data
   readonly schools: readonly School[];
   readonly contacts: readonly Contact[];
   readonly programs: readonly Program[];
-  // Derived Data
-  readonly participations: readonly SchoolProgramParticipation[];
+  
+  // Participations (at different filter levels)
+  readonly allParticipations: readonly SchoolProgramParticipation[]; // All data
+  readonly participationsByYear: readonly SchoolProgramParticipation[]; // Filtered by year only
+  readonly participations: readonly SchoolProgramParticipation[]; // Fully filtered by year, program, and search
+  
+  // Mapped & Prepared Data
   readonly mappedParticipations: readonly MappedParticipation[];
   readonly schoolsInfo: readonly SchoolParticipationInfo[];
   readonly generalStats: GeneralStats;
@@ -83,6 +89,11 @@ export interface SchoolParticipationContextType {
   readonly availableSchoolYears: readonly SchoolYear[];
   readonly availablePrograms: readonly ProgramWithCount[];
   readonly lookupMaps: LookupMaps;
+  
+  // UI-Ready Data for Selectors/Filters
+  readonly schoolOptions: readonly { readonly label: string; readonly value: string }[];
+  readonly programOptions: readonly { readonly label: string; readonly value: string }[];
+  
   // Filter State & Setters
   readonly selectedSchoolYear: SchoolYear | "all";
   readonly setSelectedSchoolYear: React.Dispatch<React.SetStateAction<SchoolYear | "all">>;
@@ -96,6 +107,7 @@ export interface SchoolParticipationContextType {
   readonly setStatusFilter: React.Dispatch<React.SetStateAction<"all" | "participating" | "notParticipating">>;
   readonly tableSearch: string;
   readonly setTableSearch: React.Dispatch<React.SetStateAction<string>>;
+  
   // Actions & Notifications
   readonly notification: NotificationState;
   readonly closeNotification: () => void;

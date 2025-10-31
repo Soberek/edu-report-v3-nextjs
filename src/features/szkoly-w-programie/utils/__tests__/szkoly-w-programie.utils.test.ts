@@ -477,12 +477,12 @@ describe("szkoly-w-programie.utils", () => {
 
   // Test for addParticipationCountToPrograms
   describe("addParticipationCountToPrograms", () => {
-    it("should add participation count to programs", () => {
+    it("should add unique school count to programs", () => {
       const result = addParticipationCountToPrograms(mockPrograms, mockParticipations);
 
-      expect(result[0].participationCount).toBe(1); // prog1: 1 participation
-      expect(result[1].participationCount).toBe(2); // prog2: 2 participations
-      expect(result[2].participationCount).toBe(1); // prog3: 1 participation
+      expect(result[0].participationCount).toBe(1); // prog1: 1 unique school (s1)
+      expect(result[1].participationCount).toBe(2); // prog2: 2 unique schools (s2, s1 from 2 different years)
+      expect(result[2].participationCount).toBe(1); // prog3: 1 unique school (s3)
     });
 
     it("should set count to 0 for programs with no participations", () => {
@@ -490,6 +490,15 @@ describe("szkoly-w-programie.utils", () => {
       result.forEach((program) => {
         expect(program.participationCount).toBe(0);
       });
+    });
+
+    it("should count same school only once even with multiple school years", () => {
+      // School s1 has 2 participations in prog2 (different years: 2024/2025, 2025/2026)
+      // But should count as 1 unique school
+      const prog2 = mockParticipations.filter((p) => p.programId === "prog2");
+      const result = addParticipationCountToPrograms([mockPrograms[1]], prog2);
+
+      expect(result[0].participationCount).toBe(2); // 2 unique schools: s2 and s1
     });
   });
 

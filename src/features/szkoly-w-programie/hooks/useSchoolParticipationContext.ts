@@ -32,7 +32,9 @@ export const useParticipationData = () => {
     schools,
     contacts,
     programs,
+    allParticipations,
     participations,
+    participationsByYear,
     mappedParticipations,
     schoolsInfo,
     generalStats,
@@ -40,12 +42,16 @@ export const useParticipationData = () => {
     availableSchoolYears,
     availablePrograms,
     lookupMaps,
+    schoolOptions,
+    programOptions,
   } = useSafeContext();
   return {
     schools,
     contacts,
     programs,
+    allParticipations,
     participations,
+    participationsByYear,
     mappedParticipations,
     schoolsInfo,
     generalStats,
@@ -53,6 +59,8 @@ export const useParticipationData = () => {
     availableSchoolYears,
     availablePrograms,
     lookupMaps,
+    schoolOptions,
+    programOptions,
   };
 };
 

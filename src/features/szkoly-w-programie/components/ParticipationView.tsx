@@ -19,7 +19,7 @@ export default function ParticipationView() {
   const debouncedSearch = useDebounce(searchInput, 300);
 
   const { isLoading, error } = useParticipationStatus();
-  const { schools, contacts, programs, participations, availableSchoolYears, availablePrograms, lookupMaps } = useParticipationData();
+  const { schools, contacts, programs, participations, participationsByYear, availableSchoolYears, availablePrograms, lookupMaps } = useParticipationData();
   const { selectedSchoolYear, setSelectedSchoolYear, selectedProgram, setSelectedProgram, setTableSearch } = useParticipationFilters();
   const { notification, closeNotification, handleSubmit, handleUpdateParticipation, handleDeleteParticipation } = useParticipationActions();
 
@@ -53,7 +53,9 @@ export default function ParticipationView() {
 
   const renderHeader = () => <PageHeader title={PAGE_CONSTANTS.TITLE} subtitle={PAGE_CONSTANTS.SUBTITLE} />;
 
-  const renderStatisticsSection = () => <ProgramStatistics participations={participations} programs={programs} />;
+  const renderStatisticsSection = () => (
+    <ProgramStatistics participations={participationsByYear} programs={programs} />
+  );
 
   const renderSchoolYearSelector = () => {
     const SCHOOL_YEARS: SchoolYear[] = ["2024/2025", "2025/2026", "2026/2027", "2027/2028"];

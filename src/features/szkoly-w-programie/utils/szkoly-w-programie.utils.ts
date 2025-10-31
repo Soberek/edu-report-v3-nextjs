@@ -74,10 +74,20 @@ export const calculateGeneralStats = (
 };
 
 export const addParticipationCountToPrograms = (programs: readonly Program[], participations: readonly SchoolProgramParticipation[]) => {
-  const counts = participations.reduce((acc: Record<string, number>, p) => {
-    acc[p.programId] = (acc[p.programId] || 0) + 1;
+  // Group participations by programId and count unique schools per program
+  const programSchools = participations.reduce((acc: Record<string, Set<string>>, p) => {
+    if (!acc[p.programId]) {
+      acc[p.programId] = new Set();
+    }
+    acc[p.programId].add(p.schoolId);
     return acc;
   }, {});
+
+  const counts = Object.entries(programSchools).reduce((acc: Record<string, number>, [programId, schools]) => {
+    acc[programId] = schools.size;
+    return acc;
+  }, {});
+
   return programs.map((program) => ({ ...program, participationCount: counts[program.id] || 0 }));
 };
 

@@ -60,12 +60,16 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
   const { schoolsInfo, generalStats, programStats } = useSchoolStatistics(schools, programs, allParticipations, isLoading);
   const lookupMaps = useMemo(() => createLookupMaps(schools, contacts, programs), [schools, contacts, programs]);
 
-  const filteredParticipations = useMemo(() => {
+  const participationsByYear = useMemo(() => {
     if (!allParticipations) return [];
-    let filtered = filterBySchoolYear(allParticipations, selectedSchoolYear);
-    filtered = filterByProgram(filtered, selectedProgram);
+    return filterBySchoolYear(allParticipations, selectedSchoolYear);
+  }, [allParticipations, selectedSchoolYear]);
+
+  const filteredParticipations = useMemo(() => {
+    if (!participationsByYear) return [];
+    let filtered = filterByProgram(participationsByYear, selectedProgram);
     return searchParticipations(filtered, lookupMaps.schoolsMap, lookupMaps.contactsMap, lookupMaps.programsMap, tableSearch);
-  }, [allParticipations, selectedSchoolYear, selectedProgram, tableSearch, lookupMaps]);
+  }, [participationsByYear, selectedProgram, tableSearch, lookupMaps]);
 
   const mappedParticipations = useMemo(
     () => mapParticipationsForDisplay(filteredParticipations, lookupMaps.schoolsMap, lookupMaps.contactsMap, lookupMaps.programsMap),
@@ -75,10 +79,9 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
   const availableSchoolYears = useMemo(() => getAvailableSchoolYears(allParticipations), [allParticipations]);
 
   const availablePrograms = useMemo(() => {
-    if (!allParticipations || !programs) return [];
-    const yearFilteredParticipations = filterBySchoolYear(allParticipations, selectedSchoolYear);
-    return Array.from(addParticipationCountToPrograms(programs, yearFilteredParticipations));
-  }, [allParticipations, selectedSchoolYear, programs]);
+    if (!participationsByYear || !programs) return [];
+    return Array.from(addParticipationCountToPrograms(programs, participationsByYear));
+  }, [participationsByYear, programs]);
 
   const filteredSchoolsInfo = useMemo(() => {
     let filtered = schoolsInfo || [];
@@ -89,6 +92,17 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
     return filtered;
   }, [schoolsInfo, schoolFilter, selectedProgram, programFilter, statusFilter]);
 
+  // UI-Ready Data for Selectors
+  const schoolOptions = useMemo(
+    () => schools.map((school) => ({ label: school.name, value: school.name })),
+    [schools]
+  );
+
+  const programOptions = useMemo(
+    () => programs.map((program) => ({ label: program.name, value: program.id })),
+    [programs]
+  );
+
   // 5. Assemble the context value
   const value: SchoolParticipationContextType = {
     isLoading,
@@ -96,7 +110,9 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
     schools,
     contacts,
     programs,
+    allParticipations,
     participations: filteredParticipations,
+    participationsByYear,
     mappedParticipations,
     schoolsInfo: filteredSchoolsInfo,
     generalStats,
@@ -104,6 +120,8 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
     availableSchoolYears,
     availablePrograms,
     lookupMaps,
+    schoolOptions,
+    programOptions,
     selectedSchoolYear,
     setSelectedSchoolYear,
     selectedProgram,

@@ -39,7 +39,7 @@ const renderPrograms = (programs: readonly Program[], color: "success" | "error"
 
 export default function NonParticipationView() {
   const { isLoading } = useParticipationStatus();
-  const { schoolsInfo, generalStats, programStats, schools, programs } = useParticipationData();
+  const { schoolsInfo, generalStats, programStats, schoolOptions, programOptions } = useParticipationData();
   const {
     schoolFilter,
     setSchoolFilter,
@@ -61,16 +61,6 @@ export default function NonParticipationView() {
         return nameA.localeCompare(nameB);
       }),
     [programStats]
-  );
-
-  const schoolOptions = useMemo(
-    () => schools.map((school) => ({ label: school.name, value: school.name })),
-    [schools]
-  );
-
-  const programOptions = useMemo(
-    () => programs.map((program) => ({ label: program.name, value: program.id })),
-    [programs]
   );
 
   const filterFields: FilterField[] = [
