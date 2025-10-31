@@ -1,8 +1,10 @@
 
 import { useQueryWithNotifications } from "@/hooks/useQueryWithNotifications";
 import { useUser } from "@/hooks/useUser";
+import { useQuery } from "@tanstack/react-query";
 import type { School, Contact, Program, SchoolProgramParticipation } from "@/types";
 import { fetchCollection } from "@/services/firebaseService";
+import { programs as LOCAL_PROGRAMS } from "@/constants/programs";
 import { queryKeys, COLLECTIONS } from "../constants/queryConstants";
 
 /**
@@ -30,17 +32,16 @@ export const useContactsQuery = () => {
 };
 
 /**
- * Fetches programs data using TanStack Query with error notifications.
- * Simplified to use pure TanStack Query (removed mixed state management).
+ * Fetches programs data from local constants (not Firebase).
+ * Programs are shared across all users and don't need user-specific queries.
  */
 export const useProgramsQuery = () => {
-  const { user } = useUser();
-  
-  return useQueryWithNotifications<Program[]>({
-    queryKey: queryKeys.programsByUser(user?.uid || ""),
-    queryFn: () => fetchCollection<Program>(COLLECTIONS.PROGRAMS, user!.uid),
-    enabled: !!user?.uid,
-  }, "Dane programów");
+  return useQuery<Program[]>({
+    queryKey: queryKeys.programsAll(),
+    queryFn: () => Promise.resolve(LOCAL_PROGRAMS),
+    staleTime: Infinity, // Static data never becomes stale
+    gcTime: Infinity, // Keep in cache indefinitely
+  });
 };
 
 /**
