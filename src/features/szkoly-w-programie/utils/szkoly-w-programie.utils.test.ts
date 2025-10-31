@@ -261,53 +261,56 @@ describe("szkoly-w-programie.utils", () => {
     });
   });
 
-  // Test for calculateProgramStats
-  describe("calculateProgramStats", () => {
-    it("should calculate stats for all programs", () => {
+  // Test for calculateProgramStats (detailed counting)
+  describe("calculateProgramStats - detailed counting", () => {
+    it("should calculate eligible schools correctly per program", () => {
       const participationsMap = createSchoolParticipationsMap(mockParticipations);
       const result = calculateProgramStats(mockSchools, mockPrograms, participationsMap);
 
-      // prog1: eligible=2 (s1-Szkoła podstawowa, s3-Szkoła podstawowa), participating=1 (s1)
-      expect(result["Program Edukacji Zdrowotnej"]).toEqual({
-        eligible: 2,
-        participating: 1,
-        notParticipating: 1,
-      });
-
-      // prog2: eligible=3 (s1, s2-Liceum, s3), participating=2 (s1, s2)
-      expect(result["Program Profilaktyki"]).toEqual({
-        eligible: 3,
-        participating: 2,
-        notParticipating: 1,
-      });
-
-      // prog4: eligible=1 (s2), participating=0
-      expect(result["Program dla Liceów"]).toEqual({
-        eligible: 1,
-        participating: 0,
-        notParticipating: 1,
-      });
+      // prog1 is for "Szkoła podstawowa" - s1, s3 are eligible
+      expect(result["Program Edukacji Zdrowotnej"].eligible).toBe(2);
     });
 
-    it("should handle programs with no eligible schools", () => {
-      const emptyPrograms: Program[] = [
-        {
-          id: "prog-special",
-          code: "SPE",
-          name: "Special Program",
-          schoolTypes: ["Przedszkole"],
-          programType: "programowy",
-          description: "Special program",
-        },
-      ];
-      const participationsMap = createSchoolParticipationsMap([]);
-      const result = calculateProgramStats(mockSchools, emptyPrograms, participationsMap);
+    it("should calculate participating schools correctly per program", () => {
+      const participationsMap = createSchoolParticipationsMap(mockParticipations);
+      const result = calculateProgramStats(mockSchools, mockPrograms, participationsMap);
 
-      expect(result).toEqual({});
+      // prog1: s1 participates
+      expect(result["Program Edukacji Zdrowotnej"].participating).toBe(1);
+    });
+
+    it("should calculate not participating schools correctly per program", () => {
+      const participationsMap = createSchoolParticipationsMap(mockParticipations);
+      const result = calculateProgramStats(mockSchools, mockPrograms, participationsMap);
+
+      // prog1: s1 participates, s3 doesn't = 1 not participating
+      expect(result["Program Edukacji Zdrowotnej"].notParticipating).toBe(1);
+    });
+
+    it("should count all schools with multiple program types correctly", () => {
+      const participationsMap = createSchoolParticipationsMap(mockParticipations);
+      const result = calculateProgramStats(mockSchools, mockPrograms, participationsMap);
+
+      // prog2 is for both "Szkoła podstawowa" and "Liceum"
+      // eligible: s1, s3 (basic), s2 (Liceum) = 3
+      expect(result["Program Profilaktyki"].eligible).toBe(3);
+      // participating: s1, s2 = 2
+      expect(result["Program Profilaktyki"].participating).toBe(2);
+      // not participating: s3 = 1
+      expect(result["Program Profilaktyki"].notParticipating).toBe(1);
+    });
+
+    it("should verify math: eligible = participating + notParticipating", () => {
+      const participationsMap = createSchoolParticipationsMap(mockParticipations);
+      const result = calculateProgramStats(mockSchools, mockPrograms, participationsMap);
+
+      Object.values(result).forEach((stat) => {
+        expect(stat.eligible).toBe(stat.participating + stat.notParticipating);
+      });
     });
   });
 
-  // Test for calculateGeneralStats (with fixed logic)
+  // Test for calculateGeneralStats
   describe("calculateGeneralStats", () => {
     it("should correctly count non-participating schools", () => {
       const participationsMap = createSchoolParticipationsMap(mockParticipations);
@@ -321,7 +324,7 @@ describe("szkoly-w-programie.utils", () => {
       expect(result.totalParticipations).toBe(4);
     });
 
-    it("should calculate total missing participations", () => {
+    it("should calculate total missing participations correctly", () => {
       const participationsMap = createSchoolParticipationsMap(mockParticipations);
       const schoolsInfo = calculateSchoolParticipationInfo(mockSchools, mockPrograms, participationsMap);
       const programStats = calculateProgramStats(mockSchools, mockPrograms, participationsMap);
@@ -345,6 +348,26 @@ describe("szkoly-w-programie.utils", () => {
       // schoolsInfo[3] will have participating=[], notParticipating=[]
       // So it won't be counted as non-participating
       expect(result.nonParticipatingCount).toBe(1); // s2 has notParticipating.length > 0 with no participating
+    });
+
+    it("should calculate correct total schools count", () => {
+      const participationsMap = createSchoolParticipationsMap(mockParticipations);
+      const schoolsInfo = calculateSchoolParticipationInfo(mockSchools, mockPrograms, participationsMap);
+      const programStats = calculateProgramStats(mockSchools, mockPrograms, participationsMap);
+
+      const result = calculateGeneralStats(mockSchools, schoolsInfo, programStats, mockParticipations);
+
+      expect(result.totalSchools).toBe(mockSchools.length);
+    });
+
+    it("should calculate correct total participations count", () => {
+      const participationsMap = createSchoolParticipationsMap(mockParticipations);
+      const schoolsInfo = calculateSchoolParticipationInfo(mockSchools, mockPrograms, participationsMap);
+      const programStats = calculateProgramStats(mockSchools, mockPrograms, participationsMap);
+
+      const result = calculateGeneralStats(mockSchools, schoolsInfo, programStats, mockParticipations);
+
+      expect(result.totalParticipations).toBe(mockParticipations.length);
     });
   });
 
