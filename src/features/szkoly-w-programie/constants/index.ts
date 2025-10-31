@@ -41,6 +41,7 @@ export const MESSAGES = {
     UPDATE_FAILED: "Wystąpił błąd podczas aktualizacji danych.",
     DELETE_FAILED: "Wystąpił błąd podczas usuwania danych.",
     VALIDATION_ERROR: "Proszę poprawić błędy w formularzu.",
+    INVALID_ID: "Identyfikator uczestnictwa jest nieprawidłowy.",
   },
   CONFIRMATION: {
     DELETE_CONFIRMATION: "Czy na pewno chcesz usunąć to uczestnictwo?",

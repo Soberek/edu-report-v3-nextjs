@@ -1,9 +1,10 @@
 "use client";
 
-import React, { createContext, useState, useMemo } from "react";
+import React, { createContext, useMemo } from "react";
 import { useSchoolsQuery, useContactsQuery, useProgramsQuery, useParticipationsQuery } from "../hooks/queries";
 import { useParticipationMutations } from "../hooks/mutations";
 import { useSchoolStatistics } from "../hooks/useSchoolStatistics";
+import { useFilterState } from "../hooks/useFilterState";
 import { useNotification } from "@/hooks";
 import type { SchoolYear, School, Contact, Program, SchoolProgramParticipation } from "@/types";
 import { createLookupMaps, mapParticipationsForDisplay } from "../utils";
@@ -38,7 +39,10 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
   const { addParticipation, updateParticipation, deleteParticipation } = useParticipationMutations();
   const { notification, close: closeNotification } = useNotification();
 
-  // 2. Combined Loading and Error State
+  // 2. Filter State Management (unified with useReducer)
+  const { filters, setSchoolYear, setProgram, setSchoolName, setStatus, setSearch, resetFilters } = useFilterState();
+
+  // 3. Combined Loading and Error State
   const isLoading = useMemo(
     () => schoolsLoading || contactsLoading || programsLoading || participationsLoading,
     [schoolsLoading, contactsLoading, programsLoading, participationsLoading]
@@ -48,28 +52,19 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
     [schoolsError, contactsError, programsError, participationsError]
   );
 
-  // 3. Client-side State (Filters)
-  const [selectedSchoolYear, setSelectedSchoolYear] = useState<SchoolYear | "all">("2025/2026");
-  const [selectedProgram, setSelectedProgram] = useState<string | "all">("all");
-  const [schoolFilter, setSchoolFilter] = useState<string | null>(null);
-  const [programFilter, setProgramFilter] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<"all" | "participating" | "notParticipating">("all");
-  const [tableSearch, setTableSearch] = useState<string>("");
-
   // 4. Memoized Derivations & Calculations
   const { schoolsInfo, generalStats, programStats } = useSchoolStatistics(schools, programs, allParticipations, isLoading);
   const lookupMaps = useMemo(() => createLookupMaps(schools, contacts, programs), [schools, contacts, programs]);
 
   const participationsByYear = useMemo(() => {
     if (!allParticipations) return [];
-    return filterBySchoolYear(allParticipations, selectedSchoolYear);
-  }, [allParticipations, selectedSchoolYear]);
+    return filterBySchoolYear(allParticipations, filters.schoolYear);
+  }, [allParticipations, filters.schoolYear]);
 
   const filteredParticipations = useMemo(() => {
     if (!participationsByYear) return [];
-    let filtered = filterByProgram(participationsByYear, selectedProgram);
-    return searchParticipations(filtered, lookupMaps.schoolsMap, lookupMaps.contactsMap, lookupMaps.programsMap, tableSearch);
-  }, [participationsByYear, selectedProgram, tableSearch, lookupMaps]);
+    return searchParticipations(filterByProgram(participationsByYear, filters.program), lookupMaps.schoolsMap, lookupMaps.contactsMap, lookupMaps.programsMap, filters.search);
+  }, [participationsByYear, filters.program, filters.search, lookupMaps]);
 
   const mappedParticipations = useMemo(
     () => mapParticipationsForDisplay(filteredParticipations, lookupMaps.schoolsMap, lookupMaps.contactsMap, lookupMaps.programsMap),
@@ -85,12 +80,12 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
 
   const filteredSchoolsInfo = useMemo(() => {
     let filtered = schoolsInfo || [];
-    filtered = filterSchoolsByName(filtered, schoolFilter);
-    const activeProgramFilter = selectedProgram !== "all" ? selectedProgram : programFilter;
+    filtered = filterSchoolsByName(filtered, filters.schoolName);
+    const activeProgramFilter = filters.program !== "all" ? filters.program : filters.schoolName;
     filtered = filterSchoolsByProgram(filtered, activeProgramFilter);
-    filtered = filterSchoolsByStatus(filtered, statusFilter);
+    filtered = filterSchoolsByStatus(filtered, filters.status);
     return filtered;
-  }, [schoolsInfo, schoolFilter, selectedProgram, programFilter, statusFilter]);
+  }, [schoolsInfo, filters.schoolName, filters.program, filters.status]);
 
   // UI-Ready Data for Selectors
   const schoolOptions = useMemo(
@@ -122,18 +117,14 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
     lookupMaps,
     schoolOptions,
     programOptions,
-    selectedSchoolYear,
-    setSelectedSchoolYear,
-    selectedProgram,
-    setSelectedProgram,
-    schoolFilter,
-    setSchoolFilter,
-    programFilter,
-    setProgramFilter,
-    statusFilter,
-    setStatusFilter,
-    tableSearch,
-    setTableSearch,
+    // Filter state (from useFilterState hook)
+    filters,
+    setSchoolYear,
+    setProgram,
+    setSchoolName,
+    setStatus,
+    setSearch,
+    resetFilters,
     notification,
     closeNotification,
     handleSubmit: addParticipation,

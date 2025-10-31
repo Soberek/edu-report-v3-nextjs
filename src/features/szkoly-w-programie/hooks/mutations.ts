@@ -2,10 +2,11 @@
 import { useCallback } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useFirebaseData } from "@/hooks/useFirebaseData";
+import { useWithNotification } from "./useWithNotification";
 import { useNotification } from "@/hooks";
 import { SchoolProgramParticipation, SchoolProgramParticipationDTO } from "@/types";
 import { schoolProgramParticipationDTOSchema, schoolProgramParticiapationUpdateDTOSchema } from "@/models/SchoolProgramParticipation";
-import { getErrorMessage, normalizeStudentCount } from "@/hooks/utils/error-handler.utils";
+import { normalizeStudentCount } from "@/hooks/utils/error-handler.utils";
 import { MESSAGES } from "../constants";
 
 /**
@@ -14,7 +15,8 @@ import { MESSAGES } from "../constants";
  */
 export const useParticipationMutations = () => {
   const { user } = useUser();
-  const { showSuccess, showError } = useNotification();
+  const { showError } = useNotification();
+  const executeWithNotification = useWithNotification();
 
   // We only need the mutation functions from useFirebaseData, not the data itself.
   // Assumes that useFirebaseData is real-time or that updates will trigger a re-render.
@@ -25,45 +27,47 @@ export const useParticipationMutations = () => {
   } = useFirebaseData<SchoolProgramParticipation>("school-program-participation", user?.uid);
 
   const addParticipation = useCallback(async (data: SchoolProgramParticipationDTO) => {
-    try {
-      const validatedData = schoolProgramParticipationDTOSchema.parse({
-        ...data,
-        studentCount: normalizeStudentCount(data.studentCount),
-      });
-      await createItem(validatedData);
-      showSuccess(MESSAGES.SUCCESS.PARTICIPATION_ADDED);
-    } catch (error) {
-      const errorMessage = getErrorMessage(error, MESSAGES.ERROR.SAVE_FAILED);
-      showError(errorMessage);
-      throw error; // Re-throw for the component to handle if needed
-    }
-  }, [createItem, showSuccess, showError]);
+    await executeWithNotification(
+      async () => {
+        const validatedData = schoolProgramParticipationDTOSchema.parse({
+          ...data,
+          studentCount: normalizeStudentCount(data.studentCount),
+        });
+        await createItem(validatedData);
+      },
+      MESSAGES.SUCCESS.PARTICIPATION_ADDED,
+      MESSAGES.ERROR.SAVE_FAILED
+    );
+  }, [createItem, executeWithNotification]);
 
   const updateParticipation = useCallback(async (id: string, data: Partial<SchoolProgramParticipation>) => {
-    try {
-      const validatedData = schoolProgramParticiapationUpdateDTOSchema.parse({
-        ...data,
-        id,
-        studentCount: normalizeStudentCount(data.studentCount),
-      });
-      await updateItem(id, validatedData);
-      showSuccess(MESSAGES.SUCCESS.PARTICIPATION_UPDATED);
-    } catch (error) {
-      const errorMessage = getErrorMessage(error, MESSAGES.ERROR.UPDATE_FAILED);
-      showError(errorMessage);
-      throw error;
-    }
-  }, [updateItem, showSuccess, showError]);
+    await executeWithNotification(
+      async () => {
+        const validatedData = schoolProgramParticiapationUpdateDTOSchema.parse({
+          ...data,
+          id,
+          studentCount: normalizeStudentCount(data.studentCount),
+        });
+        await updateItem(id, validatedData);
+      },
+      MESSAGES.SUCCESS.PARTICIPATION_UPDATED,
+      MESSAGES.ERROR.UPDATE_FAILED
+    );
+  }, [updateItem, executeWithNotification]);
 
   const deleteParticipation = useCallback(async (id: string) => {
-    try {
-      await deleteItem(id);
-      showSuccess(MESSAGES.SUCCESS.PARTICIPATION_DELETED);
-    } catch (error) {
-      showError(MESSAGES.ERROR.DELETE_FAILED);
-      throw error;
+    if (!id || typeof id !== "string" || id.trim().length === 0) {
+      showError(MESSAGES.ERROR.INVALID_ID);
+      return;
     }
-  }, [deleteItem, showSuccess, showError]);
+    await executeWithNotification(
+      async () => {
+        await deleteItem(id);
+      },
+      MESSAGES.SUCCESS.PARTICIPATION_DELETED,
+      MESSAGES.ERROR.DELETE_FAILED
+    );
+  }, [deleteItem, showError, executeWithNotification]);
 
   return {
     addParticipation,
