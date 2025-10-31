@@ -39,7 +39,8 @@ export const ProgramStatistics: React.FC<ProgramStatisticsProps> = ({ participat
     return Object.entries(programGroups)
       .map(([programId, programParticipations]) => {
         const program = programs.find((p) => p.id === programId);
-        const schoolCount = programParticipations.length;
+        // Count UNIQUE schools, not participations (one school can have multiple participations for different years)
+        const schoolCount = new Set(programParticipations.map((p) => p.schoolId)).size;
         const totalStudents = programParticipations.reduce((sum, p) => sum + p.studentCount, 0);
         const schoolYears = [...new Set(programParticipations.map((p) => p.schoolYear))].sort();
 
