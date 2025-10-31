@@ -2,10 +2,12 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 echo "🔍 Running lint check..."
-pnpm lint
-
-echo "🏗️ Running build check..."
-pnpm build
+pnpm lint || exit 1
 
 echo "🧪 Running tests..."
-pnpm test
+pnpm test || exit 1
+
+echo "🏗️ Running build check..."
+pnpm build || exit 1
+
+
