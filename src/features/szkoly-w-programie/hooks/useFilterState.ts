@@ -16,7 +16,7 @@
  * - Type-safe filter actions
  */
 
-import { useReducer } from 'react';
+import { useReducer, useCallback } from 'react';
 import type { FilterState } from '../constants/filterDefaults';
 import { DEFAULT_FILTERS, FILTER_VALUES } from '../constants/filterDefaults';
 
@@ -56,24 +56,51 @@ const filterReducer = (state: FilterState, action: FilterAction): FilterState =>
 /**
  * Hook providing filter state and dispatch actions
  * Replaces 6 separate useState + 6 setters
+ * Uses useCallback to memoize dispatcher functions
  */
 export function useFilterState() {
   const [filters, dispatch] = useReducer(filterReducer, DEFAULT_FILTERS as FilterState);
 
+  // Memoize dispatcher functions to prevent context re-renders
+  const setSchoolYear = useCallback((year: string) => {
+    dispatch({ type: 'SET_SCHOOL_YEAR', payload: year });
+  }, []);
+
+  const setProgram = useCallback((program: string) => {
+    dispatch({ type: 'SET_PROGRAM', payload: program });
+  }, []);
+
+  const setSchoolName = useCallback((name: string) => {
+    dispatch({ type: 'SET_SCHOOL_NAME', payload: name });
+  }, []);
+
+  const setStatus = useCallback(
+    (status: typeof FILTER_VALUES[keyof typeof FILTER_VALUES]) => {
+      dispatch({ type: 'SET_STATUS', payload: status });
+    },
+    []
+  );
+
+  const setSearch = useCallback((search: string) => {
+    dispatch({ type: 'SET_SEARCH', payload: search });
+  }, []);
+
+  const updateFilters = useCallback((updates: Partial<FilterState>) => {
+    dispatch({ type: 'UPDATE_FILTERS', payload: updates });
+  }, []);
+
+  const resetFilters = useCallback(() => {
+    dispatch({ type: 'RESET_FILTERS' });
+  }, []);
+
   return {
     filters,
-
-    // Individual setters - convenience methods
-    setSchoolYear: (year: string) => dispatch({ type: 'SET_SCHOOL_YEAR', payload: year }),
-    setProgram: (program: string) => dispatch({ type: 'SET_PROGRAM', payload: program }),
-    setSchoolName: (name: string) => dispatch({ type: 'SET_SCHOOL_NAME', payload: name }),
-    setStatus: (status: typeof FILTER_VALUES[keyof typeof FILTER_VALUES]) => dispatch({ type: 'SET_STATUS', payload: status }),
-    setSearch: (search: string) => dispatch({ type: 'SET_SEARCH', payload: search }),
-
-    // Batch update - for multiple filters at once
-    updateFilters: (updates: Partial<FilterState>) => dispatch({ type: 'UPDATE_FILTERS', payload: updates }),
-
-    // Reset all filters to default
-    resetFilters: () => dispatch({ type: 'RESET_FILTERS' }),
+    setSchoolYear,
+    setProgram,
+    setSchoolName,
+    setStatus,
+    setSearch,
+    updateFilters,
+    resetFilters,
   };
 }

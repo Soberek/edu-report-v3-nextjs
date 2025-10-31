@@ -98,39 +98,75 @@ export const SchoolParticipationProvider = ({ children }: { children: React.Reac
     [programs]
   );
 
-  // 5. Assemble the context value
-  const value: SchoolParticipationContextType = {
-    isLoading,
-    error,
-    schools,
-    contacts,
-    programs,
-    allParticipations,
-    participations: filteredParticipations,
-    participationsByYear,
-    mappedParticipations,
-    schoolsInfo: filteredSchoolsInfo,
-    generalStats,
-    programStats,
-    availableSchoolYears,
-    availablePrograms,
-    lookupMaps,
-    schoolOptions,
-    programOptions,
-    // Filter state (from useFilterState hook)
-    filters,
-    setSchoolYear,
-    setProgram,
-    setSchoolName,
-    setStatus,
-    setSearch,
-    resetFilters,
-    notification,
-    closeNotification,
-    handleSubmit: addParticipation,
-    handleUpdateParticipation: updateParticipation,
-    handleDeleteParticipation: deleteParticipation,
-  };
+  // 5. Memoize filter dispatcher methods to prevent infinite loops
+  const filterDispatchers = useMemo(
+    () => ({
+      setSchoolYear,
+      setProgram,
+      setSchoolName,
+      setStatus,
+      setSearch,
+      resetFilters,
+    }),
+    [setSchoolYear, setProgram, setSchoolName, setStatus, setSearch, resetFilters]
+  );
+
+  // 6. Assemble the context value with proper memoization
+  const value: SchoolParticipationContextType = useMemo(
+    () => ({
+      isLoading,
+      error,
+      schools,
+      contacts,
+      programs,
+      allParticipations,
+      participations: filteredParticipations,
+      participationsByYear,
+      mappedParticipations,
+      schoolsInfo: filteredSchoolsInfo,
+      generalStats,
+      programStats,
+      availableSchoolYears,
+      availablePrograms,
+      lookupMaps,
+      schoolOptions,
+      programOptions,
+      // Filter state (from useFilterState hook)
+      filters,
+      ...filterDispatchers,
+      notification,
+      closeNotification,
+      handleSubmit: addParticipation,
+      handleUpdateParticipation: updateParticipation,
+      handleDeleteParticipation: deleteParticipation,
+    }),
+    [
+      isLoading,
+      error,
+      schools,
+      contacts,
+      programs,
+      allParticipations,
+      filteredParticipations,
+      participationsByYear,
+      mappedParticipations,
+      filteredSchoolsInfo,
+      generalStats,
+      programStats,
+      availableSchoolYears,
+      availablePrograms,
+      lookupMaps,
+      schoolOptions,
+      programOptions,
+      filters,
+      filterDispatchers,
+      notification,
+      closeNotification,
+      addParticipation,
+      updateParticipation,
+      deleteParticipation,
+    ]
+  );
 
   return (
     <SchoolParticipationContext.Provider value={value}>
