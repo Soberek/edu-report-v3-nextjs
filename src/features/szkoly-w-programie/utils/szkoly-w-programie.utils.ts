@@ -63,7 +63,8 @@ export const calculateGeneralStats = (
   Object.values(programStats).forEach((s) => {
     totalMissingParticipations += s.notParticipating;
   });
-  const nonParticipatingCount = schoolsInfo.filter((i) => i.notParticipating.length > 0).length;
+  // Szkoła jest nieuczestnicząca tylko jeśli nie uczestniczy w ŻADNYM programie, w którym mogłaby uczestniczyć
+  const nonParticipatingCount = schoolsInfo.filter((i) => i.participating.length === 0 && i.notParticipating.length > 0).length;
   return {
     totalSchools: schools.length,
     nonParticipatingCount,
