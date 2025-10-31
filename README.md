@@ -404,3 +404,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Zod](https://zod.dev/) for schema validation
 - [Framer Motion](https://www.framer.com/motion/) for animations
 - [Recharts](https://recharts.org/) for data visualization
+# Test commit
