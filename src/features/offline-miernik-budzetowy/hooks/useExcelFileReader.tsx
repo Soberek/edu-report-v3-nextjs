@@ -33,7 +33,6 @@ const fileReaderReducer = (
   state: UseFileReaderState,
   action: FileReaderAction,
 ): UseFileReaderState => {
-  console.log("Reducer action:", action);
   switch (action.type) {
     case "RESET":
       return initialState;

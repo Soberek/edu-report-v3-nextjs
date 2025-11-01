@@ -32,7 +32,9 @@ export const useParticipationData = () => {
     schools,
     contacts,
     programs,
+    allParticipations,
     participations,
+    participationsByYear,
     mappedParticipations,
     schoolsInfo,
     generalStats,
@@ -40,12 +42,16 @@ export const useParticipationData = () => {
     availableSchoolYears,
     availablePrograms,
     lookupMaps,
+    schoolOptions,
+    programOptions,
   } = useSafeContext();
   return {
     schools,
     contacts,
     programs,
+    allParticipations,
     participations,
+    participationsByYear,
     mappedParticipations,
     schoolsInfo,
     generalStats,
@@ -53,6 +59,8 @@ export const useParticipationData = () => {
     availableSchoolYears,
     availablePrograms,
     lookupMaps,
+    schoolOptions,
+    programOptions,
   };
 };
 
@@ -62,32 +70,42 @@ export const useParticipationData = () => {
  */
 export const useParticipationFilters = () => {
   const {
-    selectedSchoolYear,
-    setSelectedSchoolYear,
-    selectedProgram,
-    setSelectedProgram,
-    schoolFilter,
-    setSchoolFilter,
-    programFilter,
-    setProgramFilter,
-    statusFilter,
-    setStatusFilter,
-    tableSearch,
-    setTableSearch,
+    filters,
+    setSchoolYear,
+    setProgram,
+    setSchoolName,
+    setStatus,
+    setSearch,
+    resetFilters,
   } = useSafeContext();
+  
   return {
-    selectedSchoolYear,
-    setSelectedSchoolYear,
-    selectedProgram,
-    setSelectedProgram,
-    schoolFilter,
-    setSchoolFilter,
-    programFilter,
-    setProgramFilter,
-    statusFilter,
-    setStatusFilter,
-    tableSearch,
-    setTableSearch,
+    // Filter state
+    filters,
+    
+    // Backward compatibility: legacy filter values
+    selectedSchoolYear: filters.schoolYear,
+    selectedProgram: filters.program,
+    schoolFilter: filters.schoolName || null,
+    programFilter: filters.program,
+    statusFilter: filters.status,
+    tableSearch: filters.search,
+    
+    // Action functions
+    setSchoolYear,
+    setProgram,
+    setSchoolName,
+    setStatus,
+    setSearch,
+    resetFilters,
+    
+    // Legacy compatibility: direct setter functions
+    setSelectedSchoolYear: setSchoolYear,
+    setSelectedProgram: setProgram,
+    setSchoolFilter: (value: string | null) => setSchoolName(value || ""),
+    setProgramFilter: (value: string | null) => setProgram(value || "all"),
+    setStatusFilter: setStatus,
+    setTableSearch: setSearch,
   };
 };
 

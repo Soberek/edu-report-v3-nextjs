@@ -1,9 +1,11 @@
 
 import { useQueryWithNotifications } from "@/hooks/useQueryWithNotifications";
 import { useUser } from "@/hooks/useUser";
-import { usePrograms as useOriginalPrograms } from "@/features/programy-edukacyjne/hooks/useProgram";
+import { useQuery } from "@tanstack/react-query";
 import type { School, Contact, Program, SchoolProgramParticipation } from "@/types";
 import { fetchCollection } from "@/services/firebaseService";
+import { programs as LOCAL_PROGRAMS } from "@/constants/programs";
+import { queryKeys, COLLECTIONS } from "../constants/queryConstants";
 
 /**
  * Fetches school data using TanStack Query with error notifications.
@@ -11,9 +13,9 @@ import { fetchCollection } from "@/services/firebaseService";
 export const useSchoolsQuery = () => {
   const { user } = useUser();
   return useQueryWithNotifications<School[]>({
-    queryKey: ["schools", user?.uid],
-    queryFn: () => fetchCollection<School>("schools", user!.uid),
-    enabled: !!user?.uid, // Only run the query if the user is logged in
+    queryKey: queryKeys.schoolsByUser(user?.uid || ""),
+    queryFn: () => fetchCollection<School>(COLLECTIONS.SCHOOLS, user!.uid),
+    enabled: !!user?.uid,
   }, "Dane szkół");
 };
 
@@ -23,42 +25,23 @@ export const useSchoolsQuery = () => {
 export const useContactsQuery = () => {
   const { user } = useUser();
   return useQueryWithNotifications<Contact[]>({
-    queryKey: ["contacts", user?.uid],
-    queryFn: () => fetchCollection<Contact>("contacts", user!.uid),
+    queryKey: queryKeys.contactsByUser(user?.uid || ""),
+    queryFn: () => fetchCollection<Contact>(COLLECTIONS.CONTACTS, user!.uid),
     enabled: !!user?.uid,
   }, "Dane kontaktów");
 };
 
 /**
- * Fetches programs data using TanStack Query.
- * Uses global QueryClient defaults for caching and retry behavior.
+ * Fetches programs data from local constants (not Firebase).
+ * Programs are shared across all users and don't need user-specific queries.
  */
 export const useProgramsQuery = () => {
-  const { user } = useUser();
-  const { programs, loading, errorMessage } = useOriginalPrograms();
-
-  return useQueryWithNotifications<Program[]>({
-    queryKey: ["programs", user?.uid],
-    queryFn: () => fetchCollection<Program>("programs", user!.uid),
-    enabled: !!user?.uid,
-    initialData: programs,
-    placeholderData: programs,
-    // Custom retry logic to respect local error states
-    retry: (failureCount, error) => {
-      if (errorMessage) {
-        return false; // Don't retry if there's a local error
-      }
-      // Use global retry logic for network/server errors
-      if (error instanceof Error && error.message.includes("400") || error instanceof Error && error.message.includes("500")) {
-        return false; // Don't retry client errors
-      }
-      return failureCount < 3;
-    },
-    meta: {
-      localLoading: loading,
-      localError: errorMessage,
-    },
-  }, "Dane programów");
+  return useQuery<Program[]>({
+    queryKey: queryKeys.programsAll(),
+    queryFn: () => Promise.resolve(LOCAL_PROGRAMS),
+    staleTime: Infinity, // Static data never becomes stale
+    gcTime: Infinity, // Keep in cache indefinitely
+  });
 };
 
 /**
@@ -67,8 +50,8 @@ export const useProgramsQuery = () => {
 export const useParticipationsQuery = () => {
   const { user } = useUser();
   return useQueryWithNotifications<SchoolProgramParticipation[]>({
-    queryKey: ["participations", user?.uid],
-    queryFn: () => fetchCollection<SchoolProgramParticipation>("school-program-participation", user!.uid),
+    queryKey: queryKeys.participationsByUser(user?.uid || ""),
+    queryFn: () => fetchCollection<SchoolProgramParticipation>(COLLECTIONS.PARTICIPATIONS, user!.uid),
     enabled: !!user?.uid,
   }, "Dane uczestnictwa szkół");
 };

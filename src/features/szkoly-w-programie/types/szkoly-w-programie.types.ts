@@ -1,6 +1,7 @@
 import type { Program, School, Contact, SchoolYear } from "@/types";
 import type { SchoolProgramParticipation, SchoolProgramParticipationDTO, schoolProgramParticiapationUpdateDTOSchema } from "@/models/SchoolProgramParticipation";
 import type { NotificationState } from "@/hooks/useNotification";
+import type { FilterState, StatusFilterValue } from "../constants/filterDefaults";
 
 /**
  * A collection of lookup maps for efficient data access.
@@ -70,12 +71,18 @@ export interface SchoolParticipationContextType {
   // Status
   readonly isLoading: boolean;
   readonly error: Error | null;
+  
   // Raw Data
   readonly schools: readonly School[];
   readonly contacts: readonly Contact[];
   readonly programs: readonly Program[];
-  // Derived Data
-  readonly participations: readonly SchoolProgramParticipation[];
+  
+  // Participations (at different filter levels)
+  readonly allParticipations: readonly SchoolProgramParticipation[]; // All data
+  readonly participationsByYear: readonly SchoolProgramParticipation[]; // Filtered by year only
+  readonly participations: readonly SchoolProgramParticipation[]; // Fully filtered by year, program, and search
+  
+  // Mapped & Prepared Data
   readonly mappedParticipations: readonly MappedParticipation[];
   readonly schoolsInfo: readonly SchoolParticipationInfo[];
   readonly generalStats: GeneralStats;
@@ -83,19 +90,20 @@ export interface SchoolParticipationContextType {
   readonly availableSchoolYears: readonly SchoolYear[];
   readonly availablePrograms: readonly ProgramWithCount[];
   readonly lookupMaps: LookupMaps;
-  // Filter State & Setters
-  readonly selectedSchoolYear: SchoolYear | "all";
-  readonly setSelectedSchoolYear: React.Dispatch<React.SetStateAction<SchoolYear | "all">>;
-  readonly selectedProgram: string | "all";
-  readonly setSelectedProgram: React.Dispatch<React.SetStateAction<string | "all">>;
-  readonly schoolFilter: string | null;
-  readonly setSchoolFilter: React.Dispatch<React.SetStateAction<string | null>>;
-  readonly programFilter: string | null;
-  readonly setProgramFilter: React.Dispatch<React.SetStateAction<string | null>>;
-  readonly statusFilter: "all" | "participating" | "notParticipating";
-  readonly setStatusFilter: React.Dispatch<React.SetStateAction<"all" | "participating" | "notParticipating">>;
-  readonly tableSearch: string;
-  readonly setTableSearch: React.Dispatch<React.SetStateAction<string>>;
+  
+  // UI-Ready Data for Selectors/Filters
+  readonly schoolOptions: readonly { readonly label: string; readonly value: string }[];
+  readonly programOptions: readonly { readonly label: string; readonly value: string }[];
+  
+  // Filter State & Actions (managed by useFilterState hook)
+  readonly filters: FilterState;
+  readonly setSchoolYear: (year: string) => void;
+  readonly setProgram: (program: string) => void;
+  readonly setSchoolName: (name: string) => void;
+  readonly setStatus: (status: StatusFilterValue) => void;
+  readonly setSearch: (search: string) => void;
+  readonly resetFilters: () => void;
+  
   // Actions & Notifications
   readonly notification: NotificationState;
   readonly closeNotification: () => void;
