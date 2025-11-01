@@ -28,12 +28,16 @@ export const isValidId = (id?: string): id is string =>
   id !== undefined && typeof id === "string" && id.trim().length > 0;
 
 /**
- * Checks if a value is a valid student count (positive number)
+ * Checks if a value is a valid student count (non-negative integer)
  * @param count - The count to validate
- * @returns true if count is a positive number
+ * @returns true if count is a non-negative integer up to 10000
  */
 export const isValidStudentCount = (count?: number): count is number =>
-  count !== undefined && typeof count === "number" && count > 0;
+  count !== undefined && 
+  typeof count === "number" && 
+  Number.isInteger(count) && 
+  count >= 0 && 
+  count <= 10000;
 
 /**
  * Trims and normalizes a string for comparison

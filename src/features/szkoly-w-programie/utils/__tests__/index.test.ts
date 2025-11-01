@@ -113,8 +113,8 @@ describe("createProgramOptions", () => {
     const result = createProgramOptions(programs);
 
     expect(result).toEqual([
-      { id: "1", name: "Program A" },
-      { id: "2", name: "Program B" },
+      { id: "1", name: "PA - Program A" },
+      { id: "2", name: "PB - Program B" },
     ]);
   });
 

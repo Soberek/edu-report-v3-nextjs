@@ -33,6 +33,24 @@ export const createSchoolParticipationsMap = (
   return map;
 };
 
+/**
+ * Creates lookup maps for schools, contacts, and programs.
+ * Used to efficiently retrieve entities by ID in filtering and display operations.
+ */
+export const createLookupMaps = (
+  schools: readonly School[],
+  contacts: readonly Contact[],
+  programs: readonly Program[]
+): Readonly<{
+  schoolsMap: Record<string, School>;
+  contactsMap: Record<string, Contact>;
+  programsMap: Record<string, Program>;
+}> => ({
+  schoolsMap: Object.fromEntries(schools.map(s => [s.id, s])),
+  contactsMap: Object.fromEntries(contacts.map(c => [c.id, c])),
+  programsMap: Object.fromEntries(programs.map(p => [p.id, p])),
+});
+
 /** Filters programs applicable to a specific school by school type */
 export const getApplicablePrograms = (
   school: School,
@@ -259,7 +277,12 @@ export const searchParticipations = (
  * Creates default form values for a new participation record.
  * Used when initializing add/edit forms.
  */
-export const createDefaultFormValues = (): SchoolProgramParticipationDTO => ({
+export const createDefaultFormValues = (): SchoolProgramParticipationDTO & { 
+  id: string; 
+  createdAt: string; 
+  userId: string; 
+} => ({
+  id: '',
   schoolId: '',
   programId: '',
   coordinatorId: '',
@@ -268,6 +291,8 @@ export const createDefaultFormValues = (): SchoolProgramParticipationDTO => ({
   studentCount: 0,
   notes: '',
   reportSubmitted: false,
+  createdAt: '',
+  userId: '',
 });
 
 /**

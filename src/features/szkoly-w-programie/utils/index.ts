@@ -14,6 +14,7 @@ export {
 // Core business logic and data transformation
 export {
   createSchoolParticipationsMap,
+  createLookupMaps,
   getApplicablePrograms,
   calculateSchoolParticipationInfo,
   calculateProgramStats,
