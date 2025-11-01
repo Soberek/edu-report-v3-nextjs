@@ -212,7 +212,7 @@ describe("szkoly-w-programie.utils", () => {
         { id: "p3", programId: "prog2" }, // Missing schoolId
       ];
       const result = createSchoolParticipationsMap(incompleteData as unknown as SchoolProgramParticipation[]);
-      expect(result).toEqual({ s1: ["prog1", undefined] });
+      expect(result).toEqual({ s1: ["prog1"] });
     });
   });
 

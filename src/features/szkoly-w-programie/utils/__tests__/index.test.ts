@@ -1,21 +1,19 @@
 import { describe, it, expect, vi } from "vitest";
 import {
-  transformSchoolsToOptions,
-  transformContactsToOptions,
-  transformProgramsToOptions,
-  transformSchoolYearsToOptions,
-  validateStudentCount,
-  formatStudentCount,
+  createSchoolOptions,
+  createContactOptions,
+  createProgramOptions,
+  createSchoolYearOptions,
+  isValidStudentCount,
   getCurrentSchoolYear,
   isValidSchoolYear,
-  formatParticipationForSubmission,
   createDefaultFormValues,
   mapParticipationsForDisplay,
 } from "../index";
 import type { School, Contact, Program } from "@/types";
 import type { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
 
-describe("transformSchoolsToOptions", () => {
+describe("createSchoolOptions", () => {
   it("should transform schools to select options", () => {
     const schools: School[] = [
       {
@@ -42,7 +40,7 @@ describe("transformSchoolsToOptions", () => {
       },
     ];
 
-    const result = transformSchoolsToOptions(schools);
+    const result = createSchoolOptions(schools);
 
     expect(result).toEqual([
       { id: "1", name: "School A" },
@@ -51,12 +49,12 @@ describe("transformSchoolsToOptions", () => {
   });
 
   it("should return empty array for empty schools", () => {
-    const result = transformSchoolsToOptions([]);
+    const result = createSchoolOptions([]);
     expect(result).toEqual([]);
   });
 });
 
-describe("transformContactsToOptions", () => {
+describe("createContactOptions", () => {
   it("should transform contacts to select options", () => {
     const contacts: Contact[] = [
       {
@@ -79,21 +77,21 @@ describe("transformContactsToOptions", () => {
       },
     ];
 
-    const result = transformContactsToOptions(contacts);
+    const result = createContactOptions(contacts);
 
     expect(result).toEqual([
-      { id: "1", name: "John Doe", firstName: "John", lastName: "Doe" },
-      { id: "2", name: "Jane Smith", firstName: "Jane", lastName: "Smith" },
+      { id: "1", name: "John Doe" },
+      { id: "2", name: "Jane Smith" },
     ]);
   });
 
   it("should return empty array for empty contacts", () => {
-    const result = transformContactsToOptions([]);
+    const result = createContactOptions([]);
     expect(result).toEqual([]);
   });
 });
 
-describe("transformProgramsToOptions", () => {
+describe("createProgramOptions", () => {
   it("should transform programs to select options", () => {
     const programs: Program[] = [
       {
@@ -112,25 +110,25 @@ describe("transformProgramsToOptions", () => {
       },
     ];
 
-    const result = transformProgramsToOptions(programs);
+    const result = createProgramOptions(programs);
 
     expect(result).toEqual([
-      { id: "1", name: "Program A", code: "PA" },
-      { id: "2", name: "Program B", code: "PB" },
+      { id: "1", name: "PA - Program A" },
+      { id: "2", name: "PB - Program B" },
     ]);
   });
 
   it("should return empty array for empty programs", () => {
-    const result = transformProgramsToOptions([]);
+    const result = createProgramOptions([]);
     expect(result).toEqual([]);
   });
 });
 
-describe("transformSchoolYearsToOptions", () => {
+describe("createSchoolYearOptions", () => {
   it("should transform school years to select options", () => {
     const schoolYears = ["2024/2025", "2025/2026"];
 
-    const result = transformSchoolYearsToOptions(schoolYears);
+    const result = createSchoolYearOptions(schoolYears);
 
     expect(result).toEqual([
       { id: "2024/2025", name: "2024/2025" },
@@ -139,32 +137,22 @@ describe("transformSchoolYearsToOptions", () => {
   });
 
   it("should return empty array for empty school years", () => {
-    const result = transformSchoolYearsToOptions([]);
+    const result = createSchoolYearOptions([]);
     expect(result).toEqual([]);
   });
 });
 
-describe("validateStudentCount", () => {
+describe("isValidStudentCount", () => {
   it("should validate valid student counts", () => {
-    expect(validateStudentCount(0)).toBe(true);
-    expect(validateStudentCount(100)).toBe(true);
-    expect(validateStudentCount(10000)).toBe(true);
+    expect(isValidStudentCount(0)).toBe(true);
+    expect(isValidStudentCount(100)).toBe(true);
+    expect(isValidStudentCount(10000)).toBe(true);
   });
 
   it("should reject invalid student counts", () => {
-    expect(validateStudentCount(-1)).toBe(false);
-    expect(validateStudentCount(10001)).toBe(false);
-    expect(validateStudentCount(1.5)).toBe(false);
-  });
-});
-
-describe("formatStudentCount", () => {
-  it("should format student counts correctly", () => {
-    expect(formatStudentCount(0)).toBe("Brak uczniów");
-    expect(formatStudentCount(1)).toBe("1 uczeń");
-    expect(formatStudentCount(2)).toBe("2 uczniów");
-    expect(formatStudentCount(5)).toBe("5 uczniów");
-    expect(formatStudentCount(25)).toBe("25 uczniów");
+    expect(isValidStudentCount(-1)).toBe(false);
+    expect(isValidStudentCount(10001)).toBe(false);
+    expect(isValidStudentCount(1.5)).toBe(false);
   });
 });
 
@@ -204,36 +192,6 @@ describe("isValidSchoolYear", () => {
     expect(isValidSchoolYear("2023/2024")).toBe(false);
     expect(isValidSchoolYear("invalid")).toBe(false);
     expect(isValidSchoolYear("")).toBe(false);
-  });
-});
-
-describe("formatParticipationForSubmission", () => {
-  it("should format participation data for submission", () => {
-    const data = {
-      schoolId: "school1",
-      programId: "program1",
-      coordinatorId: "coord1",
-      schoolYear: "2024/2025" as const,
-      studentCount: 100,
-      notes: "Test notes",
-    };
-    const userId = "user123";
-
-    const result = formatParticipationForSubmission(data, userId);
-
-    expect(result).toEqual({
-      ...data,
-      id: "",
-      createdAt: expect.any(String),
-      userId: "user123",
-      reportSubmitted: false,
-    });
-    expect(result.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
-  });
-
-  it("should throw error for invalid data", () => {
-    expect(() => formatParticipationForSubmission(null, "user123")).toThrow("Invalid participation data provided");
-    expect(() => formatParticipationForSubmission({}, "")).toThrow("User ID is required");
   });
 });
 

@@ -72,11 +72,6 @@ export interface EditParticipationFormProps {
   readonly onSubmit: (data: SchoolProgramParticipationDTO) => void;
 }
 
-export interface EditParticipationFormRef {
-  readonly submit: () => void;
-  readonly isDirty: boolean;
-}
-
 // Hook types
 export interface UseParticipationPageProps {
   readonly onSubmit?: (data: SchoolProgramParticipationDTO) => Promise<void>;

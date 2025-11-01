@@ -1,13 +1,39 @@
+/**
+ * useParticipationForm - Manages participation form state and validation.
+ * Wraps React Hook Form with Zod validation and submission handling.
+ */
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useMemo } from "react";
 import { schoolProgramParticipationDTOSchema, type SchoolProgramParticipationDTO } from "@/models/SchoolProgramParticipation";
-import { getCurrentSchoolYear } from "../utils";
+import { getCurrentSchoolYear } from "../utils/date.utils";
 import type { UseParticipationFormProps } from "../types";
 import type { SchoolYear } from "../constants";
 
+/**
+ * Hook for managing participation form state with validation.
+ * Integrates React Hook Form with Zod schema validation.
+ *
+ * @param onSubmit - Callback fired when form is submitted (should handle API call)
+ * @param initialData - Optional initial form data (for edit forms)
+ * @returns Form methods, validation state, and event handlers
+ *
+ * @example
+ * const form = useParticipationForm({
+ *   onSubmit: async (data) => {
+ *     await api.createParticipation(data);
+ *   },
+ * });
+ *
+ * return (
+ *   <form onSubmit={form.handleSubmit(form.handleFormSubmit)}>
+ *     <input {...form.control.register('studentCount')} />
+ *   </form>
+ * );
+ */
 export const useParticipationForm = ({ onSubmit, initialData }: UseParticipationFormProps) => {
-  // Memoize form configuration
+  // Memoize form configuration to prevent unnecessary recreations
   const formConfig = useMemo(
     () => ({
       resolver: zodResolver(schoolProgramParticipationDTOSchema),
@@ -29,7 +55,10 @@ export const useParticipationForm = ({ onSubmit, initialData }: UseParticipation
   const form = useForm<SchoolProgramParticipationDTO>(formConfig);
   const { control, handleSubmit, reset, formState, watch } = form;
 
-  // Handle form submission with error handling
+  /**
+   * Handles form submission with data normalization.
+   * Ensures studentCount is properly converted to number type.
+   */
   const handleFormSubmit = useCallback(
     async (data: SchoolProgramParticipationDTO) => {
       try {
@@ -48,7 +77,7 @@ export const useParticipationForm = ({ onSubmit, initialData }: UseParticipation
     [onSubmit, reset]
   );
 
-  // Validation state
+  // Memoize validation state for performance
   const validationState = useMemo(
     () => ({
       isValid: formState.isValid,
