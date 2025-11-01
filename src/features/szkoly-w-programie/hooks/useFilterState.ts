@@ -1,19 +1,13 @@
 /**
- * useFilterState - Manages filter state with useReducer
- * 
- * Single hook replacing 6 useState calls:
- * - selectedSchoolYear
- * - selectedProgram
- * - schoolFilter
- * - programFilter
- * - statusFilter
- * - tableSearch
+ * useFilterState - Manages filter state with useReducer.
+ * Single hook replacing 6 useState calls with a unified state machine.
  *
  * Benefits:
  * - Single source of truth for filter state
- * - Easier to track state transitions
+ * - Easier to track state transitions and debug
  * - Better for complex filter logic
  * - Type-safe filter actions
+ * - Memoized dispatcher functions to prevent context re-renders
  */
 
 import { useReducer, useCallback } from 'react';
@@ -30,7 +24,8 @@ export type FilterAction =
   | { type: 'RESET_FILTERS' };
 
 /**
- * Filter reducer - handles all filter state transitions
+ * Filter reducer - handles all filter state transitions.
+ * Pure function suitable for testing.
  */
 const filterReducer = (state: FilterState, action: FilterAction): FilterState => {
   switch (action.type) {
@@ -54,9 +49,25 @@ const filterReducer = (state: FilterState, action: FilterAction): FilterState =>
 };
 
 /**
- * Hook providing filter state and dispatch actions
- * Replaces 6 separate useState + 6 setters
- * Uses useCallback to memoize dispatcher functions
+ * Hook providing filter state and memoized dispatcher functions.
+ * Replaces 6 separate useState + 6 setters with unified state management.
+ *
+ * @returns Current filter state and typed dispatcher functions
+ *
+ * @example
+ * const {
+ *   filters,
+ *   setSchoolYear,
+ *   setProgram,
+ *   resetFilters,
+ * } = useFilterState();
+ *
+ * return (
+ *   <Select
+ *     value={filters.schoolYear}
+ *     onChange={(e) => setSchoolYear(e.target.value)}
+ *   />
+ * );
  */
 export function useFilterState() {
   const [filters, dispatch] = useReducer(filterReducer, DEFAULT_FILTERS as FilterState);

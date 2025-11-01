@@ -4,7 +4,16 @@ export { default as ParticipationView } from "./ParticipationView";
 export { default as NonParticipationView } from "./NonParticipationView";
 export { ParticipationForm } from "./ParticipationForm";
 export { EditParticipationForm } from "./EditParticipationForm";
+export { ParticipationFormFields } from "./ParticipationFormFields";
 export { ProgramStatistics } from "./ProgramStatistics";
+export { EditParticipationDialog, AddParticipationDialog } from "./TableDialogs";
+export type { EditParticipationFormRef } from "./EditParticipationForm";
+
+// Form layout components
+export { FormSection } from "./FormSection";
+export type { FormSectionProps } from "./FormSection";
+export { FormSubmitButton } from "./FormSubmitButton";
+export type { FormSubmitButtonProps } from "./FormSubmitButton";
 
 // Table configuration
 export { createColumns, CUSTOM_STYLES, TABLE_COLUMNS, type TableColumnConfig } from "./TableConfig";
