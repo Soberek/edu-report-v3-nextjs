@@ -1,210 +1,49 @@
-import type { Contact, Program, School as SchoolType } from "@/types";
-import type { SchoolProgramParticipation } from "@/models/SchoolProgramParticipation";
-import type { SelectOption } from "../types/shared";
-import type { MappedParticipation } from "../types";
-
-// Constants
-const SCHOOL_YEAR_START_MONTH = 9; // September
-const STUDENT_COUNT_MIN = 0;
-const STUDENT_COUNT_MAX = 10000;
-
 /**
- * Transforms school data to select options
+ * Public API for utility functions.
+ * Exports data transformation, validation, and business logic helpers.
  */
-export const transformSchoolsToOptions = (schools: readonly SchoolType[]): SelectOption[] => {
-  if (!schools?.length) return [];
-  return schools.map((school) => ({
-    id: school.id,
-    name: school.name,
-  }));
-};
 
-/**
- * Transforms contacts data to select options
- */
-export const transformContactsToOptions = (contacts: readonly Contact[]): SelectOption[] => {
-  if (!contacts?.length) return [];
-  return contacts.map((contact) => ({
-    id: contact.id,
-    name: `${contact.firstName} ${contact.lastName}`,
-    firstName: contact.firstName,
-    lastName: contact.lastName,
-  }));
-};
+// Option factories for creating select/autocomplete options
+export {
+  createSchoolOptions,
+  createContactOptions,
+  createProgramOptions,
+  createSchoolYearOptions,
+} from './optionFactories';
 
-/**
- * Transforms programs data to select options
- */
-export const transformProgramsToOptions = (programs: readonly Program[]): SelectOption[] => {
-  if (!programs?.length) return [];
-  return programs.map((program) => ({
-    id: program.id,
-    name: program.name,
-    code: program.code,
-  }));
-};
+// Core business logic and data transformation
+export {
+  createSchoolParticipationsMap,
+  getApplicablePrograms,
+  calculateSchoolParticipationInfo,
+  calculateProgramStats,
+  calculateGeneralStats,
+  addParticipationCountToPrograms,
+  filterBySchoolYear,
+  filterByProgram,
+  filterSchoolsByStatus,
+  filterSchoolsByName,
+  filterSchoolsByProgram,
+  getAvailableSchoolYears,
+  searchParticipations,
+  createDefaultFormValues,
+  mapParticipationsForDisplay,
+} from './szkoly-w-programie.utils';
 
-/**
- * Transforms school years to select options
- */
-export const transformSchoolYearsToOptions = (schoolYears: readonly string[]): SelectOption[] => {
-  if (!schoolYears?.length) return [];
-  return schoolYears.map((year) => ({
-    id: year,
-    name: year,
-  }));
-};
+// Date and time utilities
+export {
+  getCurrentSchoolYear,
+  isValidSchoolYear,
+  formatDateToPolish,
+} from './date.utils';
 
-/**
- * Maps participations to display format with related data
- */
-export const mapParticipationsForDisplay = (
-  participations: readonly SchoolProgramParticipation[],
-  schoolsMap: Readonly<Record<string, SchoolType>>,
-  contactsMap: Readonly<Record<string, Contact>>,
-  programsMap: Readonly<Record<string, Program>>
-): MappedParticipation[] => {
-  return participations.map((participation) => {
-    const { id, schoolId, programId, coordinatorId } = participation;
-    const school = schoolsMap[schoolId];
-    const program = programsMap[programId];
-    const coordinator = contactsMap[coordinatorId];
-
-    return {
-      ...participation,
-      schoolName: school?.name || "N/A",
-      schoolEmail: school?.email,
-      programName: program?.name || "N/A",
-      coordinatorName: coordinator ? `${coordinator.firstName} ${coordinator.lastName}` : "N/A",
-      coordinatorEmail: coordinator?.email,
-      coordinatorPhone: coordinator?.phone,
-    };
-  });
-};
-
-/**
- * Creates lookup maps for efficient data access
- */
-export const createLookupMaps = (schools: readonly SchoolType[], contacts: readonly Contact[], programs: readonly Program[]) => ({
-  schoolsMap: Object.fromEntries(schools.map((s) => [s.id, s])) as Readonly<Record<string, SchoolType>>,
-  contactsMap: Object.fromEntries(contacts.map((c) => [c.id, c])) as Readonly<Record<string, Contact>>,
-  programsMap: Object.fromEntries(programs.map((p) => [p.id, p])) as Readonly<Record<string, Program>>,
-});
-
-/**
- * Validates student count
- */
-export const validateStudentCount = (count: number): boolean => {
-  return Number.isInteger(count) && count >= STUDENT_COUNT_MIN && count <= STUDENT_COUNT_MAX;
-};
-
-/**
- * Formats student count for display
- */
-export const formatStudentCount = (count: number): string => {
-  if (count === 0) return "Brak uczniów";
-  if (count === 1) return "1 uczeń";
-  if (count < 5) return `${count} uczniów`;
-  return `${count} uczniów`;
-};
-
-/**
- * Gets current school year
- */
-export const getCurrentSchoolYear = (): string => {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // getMonth() returns 0-11
-
-  // School year starts in September
-  const schoolYearStart = currentMonth >= SCHOOL_YEAR_START_MONTH ? currentYear : currentYear - 1;
-  return `${schoolYearStart}/${schoolYearStart + 1}`;
-};
-
-/**
- * Checks if school year is valid
- */
-export const isValidSchoolYear = (year: string): boolean => {
-  const validYears = ["2024/2025", "2025/2026", "2026/2027", "2027/2028"];
-  return validYears.includes(year);
-};
-
-/**
- * Formats participation data for API submission
- */
-export const formatParticipationForSubmission = (data: unknown, userId: string): SchoolProgramParticipation => {
-  if (!data || typeof data !== "object") {
-    throw new Error("Invalid participation data provided");
-  }
-
-  if (!userId) {
-    throw new Error("User ID is required");
-  }
-
-  const participationData = data as Partial<SchoolProgramParticipation>;
-
-  return {
-    ...(participationData as SchoolProgramParticipation),
-    id: "", // Will be generated by Firebase
-    createdAt: new Date().toISOString(),
-    userId,
-    reportSubmitted: false,
-  };
-};
-
-/**
- * Creates default form values
- */
-export const createDefaultFormValues = (): SchoolProgramParticipation => ({
-  id: "",
-  schoolId: "",
-  programId: "",
-  coordinatorId: "",
-  previousCoordinatorId: "",
-  schoolYear: getCurrentSchoolYear() as "2024/2025" | "2025/2026" | "2026/2027" | "2027/2028",
-  studentCount: 0,
-  notes: "",
-  createdAt: "",
-  userId: "",
-  reportSubmitted: false,
-});
-
-/**
- * Debounce function for performance optimization
- */
-export const debounce = <T extends (...args: unknown[]) => unknown>(func: T, wait: number): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout;
-
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-};
-
-/**
- * Truncates text to specified length with ellipsis
- */
-export const truncateText = (text: string, maxLength: number): string => {
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + "...";
-};
-
-/**
- * Capitalizes the first letter of a string
- */
-export const capitalize = (str: string): string => {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-};
-
-/**
- * Formats date to Polish locale
- */
-export const formatDateToPolish = (date: Date | string): string => {
-  const dateObj = typeof date === "string" ? new Date(date) : date;
-
-  return dateObj.toLocaleDateString("pl-PL", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
+// Validation utilities
+export {
+  isValidEmail,
+  isValidPhone,
+  isValidId,
+  isValidStudentCount,
+  normalizeString,
+} from './validation.utils';
+export * from "./validation.utils";
+export * from "./optionFactories";
