@@ -36,25 +36,21 @@ export type ProgramType = (typeof PROGRAM_TYPES)[keyof typeof PROGRAM_TYPES];
  * These represent the main types of actions recorded in Excel data
  */
 export const ACTION_TYPES = {
-  STOISKO_EDUKACYJNO_INFORMACYJNE: "Stoisko edukacyjno-informacyjne",
-  SPRAWOZDANIE: "Sprawozdanie",
-  SPRAWOZDANIE_MIESIEACZNE: "Sprawozdanie miesięczne",
-  PRELEKCJA: "Prelekcja",
-  WYKLAD: "Wykład",
-  PUBLIKACJA_MEDIA: "Publikacja media",
-  KONKURS: "Konkurs",
-  LIST_INTENCYJNE: "List intencyjne",
-  WIZYTACJA: "Wizytacja",
-  GRY_I_ZABAWY: "Gry i zabawy",
-  INSTRUKTAZ: "Instruktaż",
-  DYSTRYBUCJA: "Dystrybucja",
-  INSTRUKTAZ_INDYWIDUALNY: "Instruktaż indywidualny",
+  LIST_INTENCYJNY: "List intencyjny",
+  ROZMOWA_INDYWIDUALNA: "Rozmowa indywidualna (instruktaż)",
+  PORADNICTWO: "Poradnictwo",
   NARADA: "Narada",
   SZKOLENIE: "Szkolenie",
-  HAPPENING_ULICZNY: "Happening uliczny",
+  PRELEKCJA_WARSZTAT: "Prelekcja (warsztat)",
+  WYKLAD: "Wykład",
   KONFERENCJA: "Konferencja",
-  WARSZTATY: "Warsztaty",
-  PORADNICTWO: "Poradnictwo",
+  STOISKO_EDUKACYJNO_INFORMACYJNE: "Stoisko edukacyjno-informacyjne",
+  HAPPENING: "Happening (przemarsz, gra, event)",
+  KONKURS: "Konkurs (quiz)",
+  DYSTRYBUCJA: "Dystrybucja",
+  WIZYTACJA: "Wizytacja",
+  SPRAWOZDANIE: "Sprawozdanie (z programu, miernik, tytoń)",
+  WYWIAD_DO_MEDIOW: "Wywiad do mediów",
   // Publikacja media subcategories
   PUBLIKACJA_MEDIA_PORTAL_X: "Publikacja media (Portal X)",
   PUBLIKACJA_MEDIA_FACEBOOK: "Publikacja media (Facebook)",
@@ -125,81 +121,60 @@ export interface IndicatorGroup {
 }
 
 // ============================================================================
-// PROGRAM CATEGORY MAPPING - ALL 47 PROGRAMS
+// PROGRAM CATEGORY MAPPING - ALL PROGRAMS
 // ============================================================================
 
 /**
  * Program name to main category mapping
- * Maps all 47 specific program names to their main health categories
+ * Maps all specific program names to their main health categories
  * This is the definitive list of all programs in the system
  *
  * Categories distribution:
- * - Szczepienia: 6 programs
- * - Zapobieganie otyłości: 6 programs
- * - Profilaktyka uzależnień: 9 programs
- * - HIV/AIDS: 2 programs
- * - Inne: 24 programs
- * Total: 47 programs
+ * - Szczepienia: 1 program
+ * - Zapobieganie otyłości: 3 programs
+ * - Profilaktyka uzależnień: 1 program
+ * - HIV/AIDS: 1 program
+ * - Inne: 11 programs
+ * Total: 17 programs
  */
 export const PROGRAM_CATEGORY_MAPPING: Record<string, MainCategory> = {
   // ========================================
-  // SZCZEPIENIA (Vaccinations) - 6 programs
+  // SZCZEPIENIA (Vaccinations) - 1 program
   // ========================================
-  "Podstępne WZW": MAIN_CATEGORIES.SZCZEPIENIA,
-  "Profilaktyka grypy": MAIN_CATEGORIES.SZCZEPIENIA,
   "Promocja szczepień ochronnych": MAIN_CATEGORIES.SZCZEPIENIA,
-  "Europejski Tydzień Szczepień": MAIN_CATEGORIES.SZCZEPIENIA,
-  "Profilaktyka chorób odkleszczowych": MAIN_CATEGORIES.SZCZEPIENIA,
-  "Profilaktyka chorób zakaźnych": MAIN_CATEGORIES.SZCZEPIENIA,
 
   // ================================================
-  // ZAPOBIEGANIE OTYŁOŚCI (Obesity Prevention) - 6 programs
+  // ZAPOBIEGANIE OTYŁOŚCI (Obesity Prevention) - 3 programs
   // ================================================
-  "Skąd się biorą ekologiczne produkty": MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
-  "Trzymaj formę": MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
-  "Profilaktyka cukrzycy": MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
-  "Promocja zdrowego stylu życia": MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
-  "Promocja zdrowego stylu życia - inne": MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
-  "Kampania EFSA": MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
+  "Trzymaj Formę": MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
+  "Promocja zdrowego stylu życia, aktywności fizycznej i prawidłowego odżywiania": MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
 
   // =====================================================
-  // PROFILAKTYKA UZALEŻNIEŃ (Addiction Prevention) - 9 programs
+  // PROFILAKTYKA UZALEŻNIEŃ (Addiction Prevention) - 1 program
   // =====================================================
-  "Bieg po zdrowie": MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
-  "Czyste powietrze wokół nas": MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
+  "Profilaktyka używania substancji psychoaktywnych (NSP, nikotyna i światowe dni związane z nikotyną, alkohol)":
+    MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
   "Porozmawiajmy o zdrowiu i nowych zagrożeniach": MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
-  "Ars - czyli jak dbać o miłość": MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
-  "Profilaktyka palenia tytoniu": MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
-  "Światowy Dzień Rzucania Palenia": MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
-  "Profilaktyka używania napojów energetycznych": MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
-  "Nowe narkotyki": MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
-  "Światowy Dzień bez Tytoniu": MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
 
   // ====================
-  // HIV/AIDS - 2 programs
+  // HIV/AIDS - 1 program
   // ====================
-  "HIV/AIDS": MAIN_CATEGORIES.HIV_AIDS,
-  "Światowy Dzień AIDS": MAIN_CATEGORIES.HIV_AIDS,
+  "Krajowy Program Zapobiegania Zakażeniom HIV i Zwalczania AIDS": MAIN_CATEGORIES.HIV_AIDS,
 
   // ================================
-  // INNE (Other) - 24 programs
+  // INNE (Other) - 11 programs
   // ================================
   "Zdrowe zęby mamy, marchewkę zajadamy": MAIN_CATEGORIES.INNE,
-  "Higiena naszą tarczą": MAIN_CATEGORIES.INNE,
-  "Bezpieczne ferie": MAIN_CATEGORIES.INNE,
-  Radon: MAIN_CATEGORIES.INNE,
-  "Moja szkoła, zdrowa szkoła": MAIN_CATEGORIES.INNE,
-  "Profilaktyka wad postawy": MAIN_CATEGORIES.INNE,
-  "Znamię, znam je": MAIN_CATEGORIES.INNE,
-  "Światowy Dzień Wody": MAIN_CATEGORIES.INNE,
+  "Higiena naszą tarczą ochroną": MAIN_CATEGORIES.INNE,
+  "Profilaktyka chorób zakaźnych": MAIN_CATEGORIES.INNE,
+  "Profilaktyka chorób nowotworowych": MAIN_CATEGORIES.INNE,
+  "Promocja bezpiecznego grzybobrania i profilaktyka zatruć grzybami": MAIN_CATEGORIES.INNE,
   "Światowy Dzień Zdrowia": MAIN_CATEGORIES.INNE,
-  "Bezpieczne Wakacje": MAIN_CATEGORIES.INNE,
-  "Profilaktyka nowotworowa": MAIN_CATEGORIES.INNE,
-  "Profilaktyka nowotworowa - Profilaktyka raka piersi": MAIN_CATEGORIES.INNE,
-  "Profilaktyka nowotworowa - Profilaktyka raka jąder": MAIN_CATEGORIES.INNE,
-  Cyberprzemoc: MAIN_CATEGORIES.INNE,
-  "Power Ukraina": MAIN_CATEGORIES.INNE,
-  "Profilaktyki chorób układu pokarmowego, w tym zatruć pokarmowych – salmonella, grzyby i inne": MAIN_CATEGORIES.INNE,
+  "Europejski i Światowy Dzień Wiedzy o Antybiotykach": MAIN_CATEGORIES.INNE,
+  "Bezpieczeństwo dzieci podczas wypoczynku letniego i zimowego (bezpieczne ferie i wakacje)": MAIN_CATEGORIES.INNE,
+  Seniorzy: MAIN_CATEGORIES.INNE,
+  "Promocja zdrowia psychicznego": MAIN_CATEGORIES.INNE,
+  "Wpływ czynników środowiskowych na zdrowie": MAIN_CATEGORIES.INNE,
 };
 
 // ============================================================================
@@ -209,48 +184,65 @@ export const INDICATORS_CONFIG: IndicatorGroup[] = [
   {
     name: "Zdrowotne",
     indicators: [
-      // {
-      //   id: "szczepienia",
-      //   name: "Szczepienia",
-      //   description: "Program szczepień ochronnych",
-      //   mainCategories: ["Szczepienia"],
-      // },
-      // {
-      //   id: "otylosc",
-      //   name: "Zapobieganie otyłości",
-      //   description: "Program profilaktyki otyłości i zdrowego stylu życia",
-      //   mainCategories: ["Zapobieganie otyłości"],
-      // },
-      // {
-      //   id: "uzaleznienia",
-      //   name: "Profilaktyka uzależnień",
-      //   description: "Program profilaktyki narkomanii, alkoholizmu i papierosów",
-      //   mainCategories: ["Profilaktyka uzależnień"],
-      // },
-      // {
-      //   id: "hiv_aids",
-      //   name: "HIV/AIDS",
-      //   description: "Program edukacji w zakresie HIV/AIDS",
-      //   mainCategories: ["HIV/AIDS"],
-      // },
       {
-        id: "palenie_tytoniu",
-        name: "Światowe dni bez tytoniu",
-        description: "Pogrupowanie świadomościowych dni dotyczących palenia tytoniu",
-        programGroups: {
-          "Światowy Dzień Rzucania Palenia": ["Światowy Dzień Rzucania Palenia", "Światowy Dzień bez Tytoniu", "Profilaktyka palenia tytoniu"],
-        },
+        id: "szczepienia",
+        name: "Szczepienia",
+        description: "Program szczepień ochronnych",
+        mainCategories: [MAIN_CATEGORIES.SZCZEPIENIA],
+      },
+      {
+        id: "otylosc",
+        name: "Zapobieganie otyłości",
+        description: "Program profilaktyki otyłości i zdrowego stylu życia",
+        mainCategories: [MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI],
+      },
+      {
+        id: "uzaleznienia",
+        name: "Profilaktyka uzależnień",
+        description: "Program profilaktyki narkomanii, alkoholizmu i substancji psychoaktywnych",
+        mainCategories: [MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA],
+      },
+      {
+        id: "hiv_aids",
+        name: "HIV/AIDS",
+        description: "Program edukacji w zakresie HIV/AIDS",
+        mainCategories: [MAIN_CATEGORIES.HIV_AIDS],
+      },
+      {
+        id: "profilaktyka_substancji",
+        name: "Profilaktyka używania substancji psychoaktywnych",
+        description: "NSP, nikotyna, światowe dni związane z nikotyną, alkohol",
+        specificPrograms: ["Profilaktyka używania substancji psychoaktywnych (NSP, nikotyna i światowe dni związane z nikotyną, alkohol)"],
       },
       {
         id: "zdrowy_styl_zycia",
         name: "Promocja zdrowego stylu życia",
-        description: "Zgrupowane programy promocji zdrowego stylu życia",
-        programGroups: {
-          "Promocja zdrowego stylu życia": [
-            "Promocja zdrowego stylu życia",
-            "Promocja zdrowego stylu życia - inne",
-          ],
-        },
+        description: "Aktywność fizyczna i prawidłowe odżywianie",
+        specificPrograms: ["Promocja zdrowego stylu życia, aktywności fizycznej i prawidłowego odżywiania"],
+      },
+      {
+        id: "choroby_zakazne",
+        name: "Profilaktyka chorób zakaźnych",
+        description: "Program profilaktyki chorób zakaźnych",
+        specificPrograms: ["Profilaktyka chorób zakaźnych"],
+      },
+      {
+        id: "choroby_nowotworowe",
+        name: "Profilaktyka chorób nowotworowych",
+        description: "Program profilaktyki chorób nowotworowych",
+        specificPrograms: ["Profilaktyka chorób nowotworowych"],
+      },
+      {
+        id: "bezpieczenstwo_dzieci",
+        name: "Bezpieczeństwo dzieci",
+        description: "Bezpieczeństwo podczas wypoczynku letniego i zimowego",
+        specificPrograms: ["Bezpieczeństwo dzieci podczas wypoczynku letniego i zimowego (bezpieczne ferie i wakacje)"],
+      },
+      {
+        id: "zdrowie_psychiczne",
+        name: "Promocja zdrowia psychicznego",
+        description: "Program promocji zdrowia psychicznego",
+        specificPrograms: ["Promocja zdrowia psychicznego"],
       },
     ],
   },
@@ -261,14 +253,26 @@ export const INDICATORS_CONFIG: IndicatorGroup[] = [
         id: "wszystkie_programy",
         name: "Wszystkie programy",
         description: "Wszystkie programy edukacyjne (bez wizyt nieprogramowych)",
-        mainCategories: ["Szczepienia", "Zapobieganie otyłości", "Profilaktyka uzależnień", "HIV/AIDS", "Inne"],
+        mainCategories: [
+          MAIN_CATEGORIES.SZCZEPIENIA,
+          MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
+          MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
+          MAIN_CATEGORIES.HIV_AIDS,
+          MAIN_CATEGORIES.INNE,
+        ],
         includeNonProgram: false,
       },
       {
         id: "wszystkie_razem",
         name: "Wszystko razem",
         description: "Wszystkie programy i wizytacje (włącznie z nieprogramowymi)",
-        mainCategories: ["Szczepienia", "Zapobieganie otyłości", "Profilaktyka uzależnień", "HIV/AIDS", "Inne"],
+        mainCategories: [
+          MAIN_CATEGORIES.SZCZEPIENIA,
+          MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI,
+          MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA,
+          MAIN_CATEGORIES.HIV_AIDS,
+          MAIN_CATEGORIES.INNE,
+        ],
         includeNonProgram: true,
       },
     ],

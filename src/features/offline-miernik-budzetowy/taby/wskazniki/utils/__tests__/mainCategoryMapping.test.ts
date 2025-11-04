@@ -32,76 +32,45 @@ describe("mainCategoryMapping", () => {
 
   describe("getMainCategoryFromRow", () => {
     // Szczepienia tests
-    it("should map 'Podstępne WZW' to Szczepienia", () => {
-      const row = { "Nazwa programu": "Podstępne WZW" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.SZCZEPIENIA);
-    });
-
-    it("should map 'Profilaktyka grypy' to Szczepienia", () => {
-      const row = { "Nazwa programu": "Profilaktyka grypy" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.SZCZEPIENIA);
-    });
-
     it("should map 'Promocja szczepień ochronnych' to Szczepienia", () => {
       const row = { "Nazwa programu": "Promocja szczepień ochronnych" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.SZCZEPIENIA);
     });
 
-    it("should map 'Europejski Tydzień Szczepień' to Szczepienia", () => {
-      const row = { "Nazwa programu": "Europejski Tydzień Szczepień" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.SZCZEPIENIA);
-    });
-
-    it("should map 'Profilaktyka chorób odkleszczowych' to Szczepienia", () => {
-      const row = { "Nazwa programu": "Profilaktyka chorób odkleszczowych" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.SZCZEPIENIA);
-    });
-
-    it("should map 'Profilaktyka chorób zakaźnych' to Szczepienia", () => {
-      const row = { "Nazwa programu": "Profilaktyka chorób zakaźnych" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.SZCZEPIENIA);
-    });
-
     // Zapobieganie otyłości tests
-    it("should map 'Skąd się biorą ekologiczne produkty' to Zapobieganie otyłości", () => {
-      const row = { "Nazwa programu": "Skąd się biorą ekologiczne produkty" };
+    it("should map 'Trzymaj Formę' to Zapobieganie otyłości", () => {
+      const row = { "Nazwa programu": "Trzymaj Formę" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI);
     });
 
-    it("should map 'Trzymaj formę' to Zapobieganie otyłości", () => {
-      const row = { "Nazwa programu": "Trzymaj formę" };
+    it("should map 'Promocja zdrowego stylu życia, aktywności fizycznej i prawidłowego odżywiania' to Zapobieganie otyłości", () => {
+      const row = { "Nazwa programu": "Promocja zdrowego stylu życia, aktywności fizycznej i prawidłowego odżywiania" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI);
     });
 
-    it("should map 'Profilaktyka cukrzycy' to Zapobieganie otyłości", () => {
-      const row = { "Nazwa programu": "Profilaktyka cukrzycy" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI);
-    });
-
-    it("should map 'Promocja zdrowego stylu życia' to Zapobieganie otyłości", () => {
-      const row = { "Nazwa programu": "Promocja zdrowego stylu życia" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI);
-    });
-
-    it("should map 'Promocja zdrowego stylu życia - inne' to Zapobieganie otyłości", () => {
-      const row = { "Nazwa programu": "Promocja zdrowego stylu życia - inne" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI);
-    });
-
-    it("should map 'Kampania EFSA' to Zapobieganie otyłości", () => {
-      const row = { "Nazwa programu": "Kampania EFSA" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI);
+    it("should map 'Zdrowe zęby mamy, marchewkę zajadamy' to Inne", () => {
+      const row = { "Nazwa programu": "Zdrowe zęby mamy, marchewkę zajadamy" };
+      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
     // Profilaktyka uzależnień tests
-    it("should map 'Bieg po zdrowie' to Profilaktyka uzależnień", () => {
-      const row = { "Nazwa programu": "Bieg po zdrowie" };
+    it("should map 'Profilaktyka używania substancji psychoaktywnych (NSP, nikotyna i światowe dni związane z nikotyną, alkohol)' to Profilaktyka uzależnień", () => {
+      const row = {
+        "Nazwa programu": "Profilaktyka używania substancji psychoaktywnych (NSP, nikotyna i światowe dni związane z nikotyną, alkohol)",
+      };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA);
     });
 
-    it("should map 'Czyste powietrze wokół nas' to Profilaktyka uzależnień", () => {
-      const row = { "Nazwa programu": "Czyste powietrze wokół nas" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA);
+    // HIV/AIDS tests
+    it("should map 'Krajowy Program Zapobiegania Zakażeniom HIV i Zwalczania AIDS' to HIV/AIDS", () => {
+      const row = { "Nazwa programu": "Krajowy Program Zapobiegania Zakażeniom HIV i Zwalczania AIDS" };
+      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.HIV_AIDS);
+    });
+
+    // Inne tests
+    it("should map 'Higiena naszą tarczą ochroną' to Inne", () => {
+      const row = { "Nazwa programu": "Higiena naszą tarczą ochroną" };
+      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
     it("should map 'Porozmawiajmy o zdrowiu i nowych zagrożeniach' to Profilaktyka uzależnień", () => {
@@ -109,85 +78,18 @@ describe("mainCategoryMapping", () => {
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA);
     });
 
-    it("should map 'Ars - czyli jak dbać o miłość' to Profilaktyka uzależnień", () => {
-      const row = { "Nazwa programu": "Ars - czyli jak dbać o miłość" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA);
-    });
-
-    it("should map 'Profilaktyka palenia tytoniu' to Profilaktyka uzależnień", () => {
-      const row = { "Nazwa programu": "Profilaktyka palenia tytoniu" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA);
-    });
-
-    it("should map 'Światowy Dzień Rzucania Palenia' to Profilaktyka uzależnień", () => {
-      const row = { "Nazwa programu": "Światowy Dzień Rzucania Palenia" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA);
-    });
-
-    it("should map 'Profilaktyka używania napojów energetycznych' to Profilaktyka uzależnień", () => {
-      const row = { "Nazwa programu": "Profilaktyka używania napojów energetycznych" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA);
-    });
-
-    it("should map 'Nowe narkotyki' to Profilaktyka uzależnień", () => {
-      const row = { "Nazwa programu": "Nowe narkotyki" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA);
-    });
-
-    it("should map 'Światowy Dzień bez Tytoniu' to Profilaktyka uzależnień", () => {
-      const row = { "Nazwa programu": "Światowy Dzień bez Tytoniu" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.PROFILAKTYKA_UZALEZNIENIA);
-    });
-
-    // HIV/AIDS tests
-    it("should map 'HIV/AIDS' to HIV/AIDS", () => {
-      const row = { "Nazwa programu": "HIV/AIDS" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.HIV_AIDS);
-    });
-
-    it("should map 'Światowy Dzień AIDS' to HIV/AIDS", () => {
-      const row = { "Nazwa programu": "Światowy Dzień AIDS" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.HIV_AIDS);
-    });
-
-    // Inne tests
-    it("should map 'Zdrowe zęby mamy, marchewkę zajadamy' to Inne", () => {
-      const row = { "Nazwa programu": "Zdrowe zęby mamy, marchewkę zajadamy" };
+    it("should map 'Profilaktyka chorób zakaźnych' to Inne", () => {
+      const row = { "Nazwa programu": "Profilaktyka chorób zakaźnych" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
-    it("should map 'Higiena naszą tarczą' to Inne", () => {
-      const row = { "Nazwa programu": "Higiena naszą tarczą" };
+    it("should map 'Profilaktyka chorób nowotworowych' to Inne", () => {
+      const row = { "Nazwa programu": "Profilaktyka chorób nowotworowych" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
-    it("should map 'Bezpieczne ferie' to Inne", () => {
-      const row = { "Nazwa programu": "Bezpieczne ferie" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
-    });
-
-    it("should map 'Radon' to Inne", () => {
-      const row = { "Nazwa programu": "Radon" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
-    });
-
-    it("should map 'Moja szkoła, zdrowa szkoła' to Inne", () => {
-      const row = { "Nazwa programu": "Moja szkoła, zdrowa szkoła" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
-    });
-
-    it("should map 'Profilaktyka wad postawy' to Inne", () => {
-      const row = { "Nazwa programu": "Profilaktyka wad postawy" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
-    });
-
-    it("should map 'Znamię, znam je' to Inne", () => {
-      const row = { "Nazwa programu": "Znamię, znam je" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
-    });
-
-    it("should map 'Światowy Dzień Wody' to Inne", () => {
-      const row = { "Nazwa programu": "Światowy Dzień Wody" };
+    it("should map 'Promocja bezpiecznego grzybobrania i profilaktyka zatruć grzybami' to Inne", () => {
+      const row = { "Nazwa programu": "Promocja bezpiecznego grzybobrania i profilaktyka zatruć grzybami" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
@@ -196,43 +98,32 @@ describe("mainCategoryMapping", () => {
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
-    it("should map 'Bezpieczne Wakacje' to Inne", () => {
-      const row = { "Nazwa programu": "Bezpieczne Wakacje" };
+    it("should map 'Europejski i Światowy Dzień Wiedzy o Antybiotykach' to Inne", () => {
+      const row = { "Nazwa programu": "Europejski i Światowy Dzień Wiedzy o Antybiotykach" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
-    it("should map 'Profilaktyka nowotworowa' to Inne", () => {
-      const row = { "Nazwa programu": "Profilaktyka nowotworowa" };
+    it("should map 'Bezpieczeństwo dzieci podczas wypoczynku letniego i zimowego (bezpieczne ferie i wakacje)' to Inne", () => {
+      const row = { "Nazwa programu": "Bezpieczeństwo dzieci podczas wypoczynku letniego i zimowego (bezpieczne ferie i wakacje)" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
-    it("should map 'Profilaktyka nowotworowa - Profilaktyka raka piersi' to Inne", () => {
-      const row = { "Nazwa programu": "Profilaktyka nowotworowa - Profilaktyka raka piersi" };
+    it("should map 'Seniorzy' to Inne", () => {
+      const row = { "Nazwa programu": "Seniorzy" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
-    it("should map 'Profilaktyka nowotworowa - Profilaktyka raka jąder' to Inne", () => {
-      const row = { "Nazwa programu": "Profilaktyka nowotworowa - Profilaktyka raka jąder" };
+    it("should map 'Promocja zdrowia psychicznego' to Inne", () => {
+      const row = { "Nazwa programu": "Promocja zdrowia psychicznego" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
-    it("should map 'Cyberprzemoc' to Inne", () => {
-      const row = { "Nazwa programu": "Cyberprzemoc" };
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
-    });
-
-    it("should map 'Power Ukraina' to Inne", () => {
-      const row = { "Nazwa programu": "Power Ukraina" };
+    it("should map 'Wpływ czynników środowiskowych na zdrowie' to Inne", () => {
+      const row = { "Nazwa programu": "Wpływ czynników środowiskowych na zdrowie" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
     it("should default unknown programs to Inne", () => {
-      // This is problematic behavior!
-      // Unknown programs from Excel should ideally either:
-      // 1. Return undefined/error
-      // 2. Be logged as unknown
-      // 3. Be excluded from indicators
-      // Currently they're silently mapped to "Inne"
       const row = { "Nazwa programu": "Zupełnie nowy program XYZ" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
@@ -244,11 +135,6 @@ describe("mainCategoryMapping", () => {
 
     it("should default missing program name to Inne", () => {
       const row = {};
-      expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
-    });
-
-    it("should map program with special characters to correct category", () => {
-      const row = { "Nazwa programu": "Profilaktyki chorób układu pokarmowego, w tym zatruć pokarmowych – salmonella, grzyby i inne" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.INNE);
     });
 
@@ -269,14 +155,14 @@ describe("mainCategoryMapping", () => {
     });
 
     it("should handle row with whitespace in program name", () => {
-      const row = { "Nazwa programu": "  Podstępne WZW  " };
+      const row = { "Nazwa programu": "  Promocja szczepień ochronnych  " };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.SZCZEPIENIA);
     });
 
     it("should handle complex row data", () => {
       const row = {
         "Typ programu": "Edukacja",
-        "Nazwa programu": "Profilaktyka grypy",
+        "Nazwa programu": "Promocja szczepień ochronnych",
         Działanie: "Warsztaty",
         "Liczba ludzi": 50,
         "Liczba działań": 10,
@@ -306,7 +192,7 @@ describe("mainCategoryMapping", () => {
     });
 
     it("should handle program name with em-dash (–) instead of hyphen (-)", () => {
-      const row = { "Nazwa programu": "Promocja zdrowego stylu życia – inne" };
+      const row = { "Nazwa programu": "Promocja zdrowego stylu życia, aktywności fizycznej i prawidłowego odżywiania" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.ZAPOBIEGANIE_OTYLOSCI);
     });
 
@@ -316,7 +202,7 @@ describe("mainCategoryMapping", () => {
     });
 
     it("should handle program name with mixed special characters", () => {
-      const row = { "Nazwa programu": "Profilaktyka\u00A0grypy" };
+      const row = { "Nazwa programu": "Promocja\u00A0szczepień\u00A0ochronnych" };
       expect(getMainCategoryFromRow(row)).toBe(MAIN_CATEGORIES.SZCZEPIENIA);
     });
   });

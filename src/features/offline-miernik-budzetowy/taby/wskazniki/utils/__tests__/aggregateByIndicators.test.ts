@@ -9,7 +9,7 @@ describe("aggregateByIndicators", () => {
     testData = [
       {
         "Typ programu": "PROGRAMOWE",
-        "Nazwa programu": "Profilaktyka grypy",
+        "Nazwa programu": "Promocja szczepień ochronnych",
         Działanie: "Warsztaty",
         "Liczba ludzi": 30,
         "Liczba działań": 5,
@@ -25,7 +25,7 @@ describe("aggregateByIndicators", () => {
       },
       {
         "Typ programu": "PROGRAMOWE",
-        "Nazwa programu": "Profilaktyka grypy",
+        "Nazwa programu": "Promocja szczepień ochronnych",
         Działanie: "Konsultacje",
         "Liczba ludzi": 20,
         "Liczba działań": 2,
@@ -33,7 +33,7 @@ describe("aggregateByIndicators", () => {
       },
       {
         "Typ programu": "PROGRAMOWE",
-        "Nazwa programu": "Trzymaj formę",
+        "Nazwa programu": "Trzymaj Formę",
         Działanie: "Zajęcia",
         "Liczba ludzi": 25,
         "Liczba działań": 4,
@@ -59,8 +59,8 @@ describe("aggregateByIndicators", () => {
   it("should group data by main category", () => {
     const result = aggregateByIndicators(testData);
 
-    // Should have Szczepienia (from Profilaktyka grypy, Szczepienia)
-    // and Zapobieganie otyłości (from Trzymaj formę)
+    // Should have Szczepienia (from Promocja szczepień ochronnych)
+    // and Zapobieganie otyłości (from Trzymaj Formę)
     const categories = Object.keys(result.byCategory);
     expect(categories).toContain("Szczepienia");
     expect(categories).toContain("Zapobieganie otyłości");
@@ -73,9 +73,9 @@ describe("aggregateByIndicators", () => {
     const otyloscTotal = result.categoryTotals["Zapobieganie otyłości"];
 
     expect(szczepieniaTotal).toBeDefined();
-    // Szczepienia: Profilaktyka grypy (30+20=50) + Promocja szczepień ochronnych (50) = 100
+    // Szczepienia: Promocja szczepień ochronnych (30+50+20) = 100
     expect(szczepieniaTotal.people).toBe(100);
-    expect(szczepieniaTotal.actions).toBe(10); // 5 + 2 + 3
+    expect(szczepieniaTotal.actions).toBe(10); // 5 + 3 + 2
 
     expect(otyloscTotal).toBeDefined();
     expect(otyloscTotal.people).toBe(25);
@@ -102,25 +102,28 @@ describe("aggregateByIndicators", () => {
   it("should handle multiple actions per program", () => {
     const result = aggregateByIndicators(testData);
 
-    // Profilaktyka grypy should have two actions: Warsztaty and Konsultacje
+    // Promocja szczepień ochronnych should have three actions: Warsztaty, Prelekcja, and Konsultacje
     const szczepienia = result.byCategory["Szczepienia"];
-    const profilakykaGrypy = szczepienia["PROGRAMOWE"]["Profilaktyka grypy"];
+    const promocjaSzczepien = szczepienia["PROGRAMOWE"]["Promocja szczepień ochronnych"];
 
-    expect(profilakykaGrypy).toBeDefined();
-    expect(Object.keys(profilakykaGrypy).length).toBe(2); // Warsztaty and Konsultacje
-    expect(profilakykaGrypy["Warsztaty"]).toBeDefined();
-    expect(profilakykaGrypy["Warsztaty"].people).toBe(30);
-    expect(profilakykaGrypy["Warsztaty"].actionNumber).toBe(5);
-    expect(profilakykaGrypy["Konsultacje"]).toBeDefined();
-    expect(profilakykaGrypy["Konsultacje"].people).toBe(20);
-    expect(profilakykaGrypy["Konsultacje"].actionNumber).toBe(2);
+    expect(promocjaSzczepien).toBeDefined();
+    expect(Object.keys(promocjaSzczepien).length).toBe(3); // Warsztaty, Prelekcja, and Konsultacje
+    expect(promocjaSzczepien["Warsztaty"]).toBeDefined();
+    expect(promocjaSzczepien["Warsztaty"].people).toBe(30);
+    expect(promocjaSzczepien["Warsztaty"].actionNumber).toBe(5);
+    expect(promocjaSzczepien["Prelekcja"]).toBeDefined();
+    expect(promocjaSzczepien["Prelekcja"].people).toBe(50);
+    expect(promocjaSzczepien["Prelekcja"].actionNumber).toBe(3);
+    expect(promocjaSzczepien["Konsultacje"]).toBeDefined();
+    expect(promocjaSzczepien["Konsultacje"].people).toBe(20);
+    expect(promocjaSzczepien["Konsultacje"].actionNumber).toBe(2);
   });
 
   it("should accumulate duplicate entries", () => {
     const dataWithDuplicates: ExcelRow[] = [
       {
         "Typ programu": "PROGRAMOWE",
-        "Nazwa programu": "Profilaktyka grypy",
+        "Nazwa programu": "Promocja szczepień ochronnych",
         Działanie: "Warsztaty",
         "Liczba ludzi": 20,
         "Liczba działań": 2,
@@ -128,7 +131,7 @@ describe("aggregateByIndicators", () => {
       },
       {
         "Typ programu": "PROGRAMOWE",
-        "Nazwa programu": "Profilaktyka grypy",
+        "Nazwa programu": "Promocja szczepień ochronnych",
         Działanie: "Warsztaty",
         "Liczba ludzi": 15,
         "Liczba działań": 3,
@@ -139,7 +142,7 @@ describe("aggregateByIndicators", () => {
     const result = aggregateByIndicators(dataWithDuplicates);
 
     const szczepienia = result.byCategory["Szczepienia"];
-    const warsztaty = szczepienia["PROGRAMOWE"]["Profilaktyka grypy"]["Warsztaty"];
+    const warsztaty = szczepienia["PROGRAMOWE"]["Promocja szczepień ochronnych"]["Warsztaty"];
 
     expect(warsztaty.people).toBe(35); // 20 + 15
     expect(warsztaty.actionNumber).toBe(5); // 2 + 3
@@ -149,7 +152,7 @@ describe("aggregateByIndicators", () => {
     const dataWithNonProgramVisits: ExcelRow[] = [
       {
         "Typ programu": "PROGRAMOWE",
-        "Nazwa programu": "Profilaktyka grypy",
+        "Nazwa programu": "Promocja szczepień ochronnych",
         Działanie: "Warsztaty",
         "Liczba ludzi": 30,
         "Liczba działań": 5,
@@ -175,7 +178,7 @@ describe("aggregateByIndicators", () => {
 
     const result = aggregateByIndicators(dataWithNonProgramVisits);
 
-    // Should only include: Profilaktyka grypy (30 people) + Konsultacja (5 people) = 35 people
+    // Should only include: Promocja szczepień ochronnych (30 people) + Konsultacja (5 people) = 35 people
     // NOT including Wizytacja (10 people)
     expect(result.totalPeople).toBe(35); // 30 + 5, NOT 45
     expect(result.totalActions).toBe(6); // 5 + 1, NOT 8
@@ -185,7 +188,7 @@ describe("aggregateByIndicators", () => {
     const dataWithMultipleVisits: ExcelRow[] = [
       {
         "Typ programu": "PROGRAMOWE",
-        "Nazwa programu": "Profilaktyka grypy",
+        "Nazwa programu": "Promocja szczepień ochronnych",
         Działanie: "Warsztaty",
         "Liczba ludzi": 30,
         "Liczba działań": 5,
@@ -219,17 +222,17 @@ describe("aggregateByIndicators", () => {
 
     const result = aggregateByIndicators(dataWithMultipleVisits);
 
-    // Should only include Profilaktyka grypy (30 people)
+    // Should only include Promocja szczepień ochronnych (30 people)
     // All three wizytacja rows should be skipped (5+8+3=16 people)
-    expect(result.totalPeople).toBe(30); // Only from Profilaktyka grypy
-    expect(result.totalActions).toBe(5); // Only from Profilaktyka grypy
+    expect(result.totalPeople).toBe(30); // Only from Promocja szczepień ochronnych
+    expect(result.totalActions).toBe(5); // Only from Promocja szczepień ochronnych
   });
 
   it("should be case-insensitive for wizytacja in indicators", () => {
     const dataWithCases: ExcelRow[] = [
       {
         "Typ programu": "PROGRAMOWE",
-        "Nazwa programu": "Profilaktyka grypy",
+        "Nazwa programu": "Promocja szczepień ochronnych",
         Działanie: "Warsztaty",
         "Liczba ludzi": 30,
         "Liczba działań": 5,
