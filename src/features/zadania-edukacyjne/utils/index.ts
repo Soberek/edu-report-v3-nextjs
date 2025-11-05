@@ -181,5 +181,35 @@ export const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
+/**
+ * Translates activity type to Polish
+ */
+export const getActivityTypeLabel = (type: string): string => {
+  const activityTypeMap: Record<string, string> = {
+    presentation: "Prelekcja",
+    lecture: "Wykład",
+    distribution: "Dystrybucja",
+    media_publication: "Publikacja media",
+    educational_info_stand: "Stoisko informacyjne-edukacyjne",
+    report: "Sprawozdanie",
+    monthly_report: "Sprawozdanie miesięczne",
+    intent_letter: "List intencyjny",
+    visitation: "Wizytacja",
+    games: "Gry i zabawy",
+    instruction: "Instruktaż",
+    individual_instruction: "Instruktaż indywidualny",
+    meeting: "Narada",
+    training: "Szkolenie",
+    conference: "Konferencja",
+    counseling: "Poradnictwo",
+    workshop: "Warsztaty",
+    contest: "Konkurs",
+    other: "Inny",
+    street_happening: "Happening uliczny",
+  };
+
+  return activityTypeMap[type] || type;
+};
+
 // Re-export material utilities
 export * from "./materialUtils";

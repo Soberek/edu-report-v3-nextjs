@@ -1,9 +1,9 @@
 import React from "react";
-import { Card, CardContent, CardActions, Typography, Box, Chip, Button, Collapse, Avatar, Divider } from "@mui/material";
-import { Edit, Delete, ExpandMore, ExpandLess, CalendarToday, School, Assignment, Tag } from "@mui/icons-material";
+import { Card, CardContent, Typography, Box, Chip, Button, Collapse, Avatar, Divider } from "@mui/material";
+import { Edit, Delete, ExpandMore, ExpandLess, CalendarToday, School, Assignment } from "@mui/icons-material";
 import type { TaskCardProps } from "../types";
-import { formatTaskDate, getMaterialsSummary, getMaterialsDetailsList, getTotalDistributedCount } from "../utils";
-import { STYLE_CONSTANTS, BUTTON_LABELS } from "../constants";
+import { formatTaskDate, getMaterialsSummary, getMaterialsDetailsList, getTotalDistributedCount, getActivityTypeLabel } from "../utils";
+import { STYLE_CONSTANTS } from "../constants";
 import { useSchoolsMap } from "../hooks/useSchoolsMap";
 
 export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleExpansion, onEdit, onDelete }) => {
@@ -16,93 +16,92 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
   const totalMaterialsCount = getTotalDistributedCount(task.activities);
 
   const renderTaskSummary = () => (
-    <Box>
-      {/* Header with Avatar and Quick Info */}
-      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2, mb: 2 }}>
-        <Avatar
-          sx={{
-            bgcolor: STYLE_CONSTANTS.COLORS.PRIMARY,
-            width: 48,
-            height: 48,
-            fontSize: "1.1rem",
-            fontWeight: "bold",
-          }}
-        >
-          {task.taskNumber?.split("/")[0] || "?"}
-        </Avatar>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, py: 0.75 }}>
+      {/* Number/Avatar */}
+      <Avatar
+        sx={{
+          bgcolor: STYLE_CONSTANTS.COLORS.PRIMARY,
+          width: 36,
+          height: 36,
+          fontSize: "0.9rem",
+          fontWeight: "bold",
+          flexShrink: 0,
+        }}
+      >
+        {task.taskNumber?.split("/")[0] || "?"}
+      </Avatar>
 
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
-            <Typography variant="h6" fontWeight="bold" sx={{ color: STYLE_CONSTANTS.COLORS.PRIMARY }}>
-              {task.referenceNumber}
-            </Typography>
-            <Chip
-              label={taskDate}
-              size="small"
-              icon={<CalendarToday sx={{ fontSize: "0.8rem" }} />}
-              sx={{ fontSize: "0.75rem", height: 20 }}
-            />
-          </Box>
-
-          <Typography variant="body1" fontWeight="medium" sx={{ mb: 1, lineHeight: 1.3 }}>
-            {task.title.length > 80 ? `${task.title.substring(0, 80)}...` : task.title}
+      {/* Title and main info */}
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+          <Typography variant="body2" fontWeight="bold" sx={{ color: STYLE_CONSTANTS.COLORS.PRIMARY, minWidth: "fit-content" }}>
+            {task.referenceNumber}
           </Typography>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-            <School sx={{ fontSize: "1rem", color: "text.secondary" }} />
-            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: "medium" }}>
+          <Typography
+            variant="body2"
+            fontWeight="medium"
+            sx={{ flexGrow: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+          >
+            {task.title}
+          </Typography>
+
+          {task.activities.length > 0 && (
+            <Chip
+              label={getActivityTypeLabel(task.activities[0].type)}
+              size="small"
+              variant="outlined"
+              sx={{ fontSize: "0.65rem", height: 20, flexShrink: 0 }}
+            />
+          )}
+
+          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: "medium", minWidth: "fit-content", flexShrink: 0 }}>
+            {task.programName}
+          </Typography>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexShrink: 0 }}>
+            <School sx={{ fontSize: "0.9rem", color: "text.secondary" }} />
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: "medium" }}>
               {getSchoolName(task.schoolId)}
             </Typography>
           </Box>
 
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.85rem", fontStyle: "italic" }}>
-            {task.programName}
-          </Typography>
-        </Box>
-      </Box>
-
-      {/* Quick Stats Row */}
-      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
-        <Chip
-          icon={<Assignment sx={{ fontSize: "0.8rem" }} />}
-          label={`${activityCount} ${activityCount === 1 ? "aktywność" : "aktywności"}`}
-          size="small"
-          sx={{
-            backgroundColor: STYLE_CONSTANTS.GRADIENTS.SUCCESS,
-            color: "#2e7d32",
-            fontWeight: "bold",
-            fontSize: "0.75rem",
-          }}
-        />
-
-        {task.activities.length > 0 && (
           <Chip
-            icon={<Tag sx={{ fontSize: "0.8rem" }} />}
-            label={task.activities[0].type}
+            label={taskDate}
             size="small"
-            variant="outlined"
-            color="primary"
-            sx={{ fontSize: "0.75rem" }}
+            icon={<CalendarToday sx={{ fontSize: "0.7rem" }} />}
+            sx={{ fontSize: "0.7rem", height: 22, flexShrink: 0 }}
           />
-        )}
 
-        {task.taskNumber && (
-          <Chip label={`Nr: ${task.taskNumber}`} size="small" variant="outlined" sx={{ fontSize: "0.75rem", color: "text.secondary" }} />
-        )}
+          {totalMaterialsCount > 0 && (
+            <Chip
+              label={`📦 ${totalMaterialsCount}`}
+              size="small"
+              sx={{
+                fontSize: "0.7rem",
+                height: 22,
+                color: "success.main",
+                borderColor: "success.main",
+                backgroundColor: "success.50",
+                flexShrink: 0,
+              }}
+            />
+          )}
 
-        {totalMaterialsCount > 0 && (
           <Chip
-            label={`📦 ${totalMaterialsCount} materiałów`}
+            label={`${activityCount}`}
             size="small"
-            variant="outlined"
+            icon={<Assignment sx={{ fontSize: "0.7rem" }} />}
             sx={{
-              fontSize: "0.75rem",
-              color: "success.main",
-              borderColor: "success.main",
-              backgroundColor: "success.50",
+              backgroundColor: STYLE_CONSTANTS.GRADIENTS.SUCCESS,
+              color: "#2e7d32",
+              fontWeight: "bold",
+              fontSize: "0.7rem",
+              height: 22,
+              flexShrink: 0,
             }}
           />
-        )}
+        </Box>
       </Box>
     </Box>
   );
@@ -259,97 +258,72 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, isExpanded, onToggleEx
   return (
     <Card
       sx={{
-        mb: STYLE_CONSTANTS.SPACING.MEDIUM,
+        mb: STYLE_CONSTANTS.SPACING.SMALL,
         borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.MEDIUM,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
         border: "1px solid rgba(0,0,0,0.06)",
         transition: "all 0.3s ease",
         "&:hover": {
-          boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-          transform: "translateY(-2px)",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
           borderColor: STYLE_CONSTANTS.COLORS.PRIMARY + "40",
         },
       }}
     >
-      <CardContent sx={{ pb: 1 }}>
-        {renderTaskSummary()}
+      <CardContent sx={{ p: 1.5, pb: isExpanded ? 1.5 : 1.5, "&:last-child": { pb: isExpanded ? 1.5 : 1.5 } }}>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", flex: 1 }}>{renderTaskSummary()}</Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flexShrink: 0 }}>
+            <Button
+              onClick={onToggleExpansion}
+              size="small"
+              variant="text"
+              sx={{
+                minWidth: "auto",
+                p: 0.5,
+                color: "text.secondary",
+                "&:hover": {
+                  color: STYLE_CONSTANTS.COLORS.PRIMARY,
+                  backgroundColor: STYLE_CONSTANTS.COLORS.PRIMARY + "08",
+                },
+              }}
+            >
+              {isExpanded ? <ExpandLess sx={{ fontSize: "1.2rem" }} /> : <ExpandMore sx={{ fontSize: "1.2rem" }} />}
+            </Button>
+
+            <Button
+              size="small"
+              variant="text"
+              startIcon={<Edit sx={{ fontSize: "0.9rem" }} />}
+              onClick={onEdit}
+              sx={{
+                minWidth: "auto",
+                p: 0.5,
+                color: STYLE_CONSTANTS.COLORS.PRIMARY,
+                fontSize: "0.75rem",
+              }}
+            >
+              Edytuj
+            </Button>
+            <Button
+              size="small"
+              variant="text"
+              startIcon={<Delete sx={{ fontSize: "0.9rem" }} />}
+              onClick={onDelete}
+              sx={{
+                minWidth: "auto",
+                p: 0.5,
+                color: "error.main",
+                fontSize: "0.75rem",
+              }}
+            >
+              Usuń
+            </Button>
+          </Box>
+        </Box>
+
         {renderTaskDetails()}
       </CardContent>
-
-      <CardActions sx={{ justifyContent: "space-between", px: 2, pb: 2, pt: 1 }}>
-        <Button
-          onClick={onToggleExpansion}
-          size="small"
-          variant="outlined"
-          startIcon={isExpanded ? <ExpandLess /> : <ExpandMore />}
-          sx={{
-            borderRadius: 3,
-            textTransform: "none",
-            fontWeight: "medium",
-            fontSize: "0.8rem",
-            minWidth: "auto",
-            px: 2,
-            borderColor: "divider",
-            color: "text.secondary",
-            "&:hover": {
-              borderColor: STYLE_CONSTANTS.COLORS.PRIMARY,
-              backgroundColor: STYLE_CONSTANTS.COLORS.PRIMARY + "08",
-              color: STYLE_CONSTANTS.COLORS.PRIMARY,
-            },
-          }}
-        >
-          {isExpanded ? "Zwiń" : "Rozwiń"}
-        </Button>
-
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<Edit sx={{ fontSize: "1rem" }} />}
-            onClick={onEdit}
-            sx={{
-              borderRadius: 3,
-              textTransform: "none",
-              fontWeight: "medium",
-              fontSize: "0.8rem",
-              minWidth: "auto",
-              px: 2,
-              borderColor: STYLE_CONSTANTS.COLORS.PRIMARY,
-              color: STYLE_CONSTANTS.COLORS.PRIMARY,
-              "&:hover": {
-                backgroundColor: STYLE_CONSTANTS.COLORS.PRIMARY,
-                color: "white",
-                transform: "scale(1.02)",
-              },
-            }}
-          >
-            {BUTTON_LABELS.EDIT}
-          </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            startIcon={<Delete sx={{ fontSize: "1rem" }} />}
-            onClick={onDelete}
-            sx={{
-              borderRadius: 3,
-              textTransform: "none",
-              fontWeight: "medium",
-              fontSize: "0.8rem",
-              minWidth: "auto",
-              px: 2,
-              borderColor: "error.main",
-              color: "error.main",
-              "&:hover": {
-                backgroundColor: "error.main",
-                color: "white",
-                transform: "scale(1.02)",
-              },
-            }}
-          >
-            {BUTTON_LABELS.DELETE}
-          </Button>
-        </Box>
-      </CardActions>
     </Card>
   );
 };

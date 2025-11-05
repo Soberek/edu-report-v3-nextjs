@@ -294,17 +294,17 @@ export type Activity =
 // Główna struktura zadania
 export interface EducationalTask {
   id: string;
-  title: string;
-  programName: string;
-  date: string;
-  schoolId: string;
+  title: string; // tytuł zadania
+  programName: string; // nazwa programu powiązanego z zadaniem
+  date: string; // data realizacji zadania
+  schoolId: string; // id szkoły powiązanej z zadaniem
   taskNumber: string; // np. 45/2025
   referenceNumber: string; // np. OZiPZ.966.5.2.2025
   referenceId?: string;
   activities: Activity[]; // Może zawierać mix różnych typów
-  createdBy: string;
-  createdAt: string;
-  updatedAt?: string;
+  createdBy: string; // ID użytkownika, który utworzył zadanie
+  createdAt: string; // data utworzenia
+  updatedAt?: string; // data ostatniej aktualizacji
 }
 
 // Formularze

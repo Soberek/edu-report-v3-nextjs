@@ -8,7 +8,7 @@ export const extractMaterialsFromActivities = (activities: Activity[]): Material
   const allMaterials: Material[] = [];
 
   activities.forEach((activity) => {
-    if (isDistributionActivity(activity)) {
+    if (isDistributionActivity(activity) && activity.materials) {
       allMaterials.push(...activity.materials);
     }
   });
