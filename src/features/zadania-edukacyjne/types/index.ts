@@ -111,7 +111,7 @@ export const MONTH_NAMES = [
   "Grudzień",
 ] as const;
 
-export type MonthName = typeof MONTH_NAMES[number];
+export type MonthName = (typeof MONTH_NAMES)[number];
 
 // Initial state
 export const INITIAL_PAGE_STATE: EducationalTasksPageState = {

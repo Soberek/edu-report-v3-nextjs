@@ -16,7 +16,7 @@ export const TaskGroups: React.FC<TaskGroupProps> = ({ group, expandedTasks, onT
       <Box
         sx={{
           p: STYLE_CONSTANTS.SPACING.MEDIUM,
-          mb: STYLE_CONSTANTS.SPACING.MEDIUM,
+          mb: STYLE_CONSTANTS.SPACING.SMALL,
           backgroundColor: STYLE_CONSTANTS.COLORS.HEADER_BACKGROUND,
           color: "white",
           borderRadius: STYLE_CONSTANTS.BORDER_RADIUS.MEDIUM,

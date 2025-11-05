@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import theme from "@/providers/ThemeProvider";
@@ -31,23 +32,24 @@ export default function RootLayout({
           <NotificationProvider>
             <GlobalErrorBoundary>
               <AppRouterCacheProvider>
-              <LocalizationProviderClient>
-                <ThemeProvider theme={theme}>
-                  <SearchProvider>
-                    <UserProvider>
-                      <NavProvider>
-                        <QueryClientProvider>
-                          <AuthenticatedLayout>{children}</AuthenticatedLayout>
-                        </QueryClientProvider>
-                      </NavProvider>
-                    </UserProvider>
-                  </SearchProvider>
-                </ThemeProvider>
-              </LocalizationProviderClient>
-            </AppRouterCacheProvider>
-          </GlobalErrorBoundary>
+                <LocalizationProviderClient>
+                  <ThemeProvider theme={theme}>
+                    <SearchProvider>
+                      <UserProvider>
+                        <NavProvider>
+                          <QueryClientProvider>
+                            <AuthenticatedLayout>{children}</AuthenticatedLayout>
+                          </QueryClientProvider>
+                        </NavProvider>
+                      </UserProvider>
+                    </SearchProvider>
+                  </ThemeProvider>
+                </LocalizationProviderClient>
+              </AppRouterCacheProvider>
+            </GlobalErrorBoundary>
           </NotificationProvider>
         </GlobalErrorProvider>
+        <Analytics />
       </body>
     </html>
   );
