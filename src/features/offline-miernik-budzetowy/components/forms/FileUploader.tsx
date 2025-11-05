@@ -52,7 +52,7 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-             Obsługiwane formaty: .xlsx (maks. 10MB)
+            Obsługiwane formaty: .xlsx (maks. 10MB)
           </Typography>
 
           <input ref={fileInputRef} type="file" accept=".xlsx" onChange={onFileUpload} style={{ display: "none" }} />
@@ -76,9 +76,18 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
 
         {/* Error Display */}
         {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
+          <Box sx={{ mt: 2 }}>
+            <Alert
+              severity="error"
+              action={
+                <Button color="inherit" size="small" onClick={handleReset} startIcon={<Refresh />}>
+                  Resetuj
+                </Button>
+              }
+            >
+              {error}
+            </Alert>
+          </Box>
         )}
       </Box>
     );

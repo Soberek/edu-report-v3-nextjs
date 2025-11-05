@@ -12,6 +12,10 @@ export * from "./fileUtils";
 // Error handling utilities
 export * from "./errorHandler";
 
+// Excel parsing and normalization
+export * from "./excelParser";
+export * from "./cellNormalizer";
+
 // Core data processing utilities
 export { validateExcelData, aggregateData, exportToExcel } from "./dataProcessing";
 

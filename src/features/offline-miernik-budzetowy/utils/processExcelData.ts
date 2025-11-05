@@ -1,5 +1,5 @@
 import moment from "moment";
-import type { ExcelRow } from "../hooks/useExcelFileReader";
+import type { ExcelRow } from "../types";
 
 import type { Month } from "../components/forms/month-buttons";
 

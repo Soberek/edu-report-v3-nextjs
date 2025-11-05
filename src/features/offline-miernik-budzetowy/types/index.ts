@@ -45,15 +45,15 @@ export interface BudgetMeterState {
   rawData: ExcelRow[];
   isLoading: boolean;
   fileError: string | null;
-  
+
   // Month selection
   selectedMonths: Month[];
   monthError: string | null;
-  
+
   // Data processing
   aggregatedData: AggregatedData | null;
   processingError: string | null;
-  
+
   // UI state
   isProcessing: boolean;
 }
@@ -75,7 +75,7 @@ export type BudgetMeterAction =
 export const ExcelRowSchema = z.object({
   "Typ programu": z.string().min(1, "Typ programu jest wymagany"),
   "Nazwa programu": z.string().min(1, "Nazwa programu jest wymagana"),
-  "Działanie": z.string().min(1, "Działanie jest wymagane"),
+  Działanie: z.string().min(1, "Działanie jest wymagane"),
   "Liczba ludzi": z.union([z.string(), z.number()]).transform((val) => {
     // Handle empty strings as 0
     if (val === "" || val === 0) return 0;
@@ -94,7 +94,7 @@ export const ExcelRowSchema = z.object({
     }
     return num;
   }),
-  "Data": z.string().refine((date) => {
+  Data: z.string().refine((date) => {
     // Allow empty dates for filtering later
     if (date === "") return true;
     const parsed = new Date(date);
@@ -109,9 +109,8 @@ export const MonthSchema = z.object({
 
 export const FileValidationSchema = z.object({
   name: z.string().min(1),
-  type: z.string().refine((type) => 
-    type.includes("spreadsheet") || type.includes("excel") || 
-    type.endsWith(".xlsx"),
+  type: z.string().refine(
+    (type) => type.includes("spreadsheet") || type.includes("excel") || type.endsWith(".xlsx"),
     "File must be Excel format (.xlsx)" // Will be caught and formatted with constants
   ),
   size: z.number().max(10 * 1024 * 1024, "File cannot be larger than 10MB"), // Will be caught and formatted with constants
@@ -119,8 +118,18 @@ export const FileValidationSchema = z.object({
 
 // Constants
 export const MONTH_NAMES = [
-  "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
-  "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
+  "Styczeń",
+  "Luty",
+  "Marzec",
+  "Kwiecień",
+  "Maj",
+  "Czerwiec",
+  "Lipiec",
+  "Sierpień",
+  "Wrzesień",
+  "Październik",
+  "Listopad",
+  "Grudzień",
 ] as const;
 
 export const VALID_FILE_EXTENSIONS = [".xlsx", ".xls"] as const;
@@ -129,4 +138,3 @@ export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 // Error Messages - Use from constants/errorMessages.ts
 // Re-export for backward compatibility
 export { ERROR_MESSAGES } from "../constants";
-
