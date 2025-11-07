@@ -93,15 +93,15 @@ describe("ExportButtons", () => {
   it("should render text fields for filename customization", () => {
     renderWithTheme(<ExportButtons {...defaultProps} />);
     expect(screen.getByLabelText("Nazwa pliku Excel")).toBeInTheDocument();
-    expect(screen.getByLabelText("Nazwa szablonu miesięcznego")).toBeInTheDocument();
-    expect(screen.getByLabelText("Nazwa szablonu narastającego")).toBeInTheDocument();
+    expect(screen.getByLabelText("Nazwa pliku miesięcznego")).toBeInTheDocument();
+    expect(screen.getByLabelText("Nazwa pliku narastającego")).toBeInTheDocument();
   });
 
   it("should disable text fields when isProcessing is true", () => {
     renderWithTheme(<ExportButtons {...defaultProps} isProcessing={true} />);
     expect(screen.getByLabelText("Nazwa pliku Excel")).toBeDisabled();
-    expect(screen.getByLabelText("Nazwa szablonu miesięcznego")).toBeDisabled();
-    expect(screen.getByLabelText("Nazwa szablonu narastającego")).toBeDisabled();
+    expect(screen.getByLabelText("Nazwa pliku miesięcznego")).toBeDisabled();
+    expect(screen.getByLabelText("Nazwa pliku narastającego")).toBeDisabled();
   });
 
   it("should handle export failure gracefully", async () => {

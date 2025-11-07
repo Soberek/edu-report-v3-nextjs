@@ -71,6 +71,8 @@ function ExcelUploaderMonthsButtons({ months, handleMonthSelect }: Props) {
             key={monthNumber}
             onClick={() => handleMonthSelect(monthNumber)}
             size="medium"
+            aria-pressed={selected}
+            aria-label={`${getMonthName(monthNumber)} ${selected ? "selected" : "not selected"}`}
             sx={{
               minWidth: 80,
               height: 44,

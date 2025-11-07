@@ -27,3 +27,6 @@ export * from "./dataProcessingUtils";
 
 // Data filtering utilities
 export * from "./dataFiltering";
+
+// Export strategy pattern
+export { exportData, getAvailableExportFormats, getExportStrategy, type ExportFormat, type ExportStrategy } from "./exportStrategies";
