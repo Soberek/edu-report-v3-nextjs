@@ -5,6 +5,8 @@ import { AdvancedStats } from "../../taby/statystyki";
 import { BarCharts } from "../../taby/wykresy";
 import { DataTable } from "../../taby/miernik-budzetowy";
 import { IndicatorsView } from "../../taby/wskazniki/components";
+import { ExcelTasksTable } from "../../taby/excel-tasks";
+import { filterDataBySelectedMonths } from "../../utils/dataFiltering";
 import type { AggregatedData, ExcelRow, Month } from "../../types";
 
 interface TabContentProps {
@@ -32,6 +34,11 @@ export const TabContent: React.FC<TabContentProps> = ({ activeTab, aggregatedDat
 
       case TABS.INDICATORS:
         return <IndicatorsView rawData={rawData} selectedMonths={selectedMonths} />;
+
+      case TABS.EXCEL_TASKS:
+        // Filter data to show only rows from selected months
+        const filteredData = filterDataBySelectedMonths(rawData, selectedMonths);
+        return <ExcelTasksTable rawData={filteredData} />;
 
       default:
         return null;

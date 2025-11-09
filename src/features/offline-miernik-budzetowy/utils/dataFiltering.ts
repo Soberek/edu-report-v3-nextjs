@@ -1,4 +1,5 @@
-import type { ExcelRow } from "../types";
+import moment from "moment";
+import type { ExcelRow, Month } from "../types";
 
 /**
  * Checks if a row is completely empty (all cells are empty/undefined)
@@ -253,4 +254,33 @@ export const getFilteringWarnings = (data: ExcelRow[]): { filteredRowNumbers: nu
   }
 
   return { filteredRowNumbers: completelyEmptyRowNumbers.concat(incompleteRowNumbers), warnings };
+};
+
+/**
+ * Filters Excel data to show only rows from selected months
+ * Used in ExcelTasksTable to display only relevant month data
+ * Automatically filters out invalid/empty rows
+ *
+ * @param data Array of Excel rows
+ * @param selectedMonths Array of month objects with selected flag
+ * @returns Filtered rows that match selected months and are valid (not empty)
+ */
+export const filterDataBySelectedMonths = (data: ExcelRow[], selectedMonths: Month[]): ExcelRow[] => {
+  const selectedMonthNumbers = selectedMonths.filter((m) => m.selected).map((m) => m.monthNumber);
+
+  if (selectedMonthNumbers.length === 0) {
+    return []; // No months selected
+  }
+
+  return data.filter((row) => {
+    // Skip empty rows
+    if (isCompletelyEmptyRow(row)) return false;
+    if (isRowEmpty(row)) return false;
+
+    const dateStr = String(row["Data"] || "");
+    if (!dateStr) return false; // Skip rows without date
+
+    const month = moment(dateStr, "YYYY-MM-DD").month() + 1;
+    return selectedMonthNumbers.includes(month);
+  });
 };

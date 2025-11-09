@@ -12,19 +12,20 @@ export const TABS = {
   DATA_TABLE: 2,
   MAIN_CATEGORIES: 3,
   INDICATORS: 4,
+  EXCEL_TASKS: 5,
 } as const;
 
 export const DEFAULT_ACTIVE_TAB = TABS.DATA_TABLE;
 
 // Tab Metadata
 export const TAB_CONFIG = [
-    {
+  {
     id: TABS.DATA_TABLE,
     label: "Miernik budżetowy",
     icon: "TableChart",
     testId: "data-table-tab",
   },
-    {
+  {
     id: TABS.INDICATORS,
     label: "Wskaźniki",
     icon: "Category",
@@ -42,8 +43,12 @@ export const TAB_CONFIG = [
     icon: "BarChart",
     testId: "bar-charts-tab",
   },
-
-
+  {
+    id: TABS.EXCEL_TASKS,
+    label: "Wszystkie zadania z Excel",
+    icon: "ListAlt",
+    testId: "excel-tasks-tab",
+  },
 ] as const;
 
 // UI Constants
