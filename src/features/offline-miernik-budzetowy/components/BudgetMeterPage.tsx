@@ -1,10 +1,10 @@
 import React, { useEffect, memo } from "react";
-import { Container, Box, Alert } from "@mui/material";
+import { Container, Box, Alert, CircularProgress, Typography } from "@mui/material";
 import { useBudgetMeter, useTabManager } from "../hooks";
-import { FileUploader, MonthSelector, ExportButtons, ProcessingButton, StatisticsCards, TabNavigation, TabContent } from "./";
+import { FileUploader, MonthSelector, ExportButtons, StatisticsCards, TabNavigation, TabContent } from "./";
 import { EmptyState, PageHeader } from "@/components/shared";
 import { UI_CONFIG, AUTO_PROCESSING } from "../constants";
-import { canProcessData, getSelectedMonthsCount, shouldAutoProcess, getCurrentError } from "../utils";
+import { getSelectedMonthsCount, shouldAutoProcess, getCurrentError } from "../utils";
 
 /**
  * Main Budget Meter page component
@@ -33,7 +33,6 @@ export const BudgetMeterPage: React.FC = () => {
   // Derived state
   const selectedMonthsCount = getSelectedMonthsCount(state.selectedMonths);
   const currentError = getCurrentError(state.fileError, state.monthError, state.processingError);
-  const showProcessingButton = canProcessData(state.rawData, state.selectedMonths, state.aggregatedData);
   const showStatistics = Boolean(hasValidData && state.aggregatedData);
   const showDataVisualization = Boolean(hasValidData && state.aggregatedData);
   const showEmptyState = !state.rawData.length && !currentError;
@@ -47,13 +46,26 @@ export const BudgetMeterPage: React.FC = () => {
 
   return (
     <Container maxWidth={UI_CONFIG.CONTAINER_MAX_WIDTH} sx={{ py: 4 }}>
-      <PageHeader title="Miernik Budżetowy oraz wskaźniki" />
+      <PageHeader title="Miernik Budżetowy oraz wskaźniki">
+        <Typography
+          variant="subtitle1"
+          color="text.secondary"
+          sx={{
+            fontStyle: "italic",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.5,
+          }}
+        >
+          Stworzone przez
+          <Box component="span" sx={{ color: "primary.main", fontWeight: 600 }}>
+            Krzysztof Palpuchowski
+          </Box>
+          , PSSE Myślibórz
+        </Typography>
+      </PageHeader>
 
-            <FileUploadSection
-        state={state}
-        onFileUpload={handleFileUpload}
-        onReset={resetState}
-      />
+      <FileUploadSection state={state} onFileUpload={handleFileUpload} onReset={resetState} />
 
       <MonthSelectionSection
         state={state}
@@ -73,7 +85,15 @@ export const BudgetMeterPage: React.FC = () => {
         onExportToCumulativeTemplate={handleExportToCumulativeTemplate}
       />
 
-      <ProcessingButton show={showProcessingButton} onProcess={processData} canProcess={canProcess} isProcessing={state.isProcessing} />
+      {/* Auto-processing loading indicator */}
+      {state.isProcessing && (
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 2, py: 3 }}>
+          <CircularProgress size={24} />
+          <Typography variant="body2" color="text.secondary">
+            Przetwarzanie danych...
+          </Typography>
+        </Box>
+      )}
 
       <ErrorDisplay error={currentError} />
 
@@ -92,8 +112,6 @@ export const BudgetMeterPage: React.FC = () => {
     </Container>
   );
 };
-
-
 
 /**
  * File upload section props
@@ -134,21 +152,17 @@ interface ExportSectionProps {
 /**
  * Export section component
  */
-const ExportSection: React.FC<ExportSectionProps> = memo(({
-  canExport,
-  isProcessing,
-  onExport,
-  onExportToTemplate,
-  onExportToCumulativeTemplate,
-}) => (
-  <ExportButtons
-    canExport={canExport}
-    isProcessing={isProcessing}
-    onExport={onExport}
-    onExportToTemplate={onExportToTemplate}
-    onExportToCumulativeTemplate={onExportToCumulativeTemplate}
-  />
-));
+const ExportSection: React.FC<ExportSectionProps> = memo(
+  ({ canExport, isProcessing, onExport, onExportToTemplate, onExportToCumulativeTemplate }) => (
+    <ExportButtons
+      canExport={canExport}
+      isProcessing={isProcessing}
+      onExport={onExport}
+      onExportToTemplate={onExportToTemplate}
+      onExportToCumulativeTemplate={onExportToCumulativeTemplate}
+    />
+  )
+);
 
 ExportSection.displayName = "ExportSection";
 
@@ -168,31 +182,25 @@ interface MonthSelectionSectionProps {
 /**
  * Month selection section component
  */
-const MonthSelectionSection: React.FC<MonthSelectionSectionProps> = memo(({
-  state,
-  selectedMonthsCount,
-  currentError,
-  onMonthToggle,
-  onSelectAll,
-  onDeselectAll,
-  onSelectPreset,
-}) => {
-  if (state.rawData.length === 0) {
-    return null;
-  }
+const MonthSelectionSection: React.FC<MonthSelectionSectionProps> = memo(
+  ({ state, selectedMonthsCount, currentError, onMonthToggle, onSelectAll, onDeselectAll, onSelectPreset }) => {
+    if (state.rawData.length === 0) {
+      return null;
+    }
 
-  return (
-    <MonthSelector
-      months={state.selectedMonths}
-      onMonthToggle={onMonthToggle}
-      onSelectAll={onSelectAll}
-      onDeselectAll={onDeselectAll}
-      onSelectPreset={onSelectPreset}
-      selectedCount={selectedMonthsCount}
-      disabled={!!currentError}
-    />
-  );
-});
+    return (
+      <MonthSelector
+        months={state.selectedMonths}
+        onMonthToggle={onMonthToggle}
+        onSelectAll={onSelectAll}
+        onDeselectAll={onDeselectAll}
+        onSelectPreset={onSelectPreset}
+        selectedCount={selectedMonthsCount}
+        disabled={!!currentError}
+      />
+    );
+  }
+);
 
 MonthSelectionSection.displayName = "MonthSelectionSection";
 
