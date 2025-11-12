@@ -184,17 +184,20 @@ export const ExcelTasksTable: React.FC<ExcelTasksTableProps> = React.memo(({ raw
             </TableRow>
           </TableHead>
           <TableBody>
-            {rawData.map((row, index) => (
-              <GenerateDocumentRow
-                key={index}
-                row={row}
-                index={index}
-                columns={columns}
-                theme={theme}
-                getCellStyle={getCellStyle}
-                formatCellValue={formatCellValue}
-              />
-            ))}
+            {[...rawData].reverse().map((row, displayIndex) => {
+              const originalIndex = rawData.length - 1 - displayIndex;
+              return (
+                <GenerateDocumentRow
+                  key={originalIndex}
+                  row={row}
+                  index={originalIndex}
+                  columns={columns}
+                  theme={theme}
+                  getCellStyle={getCellStyle}
+                  formatCellValue={formatCellValue}
+                />
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
