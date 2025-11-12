@@ -1,11 +1,8 @@
 import ExcelJS from "exceljs";
+import * as XLSX from "xlsx";
 import { VALID_FILE_EXTENSIONS, MAX_FILE_SIZE, ERROR_MESSAGES, type ExcelRow } from "../types";
-import {
-  createFileTypeError,
-  createFileSizeError,
-  createFileCorruptionError,
-  formatErrorForDisplay,
-} from "./errorHandler";
+import { createFileTypeError, createFileSizeError, createFileCorruptionError, formatErrorForDisplay } from "./errorHandler";
+import { debugLogger } from "./debugLogger";
 
 /**
  * Validates if a file is a valid Excel file
@@ -39,7 +36,8 @@ export const validateExcelFile = (file: File): { isValid: boolean; error?: strin
  * Reads Excel file and returns parsed data
  */
 export const readExcelFile = (file: File): Promise<{ fileName: string; data: ExcelRow[] }> => {
-  console.log("📂 DEBUG: readExcelFile called for:", file.name);
+  debugLogger.fileUpload(file.name, "start", { size: file.size, type: file.type });
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -47,112 +45,95 @@ export const readExcelFile = (file: File): Promise<{ fileName: string; data: Exc
       try {
         const arrayBuffer = event.target?.result;
         if (!arrayBuffer) {
-          console.log("❌ DEBUG: No arrayBuffer from file reader");
+          debugLogger.error("No arrayBuffer from file reader", new Error("FileReader returned null"));
           const error = createFileCorruptionError(new Error("No data from file reader"));
           reject(new Error(formatErrorForDisplay(error)));
           return;
         }
 
-        console.log("✅ DEBUG: File read successfully, parsing with ExcelJS...");
-        (async () => {
-          try {
-            const workbook = new ExcelJS.Workbook();
-            await workbook.xlsx.load(arrayBuffer as ArrayBuffer);
-            const worksheet = workbook.worksheets[0];
+        debugLogger.fileUpload(file.name, "success");
+        debugLogger.excelParsing("start", { fileName: file.name });
+        try {
+          // Use XLSX for reading - much more tolerant to file structure issues
+          const workbook = XLSX.read(new Uint8Array(arrayBuffer as ArrayBuffer), {
+            type: "array",
+            cellNF: false,
+            cellFormula: false,
+          });
 
-            if (!worksheet) {
-              console.log("❌ DEBUG: No worksheet found in workbook");
-              const error = createFileCorruptionError(new Error("No worksheet found"));
-              throw new Error(formatErrorForDisplay(error));
-            }
+          debugLogger.excelParsing("headers", { worksheetNames: workbook.SheetNames });
 
-            console.log("📊 DEBUG: Worksheet found, name:", worksheet.name);
-            console.log("📊 DEBUG: Row count:", worksheet.rowCount);
-
-            const headerRow = worksheet.getRow(1);
-            const headers: string[] = [];
-            headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-              const value = cell.value;
-              headers[colNumber - 1] = value == null ? "" : String(value);
-            });
-
-            console.log("📋 DEBUG: Headers extracted:", headers);
-            console.log("📋 DEBUG: Headers count:", headers.length);
-
-            const normalizeCellValue = (cell: ExcelJS.Cell): string | number => {
-              const cellValue = cell.value;
-
-              if (cellValue == null) {
-                return "";
-              }
-
-              if (typeof cellValue === "number") {
-                return cellValue;
-              }
-
-              if (typeof cellValue === "string") {
-                return cellValue;
-              }
-
-              if (cellValue instanceof Date) {
-                return cellValue.toISOString();
-              }
-
-              if (typeof cellValue === "boolean") {
-                return cellValue ? "TRUE" : "FALSE";
-              }
-
-              return cell.text ?? String(cellValue);
-            };
-
-            const rows: ExcelRow[] = [];
-
-            worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-              if (rowNumber === 1) return;
-
-              const rowData: ExcelRow = {};
-              let hasValue = false;
-
-              headers.forEach((header, index) => {
-                if (!header) return;
-
-                const cell = row.getCell(index + 1);
-                const normalized = normalizeCellValue(cell);
-
-                if (normalized !== "") {
-                  hasValue = true;
-                }
-
-                rowData[header] = normalized;
-              });
-
-              if (hasValue) {
-                rows.push(rowData);
-                if (rows.length <= 3) {
-                  console.log(`📄 DEBUG: Row ${rowNumber} parsed:`, JSON.stringify(rowData, null, 2));
-                }
-              }
-            });
-
-            console.log("✅ DEBUG: Total rows parsed:", rows.length);
-            console.log("📊 DEBUG: First row sample:", rows[0] ? JSON.stringify(rows[0], null, 2) : "No rows");
-
-            resolve({
-              fileName: file.name,
-              data: rows,
-            });
-          } catch (error: unknown) {
-            reject(error instanceof Error ? error : new Error(ERROR_MESSAGES.FILE_READ_ERROR));
+          const firstSheetName = workbook.SheetNames[0];
+          if (!firstSheetName) {
+            debugLogger.error("No worksheet found in workbook", new Error("Empty workbook"));
+            const error = createFileCorruptionError(new Error("No worksheet found"));
+            reject(new Error(formatErrorForDisplay(error)));
+            return;
           }
-        })();
+
+          // Convert to JSON - XLSX handles this much better
+          const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName], {
+            blankrows: false,
+            raw: true, // Get raw values including Excel date serials
+          }) as ExcelRow[];
+
+          debugLogger.excelParsing("rows", { totalRawRows: rawRows.length, firstRowSample: rawRows[0] });
+
+          // Convert Excel date serial numbers to ISO strings for "Data" column
+          const rows = rawRows.map((row, rowIndex) => {
+            const normalizedRow: ExcelRow = {};
+
+            Object.entries(row).forEach(([key, value]) => {
+              // Check if this is the "Data" column and value is a number (Excel date serial)
+              if (key === "Data" && typeof value === "number") {
+                try {
+                  // Excel date serial: days since 1900-01-01
+                  const jsDate = new Date((value - 25569) * 86400 * 1000);
+                  const year = jsDate.getFullYear();
+                  const month = String(jsDate.getMonth() + 1).padStart(2, "0");
+                  const day = String(jsDate.getDate()).padStart(2, "0");
+                  const isoDate = `${year}-${month}-${day}`;
+                  normalizedRow[key] = isoDate;
+
+                  if (rowIndex < 3) {
+                    debugLogger.info(`Date converted: ${value} -> ${isoDate}`, undefined, "DateConversion");
+                  }
+                } catch (dateError) {
+                  debugLogger.warn(`Failed to convert date: ${value}`, dateError, "DateConversion");
+                  normalizedRow[key] = String(value);
+                }
+              } else {
+                normalizedRow[key] = value;
+              }
+            });
+
+            return normalizedRow;
+          });
+
+          if (rows.length === 0) {
+            debugLogger.warn("Excel sheet is empty or has no data rows", undefined, "ExcelParsing");
+          } else {
+            debugLogger.excelParsing("complete", { totalRows: rows.length, firstRow: rows[0] });
+          }
+
+          resolve({
+            fileName: file.name,
+            data: rows,
+          });
+        } catch (error: unknown) {
+          debugLogger.fileUpload(file.name, "error", error);
+          reject(error instanceof Error ? error : new Error(ERROR_MESSAGES.FILE_READ_ERROR));
+        }
       } catch (error) {
         const errorObj = createFileCorruptionError(error instanceof Error ? error : new Error(String(error)));
+        debugLogger.error("File reading exception", errorObj, "FileRead");
         reject(new Error(formatErrorForDisplay(errorObj)));
       }
     };
 
     reader.onerror = () => {
       const error = createFileCorruptionError(new Error("File read failed"));
+      debugLogger.error("FileReader error event", error, "FileRead");
       reject(new Error(formatErrorForDisplay(error)));
     };
 

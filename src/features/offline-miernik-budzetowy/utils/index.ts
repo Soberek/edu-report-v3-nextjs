@@ -16,6 +16,9 @@ export * from "./errorHandler";
 export * from "./excelParser";
 export * from "./cellNormalizer";
 
+// Debug logging utilities
+export { debugLogger, default as defaultDebugLogger } from "./debugLogger";
+
 // Core data processing utilities
 export { validateExcelData, aggregateData, exportToExcel } from "./dataProcessing";
 
