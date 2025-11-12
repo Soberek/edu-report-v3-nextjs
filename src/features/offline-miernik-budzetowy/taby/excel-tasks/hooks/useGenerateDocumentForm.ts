@@ -37,16 +37,36 @@ export function useGenerateDocumentForm(rowData: ExcelRow, rowIndex: number): Us
   // Reset form with Excel data when rowData changes
   React.useEffect(() => {
     form.reset({
-      reportNumber: String(rowData["Numer IZRZ"] || rowData["Nr informacji"] || `Wiersz ${rowIndex + 1}`),
-      caseNumber: String(rowData["Znak sprawy"] || rowData["Nr informacji"] || `Wiersz ${rowIndex + 1}`),
+      // Numer informacji
+      reportNumber: String(rowData["Nr informacji"] || ""),
+
+      // Numer sprawy JRWA
+      caseNumber: String(rowData["Numer sprawy JRWA"] || ""),
+
+      // 1. Zadanie realizowane w ramach
       programName: String(rowData["Nazwa programu"] || ""),
+
+      // 2. Forma zadania
       taskType: String(rowData["Działanie"] || ""),
-      address: String(rowData["Adres"] || rowData["Szkoła"] || rowData["Osoba odpowiedzialna"] || ""),
+
+      // 3. Miejsce wykonania zadania
+      address: String(rowData["Lokalizacja"] || ""),
+
+      // 4. Termin wykonania zadania
       dateInput: formatDateDisplay(parseDateToIso(rowData["Data"])),
+
+      // 5. Grupa docelowa i liczba osób objętych zadaniem
       viewerCount: parseViewerCount(rowData["Liczba ludzi"]),
-      viewerCountDescription: String(rowData["Liczba działań"] || ""),
-      taskDescription: String(rowData["Działanie"] || ""),
+
+      viewerCountDescription: String(rowData["Grupa docelowa"] || ""),
+
+      // 6. Zakres uczestnictwa
+      taskDescription: String(rowData["Zakres uczestnictwa"] || ""),
+
+      // 7. Dodatkowe informacje
       additionalInfo: String(rowData["Dodatkowe informacje"] || ""),
+
+      // Czy załączyć listę obecności albo rozdzielnik
       attendanceList: rowData["Lista obecności"] === "tak",
       rozdzielnik: rowData["Rozdzielnik"] === "tak",
     });
