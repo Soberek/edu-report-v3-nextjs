@@ -16,8 +16,26 @@ export async function GET(request: Request) {
 
   try {
     const userList = await admin.auth().listUsers();
-    const users = userList.users.map((user) => user.toJSON());
-    return NextResponse.json({ users }, { status: 200 });
+    const db = admin.firestore();
+
+    // Enrich users with data from Firestore (role, etc.)
+    const enrichedUsers = await Promise.all(
+      userList.users.map(async (user) => {
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        const userData = userDoc.data();
+
+        return {
+          ...user.toJSON(),
+          role: userData?.role || user.customClaims?.role || "user",
+          customClaims: {
+            ...user.customClaims,
+            role: userData?.role || user.customClaims?.role || "user",
+          },
+        };
+      })
+    );
+
+    return NextResponse.json({ users: enrichedUsers }, { status: 200 });
   } catch (error) {
     console.error("Failed to list users:", error);
     return NextResponse.json({ error: "Failed to list users" }, { status: 500 });

@@ -1,6 +1,7 @@
 import React from "react";
-import { Box, Typography, Button, Breadcrumbs, Link, useTheme } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link } from "@mui/material";
 import { Home, ChevronRight } from "@mui/icons-material";
+import type { SxProps, Theme } from "@mui/material/styles";
 
 export interface BreadcrumbItem {
   label: string;
@@ -13,12 +14,11 @@ export interface PageHeaderProps {
   subtitle?: string;
   breadcrumbs?: BreadcrumbItem[];
   actions?: React.ReactNode;
-  sx?: object;
+  sx?: SxProps<Theme>;
+  children?: React.ReactNode;
 }
 
-export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, breadcrumbs = [], actions, sx = {} }) => {
-  const theme = useTheme();
-
+export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, breadcrumbs = [], actions, sx = {}, children }) => {
   return (
     <Box
       sx={{
@@ -106,6 +106,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, breadcr
 
         {actions && <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>{actions}</Box>}
       </Box>
+
+      {children && <Box sx={{ mt: subtitle ? 2 : 3 }}>{children}</Box>}
     </Box>
   );
 };
@@ -115,5 +117,10 @@ export const SimplePageHeader: React.FC<{
   title: string;
   subtitle?: string;
   actions?: React.ReactNode;
-  sx?: object;
-}> = ({ title, subtitle, actions, sx = {} }) => <PageHeader title={title} subtitle={subtitle} actions={actions} sx={sx} />;
+  sx?: SxProps<Theme>;
+  children?: React.ReactNode;
+}> = ({ title, subtitle, actions, sx = {}, children }) => (
+  <PageHeader title={title} subtitle={subtitle} actions={actions} sx={sx}>
+    {children}
+  </PageHeader>
+);

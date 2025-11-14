@@ -1,7 +1,8 @@
 import { useReducer, useCallback, useMemo } from "react";
 import { budgetMeterReducer, initialBudgetMeterState } from "../reducers/budgetMeterReducer";
 import { validateExcelFile, readExcelFile } from "../utils/fileUtils";
-import { validateExcelData, aggregateData, exportToExcel, exportToTemplate, exportToCumulativeTemplate } from "../utils/dataProcessing";
+import { validateExcelData, aggregateData } from "../utils/dataProcessing";
+import { exportData, type ExportFormat } from "../utils/exportStrategies";
 import { ERROR_MESSAGES } from "../constants";
 
 export const useBudgetMeter = () => {
@@ -76,12 +77,10 @@ export const useBudgetMeter = () => {
         ...month,
         selected: monthNumbers.includes(month.monthNumber),
       }));
-      
+
       // Only dispatch if selection actually changed to avoid unnecessary re-renders
-      const selectionChanged = presetMonths.some(
-        (month, idx) => month.selected !== state.selectedMonths[idx].selected
-      );
-      
+      const selectionChanged = presetMonths.some((month, idx) => month.selected !== state.selectedMonths[idx].selected);
+
       if (selectionChanged) {
         dispatch({ type: "SET_SELECTED_MONTHS", payload: presetMonths });
       }
@@ -110,44 +109,31 @@ export const useBudgetMeter = () => {
   }, [state.rawData, state.selectedMonths]);
 
   // Export functionality
-  const handleExportToExcel = useCallback(async (customFileName?: string) => {
-    if (!state.aggregatedData) {
-      return false;
-    }
+  const executeExport = useCallback(
+    async (format: ExportFormat, customFileName?: string): Promise<boolean> => {
+      if (!state.aggregatedData) {
+        return false;
+      }
 
-    try {
-      return await exportToExcel(state.aggregatedData, customFileName);
-    } catch (error) {
-      console.error("Export error:", error);
-      return false;
-    }
-  }, [state.aggregatedData]);
+      try {
+        return await exportData(state.aggregatedData, format, customFileName);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Export failed";
+        console.error(`Export error (${format}):`, errorMessage);
+        return false;
+      }
+    },
+    [state.aggregatedData]
+  );
 
-  const handleExportToTemplate = useCallback(async (customFileName?: string) => {
-    if (!state.aggregatedData) {
-      return false;
-    }
+  const handleExportToExcel = useCallback((customFileName?: string) => executeExport("excel", customFileName), [executeExport]);
 
-    try {
-      return await exportToTemplate(state.aggregatedData, customFileName);
-    } catch (error) {
-      console.error("Export to template error:", error);
-      return false;
-    }
-  }, [state.aggregatedData]);
+  const handleExportToTemplate = useCallback((customFileName?: string) => executeExport("template", customFileName), [executeExport]);
 
-  const handleExportToCumulativeTemplate = useCallback(async (customFileName?: string) => {
-    if (!state.aggregatedData) {
-      return false;
-    }
-
-    try {
-      return await exportToCumulativeTemplate(state.aggregatedData, customFileName);
-    } catch (error) {
-      console.error("Export to cumulative template error:", error);
-      return false;
-    }
-  }, [state.aggregatedData]);
+  const handleExportToCumulativeTemplate = useCallback(
+    (customFileName?: string) => executeExport("cumulative", customFileName),
+    [executeExport]
+  );
 
   // Reset functionality
   const resetState = useCallback(() => {

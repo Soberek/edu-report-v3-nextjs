@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, Button, Typography, Chip } from "@mui/material";
 import { CalendarMonth } from "@mui/icons-material";
 
@@ -11,20 +12,7 @@ interface Props {
   handleMonthSelect: (selectedMonth: number) => void;
 }
 
-const MONTH_NAMES = [
-  "Sty",
-  "Lut",
-  "Mar",
-  "Kwi",
-  "Maj",
-  "Cze",
-  "Lip",
-  "Sie",
-  "Wrz",
-  "Paź",
-  "Lis",
-  "Gru",
-];
+const MONTH_NAMES = ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze", "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"];
 
 const getMonthName = (monthNum: number): string => {
   if (monthNum < 1 || monthNum > 12) return monthNum.toString();
@@ -77,16 +65,14 @@ function ExcelUploaderMonthsButtons({ months, handleMonthSelect }: Props) {
         />
       </Box>
 
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(auto-fit, minmax(80px, 1fr))"
-        gap={1.5}
-      >
+      <Box display="grid" gridTemplateColumns="repeat(auto-fit, minmax(80px, 1fr))" gap={1.5}>
         {months.map(({ monthNumber, selected }) => (
           <Button
             key={monthNumber}
             onClick={() => handleMonthSelect(monthNumber)}
             size="medium"
+            aria-pressed={selected}
+            aria-label={`${getMonthName(monthNumber)} ${selected ? "selected" : "not selected"}`}
             sx={{
               minWidth: 80,
               height: 44,

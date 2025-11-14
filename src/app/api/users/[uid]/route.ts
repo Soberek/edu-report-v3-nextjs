@@ -27,7 +27,20 @@ export async function GET(request: Request, { params }: RouteParams) {
     }
 
     const userRecord = await admin.auth().getUser(uid);
-    return NextResponse.json({ user: userRecord.toJSON() }, { status: 200 });
+    const db = admin.firestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+
+    const enrichedUser = {
+      ...userRecord.toJSON(),
+      role: userData?.role || userRecord.customClaims?.role || "user",
+      customClaims: {
+        ...userRecord.customClaims,
+        role: userData?.role || userRecord.customClaims?.role || "user",
+      },
+    };
+
+    return NextResponse.json({ user: enrichedUser }, { status: 200 });
   } catch (error) {
     console.error("Failed to get user:", error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Failed to get user" }, { status: 500 });
@@ -70,17 +83,51 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     // Update user in Firebase Auth
     const userRecord = await admin.auth().updateUser(uid, updates);
+    const db = admin.firestore();
 
-    // Update custom claims if role is provided (admin only)
+    // Update custom claims and Firestore if role is provided (admin only)
     if (updates.role !== undefined && isAdmin) {
       const currentClaims = userRecord.customClaims || {};
       await admin.auth().setCustomUserClaims(uid, {
         ...currentClaims,
         role: updates.role,
       });
+
+      // Also update role in Firestore
+      await db
+        .collection("users")
+        .doc(uid)
+        .update({
+          role: updates.role,
+          updatedAt: new Date().toISOString(),
+        })
+        .catch(async (error) => {
+          // If document doesn't exist, create it
+          if (error.code === "not-found") {
+            await db.collection("users").doc(uid).set({
+              uid,
+              role: updates.role,
+              updatedAt: new Date().toISOString(),
+            });
+          } else {
+            throw error;
+          }
+        });
     }
 
-    return NextResponse.json({ user: userRecord.toJSON() }, { status: 200 });
+    // Get enriched user with role from Firestore
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    const enrichedUser = {
+      ...userRecord.toJSON(),
+      role: userData?.role || userRecord.customClaims?.role || "user",
+      customClaims: {
+        ...userRecord.customClaims,
+        role: userData?.role || userRecord.customClaims?.role || "user",
+      },
+    };
+
+    return NextResponse.json({ user: enrichedUser }, { status: 200 });
   } catch (error) {
     console.error("Failed to update user:", error);
     return NextResponse.json({ error: error instanceof Error ? error.message : "Failed to update user" }, { status: 500 });
@@ -100,7 +147,23 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
   try {
     const { uid } = await params;
+    const db = admin.firestore();
+
+    // Delete from Firebase Auth
     await admin.auth().deleteUser(uid);
+
+    // Delete from Firestore
+    await db
+      .collection("users")
+      .doc(uid)
+      .delete()
+      .catch((error) => {
+        // Ignore "not-found" errors, user might not have been in Firestore
+        if (error.code !== "not-found") {
+          throw error;
+        }
+      });
+
     return NextResponse.json({ message: "User deleted successfully" }, { status: 200 });
   } catch (error) {
     console.error("Failed to delete user:", error);

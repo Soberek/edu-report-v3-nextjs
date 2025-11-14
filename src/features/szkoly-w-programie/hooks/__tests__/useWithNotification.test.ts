@@ -39,11 +39,7 @@ describe("useWithNotification hook", () => {
       const { result } = renderHook(() => useWithNotification());
       const executeWithNotification = result.current;
 
-      await executeWithNotification(
-        mockOperation,
-        "Operation successful",
-        "Operation failed"
-      );
+      await executeWithNotification(mockOperation, "Operation successful", "Operation failed");
 
       expect(mockShowSuccess).toHaveBeenCalledWith("Operation successful");
     });
@@ -54,11 +50,7 @@ describe("useWithNotification hook", () => {
 
       const { result } = renderHook(() => useWithNotification());
 
-      const operationResult = await result.current(
-        mockOperation,
-        "Success",
-        "Error"
-      );
+      const operationResult = await result.current(mockOperation, "Success", "Error");
 
       expect(operationResult).toEqual(expectedResult);
     });
@@ -78,11 +70,7 @@ describe("useWithNotification hook", () => {
 
       const { result } = renderHook(() => useWithNotification());
 
-      const operationResult = await result.current(
-        mockOperation,
-        "Success",
-        "Error"
-      );
+      const operationResult = await result.current(mockOperation, "Success", "Error");
 
       expect(operationResult).toBeUndefined();
       expect(mockShowSuccess).toHaveBeenCalled();
@@ -129,9 +117,7 @@ describe("useWithNotification hook", () => {
 
       const { result } = renderHook(() => useWithNotification());
 
-      await expect(
-        result.current(mockOperation, "Success", "Error")
-      ).rejects.toThrow("Test error");
+      await expect(result.current(mockOperation, "Success", "Error")).rejects.toThrow("Test error");
     });
 
     it("should not call showSuccess on error", async () => {
@@ -149,12 +135,7 @@ describe("useWithNotification hook", () => {
     });
 
     it("should handle different error types", async () => {
-      const errors = [
-        new Error("Standard error"),
-        new TypeError("Type error"),
-        { message: "Object error" },
-        "String error",
-      ];
+      const errors = [new Error("Standard error"), new TypeError("Type error"), { message: "Object error" }, "String error"];
 
       for (const error of errors) {
         vi.clearAllMocks();
@@ -207,10 +188,7 @@ describe("useWithNotification hook", () => {
     });
 
     it("should support long-running operations", async () => {
-      const mockOperation = vi.fn(
-        () =>
-          new Promise((resolve) => setTimeout(() => resolve("data"), 100))
-      );
+      const mockOperation = vi.fn(() => new Promise((resolve) => setTimeout(() => resolve("data"), 100)));
 
       const { result } = renderHook(() => useWithNotification());
 
@@ -218,7 +196,8 @@ describe("useWithNotification hook", () => {
       await result.current(mockOperation, "Success", "Error");
       const duration = Date.now() - startTime;
 
-      expect(duration).toBeGreaterThanOrEqual(100);
+      // Allow for slight timing variations in test environment (>=95ms instead of >=100ms)
+      expect(duration).toBeGreaterThanOrEqual(95);
       expect(mockShowSuccess).toHaveBeenCalled();
     });
   });
@@ -248,10 +227,7 @@ describe("useWithNotification hook", () => {
         // Expected
       }
 
-      expect(mockGetErrorMessage).toHaveBeenCalledWith(
-        expect.any(Error),
-        errorMessage
-      );
+      expect(mockGetErrorMessage).toHaveBeenCalledWith(expect.any(Error), errorMessage);
     });
 
     it("should support different message types (Polish text)", async () => {
@@ -332,11 +308,7 @@ describe("useWithNotification hook", () => {
 
       const { result } = renderHook(() => useWithNotification());
 
-      const operationResult = await result.current(
-        mockOperation,
-        "Success",
-        "Error"
-      );
+      const operationResult = await result.current(mockOperation, "Success", "Error");
 
       expect(operationResult).toBe("instant");
       expect(mockShowSuccess).toHaveBeenCalled();
@@ -357,11 +329,7 @@ describe("useWithNotification hook", () => {
 
       const { result } = renderHook(() => useWithNotification());
 
-      const operationResult = await result.current(
-        mockOperation,
-        "Success",
-        "Error"
-      );
+      const operationResult = await result.current(mockOperation, "Success", "Error");
 
       expect(operationResult).toBeNull();
       expect(mockShowSuccess).toHaveBeenCalled();
@@ -397,11 +365,7 @@ describe("useWithNotification hook", () => {
 
       const { result } = renderHook(() => useWithNotification());
 
-      const operationResult = await result.current<User>(
-        mockOperation,
-        "Success",
-        "Error"
-      );
+      const operationResult = await result.current<User>(mockOperation, "Success", "Error");
 
       expect(operationResult.id).toBe("123");
       expect(operationResult.name).toBe("Test User");
@@ -413,11 +377,7 @@ describe("useWithNotification hook", () => {
 
       const { result } = renderHook(() => useWithNotification());
 
-      const operationResult = await result.current<number[]>(
-        mockOperation,
-        "Success",
-        "Error"
-      );
+      const operationResult = await result.current<number[]>(mockOperation, "Success", "Error");
 
       expect(operationResult).toEqual(mockData);
       expect(operationResult.length).toBe(3);

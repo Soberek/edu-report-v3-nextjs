@@ -1,6 +1,6 @@
 import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
-import { Assessment, BarChart, TableChart } from "@mui/icons-material";
+import { Assessment, BarChart, TableChart, ListAlt } from "@mui/icons-material";
 import { TAB_CONFIG, UI_CONFIG, type TabId } from "../../constants";
 
 interface TabNavigationProps {
@@ -26,6 +26,8 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabCh
         return <BarChart />;
       case "TableChart":
         return <TableChart />;
+      case "ListAlt":
+        return <ListAlt />;
       default:
         return <Assessment />; // Fallback icon instead of null
     }

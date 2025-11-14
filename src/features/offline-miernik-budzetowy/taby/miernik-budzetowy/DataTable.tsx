@@ -37,9 +37,7 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
               <TableCell sx={{ fontWeight: 700, fontSize: "0.8rem", py: 1.25, color: "text.primary" }} colSpan={2}>
                 Typ programu - Nazwa programu
               </TableCell>
-              <TableCell sx={{ fontWeight: 700, fontSize: "0.8rem", py: 1.25, color: "text.primary" }}>
-                Działanie
-              </TableCell>
+              <TableCell sx={{ fontWeight: 700, fontSize: "0.8rem", py: 1.25, color: "text.primary" }}>Działanie</TableCell>
               <TableCell align="right" sx={{ fontWeight: 700, fontSize: "0.8rem", py: 1.25, color: "text.primary" }}>
                 Działań
               </TableCell>
@@ -52,18 +50,34 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
             {Object.entries(data).map(([programType, programs], typeIndex) => (
               <React.Fragment key={programType}>
                 {/* Program Type Header */}
-                <TableRow sx={{ backgroundColor: `${getProgramTypeColor(typeIndex, theme)}08`, borderTop: `2px solid ${getProgramTypeColor(typeIndex, theme)}20` }}>
-                  <TableCell colSpan={5} sx={{ fontWeight: 700, fontSize: "0.85rem", py: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <TableRow
+                  sx={{
+                    backgroundColor: getProgramTypeColor(typeIndex, theme),
+                    borderTop: `3px solid ${getProgramTypeColor(typeIndex, theme)}`,
+                    borderBottom: `1px solid ${getProgramTypeColor(typeIndex, theme)}`,
+                  }}
+                >
+                  <TableCell colSpan={5} sx={{ fontWeight: 800, fontSize: "0.9rem", py: 1.5, pl: 2 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                       <Box
                         sx={{
-                          width: 4,
-                          height: 24,
-                          borderRadius: 0.5,
-                          backgroundColor: getProgramTypeColor(typeIndex, theme),
+                          width: 5,
+                          height: 28,
+                          borderRadius: 1,
+                          backgroundColor: "rgba(255, 255, 255, 0.4)",
+                          boxShadow: `0 2px 8px rgba(0, 0, 0, 0.2)`,
                         }}
                       />
-                      <Typography variant="caption" fontWeight={700} sx={{ fontSize: "0.85rem" }}>
+                      <Typography
+                        variant="caption"
+                        fontWeight={800}
+                        sx={{
+                          fontSize: "0.95rem",
+                          letterSpacing: "0.8px",
+                          color: "white",
+                          textTransform: "uppercase",
+                        }}
+                      >
                         {programType.toUpperCase()}
                       </Typography>
                     </Box>
@@ -75,10 +89,22 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
                   <React.Fragment key={programName}>
                     {/* Program Name Row */}
                     <TableRow sx={{ backgroundColor: theme.palette.grey[50] }}>
-                      <TableCell sx={{ pl: 2, fontWeight: 600, color: "text.primary", fontSize: "0.8rem", py: 0.75 }}>
+                      <TableCell
+                        sx={{
+                          pl: 2,
+                          fontWeight: 700,
+                          color: theme.palette.text.primary,
+                          fontSize: "0.8rem",
+                          py: 1,
+                          backgroundColor: `${getProgramTypeColor(typeIndex, theme)}12`,
+                          borderLeft: `4px solid ${getProgramTypeColor(typeIndex, theme)}`,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
                         {programName}
                       </TableCell>
-                      <TableCell colSpan={4} />
+                      <TableCell colSpan={4} sx={{ backgroundColor: `${getProgramTypeColor(typeIndex, theme)}12` }} />
                     </TableRow>
 
                     {/* Actions */}
@@ -95,7 +121,9 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
                       >
                         <TableCell sx={{ pl: 4, py: 0.75 }} />
                         <TableCell sx={{ pl: 2, color: "text.secondary", fontSize: "0.8rem", py: 0.75 }} />
-                        <TableCell sx={{ fontWeight: actionName === "Wizytacja" ? 700 : 500, fontSize: "0.8rem", py: 0.75, color: "text.primary" }}>
+                        <TableCell
+                          sx={{ fontWeight: actionName === "Wizytacja" ? 700 : 500, fontSize: "0.8rem", py: 0.75, color: "text.primary" }}
+                        >
                           {actionName}
                         </TableCell>
                         <TableCell align="right" sx={{ fontWeight: 700, color: theme.palette.primary.main, fontSize: "0.85rem", py: 0.75 }}>
@@ -112,14 +140,21 @@ export const DataTable: React.FC<DataTableProps> = React.memo(({ data, allAction
             ))}
 
             {/* Summary Row */}
-            <TableRow sx={{ color: "white", borderTop: `2px solid ${theme.palette.primary.dark}` }}>
-              <TableCell colSpan={3} sx={{ fontWeight: 700, fontSize: "0.85rem", py: 1.25 }}>
+            <TableRow
+              sx={{
+                backgroundColor: theme.palette.primary.main,
+                color: "white",
+                borderTop: `3px solid ${theme.palette.primary.dark}`,
+                fontWeight: 800,
+              }}
+            >
+              <TableCell colSpan={3} sx={{ fontWeight: 800, fontSize: "0.9rem", py: 1.5, color: "white", pl: 2 }}>
                 📊 PODSUMOWANIE
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: 700, fontSize: "0.9rem", py: 1.25 }}>
+              <TableCell align="right" sx={{ fontWeight: 800, fontSize: "0.95rem", py: 1.5, color: "white" }}>
                 {allActions}
               </TableCell>
-              <TableCell align="right" sx={{ fontWeight: 700, fontSize: "0.9rem", py: 1.25 }}>
+              <TableCell align="right" sx={{ fontWeight: 800, fontSize: "0.95rem", py: 1.5, color: "white", pr: 2 }}>
                 {allPeople}
               </TableCell>
             </TableRow>

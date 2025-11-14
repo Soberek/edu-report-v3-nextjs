@@ -12,6 +12,13 @@ export * from "./fileUtils";
 // Error handling utilities
 export * from "./errorHandler";
 
+// Excel parsing and normalization
+export * from "./excelParser";
+export * from "./cellNormalizer";
+
+// Debug logging utilities
+export { debugLogger, default as defaultDebugLogger } from "./debugLogger";
+
 // Core data processing utilities
 export { validateExcelData, aggregateData, exportToExcel } from "./dataProcessing";
 
@@ -23,3 +30,6 @@ export * from "./dataProcessingUtils";
 
 // Data filtering utilities
 export * from "./dataFiltering";
+
+// Export strategy pattern
+export { exportData, getAvailableExportFormats, getExportStrategy, type ExportFormat, type ExportStrategy } from "./exportStrategies";

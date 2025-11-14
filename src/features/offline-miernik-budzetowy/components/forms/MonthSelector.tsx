@@ -19,13 +19,13 @@ const MONTH_EMOJIS = ["❄️", "🥶", "🌸", "🌱", "🌞", "🌻", "🏖️
 
 // Quick presets for common selections
 const QUICK_PRESETS = [
-  { label: "Bieżący", get: () => [new Date().getMonth() + 1] },
-  { label: "Q1", get: () => [1, 2, 3] },
-  { label: "Q2", get: () => [4, 5, 6] },
-  { label: "Q3", get: () => [7, 8, 9] },
-  { label: "Q4", get: () => [10, 11, 12] },
-  { label: "H1", get: () => [1, 2, 3, 4, 5, 6] },
-  { label: "H2", get: () => [7, 8, 9, 10, 11, 12] },
+  { label: "Bieżący miesiąc", get: () => [new Date().getMonth() + 1] },
+  { label: "1 Kwartał", get: () => [1, 2, 3] },
+  { label: "2 Kwartał", get: () => [4, 5, 6] },
+  { label: "3 Kwartał", get: () => [7, 8, 9] },
+  { label: "4 Kwartał", get: () => [10, 11, 12] },
+  { label: "1 Półrocze", get: () => [1, 2, 3, 4, 5, 6] },
+  { label: "2 Półrocze", get: () => [7, 8, 9, 10, 11, 12] },
   { label: "Rok", get: () => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
 ];
 
@@ -83,7 +83,7 @@ export const MonthSelector: React.FC<MonthSelectorProps> = React.memo(
           const month = months.find((m) => m.monthNumber === monthNum);
           return month?.selected === true;
         });
-        
+
         // Also check that NO other months are selected
         const onlyPresetMonthsSelected = months.every((month) => {
           return presetMonths.includes(month.monthNumber) ? month.selected : !month.selected;
@@ -180,21 +180,33 @@ export const MonthSelector: React.FC<MonthSelectorProps> = React.memo(
           <Box sx={{ display: "flex", gap: 0.75 }}>
             <Button
               size="small"
-
               onClick={onSelectAll}
               disabled={disabled || selectedCount === 12}
-              sx={{ textTransform: "none", fontWeight: 500, fontSize: "0.75rem", px: 1, py: 0.25, border: `1px solid ${theme.palette.divider}` }}
+              sx={{
+                textTransform: "none",
+                fontWeight: 500,
+                fontSize: "0.75rem",
+                px: 1,
+                py: 0.25,
+                border: `1px solid ${theme.palette.divider}`,
+              }}
             >
-              ✅ Wszystkie
+              ✅ Zaznacz wszystkie
             </Button>
             <Button
               size="small"
-
               onClick={onDeselectAll}
               disabled={disabled || selectedCount === 0}
-              sx={{ textTransform: "none", fontWeight: 500, fontSize: "0.75rem", px: 1, py: 0.25, border: `1px solid ${theme.palette.divider}` }}
+              sx={{
+                textTransform: "none",
+                fontWeight: 500,
+                fontSize: "0.75rem",
+                px: 1,
+                py: 0.25,
+                border: `1px solid ${theme.palette.divider}`,
+              }}
             >
-              ❌ Brak
+              ❌ Odznacz wszystkie
             </Button>
           </Box>
         </Box>
@@ -271,31 +283,25 @@ export const MonthSelector: React.FC<MonthSelectorProps> = React.memo(
                       p: 0.75,
                       textAlign: "center",
                       borderRadius: 1,
-                      border: `1.5px solid ${month.selected ? theme.palette.primary.main : theme.palette.divider
-                        }`,
-                      backgroundColor: month.selected
-                        ? `${theme.palette.primary.main}15`
-                        : "transparent",
+                      border: `1.5px solid ${month.selected ? theme.palette.primary.main : theme.palette.divider}`,
+                      backgroundColor: month.selected ? `${theme.palette.primary.main}15` : "transparent",
                       transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
                       "&:hover": disabled
                         ? {}
                         : {
-                          borderColor: theme.palette.primary.main,
-                          backgroundColor: `${theme.palette.primary.main}10`,
-                          transform: "translateY(-1px)",
-                          boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
-                        },
+                            borderColor: theme.palette.primary.main,
+                            backgroundColor: `${theme.palette.primary.main}10`,
+                            transform: "translateY(-1px)",
+                            boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
+                          },
                     }}
                   >
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 0.25, fontSize: "1.2rem" }}
-                    >
+                    <Typography variant="body2" sx={{ mb: 0.25, fontSize: "1.2rem" }}>
                       {MONTH_EMOJIS[month.monthNumber - 1]}
                     </Typography>
 
                     <Typography variant="caption" color="text.primary" sx={{ display: "block", fontSize: "0.75rem", fontWeight: 600 }}>
-                      {monthFullName.substring(0, 3)}
+                      {monthFullName}
                     </Typography>
 
                     {/* Selection checkmark */}

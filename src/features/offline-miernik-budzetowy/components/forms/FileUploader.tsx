@@ -16,16 +16,21 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
     const theme = useTheme();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleFileSelect = () => {
-      fileInputRef.current?.click();
-    };
-
     const handleReset = () => {
-      // Clear the file input value to allow re-uploading the same file
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
       onReset();
+    };
+
+    const handleFileClick = () => {
+      fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      onFileUpload(event);
+      // Allow selecting the same file again after upload or reset
+      event.target.value = "";
     };
 
     return (
@@ -46,27 +51,30 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
           }}
         >
           <CloudUpload sx={{ fontSize: 48, color: theme.palette.primary.main, mb: 2 }} />
-
           <Typography variant="h6" fontWeight="bold" color="text.primary" sx={{ mb: 1 }}>
             {fileName ? `Wczytano: ${fileName}` : "Wybierz plik Excel"}
           </Typography>
-
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-             Obsługiwane formaty: .xlsx (maks. 10MB)
+            Obsługiwane formaty: .xlsx (maks. 10MB)
           </Typography>
-
-          <input ref={fileInputRef} type="file" accept=".xlsx" onChange={onFileUpload} style={{ display: "none" }} />
-
           <Button
             variant="contained"
-            onClick={handleFileSelect}
+            onClick={handleFileClick}
             disabled={isLoading || isProcessing}
             startIcon={<CloudUpload />}
             sx={{ mr: 2 }}
           >
             {isLoading ? "⏳ Wczytywanie..." : "Wybierz plik"}
           </Button>
-
+          <input
+            ref={fileInputRef}
+            id="excel-file-input"
+            type="file"
+            accept=".xlsx"
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+            aria-label="Wybierz plik Excel do wczytania"
+          />{" "}
           {fileName && (
             <Button variant="outlined" onClick={handleReset} disabled={isLoading || isProcessing} startIcon={<Refresh />}>
               Resetuj
@@ -76,9 +84,21 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
 
         {/* Error Display */}
         {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
+          <Box sx={{ mt: 2 }}>
+            <Alert
+              severity="error"
+              action={
+                <Button color="inherit" size="small" onClick={handleReset} startIcon={<Refresh />}>
+                  Resetuj
+                </Button>
+              }
+              aria-live="assertive"
+              aria-atomic="true"
+              role="alert"
+            >
+              {error}
+            </Alert>
+          </Box>
         )}
       </Box>
     );

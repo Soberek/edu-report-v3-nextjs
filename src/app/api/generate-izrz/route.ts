@@ -63,24 +63,24 @@ class IzrzRepository {
     const doc = new docxtemplater(zip);
 
     let index = 0;
-    doc.setData({
-      znak_sprawy: data.caseNumber,
-      numer_izrz: data.reportNumber,
-      nazwa_programu: data.programName,
-      typ_zadania: data.taskType,
-      miasto: extractCity(data.address),
-      adres: data.address,
-      liczba_osob: data.viewerCount,
-      liczba_osob_opis: data.viewerCountDescription,
-      opis_zadania: data.taskDescription,
-      dodatkowe_informacje: data.additionalInfo,
-      data: formatDate(data.dateInput),
-      lista_obecnosci: data.attendanceList === "true" ? `${++index}. Potwierdzenie spotkania zał. F/PT/PZ/01/02` : "",
-      rozdzielnik: data.rozdzielnik === "true" ? `${++index}. Rozdzielnik materiałów zał. F/PT/PZ/01/01` : "",
-    });
 
+    // Use render() with data instead of deprecated setData()
     try {
-      doc.render();
+      doc.render({
+        znak_sprawy: data.caseNumber,
+        numer_izrz: data.reportNumber,
+        nazwa_programu: data.programName,
+        typ_zadania: data.taskType,
+        miasto: extractCity(data.address),
+        adres: data.address,
+        liczba_osob: data.viewerCount,
+        liczba_osob_opis: data.viewerCountDescription,
+        opis_zadania: data.taskDescription,
+        dodatkowe_informacje: data.additionalInfo,
+        data: formatDate(data.dateInput),
+        lista_obecnosci: data.attendanceList === "true" ? `${++index}. Potwierdzenie spotkania zał. F/PT/PZ/01/02` : "",
+        rozdzielnik: data.rozdzielnik === "true" ? `${++index}. Rozdzielnik materiałów zał. F/PT/PZ/01/01` : "",
+      });
     } catch (error) {
       console.error("Error during document rendering:", error);
       throw new Error("Error rendering document");

@@ -11,29 +11,20 @@ interface ExportButtonsProps {
 }
 
 export const ExportButtons: React.FC<ExportButtonsProps> = React.memo(
-  ({
-    onExport,
-    onExportToTemplate,
-    onExportToCumulativeTemplate,
-    canExport,
-    isProcessing,
-  }) => {
+  ({ onExport, onExportToTemplate, onExportToCumulativeTemplate, canExport, isProcessing }) => {
     const theme = useTheme();
-    const currentMonthWithCapitalFirstLetter =
-      new Date()
-        .toLocaleString("pl-PL", { month: "long" })
-        .charAt(0)
-        .toUpperCase() +
-      new Date().toLocaleString("pl-PL", { month: "long" }).slice(1);
+    const lastMonthWithCapitalFirstLetter =
+      new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toLocaleString("pl-PL", { month: "long" }).charAt(0).toUpperCase() +
+      new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toLocaleString("pl-PL", { month: "long" }).slice(1);
+    // new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toLocaleString("pl-PL", { month: "long" }).charAt(0).toUpperCase() +
+    // new Date().toLocaleString("pl-PL", { month: "long" }).slice(1);
 
     // State for custom filenames
     const [excelFileName, setExcelFileName] = useState("Bez szablonu miernik");
     const [monthlyTemplateFileName, setMonthlyTemplateFileName] = useState(
-      `Załacznik nr 1 - OZIPZ 2025 ${currentMonthWithCapitalFirstLetter}`
+      `Załacznik nr 1 - OZIPZ 2025 ${lastMonthWithCapitalFirstLetter}`
     );
-    const [cumulativeTemplateFileName, setCumulativeTemplateFileName] = useState(
-      "Załacznik nr 2 - OZIPZ 2025 Narastajacy"
-    );
+    const [cumulativeTemplateFileName, setCumulativeTemplateFileName] = useState("Załacznik nr 2 - OZIPZ 2025 Narastajacy");
 
     const handleExport = async () => {
       const success = await onExport(excelFileName);
@@ -146,7 +137,7 @@ export const ExportButtons: React.FC<ExportButtonsProps> = React.memo(
             }}
           >
             <TextField
-              label="Nazwa szablonu miesięcznego"
+              label="Nazwa pliku miesięcznego"
               value={monthlyTemplateFileName}
               onChange={(e) => setMonthlyTemplateFileName(e.target.value)}
               disabled={isProcessing}
@@ -196,7 +187,7 @@ export const ExportButtons: React.FC<ExportButtonsProps> = React.memo(
             }}
           >
             <TextField
-              label="Nazwa szablonu narastającego"
+              label="Nazwa pliku narastającego"
               value={cumulativeTemplateFileName}
               onChange={(e) => setCumulativeTemplateFileName(e.target.value)}
               disabled={isProcessing}
