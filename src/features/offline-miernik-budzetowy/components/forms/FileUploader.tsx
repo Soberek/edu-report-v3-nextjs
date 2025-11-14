@@ -17,11 +17,20 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleReset = () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       onReset();
     };
 
     const handleFileClick = () => {
       fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      onFileUpload(event);
+      // Allow selecting the same file again after upload or reset
+      event.target.value = "";
     };
 
     return (
@@ -62,7 +71,7 @@ export const FileUploader: React.FC<FileUploaderProps> = React.memo(
             id="excel-file-input"
             type="file"
             accept=".xlsx"
-            onChange={onFileUpload}
+            onChange={handleFileChange}
             style={{ display: "none" }}
             aria-label="Wybierz plik Excel do wczytania"
           />{" "}

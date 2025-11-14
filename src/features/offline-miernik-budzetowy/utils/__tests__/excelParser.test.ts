@@ -13,11 +13,12 @@ describe("excelParser", () => {
       mockWorksheet = mockWorkbook.addWorksheet("Sheet1");
     });
 
-    it("should throw error if arrayBuffer is empty or invalid", async () => {
+    it("should return empty array if arrayBuffer is empty or invalid", async () => {
       const schema = z.object({ name: z.string() });
 
-      // ExcelJS will throw "Corrupted zip" error for empty buffer
-      await expect(parseExcelFile(new ArrayBuffer(0), schema)).rejects.toThrow();
+      // XLSX library returns empty array for invalid/empty buffers instead of throwing
+      const result = await parseExcelFile(new ArrayBuffer(0), schema);
+      expect(result).toEqual([]);
     });
 
     it("should throw error if no worksheets found", async () => {
@@ -52,11 +53,11 @@ describe("excelParser", () => {
       expect(result[1].name).toBe("Jane");
     });
 
-    it("should skip empty rows", async () => {
+    it("should not skip empty rows (XLSX behavior)", async () => {
       mockWorksheet.columns = [{ header: "name", key: "name" }];
 
       mockWorksheet.addRow({ name: "John" });
-      mockWorksheet.addRow({ name: "" }); // Empty row
+      mockWorksheet.addRow({ name: "" }); // Empty string row
       mockWorksheet.addRow({ name: "Jane" });
 
       const buffer = await mockWorkbook.xlsx.writeBuffer();
@@ -65,7 +66,11 @@ describe("excelParser", () => {
 
       const result = await parseExcelFile(buffer as ArrayBuffer, schema);
 
-      expect(result).toHaveLength(2);
+      // XLSX returns all rows including empty strings
+      expect(result).toHaveLength(3);
+      expect(result[0].name).toBe("John");
+      expect(result[1].name).toBe("");
+      expect(result[2].name).toBe("Jane");
     });
 
     it("should throw error with validation errors for invalid data", async () => {
